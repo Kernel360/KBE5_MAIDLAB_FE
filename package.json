@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "cross-env NODE_ENV=development VITE_APP_ENV=development vite",
-    "build": "cp ./config/tsconfig.app.json ./config/tsconfig.json && cross-env NODE_ENV=production VITE_APP_ENV=production tsc -b && vite build",
+    "build": "cp ./config/tsconfig.app.json && cross-env NODE_ENV=production VITE_APP_ENV=production tsc -b && vite build",
     "build:dev": "cross-env NODE_ENV=development VITE_APP_ENV=development tsc -p ./config/tsconfig.json && vite build",
     "lint": "cross-env NODE_ENV=development eslint .",
     "preview": "cross-env NODE_ENV=production vite preview",
