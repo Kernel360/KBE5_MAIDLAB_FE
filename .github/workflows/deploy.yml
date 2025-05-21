@@ -14,7 +14,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: github.repository == 'KBE5_MAIDLAB_FE/KBE5_MAIDLAB_FE'
+    if: github.repository == 'Kernel360/KBE5_MAIDLAB_FE'
 
     steps:
       - uses: actions/checkout@v3
