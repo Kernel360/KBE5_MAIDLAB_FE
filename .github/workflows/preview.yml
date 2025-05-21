@@ -15,7 +15,7 @@ permissions:
 jobs:
   preview:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.head.repo.full_name != github.repository
+    if: github.event.pull_request.head.repo.full_name != github.event.repository.full_name
 
     steps:
       - uses: actions/checkout@v3
