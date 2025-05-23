@@ -41,8 +41,6 @@ function App(): React.ReactElement {
   };
 
 
-
-
   
   useEffect(() => {
     if (!hasFetched) {
