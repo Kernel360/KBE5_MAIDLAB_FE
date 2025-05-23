@@ -45,7 +45,7 @@ jobs:
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           working-directory: ./
           vercel-args: '--force'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.AUTO_ACTIONS }}
           github-comment: true
 
       - name: Comment PR with Personal Token
