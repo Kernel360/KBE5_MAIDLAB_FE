@@ -46,16 +46,17 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           github-comment: true
 
-      - name: Comment PR
+      - name: Comment PR with Personal Token
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.AUTO_ACTIONS }}
           script: |
             const previewUrl = process.env.VERCEL_URL;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `🚀 프리뷰 배포가 완료되었습니다!\n\n🔗 프리뷰 URL: https://${previewUrl}`
+              body: `✨ 프리뷰 배포 완료 ✨\n\n 🔗 프리뷰 URL: https://${previewUrl}`
             });
         env:
           VERCEL_URL: ${{ steps.deploy.outputs.preview-url }}
