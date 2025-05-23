@@ -8,6 +8,9 @@ on:
       - reopened
     branches:
       - dev
+  push:
+    branches:
+      - test/fe/#9
 
 permissions:
   contents: read
@@ -15,7 +18,6 @@ permissions:
 jobs:
   preview:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.head.repo.full_name != github.repository
 
     steps:
       - uses: actions/checkout@v3
@@ -42,8 +44,8 @@ jobs:
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           working-directory: ./
-          vercel-args: '--preview --force'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vercel-args: '--force'
+          github-token: ${{ secrets.AUTO_ACTIONS }}
           github-comment: true
 
       - name: Comment PR with Personal Token
