@@ -8,6 +8,9 @@ on:
       - reopened
     branches:
       - dev
+  push:
+    branches:
+      - test/fe/#9
 
 permissions:
   contents: read
