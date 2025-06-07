@@ -52,7 +52,8 @@ export const HTTP_STATUS = {
 
 // ===== API 기본 설정 =====
 export const API_CONFIG = {
-  BASE_URL: 'https://api-maidlab.duckdns.org',
+  BASE_URL:
+    import.meta.env.VITE_API_BASE_URL || 'https://api-maidlab.duckdns.org',
   TIMEOUT: 10000,
   RETRY_COUNT: 3,
   RETRY_DELAY: 1000,

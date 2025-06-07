@@ -1,6 +1,7 @@
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
 
-const BASE_URL = 'https://api-maidlab.duckdns.org';
+const BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'https://api-maidlab.duckdns.org';
 
 // Axios 인스턴스 생성
 export const apiClient: AxiosInstance = axios.create({
