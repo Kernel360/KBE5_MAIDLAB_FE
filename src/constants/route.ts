@@ -1,4 +1,3 @@
-// src/constants/routes.ts - 라우트 상수
 export const ROUTES = {
   // 공통 페이지
   HOME: '/',
@@ -9,6 +8,7 @@ export const ROUTES = {
   CONSUMER: {
     MYPAGE: '/consumer/mypage',
     PROFILE: '/consumer/profile',
+    PROFILE_EDIT: '/consumer/profile/edit',
     RESERVATIONS: '/consumer/reservations',
     RESERVATION_DETAIL: '/consumer/reservations/:id',
     RESERVATION_CREATE: '/consumer/reservations/create',
@@ -20,6 +20,7 @@ export const ROUTES = {
   MANAGER: {
     MYPAGE: '/manager/mypage',
     PROFILE: '/manager/profile',
+    PROFILE_EDIT: '/manager/profile/edit',
     PROFILE_CREATE: '/manager/profile/create',
     RESERVATIONS: '/manager/reservations',
     RESERVATION_DETAIL: '/manager/reservations/:id',
@@ -52,7 +53,7 @@ export const ROUTES = {
   EVENT_DETAIL: '/events/:id',
   BOARD: '/board',
   BOARD_CREATE: '/board/create',
-  BOARD_EDIT: '/board/edit',
+  BOARD_EDIT: '/board/create',
   BOARD_DETAIL: '/board/:id',
   NOT_FOUND: '/404',
 } as const;

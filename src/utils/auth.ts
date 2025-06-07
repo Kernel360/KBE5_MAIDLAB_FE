@@ -1,5 +1,6 @@
 import { tokenStorage, userStorage } from './storage';
 import { USER_TYPES } from '@/constants/user';
+import { env } from './env';
 
 /**
  * 로그인 상태 확인
@@ -168,9 +169,16 @@ export const getSocialLoginUrl = (
   provider: 'KAKAO' | 'GOOGLE',
   userType: string,
 ): string => {
-  const baseUrl =
-    process.env.REACT_APP_API_URL || 'https://api-maidlab.duckdns.org';
-  return `${baseUrl}/oauth2/authorization/${provider.toLowerCase()}?userType=${userType}`;
+  const clientId =
+    provider === 'GOOGLE' ? env.GOOGLE_CLIENT_ID : env.KAKAO_CLIENT_ID;
+  const redirectUri =
+    provider === 'GOOGLE' ? env.GOOGLE_REDIRECT_URI : env.KAKAO_REDIRECT_URI;
+
+  if (!clientId) {
+    throw new Error(`${provider} client ID is not configured`);
+  }
+
+  return `${env.API_BASE_URL}/oauth2/authorization/${provider.toLowerCase()}?userType=${userType}&client_id=${clientId}&redirect_uri=${redirectUri}`;
 };
 
 /**

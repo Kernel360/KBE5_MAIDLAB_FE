@@ -1,4 +1,3 @@
-// messages.ts
 // ===== 성공 메시지 =====
 export const SUCCESS_MESSAGES = {
   // 인증 관련
