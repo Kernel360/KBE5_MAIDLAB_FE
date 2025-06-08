@@ -52,6 +52,7 @@ export interface ManagerResponseDto {
 }
 
 export interface ConsumerListResponseDto {
+  id: number;
   phoneNumber: string;
   name: string;
   uuid: string;

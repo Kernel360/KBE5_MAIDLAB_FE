@@ -39,18 +39,29 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        // 토큰 갱신 시도
-        const refreshResponse = await apiClient.post('/api/auth/refresh');
-        const newToken = refreshResponse.data.data.accessToken;
+        const refreshToken = localStorage.getItem('refreshToken');
+        if (!refreshToken) {
+          throw new Error('No refresh token available');
+        }
 
-        localStorage.setItem('accessToken', newToken);
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        // 토큰 갱신 시도
+        const refreshResponse = await apiClient.post('/api/auth/refresh', {
+          refreshToken,
+        });
+        
+        const { accessToken, refreshToken: newRefreshToken } = refreshResponse.data.data;
+
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', newRefreshToken);
+        
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
 
         return apiClient(originalRequest);
       } catch (refreshError) {
         // 리프레시 실패 시 로그아웃 처리
         localStorage.removeItem('accessToken');
-        window.location.href = '/login';
+        localStorage.removeItem('refreshToken');
+        window.location.href = '/admin/login';
         return Promise.reject(refreshError);
       }
     }

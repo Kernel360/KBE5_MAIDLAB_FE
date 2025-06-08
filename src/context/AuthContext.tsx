@@ -11,17 +11,17 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    const token = localStorage.getItem('admin_token');
+    const token = localStorage.getItem('accessToken');
     return !!token;
   });
 
   const login = (token: string) => {
-    localStorage.setItem('admin_token', token);
+    localStorage.setItem('accessToken', token);
     setIsAuthenticated(true);
   };
 
   const logout = () => {
-    localStorage.removeItem('admin_token');
+    localStorage.removeItem('accessToken');
     setIsAuthenticated(false);
   };
 

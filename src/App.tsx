@@ -3,6 +3,9 @@ import { ThemeProvider, createTheme } from '@mui/material';
 import { ROUTES, ROUTE_COMPONENTS } from './constants';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import ManagerDetail from './pages/admin/ManagerDetail';
+import ConsumerDetail from './pages/admin/ConsumerDetail';
+import ReservationDetail from './pages/admin/ReservationDetail';
 
 const theme = createTheme({
   palette: {
@@ -39,7 +42,10 @@ function App() {
               }
             >
               <Route path="users" element={<ROUTE_COMPONENTS.ADMIN.USERS />} />
+              <Route path="users/manager/:id" element={<ManagerDetail />} />
+              <Route path="users/consumer/:id" element={<ConsumerDetail />} />
               <Route path="reservations" element={<ROUTE_COMPONENTS.ADMIN.RESERVATIONS />} />
+              <Route path="reservations/:id" element={<ReservationDetail />} />
               <Route path="events" element={<ROUTE_COMPONENTS.ADMIN.EVENTS />} />
               <Route path="boards" element={<ROUTE_COMPONENTS.ADMIN.BOARDS />} />
               <Route index element={<Navigate to="/admin/users" replace />} />

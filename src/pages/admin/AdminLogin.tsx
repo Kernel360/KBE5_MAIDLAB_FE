@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Box, Button, Container, TextField, Typography, Paper, Alert } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useAuth } from '../../context/AuthContext';
-import axios from 'axios';
+import { adminApi } from '../../apis/admin';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
@@ -28,11 +28,7 @@ const LoginButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-interface LoginResponse {
-  accessToken: string;
-}
-
-const adminLogin = () => {
+const AdminLogin = () => {
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -41,26 +37,24 @@ const adminLogin = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = location.state?.from?.pathname || '/admin/users';
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setError('');
     setIsLoading(true);
 
     try {
-      const response = await axios.post<LoginResponse>(
-        'https://api-maidlab.duckdns.org/api/admin/auth/login',
-        {
-          adminKey: id,
-          password: password,
-        }
-      );
-      
-      login(response.data.accessToken);
-      navigate(from, { replace: true });
-    } catch (err) {
-      setError('로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.');
+      const response = await adminApi.login({
+        adminKey: id,
+        password: password,
+      });
+
+      const { accessToken, refreshToken } = response;
+      login(accessToken, refreshToken);
+
+      const from = (location.state as { from?: Location })?.from?.pathname || '/admin/users';
+      navigate(from);
+    } catch (error) {
+      setError('아이디 또는 비밀번호가 올바르지 않습니다.');
     } finally {
       setIsLoading(false);
     }
@@ -114,4 +108,4 @@ const adminLogin = () => {
   );
 };
 
-export default adminLogin; 
+export default AdminLogin; 
