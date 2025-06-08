@@ -1,8 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material';
-import AdminLogin from './pages/admin/AdminLogin';
-import UserList from './pages/admin/UserList';
-import AdminLayout from './pages/admin/layout/AdminLayout';
+import { ROUTES, ROUTE_COMPONENTS } from './constants';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -31,22 +29,22 @@ function App() {
       <AuthProvider>
         <Router>
           <Routes>
-            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path={ROUTES.ADMIN.LOGIN} element={<ROUTE_COMPONENTS.ADMIN.LOGIN />} />
             <Route
-              path="/admin"
+              path={ROUTES.ADMIN.DASHBOARD}
               element={
                 <ProtectedRoute>
-                  <AdminLayout />
+                  <ROUTE_COMPONENTS.ADMIN.LAYOUT />
                 </ProtectedRoute>
               }
             >
-              <Route path="users" element={<UserList />} />
-              <Route path="reservations" element={<div>예약 관리 페이지</div>} />
-              <Route path="events" element={<div>이벤트 관리 페이지</div>} />
-              <Route path="boards" element={<div>게시판 관리 페이지</div>} />
+              <Route path="users" element={<ROUTE_COMPONENTS.ADMIN.USERS />} />
+              <Route path="reservations" element={<ROUTE_COMPONENTS.ADMIN.RESERVATIONS />} />
+              <Route path="events" element={<ROUTE_COMPONENTS.ADMIN.EVENTS />} />
+              <Route path="boards" element={<ROUTE_COMPONENTS.ADMIN.BOARDS />} />
               <Route index element={<Navigate to="/admin/users" replace />} />
             </Route>
-            <Route path="/" element={<Navigate to="/admin/login" replace />} />
+            <Route path={ROUTES.HOME} element={<Navigate to={ROUTES.ADMIN.LOGIN} replace />} />
           </Routes>
         </Router>
       </AuthProvider>
