@@ -48,8 +48,8 @@ const AdminLogin = () => {
         password: password,
       });
 
-      const { accessToken, refreshToken } = response;
-      login(accessToken, refreshToken);
+      const { accessToken } = response;
+      login(accessToken, 'ADMIN');
 
       const from = (location.state as { from?: Location })?.from?.pathname || '/admin/users';
       navigate(from);
