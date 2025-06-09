@@ -19,9 +19,9 @@ import { clearExpiredLocalStorage } from '@/utils';
 // const ConsumerReservationDetail = React.lazy(
 //   () => import('@/pages/consumer/ReservationDetail'),
 // );
-// const ConsumerReservationCreate = React.lazy(
-//   () => import('@/pages/consumer/ReservationCreate'),
-// );
+const ConsumerReservationCreate = React.lazy(
+  () => import('@/pages/reservation/ConsumerReservationCreate'),
+);
 // const ConsumerLikedManagers = React.lazy(
 //   () => import('@/pages/consumer/LikedManagers'),
 // );
@@ -181,14 +181,14 @@ const AppContent: React.FC = () => {
               </ProtectedRoute>
             }
           /> */}
-          {/* <Route
+          <Route
             path={ROUTES.CONSUMER.RESERVATION_CREATE}
             element={
               <ProtectedRoute requiredUserType="CONSUMER">
                 <ConsumerReservationCreate />
               </ProtectedRoute>
             }
-          /> */}
+          />
           {/* <Route
             path={ROUTES.CONSUMER.LIKED_MANAGERS}
             element={
