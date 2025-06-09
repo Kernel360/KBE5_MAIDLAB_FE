@@ -123,11 +123,16 @@ export const reservationApi = {
     reservationId: number,
   ): Promise<ReservationDetailResponseDto> => {
     try {
-      const response = await apiClient.get<ReservationDetailResponseDto>(
+      const response = await apiClient.get<ApiResponse<ReservationDetailResponseDto>>(
         `/api/reservations/${reservationId}`,
       );
-      return response.data;
+      console.log('API 응답:', response);
+      if (!response.data || !response.data.data) {
+        throw new Error('API 응답 데이터가 없습니다.');
+      }
+      return response.data.data;
     } catch (error) {
+      console.error('API 에러:', error);
       throw new Error(handleApiError(error));
     }
   },

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
+import { adminApi } from '../apis/admin';
 
 interface AuthContextType {
   isAuthenticated: boolean;

@@ -1,10 +1,3 @@
-import AdminLogin from '../pages/admin/AdminLogin';
-import UserList from '../pages/admin/UserList';
-import ReservationList from '../pages/admin/ReservationList';
-import EventList from '../pages/admin/EventList';
-import BoardList from '../pages/admin/BoardList';
-import AdminLayout from '../pages/admin/layout/AdminLayout';
-
 export const ROUTES = {
   // 공통 페이지
   HOME: '/',
@@ -63,15 +56,4 @@ export const ROUTES = {
   BOARD_EDIT: '/board/create',
   BOARD_DETAIL: '/board/:id',
   NOT_FOUND: '/404',
-} as const;
-
-export const ROUTE_COMPONENTS = {
-  ADMIN: {
-    LOGIN: AdminLogin,
-    LAYOUT: AdminLayout,
-    USERS: UserList,
-    RESERVATIONS: ReservationList,
-    EVENTS: EventList,
-    BOARDS: BoardList,
-  },
 } as const;
