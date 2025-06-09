@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { validateImageFile } from '@/utils';
 import { useToast } from './useToast';
 
@@ -17,6 +17,13 @@ export const useFileUpload = (maxFiles: number = 1) => {
     progress: 0,
   });
   const { showToast } = useToast();
+
+  // 컴포넌트 언마운트 시 모든 미리보기 URL 정리
+  useEffect(() => {
+    return () => {
+      state.previews.forEach((preview) => URL.revokeObjectURL(preview));
+    };
+  }, [state.previews]);
 
   const addFiles = useCallback(
     (newFiles: FileList | File[]) => {

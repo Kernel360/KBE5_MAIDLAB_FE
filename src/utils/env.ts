@@ -14,4 +14,12 @@ export const env = {
   ENABLE_MOCK: import.meta.env.VITE_ENABLE_MOCK === 'true',
   MAX_FILE_SIZE: parseInt(import.meta.env.VITE_MAX_FILE_SIZE || '5242880'),
   SESSION_TIMEOUT: parseInt(import.meta.env.VITE_SESSION_TIMEOUT || '1800000'),
+  ...(function validateEnv() {
+    const required = ['VITE_API_BASE_URL'];
+    const missing = required.filter((key) => !import.meta.env[key]);
+    if (missing.length > 0) {
+      console.warn(`Missing environment variables: ${missing.join(', ')}`);
+    }
+    return {};
+  })(),
 } as const;
