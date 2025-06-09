@@ -109,13 +109,11 @@ export const reservationApi = {
 
   // 전체 예약 조회
   getAllReservations: async (): Promise<ReservationResponseDto[]> => {
-    try {
-      const response =
-        await apiClient.get<ReservationResponseDto[]>('/api/reservations');
-      return response.data;
-    } catch (error) {
-      throw new Error(handleApiError(error));
-    }
+    const response =
+      await apiClient.get<ApiResponse<ReservationResponseDto[]>>(
+        '/api/reservations',
+      );
+    return response.data.data;
   },
 
   // 예약 상세 조회

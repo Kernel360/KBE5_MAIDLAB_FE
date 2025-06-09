@@ -5,46 +5,49 @@ src/
 ├── apis/
 │ ├── auth/
 │ │ └── index.ts # 인증 관련 API
-│ ├── posts/
-│ │ └── index.ts # 게시글 관련 API
 │ └── index.ts # API 공통 설정 및 유틸리티
+├── assets/ # 이미지, 폰트 등 정적 파일
+│ ├── images/
+│ └── fonts/
 ├── components/
 │ ├── common/ # 공통 컴포넌트
-│ │ ├── Button.tsx
-│ │ ├── Input.tsx
-│ │ └── Modal.tsx
+│ │ ├── index.ts
+│ │ ├── Button/
+│ │ ├── Input/
+│ │ └── Modal/
+│ ├── features/ # 기능 컴포넌트
+│ │ │── index.ts
+│ │ ├── auth/
+│ │ ├── admin/
+│ │ └── manager/
 │ └── layout/ # 레이아웃 컴포넌트
-│ ├── Header.tsx
-│ ├── Footer.tsx
-│ └── Sidebar.tsx
+│ ├── index.ts
+│ ├── Header/
+│ ├── Footer/
+│ └── Sidebar/
+└── constants/ # 라우트 및 설정 상수
+│ └── index.ts
+├── config/
+│ ├── env.ts # env.ts 이동
+│ ├── api.ts # api.ts 이동
+│ └── index.ts # config 통합 export
+├── hooks/ # 훅
+│ └── index.ts
 ├── pages/ # 페이지
 │ ├── Home.tsx
 │ ├── Login.tsx
 │ └── Board.tsx
-├── assets/ # 이미지, 폰트 등 정적 파일
-│ ├── images/
-│ └── fonts/
-├── styles/  
+├── styles/
 │ ├── App.css # App 컴포넌트 스타일
 │ ├── index.css # 전역 스타일
 │ └── variables.css # CSS 변수
-├── utils/
-│ ├── date.ts # 날짜 관련 유틸리티
-│ ├── validation.ts # 유효성 검사
-│ └── format.ts # 포맷팅 유틸리티
-├── hooks/
-│ ├── useAuth.ts # 인증 관련 훅
-│ └── useForm.ts # 폼 관련 훅
-├── services/
-│ ├── api.ts # API 설정
-│ └── storage.ts # 로컬 스토리지
 ├── types/
 │ ├── index.ts # API 응답 타입
 │ └── common.ts # 공통 타입
-└── constants/
-│ └── index.ts # 라우트 및 설정 상수
+├── utils/
+│ └── index.ts # 유틸 함수
 └── App.tsx # 애플리케이션 루트 컴포넌트
-└── index.tsx # React 앱의 진입점
+└── main.tsx # React 앱의 진입점
 ```
 
 <br><br>
