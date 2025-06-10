@@ -132,21 +132,30 @@ export const removeSessionStorage = (key: string): void => {
 export const tokenStorage = {
   // 액세스 토큰 저장
   setAccessToken: (token: string): void => {
-    setLocalStorage(
-      STORAGE_KEYS.ACCESS_TOKEN,
-      token,
-      STORAGE_EXPIRY.ACCESS_TOKEN,
-    );
+    try {
+      localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token);
+    } catch (error) {
+      console.error('Failed to save access token:', error);
+    }
   },
 
   // 액세스 토큰 가져오기
   getAccessToken: (): string | null => {
-    return getLocalStorage<string>(STORAGE_KEYS.ACCESS_TOKEN);
+    try {
+      return localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    } catch (error) {
+      console.error('Failed to get access token:', error);
+      return null;
+    }
   },
 
   // 모든 토큰 삭제
   clearTokens: (): void => {
-    removeLocalStorage(STORAGE_KEYS.ACCESS_TOKEN);
+    try {
+      localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+    } catch (error) {
+      console.error('Failed to clear tokens:', error);
+    }
   },
 };
 

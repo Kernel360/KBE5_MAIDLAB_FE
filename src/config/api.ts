@@ -12,10 +12,6 @@ export const api = axios.create({
 // 요청 인터셉터
 api.interceptors.request.use(
   (config) => {
-    // 개발 환경에서만 로깅
-    if (import.meta.env.DEV) {
-      console.log('Request:', config);
-    }
     return config;
   },
   (error) => {
@@ -26,10 +22,6 @@ api.interceptors.request.use(
 // 응답 인터셉터
 api.interceptors.response.use(
   (response) => {
-    // 개발 환경에서만 로깅
-    if (import.meta.env.DEV) {
-      console.log('Response:', response);
-    }
     return response;
   },
   (error) => {
