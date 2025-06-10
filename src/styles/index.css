@@ -1,4 +1,3 @@
-/* Tailwind 기본 디렉티브 */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -27,10 +26,10 @@
     overscroll-behavior: none;
   }
 
-  /* 다크모드 기본 설정 */
+  /* 다크모드 기본 설정
   .dark {
     color-scheme: dark;
-  }
+  } */
 }
 
 /* 커스텀 컴포넌트 스타일 */
@@ -62,9 +61,9 @@
     @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6;
   }
 
-  .card-dark {
+  /* .card-dark {
     @apply dark:bg-gray-800 dark:border-gray-700;
-  }
+  } */
 
   /* 모바일 안전 영역 */
   .safe-area-top {
@@ -135,10 +134,10 @@
     background-color: rgba(255, 255, 255, 0.8);
   }
 
-  .backdrop-blur-dark {
+  /* .backdrop-blur-dark {
     backdrop-filter: blur(8px);
     background-color: rgba(0, 0, 0, 0.8);
-  }
+  } */
 
   /* 그라데이션 */
   .gradient-orange {
@@ -215,12 +214,12 @@
   }
 }
 
-/* 다크모드 추가 스타일 */
+/* 다크모드 추가 스타일
 @media (prefers-color-scheme: dark) {
   .dark-auto {
     @apply dark:bg-gray-900 dark:text-white;
   }
-}
+} */
 
 /* 포커스 링 커스터마이징 */
 .focus-ring {
@@ -267,7 +266,7 @@
 
 /* 앱 전체 레이아웃 */
 .app-container {
-  @apply min-h-screen bg-gray-50 dark:bg-gray-900;
+  @apply min-h-screen bg-gray-50;
 }
 
 /* 메인 콘텐츠 영역 */

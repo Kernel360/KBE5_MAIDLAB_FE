@@ -119,8 +119,11 @@ apiClient.interceptors.response.use(
         const newToken = refreshResponse.data.data.accessToken;
 
         localStorage.setItem('accessToken', newToken);
+        
+        
+        // 대기 중인 요청들 처리
         processQueue(null, newToken);
-
+        
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return apiClient(originalRequest);
       } catch (refreshError) {
@@ -128,7 +131,8 @@ apiClient.interceptors.response.use(
         console.error('❌ 토큰 갱신 실패:', refreshError);
         processQueue(refreshError, null);
         localStorage.removeItem('accessToken');
-        window.location.href = '/login';
+        localStorage.removeItem('refreshToken');
+        window.location.href = '/admin/login';
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

@@ -25,7 +25,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
         className={`animate-spin rounded-full border-b-2 border-orange-500 ${sizeClasses[size]}`}
       ></div>
       {message && (
-        <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
+        <p className="mt-4 text-sm text-gray-600">
           {message}
         </p>
       )}

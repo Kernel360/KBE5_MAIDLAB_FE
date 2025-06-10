@@ -79,85 +79,139 @@ const App: React.FC = () => {
                 }
               /> */}
 
-            {/* 매니저 페이지 (나중에 구현) */}
-            {/* <Route
-                path={ROUTES.MANAGER.MYPAGE}
-                element={
-                  <ProtectedRoute requiredUserType="MANAGER">
-                    <ManagerMyPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.MANAGER.PROFILE}
-                element={
-                  <ProtectedRoute requiredUserType="MANAGER">
-                    <ManagerProfile />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.MANAGER.PROFILE_CREATE}
-                element={
-                  <ProtectedRoute requiredUserType="MANAGER">
-                    <ManagerProfileCreate />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.MANAGER.RESERVATIONS}
-                element={
-                  <ProtectedRoute requiredUserType="MANAGER">
-                    <ManagerReservations />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.MANAGER.REVIEWS}
-                element={
-                  <ProtectedRoute requiredUserType="MANAGER">
-                    <ManagerReviews />
-                  </ProtectedRoute>
-                }
-              /> */}
+          {/* 매니저 라우트들 */}
+          {/* <Route
+            path={ROUTES.MANAGER.MYPAGE}
+            element={
+              <ProtectedRoute requiredUserType="MANAGER">
+                <ManagerMyPage />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.MANAGER.PROFILE}
+            element={
+              <ProtectedRoute requiredUserType="MANAGER">
+                <ManagerProfile />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.MANAGER.PROFILE_EDIT}
+            element={
+              <ProtectedRoute requiredUserType="MANAGER">
+                <ManagerProfile />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.MANAGER.PROFILE_CREATE}
+            element={
+              <ProtectedRoute requiredUserType="MANAGER">
+                <ManagerProfileCreate />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.MANAGER.RESERVATIONS}
+            element={
+              <ProtectedRoute requiredUserType="MANAGER">
+                <ManagerReservations />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.MANAGER.RESERVATION_DETAIL}
+            element={
+              <ProtectedRoute requiredUserType="MANAGER">
+                <ManagerReservationDetail />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.MANAGER.REVIEWS}
+            element={
+              <ProtectedRoute requiredUserType="MANAGER">
+                <ManagerReviews />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.MANAGER.MATCHING}
+            element={
+              <ProtectedRoute requiredUserType="MANAGER">
+                <ManagerMatching />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.MANAGER.SETTLEMENTS}
+            element={
+              <ProtectedRoute requiredUserType="MANAGER">
+                <ManagerSettlements />
+              </ProtectedRoute>
+            }
+          /> */}
 
-            {/* 관리자 페이지 (나중에 구현) */}
-            {/* <Route
-                path={ROUTES.ADMIN.DASHBOARD}
-                element={
-                  <ProtectedRoute requiredUserType="ADMIN">
-                    <AdminDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.ADMIN.LOGIN}
-                element={<AdminLogin />}
-              />
-              <Route
-                path={ROUTES.ADMIN.MANAGERS}
-                element={
-                  <ProtectedRoute requiredUserType="ADMIN">
-                    <AdminManagers />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.ADMIN.CONSUMERS}
-                element={
-                  <ProtectedRoute requiredUserType="ADMIN">
-                    <AdminConsumers />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.ADMIN.RESERVATIONS}
-                element={
-                  <ProtectedRoute requiredUserType="ADMIN">
-                    <AdminReservations />
-                  </ProtectedRoute>
-                }
-              /> */}
+          {/* 관리자 라우트 */}
+          <Route key="admin-login" path={ROUTES.ADMIN.LOGIN} element={<AdminLogin />} />,
+
+          // 관리자 대시보드 및 하위 페이지들
+          <Route
+            key="admin-dashboard"
+            path={ROUTES.ADMIN.DASHBOARD}
+            element={
+              <ProtectedRoute requiredUserType="ADMIN">
+                <AdminLayout />
+              </ProtectedRoute>
+            }
+          >
+            {/* 회원 관리 */}
+            <Route path="users" element={<AdminUserList />} />
+            <Route path="users/manager/:id" element={<AdminManagerDetail />} />
+            <Route path="users/consumer/:id" element={<AdminConsumerDetail />} />
+
+            {/* 예약 관리 */}
+            <Route path="reservations" element={<AdminReservationList />} />
+            <Route path="reservations/:id" element={<AdminReservationDetail />} />
+
+            {/* 이벤트 관리 */}
+            <Route path="events" element={<AdminEvents />} />
+            <Route path="events/create" element={<AdminEventCreate />} />
+
+            {/* 게시판 관리 */}
+            <Route path="boards" element={<AdminBoards />} />
+            <Route path="boards/:id" element={<AdminBoardDetail />} />
+
+            {/* 기본 리다이렉트 */}
+            <Route index element={<Navigate to="/admin/users" replace />} />
+          </Route>
+
+          {/* 공통 게시판 라우트들 */}
+          {/* <Route
+            path={ROUTES.BOARD}
+            element={
+              <ProtectedRoute>
+                <BoardPage />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.BOARD_CREATE}
+            element={
+              <ProtectedRoute>
+                <BoardCreatePage />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.BOARD_DETAIL}
+            element={
+              <ProtectedRoute>
+                <BoardDetailPage />
+              </ProtectedRoute>
+            }
+          /> */}
 
             {/* 404 페이지 */}
             <Route path={ROUTES.NOT_FOUND} element={<NotFound />} />
@@ -171,5 +225,6 @@ const App: React.FC = () => {
     </ThemeProvider>
   );
 };
+
 
 export default App;

@@ -165,12 +165,21 @@ export const tokenStorage = {
 export const userStorage = {
   // 사용자 타입 저장
   setUserType: (userType: string): void => {
-    setLocalStorage(STORAGE_KEYS.USER_TYPE, userType);
+    try {
+      localStorage.setItem(STORAGE_KEYS.USER_TYPE, userType);
+    } catch (error) {
+      console.error('Failed to save user type:', error);
+    }
   },
 
   // 사용자 타입 가져오기
   getUserType: (): string | null => {
-    return getLocalStorage<string>(STORAGE_KEYS.USER_TYPE);
+    try {
+      return localStorage.getItem(STORAGE_KEYS.USER_TYPE);
+    } catch (error) {
+      console.error('Failed to get user type:', error);
+      return null;
+    }
   },
 
   // 사용자 정보 저장

@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react';
 import { adminApi } from '@/apis/admin';
+import type { PageParams } from '@/apis/admin';
+import type { AnswerRequestDto } from '@/apis/board';
 import { useToast } from './useToast';
-import type { PageParams, AnswerRequestDto } from '@/apis/admin';
 
 export const useAdmin = () => {
   const [loading, setLoading] = useState(false);
@@ -269,8 +270,9 @@ export const useAdmin = () => {
           showToast('답변이 등록되었습니다.', 'success');
           return { success: true, data: result };
         } catch (error: any) {
-          showToast(error.message || '답변 등록에 실패했습니다.', 'error');
-          return { success: false, error: error.message };
+          const errorMessage = error.message || '답변 등록에 실패했습니다.';
+          showToast(errorMessage, 'error');
+          return { success: false, error: errorMessage };
         }
       },
       [showToast],

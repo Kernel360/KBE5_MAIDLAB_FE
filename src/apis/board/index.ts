@@ -13,6 +13,11 @@ export interface ConsumerBoardRequestDto {
   images: ImageDto[];
 }
 
+// 답변 등록 요청 타입
+export interface AnswerRequestDto {
+  content: string;
+}
+
 // 게시판 API 함수들
 export const boardApi = {
   // 게시판 목록 조회
@@ -50,6 +55,18 @@ export const boardApi = {
         data,
       );
       return response.data.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // 답변 등록
+  answerBoard: async (boardId: number, data: AnswerRequestDto): Promise<void> => {
+    try {
+      await apiClient.post<ApiResponse<void>>(
+        `/api/board/${boardId}/answer`,
+        data,
+      );
     } catch (error) {
       throw new Error(handleApiError(error));
     }

@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { boardApi } from '@/apis/board';
 import { useToast } from './useToast';
-import type { ConsumerBoardRequestDto } from '@/apis/board';
+import type { ConsumerBoardRequestDto, ConsumerBoardResponseDto, ConsumerBoardDetailResponseDto } from '@/apis/board';
 
 export const useBoard = () => {
-  const [boards, setBoards] = useState<any[]>([]);
+  const [boards, setBoards] = useState<ConsumerBoardResponseDto[]>([]);
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
 
@@ -66,6 +66,24 @@ export const useBoard = () => {
     [fetchBoards, showToast],
   );
 
+  // 답변 등록
+  const answerBoard = useCallback(
+    async (boardId: number, answer: string) => {
+      try {
+        setLoading(true);
+        await boardApi.answerBoard(boardId, { content: answer });
+        showToast('답변이 등록되었습니다.', 'success');
+        return true;
+      } catch (error: any) {
+        showToast(error.message || '답변 등록에 실패했습니다.', 'error');
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [showToast],
+  );
+
   useEffect(() => {
     fetchBoards();
   }, [fetchBoards]);
@@ -76,5 +94,6 @@ export const useBoard = () => {
     fetchBoards,
     fetchBoardDetail,
     createBoard,
+    answerBoard,
   };
 };
