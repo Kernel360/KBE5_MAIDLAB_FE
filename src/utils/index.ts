@@ -15,3 +15,6 @@ export * from './auth';
 
 // 공통 유틸리티
 export * from './common';
+
+// 구글 OAuth 유틸리티
+export * from './googleOAuth';

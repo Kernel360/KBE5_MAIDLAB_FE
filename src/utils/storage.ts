@@ -144,24 +144,9 @@ export const tokenStorage = {
     return getLocalStorage<string>(STORAGE_KEYS.ACCESS_TOKEN);
   },
 
-  // 리프레시 토큰 저장
-  setRefreshToken: (token: string): void => {
-    setLocalStorage(
-      STORAGE_KEYS.REFRESH_TOKEN,
-      token,
-      STORAGE_EXPIRY.REFRESH_TOKEN,
-    );
-  },
-
-  // 리프레시 토큰 가져오기
-  getRefreshToken: (): string | null => {
-    return getLocalStorage<string>(STORAGE_KEYS.REFRESH_TOKEN);
-  },
-
   // 모든 토큰 삭제
   clearTokens: (): void => {
     removeLocalStorage(STORAGE_KEYS.ACCESS_TOKEN);
-    removeLocalStorage(STORAGE_KEYS.REFRESH_TOKEN);
   },
 };
 

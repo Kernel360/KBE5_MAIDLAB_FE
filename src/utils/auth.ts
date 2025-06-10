@@ -57,12 +57,10 @@ export const getCurrentUser = <T>(): T | null => {
  */
 export const login = (
   accessToken: string,
-  refreshToken: string,
   userType: string,
   userInfo?: any,
 ): void => {
   tokenStorage.setAccessToken(accessToken);
-  tokenStorage.setRefreshToken(refreshToken);
   userStorage.setUserType(userType);
 
   if (userInfo) {

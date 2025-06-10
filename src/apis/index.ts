@@ -21,13 +21,10 @@ const processQueue = (error: any, token: string | null = null) => {
   failedQueue = [];
 };
 
-// Axios 인스턴스 생성
+// API 클라이언트 생성
 export const apiClient: AxiosInstance = axios.create({
   baseURL: BASE_URL,
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  withCredentials: true, // 쿠키를 자동으로 포함하도록 설정
 });
 
 // 요청 인터셉터 - 토큰 자동 추가
@@ -70,7 +67,7 @@ apiClient.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // 토큰 갱신 시도
+        // 토큰 갱신 시도 (쿠키는 자동으로 포함됨)
         const refreshResponse = await apiClient.post('/api/auth/refresh');
         const newToken = refreshResponse.data.data.accessToken;
 
