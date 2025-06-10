@@ -33,7 +33,6 @@ export interface ChangePwRequestDto {
 
 export interface LoginResponseDto {
   accessToken: string;
-  refreshToken: string;
   expirationTime: number;
 }
 
