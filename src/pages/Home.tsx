@@ -8,11 +8,12 @@ import {
   HeroSection,
 } from '@/components';
 import { ROUTES } from '@/constants';
-import { useAuth } from '@/hooks';
+import { useAuth, useEvent } from '@/hooks';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { activeEvents, loading: eventsLoading } = useEvent();
 
   const handleServiceClick = (serviceType: string) => {
     if (!isAuthenticated) {
@@ -28,22 +29,37 @@ const Home: React.FC = () => {
     navigate(path);
   };
 
+  const handleEventClick = (eventId: number) => {
+    navigate(`${ROUTES.EVENTS}/${eventId}`);
+  };
+
+  // 알림 클릭 핸들러 (나중에 알림 페이지 연결)
+  const handleNotificationClick = () => {
+    console.log('알림 클릭');
+    // navigate('/notifications'); // 알림 페이지가 있다면
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header
         showNotification={true}
-        onNotificationClick={() => console.log('알림 클릭')}
+        onNotificationClick={handleNotificationClick}
+        // onLogoClick={() => navigate(ROUTES.HOME)} // 기본 동작과 동일하므로 생략 가능
       />
 
       <main className="px-4 py-6 pb-20">
-        <HeroSection />
+        <HeroSection
+          onEventClick={handleEventClick}
+          events={activeEvents}
+          loading={eventsLoading}
+        />
 
         <ServiceGrid onServiceClick={handleServiceClick} />
 
         <PromotionBanner
-          title="첫 예약 20% 할인"
-          subtitle="신규 가입 고객 한정"
-          discount="20%"
+          title="회원가입 혜택"
+          subtitle="지금 가입하고 포인트 받기"
+          discount="1000P"
           onClick={() => navigate(ROUTES.SIGNUP)}
         />
       </main>

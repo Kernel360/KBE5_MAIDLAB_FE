@@ -30,10 +30,6 @@ export const PromotionBanner: React.FC<PromotionBannerProps> = ({
             </span>
           </div>
         </div>
-
-        {/* Decorative elements */}
-        <div className="absolute -right-4 -top-4 w-20 h-20 bg-orange-50 rounded-full opacity-50" />
-        <div className="absolute -left-2 -bottom-2 w-12 h-12 bg-orange-50 rounded-full opacity-30" />
       </button>
     </section>
   );
