@@ -151,7 +151,11 @@ export const tokenStorage = {
 
   // 모든 토큰 삭제
   clearTokens: (): void => {
-    removeLocalStorage(STORAGE_KEYS.ACCESS_TOKEN);
+    try {
+      localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+    } catch (error) {
+      console.error('Failed to clear tokens:', error);
+    }
   },
 };
 

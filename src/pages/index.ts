@@ -4,9 +4,9 @@
 // export { default as SignUp } from './SignUp';
 // export { default as NotFound } from './NotFound';
 
-// // 구글 로그인
-// export { default as GoogleCallBack } from './GoogleCallback';
-// export { SocialSignUp } from './SocialSignUp';
+// 구글 로그인
+export { default as GoogleCallback } from './GoogleCallback';
+export { default as SocialSignUp } from './SocialSignUp';
 
 // 이벤트 페이지 (나중에 구현)
 // export { default as Events } from './Events';

@@ -1,10 +1,9 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { AuthProvider, ThemeProvider } from '@/hooks';
 import { ProtectedRoute, ToastContainer } from '@/components/common';
 import { ROUTES } from '@/constants';
 
-// Pages
 // Pages - 개별 import로 변경
 import Home from '@/pages/Home';
 import Login from '@/pages/Login';
@@ -39,15 +38,15 @@ const App: React.FC = () => {
         <div className="App">
           <Routes>
             {/* 공통 페이지 */}
-            {/* <Route path={ROUTES.HOME} element={<Home />} />
+            <Route path={ROUTES.HOME} element={<Home />} />
             <Route path={ROUTES.LOGIN} element={<Login />} />
             <Route path={ROUTES.SIGNUP} element={<SignUp />} />
             <Route path={ROUTES.SOCIAL_SIGNUP} element={<SocialSignUp />} />
-            <Route path="/google-callback" element={<GoogleCallBack />} /> */}
+            <Route path="/google-callback" element={<GoogleCallback />} />
 
             {/* 이벤트 페이지 (나중에 구현) */}
             {/* <Route path={ROUTES.EVENTS} element={<Events />} />
-              <Route path={ROUTES.EVENT_DETAIL} element={<EventDetail />} /> */}
+              <Route path={ROUTES.EVENT_DETAIL} element={<EventDetail />} />
 
             {/* 게시판 페이지 (나중에 구현) */}
             {/* <Route path={ROUTES.BOARD} element={<Board />} />
