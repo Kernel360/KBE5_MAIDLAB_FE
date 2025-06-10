@@ -1,9 +1,9 @@
+
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Box, Button, Container, TextField, Typography, Paper, Alert } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { useAuth } from '../../context/AuthContext';
-import { adminApi } from '../../apis/admin';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
@@ -32,31 +32,36 @@ const AdminLogin = () => {
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  
+  // useAdminAuth 훅에서 필요한 것들 가져오기
+  const { login, loading, isAuthenticated } = useAdminAuth();
+  
   const navigate = useNavigate();
   const location = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setIsLoading(true);
 
     try {
-      const response = await adminApi.login({
+      // login 함수 호출 (async/await 사용)
+      const result = await login({
         adminKey: id,
         password: password,
       });
 
-      const { accessToken } = response;
-      login(accessToken, 'ADMIN');
-
-      const from = (location.state as { from?: Location })?.from?.pathname || '/admin/users';
-      navigate(from);
+      // 로그인 성공시 페이지 이동
+      if (result.success) {
+        const from = (location.state as { from?: Location })?.from?.pathname || '/admin/users';
+        navigate(from);
+      } else {
+        // 로그인 실패시 에러 표시 (이미 토스트로 표시되지만 추가로 표시하고 싶다면)
+        setError(result.error || '로그인에 실패했습니다.');
+      }
     } catch (error) {
-      setError('아이디 또는 비밀번호가 올바르지 않습니다.');
-    } finally {
-      setIsLoading(false);
+      // 예상치 못한 에러 처리
+      setError('로그인 중 오류가 발생했습니다.');
+      console.error('Login error:', error);
     }
   };
 
@@ -80,7 +85,7 @@ const AdminLogin = () => {
             label="아이디"
             value={id}
             onChange={(e) => setId(e.target.value)}
-            disabled={isLoading}
+            disabled={loading}
           />
           <TextField
             variant="outlined"
@@ -91,16 +96,16 @@ const AdminLogin = () => {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            disabled={isLoading}
+            disabled={loading}
           />
           <LoginButton
             type="submit"
             fullWidth
             variant="contained"
             color="primary"
-            disabled={isLoading}
+            disabled={loading}
           >
-            {isLoading ? '로그인 중...' : '로그인'}
+            {loading ? '로그인 중...' : '로그인'}
           </LoginButton>
         </StyledForm>
       </StyledPaper>
@@ -108,4 +113,4 @@ const AdminLogin = () => {
   );
 };
 
-export default AdminLogin; 
+export default AdminLogin;

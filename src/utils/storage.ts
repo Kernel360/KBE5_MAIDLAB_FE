@@ -132,30 +132,40 @@ export const removeSessionStorage = (key: string): void => {
 export const tokenStorage = {
   // 액세스 토큰 저장
   setAccessToken: (token: string): void => {
-    setLocalStorage(
-      STORAGE_KEYS.ACCESS_TOKEN,
-      token,
-      STORAGE_EXPIRY.ACCESS_TOKEN,
-    );
+    try {
+      localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, token);
+    } catch (error) {
+      console.error('Failed to save access token:', error);
+    }
   },
 
   // 액세스 토큰 가져오기
   getAccessToken: (): string | null => {
-    return getLocalStorage<string>(STORAGE_KEYS.ACCESS_TOKEN);
+    try {
+      return localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+    } catch (error) {
+      console.error('Failed to get access token:', error);
+      return null;
+    }
   },
 
   // 리프레시 토큰 저장
   setRefreshToken: (token: string): void => {
-    setLocalStorage(
-      STORAGE_KEYS.REFRESH_TOKEN,
-      token,
-      STORAGE_EXPIRY.REFRESH_TOKEN,
-    );
+    try {
+      localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, token);
+    } catch (error) {
+      console.error('Failed to save refresh token:', error);
+    }
   },
 
   // 리프레시 토큰 가져오기
   getRefreshToken: (): string | null => {
-    return getLocalStorage<string>(STORAGE_KEYS.REFRESH_TOKEN);
+    try {
+      return localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
+    } catch (error) {
+      console.error('Failed to get refresh token:', error);
+      return null;
+    }
   },
 
   // 모든 토큰 삭제
@@ -171,12 +181,21 @@ export const tokenStorage = {
 export const userStorage = {
   // 사용자 타입 저장
   setUserType: (userType: string): void => {
-    setLocalStorage(STORAGE_KEYS.USER_TYPE, userType);
+    try {
+      localStorage.setItem(STORAGE_KEYS.USER_TYPE, userType);
+    } catch (error) {
+      console.error('Failed to save user type:', error);
+    }
   },
 
   // 사용자 타입 가져오기
   getUserType: (): string | null => {
-    return getLocalStorage<string>(STORAGE_KEYS.USER_TYPE);
+    try {
+      return localStorage.getItem(STORAGE_KEYS.USER_TYPE);
+    } catch (error) {
+      console.error('Failed to get user type:', error);
+      return null;
+    }
   },
 
   // 사용자 정보 저장

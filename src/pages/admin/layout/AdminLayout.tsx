@@ -24,9 +24,10 @@ import {
   Logout as LogoutIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
-import { useAuth } from '../../../context/AuthContext';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { ROUTES } from '../../../constants';
 import { adminApi } from '../../../apis/admin';
+import { AdminThemeProvider } from '@/components/admin/AdminThemeProvider';
 
 const drawerWidth = 240;
 
@@ -86,7 +87,7 @@ const AdminLayout = () => {
   const [open, setOpen] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout } = useAuth();
+  const { logout } = useAdminAuth();
 
   const handleDrawerToggle = () => {
     setOpen(!open);
@@ -99,16 +100,16 @@ const AdminLayout = () => {
       navigate(ROUTES.ADMIN.LOGIN);
     } catch (error) {
       console.error('로그아웃 중 오류가 발생했습니다:', error);
-      // 에러가 발생해도 로컬 상태는 정리
       logout();
       navigate(ROUTES.ADMIN.LOGIN);
     }
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <StyledAppBar position="fixed" open={open}>
-        <Toolbar>
+    <AdminThemeProvider>
+      <Box sx={{ display: 'flex' }}>
+        <StyledAppBar position="fixed" open={open}>
+          <Toolbar>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -177,6 +178,7 @@ const AdminLayout = () => {
         <Outlet />
       </Main>
     </Box>
+    </AdminThemeProvider>
   );
 };
 

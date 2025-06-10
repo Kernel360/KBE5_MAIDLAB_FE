@@ -33,10 +33,11 @@ export const ROUTES = {
   ADMIN: {
     DASHBOARD: '/admin',
     LOGIN: '/admin/login',
+    USERS: '/admin/users',
     MANAGERS: '/admin/managers',
-    MANAGER_DETAIL: '/admin/managers/:id',
+    MANAGER_DETAIL: '/admin/users/manager/:id',
     CONSUMERS: '/admin/consumers',
-    CONSUMER_DETAIL: '/admin/consumers/:id',
+    CONSUMER_DETAIL: '/admin/users/consumer/:id',
     RESERVATIONS: '/admin/reservations',
     RESERVATION_DETAIL: '/admin/reservations/:id',
     MATCHING: '/admin/matching',
@@ -57,3 +58,4 @@ export const ROUTES = {
   BOARD_DETAIL: '/board/:id',
   NOT_FOUND: '/404',
 } as const;
+

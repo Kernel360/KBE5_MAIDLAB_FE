@@ -1,23 +1,10 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthProvider, ThemeProvider, useAuth } from '@/hooks';
 import { ROUTES } from '@/constants';
 import { clearExpiredLocalStorage } from '@/utils';
 
-// Admin Pages (현재 구현된 것)
-import AdminLogin from './pages/admin/AdminLogin';
-import AdminLayout from './pages/admin/layout/AdminLayout';
-import UserList from './pages/admin/UserList';
-import ManagerDetail from './pages/admin/ManagerDetail';
-import ConsumerDetail from './pages/admin/ConsumerDetail';
-import ReservationList from './pages/admin/ReservationList';
-import ReservationDetail from './pages/admin/ReservationDetail';
-import EventList from './pages/admin/EventList';
-import EventCreate from './pages/admin/EventCreate';
-import BoardList from './pages/admin/BoardList';
-
-// 나머지 페이지 컴포넌트들 (Lazy Loading으로 준비)
+// 페이지 컴포넌트들 (Lazy Loading)
 // const HomePage = React.lazy(() => import('@/pages/Home'));
 // const LoginPage = React.lazy(() => import('@/pages/Login'));
 // const SignUpPage = React.lazy(() => import('@/pages/SignUp'));
@@ -26,21 +13,72 @@ import BoardList from './pages/admin/BoardList';
 // 소비자 페이지들
 // const ConsumerMyPage = React.lazy(() => import('@/pages/consumer/MyPage'));
 // const ConsumerProfile = React.lazy(() => import('@/pages/consumer/Profile'));
-// const ConsumerReservations = React.lazy(() => import('@/pages/consumer/Reservations'));
-// const ConsumerReservationDetail = React.lazy(() => import('@/pages/consumer/ReservationDetail'));
-// const ConsumerReservationCreate = React.lazy(() => import('@/pages/consumer/ReservationCreate'));
-// const ConsumerLikedManagers = React.lazy(() => import('@/pages/consumer/LikedManagers'));
-// const ConsumerBlacklist = React.lazy(() => import('@/pages/consumer/Blacklist'));
+// const ConsumerReservations = React.lazy(
+//   () => import('@/pages/consumer/Reservations'),
+// );
+// const ConsumerReservationDetail = React.lazy(
+//   () => import('@/pages/consumer/ReservationDetail'),
+// );
+// const ConsumerReservationCreate = React.lazy(
+//   () => import('@/pages/consumer/ReservationCreate'),
+// );
+// const ConsumerLikedManagers = React.lazy(
+//   () => import('@/pages/consumer/LikedManagers'),
+// );
+// const ConsumerBlacklist = React.lazy(
+//   () => import('@/pages/consumer/Blacklist'),
+// );
 
 // 매니저 페이지들
 // const ManagerMyPage = React.lazy(() => import('@/pages/manager/MyPage'));
 // const ManagerProfile = React.lazy(() => import('@/pages/manager/Profile'));
-// const ManagerProfileCreate = React.lazy(() => import('@/pages/manager/ProfileCreate'));
-// const ManagerReservations = React.lazy(() => import('@/pages/manager/Reservations'));
-// const ManagerReservationDetail = React.lazy(() => import('@/pages/manager/ReservationDetail'));
+// const ManagerProfileCreate = React.lazy(
+//   () => import('@/pages/manager/ProfileCreate'),
+// );
+// const ManagerReservations = React.lazy(
+//   () => import('@/pages/manager/Reservations'),
+// );
+// const ManagerReservationDetail = React.lazy(
+//   () => import('@/pages/manager/ReservationDetail'),
+// );
 // const ManagerReviews = React.lazy(() => import('@/pages/manager/Reviews'));
 // const ManagerMatching = React.lazy(() => import('@/pages/manager/Matching'));
-// const ManagerSettlements = React.lazy(() => import('@/pages/manager/Settlements'));
+// const ManagerSettlements = React.lazy(
+//   () => import('@/pages/manager/Settlements'),
+// );
+
+// 관리자 페이지들
+// const AdminDashboard = React.lazy(() => import('./pages/admin/Dashboard'));
+const AdminLogin = React.lazy(() => import('@/pages/admin/AdminLogin'));
+const AdminLayout = React.lazy(() => import('@/pages/admin/layout/AdminLayout'));
+const AdminUserList = React.lazy(() => import('@/pages/admin/UserList'));
+const AdminManagerDetail = React.lazy(
+  () => import('@/pages/admin/ManagerDetail'),
+);
+// const AdminConsumers = React.lazy(() => import('@/pages/admin/Consumers'));
+const AdminConsumerDetail = React.lazy(
+  () => import('@/pages/admin/ConsumerDetail'),
+);
+const AdminReservationList = React.lazy(
+  () => import('@/pages/admin/ReservationList'),
+);
+const AdminReservationDetail = React.lazy(
+  () => import('@/pages/admin/ReservationDetail'),
+);
+// const AdminMatching = React.lazy(() => import('@/pages/admin/MatchingList'));
+// const AdminSettlements = React.lazy(() => import('@/pages/admin/Settlements'));
+const AdminEvents = React.lazy(() => import('@/pages/admin/EventList'));
+const AdminEventCreate = React.lazy(() => import('@/pages/admin/EventCreate'));
+// const AdminEventEdit = React.lazy(() => import('@/pages/admin/EventEdit'));
+const AdminBoards = React.lazy(() => import('@/pages/admin/BoardList'));
+const AdminBoardDetail = React.lazy(() => import('@/pages/admin/BoardDetail'));
+
+// 공통 페이지들
+// const EventsPage = React.lazy(() => import('@/pages/Events'));
+// const EventDetailPage = React.lazy(() => import('@/pages/EventDetail'));
+// const BoardPage = React.lazy(() => import('@/pages/Board'));
+// const BoardCreatePage = React.lazy(() => import('@/pages/BoardCreate'));
+// const BoardDetailPage = React.lazy(() => import('@/pages/BoardDetail'));
 
 // 로딩 컴포넌트
 const LoadingSpinner: React.FC = () => (
@@ -48,26 +86,6 @@ const LoadingSpinner: React.FC = () => (
     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
   </div>
 );
-
-// Theme 설정
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#FF7F50',
-    },
-  },
-  typography: {
-    fontFamily: [
-      '-apple-system',
-      'BlinkMacSystemFont',
-      '"Segoe UI"',
-      'Roboto',
-      '"Helvetica Neue"',
-      'Arial',
-      'sans-serif',
-    ].join(','),
-  },
-});
 
 // 보호된 라우트 컴포넌트
 interface ProtectedRouteProps {
@@ -100,66 +118,246 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   return <>{children}</>;
 };
 
-// 관리자 라우트 설정
-const AdminRoutes = [
-  // 관리자 로그인 페이지
-  <Route key="admin-login" path={ROUTES.ADMIN.LOGIN} element={<AdminLogin />} />,
-  
-  // 관리자 대시보드 및 하위 페이지들
-  <Route
-    key="admin-dashboard"
-    path={ROUTES.ADMIN.DASHBOARD}
-    element={
-      <ProtectedRoute requiredUserType="ADMIN">
-        <AdminLayout />
-      </ProtectedRoute>
-    }
-  >
-    {/* 회원 관리 */}
-    <Route path="users" element={<UserList />} />
-    <Route path="users/manager/:id" element={<ManagerDetail />} />
-    <Route path="users/consumer/:id" element={<ConsumerDetail />} />
-    
-    {/* 예약 관리 */}
-    <Route path="reservations" element={<ReservationList />} />
-    <Route path="reservations/:id" element={<ReservationDetail />} />
-    
-    {/* 이벤트 관리 */}
-    <Route path="events" element={<EventList />} />
-    <Route path="events/create" element={<EventCreate />} />
-    
-    {/* 게시판 관리 */}
-    <Route path="boards" element={<BoardList />} />
-    
-    {/* 기본 리다이렉트 */}
-    <Route index element={<Navigate to="/admin/users" replace />} />
-  </Route>
-];
+// 토스트 컨테이너 컴포넌트
+const ToastContainer: React.FC = () => {
+  // 실제 토스트 라이브러리 사용시 여기에 구현
+  return null;
+};
 
-// App 컴포넌트
-const App: React.FC = () => {
+// 메인 앱 컴포넌트
+const AppContent: React.FC = () => {
+  const { isLoading } = useAuth();
+
   useEffect(() => {
-    // 만료된 로컬 스토리지 데이터 정리
+    // 만료된 로컬스토리지 정리
     clearExpiredLocalStorage();
   }, []);
 
+  // 초기 로딩 중이면 로딩 스피너 표시
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
   return (
-    <AuthProvider>
-      <ThemeProvider theme={theme}>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <React.Suspense fallback={<LoadingSpinner />}>
         <Routes>
-          {/* 관리자 라우트 */}
-          {AdminRoutes}
-          
-          {/* 추후 추가될 라우트들을 위한 자리 */}
+          {/* 공개 라우트 */}
+          {/* <Route path={ROUTES.HOME} element={<HomePage />} /> */}
+          {/* <Route path={ROUTES.LOGIN} element={<LoginPage />} /> */}
+          {/* <Route path={ROUTES.SIGNUP} element={<SignUpPage />} /> */}
+          {/* <Route path={ROUTES.EVENTS} element={<EventsPage />} /> */}
+          {/* <Route path={ROUTES.EVENT_DETAIL} element={<EventDetailPage />} /> */}
+
           {/* 소비자 라우트 */}
+          {/* <Route
+            path={ROUTES.CONSUMER.MYPAGE}
+            element={
+              <ProtectedRoute requiredUserType="CONSUMER">
+                <ConsumerMyPage />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.CONSUMER.PROFILE}
+            element={
+              <ProtectedRoute requiredUserType="CONSUMER">
+                <ConsumerProfile />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.CONSUMER.RESERVATIONS}
+            element={
+              <ProtectedRoute requiredUserType="CONSUMER">
+                <ConsumerReservations />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.CONSUMER.RESERVATION_DETAIL}
+            element={
+              <ProtectedRoute requiredUserType="CONSUMER">
+                <ConsumerReservationDetail />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.CONSUMER.RESERVATION_CREATE}
+            element={
+              <ProtectedRoute requiredUserType="CONSUMER">
+                <ConsumerReservationCreate />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.CONSUMER.LIKED_MANAGERS}
+            element={
+              <ProtectedRoute requiredUserType="CONSUMER">
+                <ConsumerLikedManagers />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.CONSUMER.BLACKLIST}
+            element={
+              <ProtectedRoute requiredUserType="CONSUMER">
+                <ConsumerBlacklist />
+              </ProtectedRoute>
+            }
+          /> */}
+
           {/* 매니저 라우트 */}
-          
-          {/* 홈 페이지 리다이렉트 */}
-          <Route path={ROUTES.HOME} element={<Navigate to={ROUTES.LOGIN} replace />} />
+          {/* <Route
+            path={ROUTES.MANAGER.MYPAGE}
+            element={
+              <ProtectedRoute requiredUserType="MANAGER">
+                <ManagerMyPage />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.MANAGER.PROFILE}
+            element={
+              <ProtectedRoute requiredUserType="MANAGER">
+                <ManagerProfile />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.MANAGER.PROFILE_CREATE}
+            element={
+              <ProtectedRoute requiredUserType="MANAGER">
+                <ManagerProfileCreate />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.MANAGER.RESERVATIONS}
+            element={
+              <ProtectedRoute requiredUserType="MANAGER">
+                <ManagerReservations />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.MANAGER.RESERVATION_DETAIL}
+            element={
+              <ProtectedRoute requiredUserType="MANAGER">
+                <ManagerReservationDetail />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.MANAGER.REVIEWS}
+            element={
+              <ProtectedRoute requiredUserType="MANAGER">
+                <ManagerReviews />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.MANAGER.MATCHING}
+            element={
+              <ProtectedRoute requiredUserType="MANAGER">
+                <ManagerMatching />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.MANAGER.SETTLEMENTS}
+            element={
+              <ProtectedRoute requiredUserType="MANAGER">
+                <ManagerSettlements />
+              </ProtectedRoute>
+            }
+          /> */}
+
+          {/* 관리자 라우트 */}
+          <Route key="admin-login" path={ROUTES.ADMIN.LOGIN} element={<AdminLogin />} />,
+
+          // 관리자 대시보드 및 하위 페이지들
+          <Route
+            key="admin-dashboard"
+            path={ROUTES.ADMIN.DASHBOARD}
+            element={
+              <ProtectedRoute requiredUserType="ADMIN">
+                <AdminLayout />
+              </ProtectedRoute>
+            }
+          >
+            {/* 회원 관리 */}
+            <Route path="users" element={<AdminUserList />} />
+            <Route path="users/manager/:id" element={<AdminManagerDetail />} />
+            <Route path="users/consumer/:id" element={<AdminConsumerDetail />} />
+
+            {/* 예약 관리 */}
+            <Route path="reservations" element={<AdminReservationList />} />
+            <Route path="reservations/:id" element={<AdminReservationDetail />} />
+
+            {/* 이벤트 관리 */}
+            <Route path="events" element={<AdminEvents />} />
+            <Route path="events/create" element={<AdminEventCreate />} />
+
+            {/* 게시판 관리 */}
+            <Route path="boards" element={<AdminBoards />} />
+            <Route path="boards/:id" element={<AdminBoardDetail />} />
+
+            {/* 기본 리다이렉트 */}
+            <Route index element={<Navigate to="/admin/users" replace />} />
+          </Route>
+
+          {/* 공통 게시판 라우트 */}
+          {/* <Route
+            path={ROUTES.BOARD}
+            element={
+              <ProtectedRoute>
+                <BoardPage />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.BOARD_CREATE}
+            element={
+              <ProtectedRoute>
+                <BoardCreatePage />
+              </ProtectedRoute>
+            }
+          /> */}
+          {/* <Route
+            path={ROUTES.BOARD_DETAIL}
+            element={
+              <ProtectedRoute>
+                <BoardDetailPage />
+              </ProtectedRoute>
+            }
+          /> */}
+
+          {/* 404 페이지 */}
+          {/* <Route path={ROUTES.NOT_FOUND} element={<NotFoundPage />} /> }
+          <Route
+            path="*"
+            element={<Navigate to={ROUTES.NOT_FOUND} replace />}
+          /> */}
         </Routes>
-      </ThemeProvider>
-    </AuthProvider>
+      </React.Suspense>
+
+      {/* 토스트 컨테이너 */}
+      <ToastContainer />
+    </div>
   );
 };
+
+// 최상위 App 컴포넌트
+const App: React.FC = () => {
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ThemeProvider>
+  );
+};
+
 
 export default App;

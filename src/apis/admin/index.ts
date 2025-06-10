@@ -6,15 +6,12 @@ import type {
 } from '../reservation';
 import type { MatchingResponseDto } from '../matching';
 import type { ConsumerProfileResponseDto } from '../consumer';
+import type { AnswerRequestDto } from '../board';
 
 // 관리자 관련 타입 정의
 export interface AdminLoginRequestDto {
   adminKey: string;
   password: string;
-}
-
-export interface AnswerRequestDto {
-  content: string;
 }
 
 export interface PageParams {
