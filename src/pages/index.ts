@@ -1,8 +1,8 @@
 // 기본 페이지들
-// export { default as Home } from './Home';
-// export { default as Login } from './Login';
-// export { default as SignUp } from './SignUp';
-// export { default as NotFound } from './NotFound';
+export { default as Home } from './Home';
+export { default as Login } from './Login';
+export { default as SignUp } from './SignUp';
+export { default as NotFound } from './NotFound';
 
 // 구글 로그인
 export { default as GoogleCallback } from './GoogleCallback';
