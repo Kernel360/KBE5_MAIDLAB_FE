@@ -148,12 +148,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         showToast(SUCCESS_MESSAGES.LOGIN, 'success');
 
-        // 사용자 타입에 따른 리다이렉트
-        const redirectPath =
-          data.userType === USER_TYPES.CONSUMER
-            ? ROUTES.CONSUMER.MYPAGE
-            : ROUTES.MANAGER.MYPAGE;
-        navigate(redirectPath);
+        navigate(ROUTES.HOME);
 
         return { success: true };
       } catch (error: any) {
