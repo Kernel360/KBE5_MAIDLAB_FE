@@ -1,18 +1,16 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { AuthProvider, ThemeProvider } from '@/hooks';
 import { ToastContainer } from '@/components/common';
 import { ROUTES } from '@/constants';
 
-// Pages
-import {
-  Home,
-  Login,
-  SignUp,
-  NotFound,
-  GoogleCallBack,
-  SocialSignUp,
-} from '@/pages';
+// Pages - 개별 import로 변경
+import Home from '@/pages/Home';
+import Login from '@/pages/Login';
+import SignUp from '@/pages/SignUp';
+import NotFound from '@/pages/NotFound';
+import GoogleCallback from '@/pages/GoogleCallback';
+import SocialSignUp from '@/pages/SocialSignUp';
 
 // Styles
 import '@/styles/index.css';
@@ -28,7 +26,7 @@ const App: React.FC = () => {
             <Route path={ROUTES.LOGIN} element={<Login />} />
             <Route path={ROUTES.SIGNUP} element={<SignUp />} />
             <Route path={ROUTES.SOCIAL_SIGNUP} element={<SocialSignUp />} />
-            <Route path="/google-callback" element={<GoogleCallBack />} />
+            <Route path="/google-callback" element={<GoogleCallback />} />
 
             {/* 이벤트 페이지 (나중에 구현) */}
             {/* <Route path={ROUTES.EVENTS} element={<Events />} />

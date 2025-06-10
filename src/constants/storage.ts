@@ -9,6 +9,7 @@ export const STORAGE_KEYS = {
   THEME: 'theme',
   RECENT_SEARCHES: 'recentSearches',
   NOTIFICATION_SETTINGS: 'notificationSettings',
+  SAVED_LOGIN_INFO: 'savedLoginInfo',
 } as const;
 
 // ===== 세션스토리지 키 상수 =====
