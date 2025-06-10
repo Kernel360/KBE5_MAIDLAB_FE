@@ -44,7 +44,20 @@ export const useEvent = () => {
     [showToast],
   );
 
-  // 이벤트 생성 (관리자용)
+  // 활성화된 이벤트 (EventListItem에는 isActive가 없으므로 모든 이벤트 반환)
+  const getActiveEvents = useCallback(() => {
+    // EventListItem에는 isActive나 날짜 필드가 없으므로
+    // 모든 이벤트를 활성 이벤트로 간주하거나
+    // 최신 순으로 정렬해서 반환
+    return events
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      )
+      .slice(0, 5); // 최신 5개만
+  }, [events]);
+
+  // 이벤트 생성 (관리자용) - EventRequestDto 타입 사용
   const createEvent = useCallback(
     async (data: EventRequestDto) => {
       try {
@@ -111,6 +124,7 @@ export const useEvent = () => {
 
   return {
     events,
+    activeEvents: getActiveEvents(), // 최신 이벤트들
     loading,
     fetchEvents,
     fetchEventDetail,

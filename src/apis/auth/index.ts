@@ -37,9 +37,9 @@ export interface LoginResponseDto {
 }
 
 export interface SocialLoginResponseDto {
+  newUser: boolean;
   accessToken: string;
   expirationTime: number;
-  newUser: boolean;
 }
 
 // 인증 API 함수들
