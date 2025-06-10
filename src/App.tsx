@@ -31,6 +31,7 @@ import '@/styles/index.css';
 
 const App: React.FC = () => {
 import { clearExpiredLocalStorage } from '@/utils';
+import '@/styles/index.css';
 
 // 페이지 컴포넌트들 (Lazy Loading)
 // const HomePage = React.lazy(() => import('@/pages/Home'));
@@ -421,9 +422,9 @@ const AppContent: React.FC = () => {
           <Route
             path={ROUTES.CONSUMER.RESERVATION_CREATE}
             element={
-              <ProtectedRoute requiredUserType="CONSUMER">
+              // <ProtectedRoute requiredUserType="CONSUMER">
                 <ConsumerReservationCreate />
-              </ProtectedRoute>
+              // </ProtectedRoute>
             }
           />
           {/* <Route
