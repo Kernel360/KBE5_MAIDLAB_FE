@@ -86,9 +86,12 @@ interface AuthContextType extends AuthState {
   login: (
     data: LoginRequestDto,
   ) => Promise<{ success: boolean; error?: string }>;
-  socialLogin: (
-    data: SocialLoginRequestDto,
-  ) => Promise<{ success: boolean; needsSignup?: boolean; error?: string }>;
+  socialLogin: (data: SocialLoginRequestDto) => Promise<{
+    success: boolean;
+    newUser?: boolean;
+    error?: string;
+    accessToken?: string;
+  }>;
   signUp: (
     data: SignUpRequestDto,
   ) => Promise<{ success: boolean; error?: string }>;
@@ -171,10 +174,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         const response = await authApi.socialLogin(data);
 
         if (response.newUser) {
+          // 신규 사용자 - 추가 정보 입력 필요
           dispatch({ type: 'AUTH_LOGOUT' });
-          return { success: true, needsSignup: true };
+          return {
+            success: true,
+            newUser: true,
+            accessToken: response.accessToken,
+          };
         }
 
+        // 기존 사용자 - 로그인 완료
         tokenStorage.setAccessToken(response.accessToken);
         userStorage.setUserType(data.userType);
 
@@ -184,7 +193,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         });
 
         showToast(SUCCESS_MESSAGES.LOGIN, 'success');
-        return { success: true, needsSignup: false };
+        return {
+          success: true,
+          newUser: false,
+          accessToken: response.accessToken,
+        };
       } catch (error: any) {
         const errorMessage =
           error.message || ERROR_MESSAGES.INVALID_CREDENTIALS;
@@ -193,7 +206,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         return { success: false, error: errorMessage };
       }
     },
-    [showToast],
+    [showToast, navigate],
   );
 
   // 회원가입 함수
