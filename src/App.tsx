@@ -11,8 +11,9 @@ import { clearExpiredLocalStorage } from '@/utils';
 // const NotFoundPage = React.lazy(() => import('@/pages/NotFound'));
 
 // 소비자 페이지들
-// const ConsumerMyPage = React.lazy(() => import('@/pages/consumer/MyPage'));
-// const ConsumerProfile = React.lazy(() => import('@/pages/consumer/Profile'));
+const ConsumerMyPage = React.lazy(() => import('@/pages/consumer/MyPage'));
+const ConsumerProfile = React.lazy(() => import('@/pages/consumer/Profile'));
+const ConsumerProfileEdit = React.lazy(() => import('@/pages/consumer/ProfileEdit'));
 // const ConsumerReservations = React.lazy(
 //   () => import('@/pages/consumer/Reservations'),
 // );
@@ -22,12 +23,9 @@ import { clearExpiredLocalStorage } from '@/utils';
 // const ConsumerReservationCreate = React.lazy(
 //   () => import('@/pages/consumer/ReservationCreate'),
 // );
-// const ConsumerLikedManagers = React.lazy(
-//   () => import('@/pages/consumer/LikedManagers'),
-// );
-// const ConsumerBlacklist = React.lazy(
-//   () => import('@/pages/consumer/Blacklist'),
-// );
+const ManagerList = React.lazy(() => import('@/pages/consumer/ManagerList'));
+// const ConsumerLikedManagers = React.lazy(() => import('@/pages/consumer/LikedManagers'));
+// const ConsumerBlacklist = React.lazy(() => import('@/pages/consumer/Blacklist'));
 
 // 매니저 페이지들
 // const ManagerMyPage = React.lazy(() => import('@/pages/manager/MyPage'));
@@ -149,22 +147,31 @@ const AppContent: React.FC = () => {
           {/* <Route path={ROUTES.EVENT_DETAIL} element={<EventDetailPage />} /> */}
 
           {/* 소비자 라우트 */}
-          {/* <Route
+          <Route
             path={ROUTES.CONSUMER.MYPAGE}
             element={
-              <ProtectedRoute requiredUserType="CONSUMER">
+              // <ProtectedRoute requiredUserType="CONSUMER">
                 <ConsumerMyPage />
-              </ProtectedRoute>
+              // </ProtectedRoute>
             }
-          /> */}
-          {/* <Route
+          />
+          <Route
             path={ROUTES.CONSUMER.PROFILE}
             element={
-              <ProtectedRoute requiredUserType="CONSUMER">
+              // <ProtectedRoute requiredUserType="CONSUMER">
                 <ConsumerProfile />
-              </ProtectedRoute>
+              // </ProtectedRoute>
             }
-          /> */}
+          />
+          <Route
+            path={ROUTES.CONSUMER.PROFILE_EDIT}
+            element={
+              // <ProtectedRoute requiredUserType="CONSUMER">
+                <ConsumerProfileEdit />
+              // </ProtectedRoute>
+            }
+          />
+        
           {/* <Route
             path={ROUTES.CONSUMER.RESERVATIONS}
             element={
@@ -189,22 +196,14 @@ const AppContent: React.FC = () => {
               </ProtectedRoute>
             }
           /> */}
-          {/* <Route
+          <Route
             path={ROUTES.CONSUMER.LIKED_MANAGERS}
-            element={
-              <ProtectedRoute requiredUserType="CONSUMER">
-                <ConsumerLikedManagers />
-              </ProtectedRoute>
-            }
-          /> */}
-          {/* <Route
+            element={<ManagerList />}
+          />
+          <Route
             path={ROUTES.CONSUMER.BLACKLIST}
-            element={
-              <ProtectedRoute requiredUserType="CONSUMER">
-                <ConsumerBlacklist />
-              </ProtectedRoute>
-            }
-          /> */}
+            element={<ManagerList />}
+          />
 
           {/* 매니저 라우트 */}
           {/* <Route
