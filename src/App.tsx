@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, ThemeProvider, useAuth } from '@/hooks';
 import { ROUTES } from '@/constants';
 import { clearExpiredLocalStorage } from '@/utils';
+import '@/styles/index.css';
 
 // 페이지 컴포넌트들 (Lazy Loading)
 // const HomePage = React.lazy(() => import('@/pages/Home'));
@@ -184,9 +185,9 @@ const AppContent: React.FC = () => {
           <Route
             path={ROUTES.CONSUMER.RESERVATION_CREATE}
             element={
-              <ProtectedRoute requiredUserType="CONSUMER">
+              // <ProtectedRoute requiredUserType="CONSUMER">
                 <ConsumerReservationCreate />
-              </ProtectedRoute>
+              // </ProtectedRoute>
             }
           />
           {/* <Route
