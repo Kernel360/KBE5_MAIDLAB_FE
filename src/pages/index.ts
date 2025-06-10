@@ -1,12 +1,12 @@
 // 기본 페이지들
-export { default as Home } from './Home';
-export { default as Login } from './Login';
-export { default as SignUp } from './SignUp';
-export { default as NotFound } from './NotFound';
+// export { default as Home } from './Home';
+// export { default as Login } from './Login';
+// export { default as SignUp } from './SignUp';
+// export { default as NotFound } from './NotFound';
 
-// 구글 로그인
-export { default as GoogleCallBack } from './GoogleCallback';
-export { SocialSignUp } from './SocialSignUp';
+// // 구글 로그인
+// export { default as GoogleCallBack } from './GoogleCallback';
+// export { SocialSignUp } from './SocialSignUp';
 
 // 이벤트 페이지 (나중에 구현)
 // export { default as Events } from './Events';
@@ -32,8 +32,14 @@ export { SocialSignUp } from './SocialSignUp';
 // export { default as ManagerReviews } from './manager/Reviews';
 
 // 관리자 페이지 (나중에 구현)
-// export { default as AdminDashboard } from './admin/Dashboard';
-// export { default as AdminLogin } from './admin/Login';
-// export { default as AdminManagers } from './admin/Managers';
-// export { default as AdminConsumers } from './admin/Consumers';
-// export { default as AdminReservations } from './admin/Reservations';
+export { default as AdminLogin } from '@/pages/admin/AdminLogin';
+export { default as AdminLayout } from '@/pages/admin/layout/AdminLayout';
+export { default as AdminUserList } from '@/pages/admin/UserList';
+export { default as AdminManagerDetail } from '@/pages/admin/ManagerDetail';
+export { default as AdminConsumerDetail } from '@/pages/admin/ConsumerDetail';
+export { default as AdminReservationList } from '@/pages/admin/ReservationList';
+export { default as AdminReservationDetail } from '@/pages/admin/ReservationDetail';
+export { default as AdminEvents } from '@/pages/admin/EventList';
+export { default as AdminEventCreate } from '@/pages/admin/EventCreate';
+export { default as AdminBoards } from '@/pages/admin/BoardList';
+export { default as AdminBoardDetail } from '@/pages/admin/BoardDetail';
