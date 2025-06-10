@@ -1,7 +1,7 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { AuthProvider, ThemeProvider } from '@/hooks';
-import { ToastContainer } from '@/components/common';
+import { ProtectedRoute, ToastContainer } from '@/components/common';
 import { ROUTES } from '@/constants';
 
 // Pages - 개별 import로 변경
@@ -11,6 +11,22 @@ import SignUp from '@/pages/SignUp';
 import NotFound from '@/pages/NotFound';
 import GoogleCallback from '@/pages/GoogleCallback';
 import SocialSignUp from '@/pages/SocialSignUp';
+  
+
+import {
+  AdminLogin,
+  AdminLayout,
+  AdminUserList,
+  AdminManagerDetail,
+  AdminConsumerDetail,
+  AdminReservationList,
+  AdminReservationDetail,
+  AdminEvents,
+  AdminEventCreate,
+  AdminBoards,
+  AdminBoardDetail,
+} from '@/pages';
+
 
 // Styles
 import '@/styles/index.css';
@@ -30,7 +46,7 @@ const App: React.FC = () => {
 
             {/* 이벤트 페이지 (나중에 구현) */}
             {/* <Route path={ROUTES.EVENTS} element={<Events />} />
-              <Route path={ROUTES.EVENT_DETAIL} element={<EventDetail />} /> */}
+              <Route path={ROUTES.EVENT_DETAIL} element={<EventDetail />} />
 
             {/* 게시판 페이지 (나중에 구현) */}
             {/* <Route path={ROUTES.BOARD} element={<Board />} />
@@ -184,7 +200,7 @@ const App: React.FC = () => {
             <Route path="boards/:id" element={<AdminBoardDetail />} />
 
             {/* 기본 리다이렉트 */}
-            <Route index element={<Navigate to="/admin/users" replace />} />
+            <Route index element={<AdminUserList />} />
           </Route>
 
           {/* 공통 게시판 라우트들 */}
@@ -214,8 +230,8 @@ const App: React.FC = () => {
           /> */}
 
             {/* 404 페이지 */}
-            <Route path={ROUTES.NOT_FOUND} element={<NotFound />} />
-            <Route path="*" element={<NotFound />} />
+            {/* <Route path={ROUTES.NOT_FOUND} element={<NotFound />} />
+            <Route path="*" element={<NotFound />} /> */}
           </Routes>
 
           {/* 전역 토스트 컨테이너 */}
