@@ -1,18 +1,70 @@
 import React, { useEffect, useState } from 'react';
 import { useReservation } from '@/hooks/useReservation';
 import { usePagination } from '@/hooks/usePagination';
-import type { ReservationResponseDto } from '@/apis/reservation';
-import { useNavigate } from 'react-router-dom';
-import { ROUTES, RESERVATION_STATUS, PAGINATION_DEFAULTS, INFO_MESSAGES } from '@/constants';
 import { ReservationCard } from '@/components/reservation/ReservationCard';
+import { ROUTES, RESERVATION_STATUS, PAGINATION_DEFAULTS, INFO_MESSAGES } from '@/constants';
 import { IoArrowBack } from 'react-icons/io5';
+import { useNavigate } from 'react-router-dom';
+import type { ReservationResponseDto } from '@/apis/reservation';
 
-type TabType = '전체' | '예정' | '완료';
-const TABS: TabType[] = ['전체', '예정', '완료'];
+// Single Responsibility: 탭 관련 상수와 타입을 분리
+type TabType = '전체' | '예정' | '진행중' | '완료';
+const TABS: TabType[] = ['전체', '예정', '진행중', '완료'];
 
-const PENDING_STATUSES = [RESERVATION_STATUS.PENDING, RESERVATION_STATUS.APPROVED] as const;
-const COMPLETED_STATUSES = [RESERVATION_STATUS.COMPLETED, RESERVATION_STATUS.CANCELED] as const;
+// Open-Closed: 상태 필터링 로직을 확장 가능하게 구성
+const RESERVATION_FILTERS = {
+  전체: (reservations: ReservationResponseDto[]) => reservations,
+  예정: (reservations: ReservationResponseDto[]) => 
+    reservations.filter(r => [
+      RESERVATION_STATUS.PENDING,
+      RESERVATION_STATUS.APPROVED,
+      RESERVATION_STATUS.MATCHED,
+    ].includes(r.status as "PENDING" | "APPROVED" | "MATCHED")),
+  진행중: (reservations: ReservationResponseDto[]) =>
+    reservations.filter(r => r.status === RESERVATION_STATUS.WORKING),
+  완료: (reservations: ReservationResponseDto[]) => 
+    reservations.filter(r => r.status === RESERVATION_STATUS.COMPLETED),
+} as const;
 
+// Interface Segregation: 컴포넌트별 책임을 명확히 분리
+const ReservationTabs: React.FC<{
+  activeTab: TabType;
+  onTabChange: (tab: TabType) => void;
+}> = ({ activeTab, onTabChange }) => (
+  <div className="flex border-b">
+    {TABS.map((tab) => (
+      <button
+        key={tab}
+        className={`flex-1 py-3 text-sm font-medium border-b-2 ${
+          activeTab === tab
+            ? 'text-blue-600 border-blue-600'
+            : 'text-gray-500 border-transparent'
+        }`}
+        onClick={() => onTabChange(tab)}
+      >
+        {tab}
+      </button>
+    ))}
+  </div>
+);
+
+// Liskov Substitution: 예약 목록 표시 컴포넌트를 독립적으로 구성
+const ReservationList: React.FC<{
+  reservations: ReservationResponseDto[];
+  onReservationClick: (id: number) => void;
+}> = ({ reservations, onReservationClick }) => (
+  <div className="space-y-4">
+    {reservations.map((reservation) => (
+      <ReservationCard
+        key={reservation.reservationId}
+        reservation={reservation}
+        onClick={() => onReservationClick(reservation.reservationId)}
+      />
+    ))}
+  </div>
+);
+
+// Dependency Inversion: 상위 컴포넌트에서 하위 컴포넌트로 의존성 주입
 const ConsumerReservations: React.FC = () => {
   const navigate = useNavigate();
   const { reservations, loading, fetchReservations } = useReservation();
@@ -30,22 +82,13 @@ const ConsumerReservations: React.FC = () => {
 
   useEffect(() => {
     if (reservations) {
-      let filtered = [...reservations];
-      if (activeTab === '예정') {
-        filtered = reservations.filter(r => 
-          PENDING_STATUSES.includes(r.status as typeof PENDING_STATUSES[number])
-        );
-      } else if (activeTab === '완료') {
-        filtered = reservations.filter(r => 
-          COMPLETED_STATUSES.includes(r.status as typeof COMPLETED_STATUSES[number])
-        );
-      }
-      setFilteredReservations(filtered);
+      const filterFn = RESERVATION_FILTERS[activeTab];
+      setFilteredReservations(filterFn(reservations));
     }
   }, [reservations, activeTab]);
 
   const handleReservationClick = (reservationId: number) => {
-    navigate(`${ROUTES.CONSUMER.RESERVATION_DETAIL.replace(':id', String(reservationId))}`);
+    navigate(ROUTES.CONSUMER.RESERVATION_DETAIL.replace(':id', String(reservationId)));
   };
 
   const currentReservations = filteredReservations.slice(startIndex, endIndex);
@@ -63,23 +106,7 @@ const ConsumerReservations: React.FC = () => {
           </button>
           <h1 className="ml-2 text-lg font-semibold">예약 내역</h1>
         </div>
-
-        {/* 탭 메뉴 */}
-        <div className="flex border-b">
-          {TABS.map((tab) => (
-            <button
-              key={tab}
-              className={`flex-1 py-3 text-sm font-medium border-b-2 ${
-                activeTab === tab
-                  ? 'text-blue-600 border-blue-600'
-                  : 'text-gray-500 border-transparent'
-              }`}
-              onClick={() => setActiveTab(tab)}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
+        <ReservationTabs activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
 
       {/* 컨텐츠 */}
@@ -90,16 +117,10 @@ const ConsumerReservations: React.FC = () => {
           </div>
         ) : currentReservations.length > 0 ? (
           <>
-            <div className="space-y-4">
-              {currentReservations.map((reservation) => (
-                <ReservationCard
-                  key={reservation.reservationId}
-                  reservation={reservation}
-                  onClick={() => handleReservationClick(reservation.reservationId)}
-                />
-              ))}
-            </div>
-
+            <ReservationList
+              reservations={currentReservations}
+              onReservationClick={handleReservationClick}
+            />
             {/* 페이지네이션 */}
             {totalPages > 1 && (
               <div className="flex justify-center items-center gap-2 mt-6">
