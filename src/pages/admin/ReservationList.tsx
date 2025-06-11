@@ -160,9 +160,18 @@ const ReservationList = () => {
     setSelectedMatching(null);
   };
 
-  const handleConfirmChange = () => {
-    // TODO: 매니저 변경 로직 구현
-    handleCloseDialog();
+  const handleConfirmChange = async (managerId: number) => {
+    if (!selectedMatching) return;
+
+    try {
+      await adminApi.changeManager(selectedMatching.reservationId, managerId);
+      // 매칭 목록 새로고침
+      const matchingsData = await adminApi.getAllMatching();
+      setMatchings(matchingsData);
+      handleCloseDialog();
+    } catch (error) {
+      console.error('매니저 변경 실패:', error);
+    }
   };
 
   if (loading) {
