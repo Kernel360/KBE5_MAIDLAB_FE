@@ -100,106 +100,108 @@ const SocialSignUp: React.FC = () => {
       </header>
 
       <main className="px-4 py-6">
-        <div className="mb-6">
-          <div className="text-center mb-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
-              안녕하세요!
-            </h2>
-            <p className="text-gray-600">
-              {userType === 'CONSUMER' ? '회원' : '매니저'} 가입을 위해 추가
-              정보를 입력해주세요.
-            </p>
-          </div>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* 성별 */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              성별 <span className="text-red-500">*</span>
-            </label>
-            <div className="flex space-x-3">
-              <button
-                type="button"
-                onClick={() => setValue('gender', 'MALE')}
-                className={`flex-1 py-3 px-4 rounded-lg border transition-all ${
-                  values.gender === 'MALE'
-                    ? 'border-orange-500 bg-orange-50 text-orange-600 font-medium'
-                    : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-                }`}
-              >
-                남성
-              </button>
-              <button
-                type="button"
-                onClick={() => setValue('gender', 'FEMALE')}
-                className={`flex-1 py-3 px-4 rounded-lg border transition-all ${
-                  values.gender === 'FEMALE'
-                    ? 'border-orange-500 bg-orange-50 text-orange-600 font-medium'
-                    : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-                }`}
-              >
-                여성
-              </button>
+        <div className="max-w-md mx-auto">
+          <div className="mb-6">
+            <div className="text-center mb-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-2">
+                안녕하세요!
+              </h2>
+              <p className="text-gray-600">
+                {userType === 'CONSUMER' ? '회원' : '매니저'} 가입을 위해 추가
+                정보를 입력해주세요.
+              </p>
             </div>
           </div>
 
-          {/* 생년월일 */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              생년월일 <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={values.birth}
-              onChange={(e) => handleBirthChange(e.target.value)}
-              onBlur={() => setFieldTouched('birth')}
-              placeholder="1990-01-01"
-              maxLength={10}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
-                errors.birth && touched.birth
-                  ? 'border-red-500'
-                  : 'border-gray-300'
-              }`}
-            />
-            {errors.birth && touched.birth && (
-              <p className="text-red-500 text-sm">
-                올바른 생년월일을 입력해주세요.
-              </p>
-            )}
-          </div>
-
-          {/* 회원가입 완료 버튼 */}
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white font-medium py-3 px-4 rounded-lg transition-colors relative"
-          >
-            {isLoading ? (
-              <div className="flex items-center justify-center">
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                가입 완료 중...
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* 성별 */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                성별 <span className="text-red-500">*</span>
+              </label>
+              <div className="flex space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setValue('gender', 'MALE')}
+                  className={`flex-1 py-3 px-4 rounded-lg border transition-all ${
+                    values.gender === 'MALE'
+                      ? 'border-orange-500 bg-orange-50 text-orange-600 font-medium'
+                      : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                  }`}
+                >
+                  남성
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setValue('gender', 'FEMALE')}
+                  className={`flex-1 py-3 px-4 rounded-lg border transition-all ${
+                    values.gender === 'FEMALE'
+                      ? 'border-orange-500 bg-orange-50 text-orange-600 font-medium'
+                      : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                  }`}
+                >
+                  여성
+                </button>
               </div>
-            ) : (
-              '회원가입 완료'
-            )}
-          </button>
+            </div>
 
-          {/* 안내 메시지 */}
-          <div className="text-center">
-            <p className="text-sm text-gray-500">
-              이미 계정이 있으시다면{' '}
-              <button
-                type="button"
-                onClick={() => navigate(ROUTES.LOGIN)}
-                className="text-orange-500 font-medium hover:underline"
-              >
-                로그인
-              </button>
-              해주세요.
-            </p>
-          </div>
-        </form>
+            {/* 생년월일 */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                생년월일 <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={values.birth}
+                onChange={(e) => handleBirthChange(e.target.value)}
+                onBlur={() => setFieldTouched('birth')}
+                placeholder="1990-01-01"
+                maxLength={10}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                  errors.birth && touched.birth
+                    ? 'border-red-500'
+                    : 'border-gray-300'
+                }`}
+              />
+              {errors.birth && touched.birth && (
+                <p className="text-red-500 text-sm">
+                  올바른 생년월일을 입력해주세요.
+                </p>
+              )}
+            </div>
+
+            {/* 회원가입 완료 버튼 */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white font-medium py-3 px-4 rounded-lg transition-colors relative"
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                  가입 완료 중...
+                </div>
+              ) : (
+                '회원가입 완료'
+              )}
+            </button>
+
+            {/* 안내 메시지 */}
+            <div className="text-center">
+              <p className="text-sm text-gray-500">
+                이미 계정이 있으시다면{' '}
+                <button
+                  type="button"
+                  onClick={() => navigate(ROUTES.LOGIN)}
+                  className="text-orange-500 font-medium hover:underline"
+                >
+                  로그인
+                </button>
+                해주세요.
+              </p>
+            </div>
+          </form>
+        </div>
       </main>
     </div>
   );

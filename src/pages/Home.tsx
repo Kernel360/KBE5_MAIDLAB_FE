@@ -48,20 +48,23 @@ const Home: React.FC = () => {
       />
 
       <main className="px-4 py-6 pb-20">
-        <HeroSection
-          onEventClick={handleEventClick}
-          events={activeEvents}
-          loading={eventsLoading}
-        />
+        {/* 가운데 정렬을 위한 컨테이너 추가 */}
+        <div className="max-w-md mx-auto">
+          <HeroSection
+            onEventClick={handleEventClick}
+            events={activeEvents}
+            loading={eventsLoading}
+          />
 
-        <ServiceGrid onServiceClick={handleServiceClick} />
+          <ServiceGrid onServiceClick={handleServiceClick} />
 
-        <PromotionBanner
-          title="회원가입 혜택"
-          subtitle="지금 가입하고 포인트 받기"
-          discount="1000P"
-          onClick={() => navigate(ROUTES.SIGNUP)}
-        />
+          <PromotionBanner
+            title="회원가입 혜택"
+            subtitle="지금 가입하고 포인트 받기"
+            discount="1000P"
+            onClick={() => navigate(ROUTES.SIGNUP)}
+          />
+        </div>
       </main>
 
       <BottomNavigation

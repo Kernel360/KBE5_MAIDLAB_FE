@@ -53,7 +53,7 @@ const AdminLogin = () => {
       // 로그인 성공시 페이지 이동
       if (result.success) {
         const from = (location.state as { from?: Location })?.from?.pathname || '/admin/users';
-        navigate(from);
+        navigate('/admin/users');
       } else {
         // 로그인 실패시 에러 표시 (이미 토스트로 표시되지만 추가로 표시하고 싶다면)
         setError(result.error || '로그인에 실패했습니다.');

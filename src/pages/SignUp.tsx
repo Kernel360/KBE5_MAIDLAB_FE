@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
-import { useAuth, useForm, useValidation, useToast } from '@/hooks';
+import { useAuth, useForm, useToast } from '@/hooks';
 import { ROUTES } from '@/constants';
 import type { SignUpRequestDto } from '@/apis/auth';
 
@@ -18,9 +18,6 @@ const SignUp: React.FC = () => {
     useForm<
       SignUpRequestDto & {
         confirmPassword: string;
-        verificationCode: string;
-        smsVerified: boolean;
-        phoneVerified: boolean;
       }
     >({
       initialValues: {
@@ -31,9 +28,6 @@ const SignUp: React.FC = () => {
         name: '',
         birth: '',
         gender: 'MALE',
-        verificationCode: '',
-        smsVerified: false,
-        phoneVerified: false,
       },
       validationSchema: {
         phoneNumber: (value) => /^01[0-9]{8,9}$/.test(value.replace(/-/g, '')),
@@ -46,12 +40,6 @@ const SignUp: React.FC = () => {
         // 비밀번호 확인 체크
         if (formData.password !== formData.confirmPassword) {
           showToast('비밀번호가 일치하지 않습니다.', 'error');
-          return;
-        }
-
-        // SMS 인증 체크 (실제로는 백엔드에서 처리)
-        if (!formData.smsVerified) {
-          showToast('SMS 인증이 필요합니다.', 'error');
           return;
         }
 
@@ -100,40 +88,6 @@ const SignUp: React.FC = () => {
     setValue('birth', formatted);
   };
 
-  // SMS 인증번호 요청
-  const handleSmsVerification = async () => {
-    if (!values.phoneNumber || errors.phoneNumber) {
-      showToast('올바른 휴대폰 번호를 입력해주세요.', 'error');
-      return;
-    }
-
-    try {
-      // 실제로는 SMS API 호출
-      console.log('SMS 인증번호 요청:', values.phoneNumber);
-
-      // 임시: 성공 처리
-      showToast('인증번호가 발송되었습니다.', 'success');
-
-      // 휴대폰 번호 중복 확인도 함께 처리
-      setValue('phoneVerified', true);
-    } catch (error) {
-      showToast('인증번호 발송에 실패했습니다.', 'error');
-    }
-  };
-
-  // 인증번호 확인
-  const handleVerificationCode = () => {
-    if (values.verificationCode.length !== 6) {
-      showToast('인증번호 6자리를 입력해주세요.', 'error');
-      return;
-    }
-
-    // 실제로는 백엔드에서 인증번호 확인
-    // 임시: 성공 처리
-    setValue('smsVerified', true);
-    showToast('인증이 완료되었습니다.', 'success');
-  };
-
   const getPasswordStrength = () => {
     const password = values.password;
     if (!password) return { strength: 0, text: '', color: '' };
@@ -167,287 +121,251 @@ const SignUp: React.FC = () => {
       </header>
 
       <main className="px-4 py-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* 사용자 타입 선택 */}
-          <div className="flex bg-gray-100 rounded-lg p-1">
-            <button
-              type="button"
-              onClick={() => setSelectedUserType('CONSUMER')}
-              className={`flex-1 py-3 px-4 rounded-md text-sm font-medium transition-colors ${
-                selectedUserType === 'CONSUMER'
-                  ? 'bg-orange-500 text-white'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              회원
-            </button>
-            <button
-              type="button"
-              onClick={() => setSelectedUserType('MANAGER')}
-              className={`flex-1 py-3 px-4 rounded-md text-sm font-medium transition-colors ${
-                selectedUserType === 'MANAGER'
-                  ? 'bg-orange-500 text-white'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              매니저
-            </button>
-          </div>
+        <div className="max-w-md mx-auto">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* 사용자 타입 선택 */}
+            <div className="flex bg-gray-100 rounded-lg p-1">
+              <button
+                type="button"
+                onClick={() => setSelectedUserType('CONSUMER')}
+                className={`flex-1 py-3 px-4 rounded-md text-sm font-medium transition-colors ${
+                  selectedUserType === 'CONSUMER'
+                    ? 'bg-orange-500 text-white'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                회원
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedUserType('MANAGER')}
+                className={`flex-1 py-3 px-4 rounded-md text-sm font-medium transition-colors ${
+                  selectedUserType === 'MANAGER'
+                    ? 'bg-orange-500 text-white'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                매니저
+              </button>
+            </div>
 
-          {/* 휴대폰 번호 */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              휴대폰 번호
-            </label>
-            <div className="flex space-x-2">
+            {/* 휴대폰 번호 */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                휴대폰 번호
+              </label>
               <input
                 type="tel"
                 value={values.phoneNumber}
                 onChange={(e) => handlePhoneChange(e.target.value)}
                 onBlur={() => setFieldTouched('phoneNumber')}
                 placeholder="010-0000-0000"
-                className={`flex-1 px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                   errors.phoneNumber && touched.phoneNumber
                     ? 'border-red-500'
                     : 'border-gray-300'
                 }`}
               />
-              <button
-                type="button"
-                onClick={handleSmsVerification}
-                disabled={!values.phoneNumber || !!errors.phoneNumber}
-                className="px-4 py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap"
-              >
-                인증번호 요청
-              </button>
+              {errors.phoneNumber && touched.phoneNumber && (
+                <p className="text-red-500 text-sm">
+                  올바른 휴대폰 번호를 입력해주세요.
+                </p>
+              )}
             </div>
-            {errors.phoneNumber && touched.phoneNumber && (
-              <p className="text-red-500 text-sm">
-                올바른 휴대폰 번호를 입력해주세요.
-              </p>
-            )}
 
-            {/* 인증번호 입력 필드 */}
-            {values.phoneNumber && !values.smsVerified && (
-              <div className="flex space-x-2 mt-2">
+            {/* 비밀번호 */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                비밀번호
+              </label>
+              <div className="relative">
                 <input
-                  type="text"
-                  value={values.verificationCode}
-                  onChange={(e) => setValue('verificationCode', e.target.value)}
-                  placeholder="인증번호 6자리"
-                  maxLength={6}
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
+                  type={showPassword ? 'text' : 'password'}
+                  value={values.password}
+                  onChange={(e) => setValue('password', e.target.value)}
+                  onBlur={() => setFieldTouched('password')}
+                  placeholder="••••••••"
+                  className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                    errors.password && touched.password
+                      ? 'border-red-500'
+                      : 'border-gray-300'
+                  }`}
                 />
                 <button
                   type="button"
-                  onClick={handleVerificationCode}
-                  disabled={values.verificationCode.length !== 6}
-                  className="px-4 py-3 bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
                 >
-                  인증확인
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
-            )}
+              {values.password && (
+                <div className="flex items-center space-x-2">
+                  <div className="flex-1 bg-gray-200 rounded-full h-2">
+                    <div
+                      className={`h-2 rounded-full transition-all ${
+                        passwordStrength.strength <= 2
+                          ? 'bg-red-500'
+                          : passwordStrength.strength <= 3
+                            ? 'bg-yellow-500'
+                            : 'bg-green-500'
+                      }`}
+                      style={{
+                        width: `${(passwordStrength.strength / 5) * 100}%`,
+                      }}
+                    />
+                  </div>
+                  <span className={`text-xs ${passwordStrength.color}`}>
+                    {passwordStrength.text}
+                  </span>
+                </div>
+              )}
+              {errors.password && touched.password && (
+                <p className="text-red-500 text-sm">
+                  영문과 숫자를 포함하여 8-20자로 입력해주세요.
+                </p>
+              )}
+            </div>
 
-            {values.smsVerified && (
-              <p className="text-green-500 text-sm">
-                ✓ 휴대폰 인증이 완료되었습니다.
-              </p>
-            )}
-          </div>
-
-          {/* 비밀번호 */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              비밀번호
-            </label>
-            <div className="relative">
+            {/* 비밀번호 확인 */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                비밀번호 확인
+              </label>
               <input
                 type={showPassword ? 'text' : 'password'}
-                value={values.password}
-                onChange={(e) => setValue('password', e.target.value)}
-                onBlur={() => setFieldTouched('password')}
+                value={values.confirmPassword}
+                onChange={(e) => setValue('confirmPassword', e.target.value)}
                 placeholder="••••••••"
-                className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
-                  errors.password && touched.password
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                  values.confirmPassword &&
+                  values.password !== values.confirmPassword
                     ? 'border-red-500'
                     : 'border-gray-300'
                 }`}
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
-              >
-                {showPassword ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
-                  <Eye className="w-5 h-5" />
+              {values.confirmPassword &&
+                values.password !== values.confirmPassword && (
+                  <p className="text-red-500 text-sm">
+                    비밀번호가 일치하지 않습니다.
+                  </p>
                 )}
-              </button>
             </div>
-            {values.password && (
-              <div className="flex items-center space-x-2">
-                <div className="flex-1 bg-gray-200 rounded-full h-2">
-                  <div
-                    className={`h-2 rounded-full transition-all ${
-                      passwordStrength.strength <= 2
-                        ? 'bg-red-500'
-                        : passwordStrength.strength <= 3
-                          ? 'bg-yellow-500'
-                          : 'bg-green-500'
-                    }`}
-                    style={{
-                      width: `${(passwordStrength.strength / 5) * 100}%`,
-                    }}
-                  />
-                </div>
-                <span className={`text-xs ${passwordStrength.color}`}>
-                  {passwordStrength.text}
-                </span>
-              </div>
-            )}
-            {errors.password && touched.password && (
-              <p className="text-red-500 text-sm">
-                영문과 숫자를 포함하여 8-20자로 입력해주세요.
-              </p>
-            )}
-          </div>
 
-          {/* 비밀번호 확인 */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              비밀번호 확인
-            </label>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              value={values.confirmPassword}
-              onChange={(e) => setValue('confirmPassword', e.target.value)}
-              placeholder="••••••••"
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
-                values.confirmPassword &&
-                values.password !== values.confirmPassword
-                  ? 'border-red-500'
-                  : 'border-gray-300'
-              }`}
-            />
-            {values.confirmPassword &&
-              values.password !== values.confirmPassword && (
+            {/* 이름 */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                이름
+              </label>
+              <input
+                type="text"
+                value={values.name}
+                onChange={(e) => setValue('name', e.target.value)}
+                onBlur={() => setFieldTouched('name')}
+                placeholder="홍길동"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                  errors.name && touched.name
+                    ? 'border-red-500'
+                    : 'border-gray-300'
+                }`}
+              />
+              {errors.name && touched.name && (
                 <p className="text-red-500 text-sm">
-                  비밀번호가 일치하지 않습니다.
+                  이름은 2-20자로 입력해주세요.
                 </p>
               )}
-          </div>
-
-          {/* 이름 */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              이름
-            </label>
-            <input
-              type="text"
-              value={values.name}
-              onChange={(e) => setValue('name', e.target.value)}
-              onBlur={() => setFieldTouched('name')}
-              placeholder="홍길동"
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
-                errors.name && touched.name
-                  ? 'border-red-500'
-                  : 'border-gray-300'
-              }`}
-            />
-            {errors.name && touched.name && (
-              <p className="text-red-500 text-sm">
-                이름은 2-20자로 입력해주세요.
-              </p>
-            )}
-          </div>
-
-          {/* 성별 */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              성별
-            </label>
-            <div className="flex space-x-3">
-              <button
-                type="button"
-                onClick={() => setValue('gender', 'MALE')}
-                className={`flex-1 py-3 px-4 rounded-lg border transition-all ${
-                  values.gender === 'MALE'
-                    ? 'border-orange-500 bg-orange-50 text-orange-600 font-medium'
-                    : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-                }`}
-              >
-                남성
-              </button>
-              <button
-                type="button"
-                onClick={() => setValue('gender', 'FEMALE')}
-                className={`flex-1 py-3 px-4 rounded-lg border transition-all ${
-                  values.gender === 'FEMALE'
-                    ? 'border-orange-500 bg-orange-50 text-orange-600 font-medium'
-                    : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-                }`}
-              >
-                여성
-              </button>
             </div>
-          </div>
 
-          {/* 생년월일 */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              생년월일
-            </label>
-            <input
-              type="text"
-              value={values.birth}
-              onChange={(e) => handleBirthChange(e.target.value)}
-              onBlur={() => setFieldTouched('birth')}
-              placeholder="1990-01-01"
-              maxLength={10}
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
-                errors.birth && touched.birth
-                  ? 'border-red-500'
-                  : 'border-gray-300'
-              }`}
-            />
-            {errors.birth && touched.birth && (
-              <p className="text-red-500 text-sm">
-                올바른 생년월일을 입력해주세요.
-              </p>
-            )}
-          </div>
-
-          {/* 회원가입 버튼 */}
-          <button
-            type="submit"
-            disabled={isLoading || !values.smsVerified}
-            className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white font-medium py-3 px-4 rounded-lg transition-colors relative"
-          >
-            {isLoading ? (
-              <div className="flex items-center justify-center">
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                가입 중...
+            {/* 성별 */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                성별
+              </label>
+              <div className="flex space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setValue('gender', 'MALE')}
+                  className={`flex-1 py-3 px-4 rounded-lg border transition-all ${
+                    values.gender === 'MALE'
+                      ? 'border-orange-500 bg-orange-50 text-orange-600 font-medium'
+                      : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                  }`}
+                >
+                  남성
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setValue('gender', 'FEMALE')}
+                  className={`flex-1 py-3 px-4 rounded-lg border transition-all ${
+                    values.gender === 'FEMALE'
+                      ? 'border-orange-500 bg-orange-50 text-orange-600 font-medium'
+                      : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                  }`}
+                >
+                  여성
+                </button>
               </div>
-            ) : (
-              '회원가입'
-            )}
-          </button>
+            </div>
 
-          {/* 로그인 링크 */}
-          <div className="text-center">
-            <span className="text-gray-600 text-sm">
-              이미 계정이 있으신가요?{' '}
-            </span>
-            <Link
-              to={ROUTES.LOGIN}
-              className="text-orange-500 text-sm font-medium hover:underline"
+            {/* 생년월일 */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                생년월일
+              </label>
+              <input
+                type="text"
+                value={values.birth}
+                onChange={(e) => handleBirthChange(e.target.value)}
+                onBlur={() => setFieldTouched('birth')}
+                placeholder="1990-01-01"
+                maxLength={10}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                  errors.birth && touched.birth
+                    ? 'border-red-500'
+                    : 'border-gray-300'
+                }`}
+              />
+              {errors.birth && touched.birth && (
+                <p className="text-red-500 text-sm">
+                  올바른 생년월일을 입력해주세요.
+                </p>
+              )}
+            </div>
+
+            {/* 회원가입 버튼 */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white font-medium py-3 px-4 rounded-lg transition-colors relative"
             >
-              로그인
-            </Link>
-          </div>
-        </form>
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                  가입 중...
+                </div>
+              ) : (
+                '회원가입'
+              )}
+            </button>
+
+            {/* 로그인 링크 */}
+            <div className="text-center">
+              <span className="text-gray-600 text-sm">
+                이미 계정이 있으신가요?{' '}
+              </span>
+              <Link
+                to={ROUTES.LOGIN}
+                className="text-orange-500 text-sm font-medium hover:underline"
+              >
+                로그인
+              </Link>
+            </div>
+          </form>
+        </div>
       </main>
     </div>
   );
