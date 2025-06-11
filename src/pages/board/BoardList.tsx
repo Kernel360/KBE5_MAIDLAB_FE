@@ -4,7 +4,7 @@ import { useToast } from '@/hooks/useToast';
 import { boardApi } from '@/apis/board';
 import { ROUTES } from '@/constants/route';
 import { BOARD_TYPES } from '@/constants/board';
-import type { ConsumerBoardResponseDto } from '@/apis/admin';
+import type { ConsumerBoardResponseDto } from '@/apis/board';
 import BoardHeader from '@/components/board/BoardHeader';
 import BoardItem from '@/components/board/BoardItem';
 
@@ -63,8 +63,9 @@ export default function BoardList() {
           setBoards(MOCK_BOARDS);
           setIsLoading(false);
         }, 500); // 로딩 상태 확인을 위한 지연
-      } catch (error: any) {
-        showToast(error.message || '게시글 목록을 불러오는데 실패했습니다.', 'error');
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : '게시글 목록을 불러오는데 실패했습니다.';
+        showToast(errorMessage, 'error');
         setIsLoading(false);
       }
     };
@@ -86,8 +87,12 @@ export default function BoardList() {
 
       {boards.length > 0 ? (
         <div className="space-y-4">
-          {boards.map((board) => (
-            <BoardItem key={board.boardId} board={board} index={board.boardId} />
+          {boards.map((board: ConsumerBoardResponseDto) => (
+            <BoardItem 
+              key={board.boardId} 
+              board={board} 
+              index={board.boardId} 
+            />
           ))}
         </div>
       ) : (

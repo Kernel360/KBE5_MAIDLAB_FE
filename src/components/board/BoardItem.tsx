@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/constants/route';
 import { BOARD_TYPE_LABELS, BOARD_TYPE_ICONS } from '@/constants/board';
-import type { ConsumerBoardResponseDto } from '@/apis/admin';
+import type { ConsumerBoardResponseDto } from '@/apis/board';
 
 interface BoardItemProps {
   board: ConsumerBoardResponseDto;

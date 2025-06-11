@@ -1,11 +1,26 @@
 import { apiClient, type ApiResponse, handleApiError } from '../index';
-import type {
-  ConsumerBoardResponseDto,
-  ConsumerBoardDetailResponseDto,
-  ImageDto,
-} from '../admin';
 
 // 게시판 관련 타입 정의
+export interface ImageDto {
+  imagePath: string;
+  name: string;
+}
+
+export interface ConsumerBoardResponseDto {
+  boardId: number;
+  title: string;
+  content: string;
+  answered: boolean;
+  boardType: 'REFUND' | 'MANAGER' | 'SERVICE' | 'ETC';
+}
+
+export interface ConsumerBoardDetailResponseDto extends ConsumerBoardResponseDto {
+  images: ImageDto[];
+  answer?: {
+    content: string;
+  };
+}
+
 export interface ConsumerBoardRequestDto {
   boardType: 'REFUND' | 'MANAGER' | 'SERVICE' | 'ETC';
   title: string;

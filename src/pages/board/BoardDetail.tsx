@@ -3,14 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/useToast';
 import { ROUTES } from '@/constants/route';
 import { BOARD_TYPES,  BOARD_TYPE_LABELS } from '@/constants/board';
-import type { ConsumerBoardDetailResponseDto } from '@/apis/admin';
+import type { ConsumerBoardDetailResponseDto, ImageDto } from '@/apis/board';
 import BoardHeader from '@/components/board/BoardHeader';
 import AnswerSection from '@/components/board/AnswerSection';
 
 // 하드코딩된 게시글  데이터
-const MOCK_BOARD_DETAILS: (ConsumerBoardDetailResponseDto & {
-  // createdAt: string; // TODO: 서버 연동 시 주석 해제
-})[] = [
+const MOCK_BOARD_DETAILS: ConsumerBoardDetailResponseDto[] = [
   {
     boardId: 1,
     boardType: BOARD_TYPES.REFUND,
@@ -172,7 +170,7 @@ export default function BoardDetail() {
         {/* 이미지 갤러리 */}
         {board.images && board.images.length > 0 && (
           <div className="grid grid-cols-3 gap-4 mb-6">
-            {board.images.map((image, index) => (
+            {board.images.map((image: ImageDto, index: number) => (
               <img
                 key={index}
                 src={image.imagePath}
