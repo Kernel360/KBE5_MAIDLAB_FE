@@ -1,5 +1,7 @@
 import { apiClient, type ApiResponse, handleApiError } from '../index';
 
+export type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+
 // 예약 관련 타입 정의
 export interface ReservationRequestDto {
   serviceDetailTypeId: number;
@@ -15,7 +17,7 @@ export interface ReservationRequestDto {
   serviceAdd: string;
   pet: string;
   specialRequest: string;
-  totalPrice: number;
+  totalPrice: string;
 }
 
 export interface ReservationResponseDto {
@@ -25,7 +27,8 @@ export interface ReservationResponseDto {
   reservationDate: string;
   startTime: string;
   endTime: string;
-  totalPrice: number;
+  totalPrice: string;
+  status: ReservationStatus;
 }
 
 export interface ReservationDetailResponseDto {
@@ -48,7 +51,7 @@ export interface ReservationDetailResponseDto {
   serviceAdd: string;
   pet: string;
   specialRequest: string;
-  totalPrice: number;
+  totalPrice: string;
 }
 
 export interface ReservationIsApprovedRequestDto {

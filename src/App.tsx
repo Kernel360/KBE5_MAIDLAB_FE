@@ -1,8 +1,9 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import { AuthProvider, ThemeProvider } from '@/hooks';
-import { ProtectedRoute, ToastContainer } from '@/components/common';
+import React, { useEffect, Suspense } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, ThemeProvider, useAuth } from '@/hooks';
 import { ROUTES } from '@/constants';
+import { clearExpiredLocalStorage } from '@/utils';
+import '@/styles/index.css';
 
 // Pages - 개별 import로 변경
 import Home from '@/pages/Home';
@@ -11,7 +12,12 @@ import SignUp from '@/pages/SignUp';
 import NotFound from '@/pages/NotFound';
 import GoogleCallback from '@/pages/GoogleCallback';
 import SocialSignUp from '@/pages/SocialSignUp';
-  
+import ConsumerReservations from '@/pages/reservation/ConsumerReservations';
+import ConsumerReservationCreate from '@/pages/reservation/ConsumerReservationCreate';
+import ConsumerReservationDetail from '@/pages/reservation/ConsumerReservationDetail';
+import ManagerReservations from '@/pages/reservation/ManagerReservations';
+import ManagerReservationDetail from '@/pages/reservation/ManagerReservationDetail';
+import { ManagerMatching } from '@/pages/matching/ManagerMatching';
 
 import {
   AdminLogin,
@@ -28,31 +34,9 @@ import {
 } from '@/pages';
 
 
-// Styles
-import '@/styles/index.css';
-
-const App: React.FC = () => { 
-import { clearExpiredLocalStorage } from '@/utils';
-import '@/styles/index.css';
-
-// 페이지 컴포넌트들 (Lazy Loading)
-// const HomePage = React.lazy(() => import('@/pages/Home'));
-// const LoginPage = React.lazy(() => import('@/pages/Login'));
-// const SignUpPage = React.lazy(() => import('@/pages/SignUp'));
-// const NotFoundPage = React.lazy(() => import('@/pages/NotFound'));
-
 // 소비자 페이지들
 // const ConsumerMyPage = React.lazy(() => import('@/pages/consumer/MyPage'));
 // const ConsumerProfile = React.lazy(() => import('@/pages/consumer/Profile'));
-// const ConsumerReservations = React.lazy(
-//   () => import('@/pages/consumer/Reservations'),
-// );
-// const ConsumerReservationDetail = React.lazy(
-//   () => import('@/pages/consumer/ReservationDetail'),
-// );
-const ConsumerReservationCreate = React.lazy(
-  () => import('@/pages/reservation/ConsumerReservationCreate'),
-);
 // const ConsumerLikedManagers = React.lazy(
 //   () => import('@/pages/consumer/LikedManagers'),
 // );
@@ -155,22 +139,10 @@ const ToastContainer: React.FC = () => {
 };
 
 // 메인 앱 컴포넌트
-const AppContent: React.FC = () => {
-  const { isLoading } = useAuth();
-
-  useEffect(() => {
-    // 만료된 로컬스토리지 정리
-    clearExpiredLocalStorage();
-  }, []);
-
-  // 초기 로딩 중이면 로딩 스피너 표시
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
-
+const App: React.FC = () => {
   return (
-    <ThemeProvider>
-      <AuthProvider>
+    <AuthProvider>
+      <ThemeProvider>
         <div className="App">
           <Routes>
             {/* 공통 페이지 */}
@@ -180,94 +152,58 @@ const AppContent: React.FC = () => {
             <Route path={ROUTES.SOCIAL_SIGNUP} element={<SocialSignUp />} />
             <Route path="/google-callback" element={<GoogleCallback />} />
 
-
-            {/* 소비자 페이지 (나중에 구현) */}
-            {/* 
-    
-              <Route
-                path={ROUTES.CONSUMER.RESERVATIONS}
-                element={
-                  <ProtectedRoute requiredUserType="CONSUMER">
-                    <ConsumerReservations />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path={ROUTES.CONSUMER.RESERVATION_CREATE}
-                element={
-                  <ProtectedRoute requiredUserType="CONSUMER">
-                    <ReservationCreate />
-                  </ProtectedRoute>
-                }
-              />
-              
-          {/* 소비자 라우트 */}
-          
-          {/* <Route
-            path={ROUTES.CONSUMER.RESERVATIONS}
-            element={
-              <ProtectedRoute requiredUserType="CONSUMER">
-                <ConsumerReservations />
-              </ProtectedRoute>
-            }
-          /> */}
-          {/* <Route
+            {/* 소비자 라우트 */}
+            <Route
+              path={ROUTES.CONSUMER.RESERVATIONS}
+              element={
+                <ProtectedRoute requiredUserType="CONSUMER">
+                  <ConsumerReservations />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.CONSUMER.RESERVATION_CREATE}
+              element={
+                <ProtectedRoute requiredUserType="CONSUMER">
+                  <ConsumerReservationCreate />
+                </ProtectedRoute>
+              }
+            />   
+        
+          <Route
             path={ROUTES.CONSUMER.RESERVATION_DETAIL}
             element={
               <ProtectedRoute requiredUserType="CONSUMER">
                 <ConsumerReservationDetail />
-              </ProtectedRoute>
-            }
-          /> */}
-          <Route
-            path={ROUTES.CONSUMER.RESERVATION_CREATE}
-            element={
-              // <ProtectedRoute requiredUserType="CONSUMER">
-                <ConsumerReservationCreate />
-              // </ProtectedRoute>
+               </ProtectedRoute>
             }
           />
-          
-          {/* <Route
+
+          {/* 매니저 라우트 */}
+          <Route
             path={ROUTES.MANAGER.RESERVATIONS}
             element={
               <ProtectedRoute requiredUserType="MANAGER">
                 <ManagerReservations />
               </ProtectedRoute>
             }
-          /> */}
-          {/* <Route
-            path={ROUTES.MANAGER.RESERVATION_DETAIL}
-            element={
-              <ProtectedRoute requiredUserType="MANAGER">
-                <ManagerReservationDetail />
-              </ProtectedRoute>
-            }
-          /> */}
-          {/* <Route
-            path={ROUTES.MANAGER.REVIEWS}
-            element={
-              <ProtectedRoute requiredUserType="MANAGER">
-                <ManagerReviews />
-              </ProtectedRoute>
-            }
-          /> */}
-          {/* <Route
+          />
+          <Route
             path={ROUTES.MANAGER.MATCHING}
             element={
               <ProtectedRoute requiredUserType="MANAGER">
                 <ManagerMatching />
               </ProtectedRoute>
             }
-          /> */}
-          {/* <Route
-            path={ROUTES.MANAGER.SETTLEMENTS}
+          />
+          <Route
+            path={ROUTES.MANAGER.RESERVATION_DETAIL}
             element={
               <ProtectedRoute requiredUserType="MANAGER">
-                <ManagerSettlements />
+                <ManagerReservationDetail />
               </ProtectedRoute>
             }
-          /> */}
+          />
 
           {/* 관리자 라우트 */}
           <Route key="admin-login" path={ROUTES.ADMIN.LOGIN} element={<AdminLogin />} />,
@@ -337,10 +273,9 @@ const AppContent: React.FC = () => {
           {/* 전역 토스트 컨테이너 */}
           <ToastContainer />
         </div>
-      </AuthProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 };
-
 
 export default App;

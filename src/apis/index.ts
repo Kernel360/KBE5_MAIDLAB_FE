@@ -2,7 +2,8 @@
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
 
 const BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'https://api-maidlab.duckdns.org';
+  // import.meta.env.VITE_API_BASE_URL || 'https://api-maidlab.duckdns.org';
+  'http://localhost:8080';
 
 // 토큰 갱신 상태 관리
 let isRefreshing = false;

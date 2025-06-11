@@ -13,10 +13,18 @@ export interface AvailableManagerResponseDto {
   name: string;
 }
 
-export interface MatchingResponseDto {
+export interface RequestMatchingListResponseDto {
   reservationId: number;
-  managerId: number;
-  matchingStatus: string;
+  serviceType: string;
+  detailServiceType: string;
+  reservationDate: string;
+  startTime : string;
+  endTime: string;
+  address: string;
+  addressDetail: string;
+  roomSize : number
+  pet: string;
+  totalPrice: string;
 }
 
 // 매칭 API 함수들
@@ -55,9 +63,9 @@ export const matchingApi = {
   getMatching: async (
     page: number,
     size: number,
-  ): Promise<MatchingResponseDto[]> => {
+  ): Promise<RequestMatchingListResponseDto[]> => {
     try {
-      const response = await apiClient.get<ApiResponse<MatchingResponseDto[]>>(
+      const response = await apiClient.get<ApiResponse<RequestMatchingListResponseDto[]>>(
         `/api/matching?page=${page}&size=${size}`,
       );
       return response.data.data;
