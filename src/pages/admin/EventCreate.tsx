@@ -41,16 +41,25 @@ const EventCreate = () => {
     content: '',
   });
   const [submitting, setSubmitting] = useState(false);
+  const [filenum, setFilenum] = useState(0); // 컴포넌트 내부로 이동
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   }, []);
 
+  // 파일 업로드 핸들러 수정
+  const handleMainImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      mainImageUpload.addFiles(e.target.files);
+      setFilenum(1);
+    }
+  }, [mainImageUpload]);
+
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (mainImageUpload.files.length === 0) {
+    if (filenum < 1) {
       alert('메인 이미지를 업로드해주세요.');
       return;
     }
@@ -77,7 +86,7 @@ const EventCreate = () => {
     } finally {
       setSubmitting(false);
     }
-  }, [formData, mainImageUpload.files, imageUpload.files, createEvent, navigate]);
+  }, [formData, filenum, mainImageUpload, imageUpload, createEvent, navigate]);
 
   const handleCancel = useCallback(() => {
     if (window.confirm('작성을 취소하시겠습니까?')) {
@@ -113,7 +122,7 @@ const EventCreate = () => {
             <input
               type="file"
               accept="image/*"
-              onChange={(e) => e.target.files && mainImageUpload.addFiles(e.target.files)}
+              onChange={handleMainImageUpload}
             />
             {mainImageUpload.previews[0] && (
               <ImagePreview src={mainImageUpload.previews[0]} alt="메인 이미지 미리보기" />
@@ -172,4 +181,4 @@ const EventCreate = () => {
   );
 };
 
-export default EventCreate; 
+export default EventCreate;
