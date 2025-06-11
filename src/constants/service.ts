@@ -66,3 +66,43 @@ export const WEEKDAY_SHORT_LABELS = {
   [WEEKDAYS.SATURDAY]: '토',
   [WEEKDAYS.SUNDAY]: '일',
 } as const;
+
+export interface ServiceDetailType {
+  id: number;
+  name: string;
+  type: keyof typeof SERVICE_TYPES;
+  price: number;
+}
+
+export const SERVICE_DETAIL_TYPES: Record<string, ServiceDetailType> = {
+  대청소: {
+    id: 1,
+    name: '대청소',
+    type: 'HOUSEKEEPING',
+    price: 50000,
+  },
+  부분청소: {
+    id: 2,
+    name: '부분청소',
+    type: 'HOUSEKEEPING',
+    price: 30000,
+  },
+  기타청소: {
+    id: 3,
+    name: '기타청소',
+    type: 'HOUSEKEEPING',
+    price: 20000,
+  },
+  아이돌봄: {
+    id: 4,
+    name: '아이돌봄',
+    type: 'CARE',
+    price: 50000,
+  },
+  어르신돌봄: {
+    id: 5,
+    name: '어르신돌봄',
+    type: 'CARE',
+    price: 30000,
+  },
+} as const;

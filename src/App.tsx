@@ -1,8 +1,10 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import { AuthProvider, ThemeProvider, ToastProvider } from '@/hooks'; // ToastProvider 추가
+import React, { useEffect, Suspense } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, ThemeProvider, ToastProvider, useAuth } from '@/hooks'; // ToastProvider 추가
 import { ProtectedRoute, ToastContainer } from '@/components/common';
 import { ROUTES } from '@/constants';
+import { clearExpiredLocalStorage } from '@/utils';
+import '@/styles/index.css';
 
 // Pages - 개별 import로 변경
 import Home from '@/pages/Home';
@@ -11,7 +13,12 @@ import SignUp from '@/pages/SignUp';
 import NotFound from '@/pages/NotFound';
 import GoogleCallback from '@/pages/GoogleCallback';
 import SocialSignUp from '@/pages/SocialSignUp';
-
+import ConsumerReservations from '@/pages/reservation/ConsumerReservations';
+import ConsumerReservationCreate from '@/pages/reservation/ConsumerReservationCreate';
+import ConsumerReservationDetail from '@/pages/reservation/ConsumerReservationDetail';
+import ManagerReservations from '@/pages/reservation/ManagerReservations';
+import ManagerReservationDetail from '@/pages/reservation/ManagerReservationDetail';
+import { ManagerMatching } from '@/pages/matching/ManagerMatching';
 import ConsumerMyPage from '@/pages/consumer/MyPage';
 import ConsumerProfile from '@/pages/consumer/Profile';
 import ManagerList from '@/pages/consumer/ManagerList';
@@ -33,8 +40,26 @@ import {
 // Styles
 import '@/styles/index.css';
 
+  if (requireAuth && !isAuthenticated) {
+    return <Navigate to={redirectTo} replace />;
+  }
+
+  if (requiredUserType && userType !== requiredUserType) {
+    return <Navigate to={ROUTES.HOME} replace />;
+  }
+
+  return <>{children}</>;
+};
+
+// 토스트 컨테이너 컴포넌트
+const ToastContainer: React.FC = () => {
+  // 실제 토스트 라이브러리 사용시 여기에 구현
+  return null;
+};
+
+// 메인 앱 컴포넌트
 const App: React.FC = () => {
-  return (
+  return ( 
     <ThemeProvider>
       <ToastProvider>
         {' '}
@@ -57,6 +82,31 @@ const App: React.FC = () => {
                 <Route path={ROUTES.BOARD_CREATE} element={<BoardCreate />} />
                 <Route path={ROUTES.BOARD_DETAIL} element={<BoardDetail />} /> */}
               {/* 소비자 페이지 (나중에 구현) */}
+            <Route
+              path={ROUTES.CONSUMER.RESERVATIONS}
+              element={
+                <ProtectedRoute requiredUserType="CONSUMER">
+                  <ConsumerReservations />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.CONSUMER.RESERVATION_CREATE}
+              element={
+                <ProtectedRoute requiredUserType="CONSUMER">
+                  <ConsumerReservationCreate />
+                </ProtectedRoute>
+              }
+            />   
+        
+          <Route
+            path={ROUTES.CONSUMER.RESERVATION_DETAIL}
+            element={
+              <ProtectedRoute requiredUserType="CONSUMER">
+                <ConsumerReservationDetail />
+               </ProtectedRoute>
+            }
+          />
               <Route
                 path={ROUTES.CONSUMER.MYPAGE}
                 element={
@@ -73,22 +123,6 @@ const App: React.FC = () => {
                   </ProtectedRoute>
                 }
               />
-              {/* <Route
-                path={ROUTES.CONSUMER.RESERVATIONS}
-                element={
-                  <ProtectedRoute requiredUserType="CONSUMER">
-                    <ConsumerReservations />
-                  </ProtectedRoute>
-                }
-              /> */}
-              {/* <Route
-                path={ROUTES.CONSUMER.RESERVATION_CREATE}
-                element={
-                  <ProtectedRoute requiredUserType="CONSUMER">
-                    <ReservationCreate />
-                  </ProtectedRoute>
-                }
-              /> */}
               <Route
                 path={ROUTES.CONSUMER.LIKED_MANAGERS}
                 element={
@@ -106,6 +140,30 @@ const App: React.FC = () => {
                 }
               /> 
               {/* 매니저 라우트들 */}
+                        <Route
+            path={ROUTES.MANAGER.RESERVATIONS}
+            element={
+              <ProtectedRoute requiredUserType="MANAGER">
+                <ManagerReservations />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.MANAGER.MATCHING}
+            element={
+              <ProtectedRoute requiredUserType="MANAGER">
+                <ManagerMatching />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path={ROUTES.MANAGER.RESERVATION_DETAIL}
+            element={
+              <ProtectedRoute requiredUserType="MANAGER">
+                <ManagerReservationDetail />
+              </ProtectedRoute>
+            }
+          />
               {/* <Route
               path={ROUTES.MANAGER.MYPAGE}
               element={
@@ -139,34 +197,10 @@ const App: React.FC = () => {
               }
             /> */}
               {/* <Route
-              path={ROUTES.MANAGER.RESERVATIONS}
-              element={
-                <ProtectedRoute requiredUserType="MANAGER">
-                  <ManagerReservations />
-                </ProtectedRoute>
-              }
-            /> */}
-              {/* <Route
-              path={ROUTES.MANAGER.RESERVATION_DETAIL}
-              element={
-                <ProtectedRoute requiredUserType="MANAGER">
-                  <ManagerReservationDetail />
-                </ProtectedRoute>
-              }
-            /> */}
-              {/* <Route
               path={ROUTES.MANAGER.REVIEWS}
               element={
                 <ProtectedRoute requiredUserType="MANAGER">
                   <ManagerReviews />
-                </ProtectedRoute>
-              }
-            /> */}
-              {/* <Route
-              path={ROUTES.MANAGER.MATCHING}
-              element={
-                <ProtectedRoute requiredUserType="MANAGER">
-                  <ManagerMatching />
                 </ProtectedRoute>
               }
             /> */}
@@ -204,7 +238,6 @@ const App: React.FC = () => {
                   path="users/consumer/:id"
                   element={<AdminConsumerDetail />}
                 />
-
                 {/* 예약 관리 */}
                 <Route path="reservations" element={<AdminReservationList />} />
                 <Route

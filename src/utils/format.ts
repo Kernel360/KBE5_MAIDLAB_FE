@@ -10,8 +10,9 @@ export const formatNumber = (num: number): string => {
 /**
  * 가격을 원화 형식으로 포맷팅 (예: 150,000원)
  */
-export const formatPrice = (price: number): string => {
-  return `${formatNumber(price)}원`;
+export const formatPrice = (price: string | number): string => {
+  const numPrice = typeof price === 'string' ? parseInt(price, 10) : price;
+  return numPrice.toLocaleString('ko-KR');
 };
 
 /**
@@ -264,4 +265,17 @@ export const formatKoreanArray = (arr: string[]): string => {
   const rest = arr.slice(0, -1);
 
   return `${rest.join(', ')} 및 ${last}`;
+};
+
+// 날짜와 시간을 포맷팅하는 함수
+export const formatDateTimeWithLocale = (date: string): string => {
+  const dateObj = new Date(date);
+  return dateObj.toLocaleString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
 };
