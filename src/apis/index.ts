@@ -4,6 +4,24 @@ import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL || 'https://api-maidlab.duckdns.org';
 
+// API 에러 코드 매핑 (백엔드와 동일)
+const API_CODE_MESSAGES = {
+  SU: '성공',
+  VF: '입력값 검증에 실패했습니다.',
+  AF: '인증에 실패했습니다.',
+  LF: '로그인에 실패했습니다.',
+  DBE: '데이터베이스 오류가 발생했습니다.',
+  DT: '이미 가입되어있는 휴대폰번호입니다.',
+  DR: '중복된 예약입니다.',
+  WR: '올바르지 않은 주소입니다.',
+  NP: '권한이 없습니다.',
+  NR: '요청한 정보를 찾을 수 없습니다.',
+  AWC: '이미 진행중이거나 완료된 작업입니다.',
+  AC: '이미 처리된 상태입니다.',
+  AD: '삭제된 계정입니다.',
+  RF: '유효하지 않은 토큰입니다.',
+} as const;
+
 // 토큰 갱신 상태 관리
 let isRefreshing = false;
 let failedQueue: Array<{
@@ -119,11 +137,10 @@ apiClient.interceptors.response.use(
         const newToken = refreshResponse.data.data.accessToken;
 
         localStorage.setItem('accessToken', newToken);
-        
-        
+
         // 대기 중인 요청들 처리
         processQueue(null, newToken);
-        
+
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return apiClient(originalRequest);
       } catch (refreshError) {
@@ -152,6 +169,8 @@ export interface ApiResponse<T> {
 
 // 공통 에러 처리 함수 (개선된 버전)
 export const handleApiError = (error: any): string => {
+  console.error('🔍 에러 분석 시작:', error);
+
   // 네트워크 오류 체크
   if (!error.response && error.request) {
     return '네트워크 연결을 확인해주세요.';
@@ -160,36 +179,61 @@ export const handleApiError = (error: any): string => {
   if (error.response) {
     const { status, data } = error.response;
 
+    // 백엔드 에러 코드가 있는 경우 우선 처리
+    if (
+      data &&
+      data.code &&
+      API_CODE_MESSAGES[data.code as keyof typeof API_CODE_MESSAGES]
+    ) {
+      const koreanMessage =
+        API_CODE_MESSAGES[data.code as keyof typeof API_CODE_MESSAGES];
+      return koreanMessage;
+    }
+
+    // 백엔드 메시지가 있는 경우
+    if (data && data.message) {
+      return data.message;
+    }
+
     // 상태 코드별 구체적인 메시지
     switch (status) {
       case 400:
-        return data.message || '잘못된 요청입니다.';
+        console.log('⚠️ 400 에러 처리');
+        return '잘못된 요청입니다.';
       case 401:
+        console.log('🔐 401 에러 처리');
         return '로그인이 필요합니다.';
       case 403:
+        console.log('🚫 403 에러 처리');
         return '권한이 없습니다.';
       case 404:
+        console.log('🔍 404 에러 처리');
         return '요청한 리소스를 찾을 수 없습니다.';
       case 409:
-        return data.message || '이미 존재하는 데이터입니다.';
+        console.log('⚡ 409 에러 처리');
+        return '이미 존재하는 데이터입니다.';
       case 429:
+        console.log('⏰ 429 에러 처리');
         return '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.';
       case 500:
+        console.log('💥 500 에러 처리');
         return '서버 내부 오류가 발생했습니다.';
       case 502:
+        console.log('🔧 502 에러 처리');
         return '서버에 일시적인 문제가 발생했습니다.';
       case 503:
+        console.log('🚨 503 에러 처리');
         return '서비스를 사용할 수 없습니다. 잠시 후 다시 시도해주세요.';
       default:
-        console.error(`API Error ${status}:`, data.message || data);
-        return data.message || '서버 오류가 발생했습니다.';
+        console.error(`❓ 알 수 없는 상태코드 ${status}:`, data);
+        return `서버 오류가 발생했습니다. (${status})`;
     }
   } else if (error.request) {
-    console.error('Network Error:', error.request);
+    console.error('🌐 요청 에러:', error.request);
     return '네트워크 오류가 발생했습니다.';
   } else {
-    console.error('Error:', error.message);
-    return '알 수 없는 오류가 발생했습니다.';
+    console.error('🤷 기타 에러:', error.message);
+    return error.message || '알 수 없는 오류가 발생했습니다.';
   }
 };
 

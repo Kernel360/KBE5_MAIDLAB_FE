@@ -8,11 +8,7 @@ import {
   getLocalStorage,
   removeLocalStorage,
 } from '@/utils/storage';
-import {
-  openGoogleLoginPopup,
-  cleanupOAuthStorage,
-  validateGoogleOAuthConfig,
-} from '@/utils/googleOAuth';
+import { openGoogleLoginPopup, cleanupOAuthStorage } from '@/utils/googleOAuth';
 import type { LoginRequestDto, SocialLoginRequestDto } from '@/apis/auth';
 import type { SavedLoginInfo } from '@/types/user';
 
