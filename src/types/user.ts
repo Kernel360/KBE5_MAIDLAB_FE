@@ -14,6 +14,15 @@ export type Gender = 'MALE' | 'FEMALE';
 export type SocialType = 'KAKAO' | 'GOOGLE';
 
 /**
+ * 로그인 정보 저장 타입
+ */
+export interface SavedLoginInfo {
+  phoneNumber: string;
+  userType: 'CONSUMER' | 'MANAGER';
+  rememberMe: boolean;
+}
+
+/**
  * 기본 사용자 정보
  */
 export interface BaseUser {

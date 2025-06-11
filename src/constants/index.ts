@@ -63,7 +63,7 @@ export const BREAKPOINTS = {
 // 테마 설정
 export const THEME = {
   LIGHT: 'light',
-  DARK: 'dark',
+  DARK: 'light',
   SYSTEM: 'system',
 } as const;
 
