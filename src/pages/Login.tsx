@@ -96,25 +96,48 @@ const Login: React.FC = () => {
 
   // Google 소셜 로그인 처리
   const handleGoogleLogin = () => {
+    console.log('🚀 Google 로그인 시작:', selectedUserType);
+
     openGoogleLoginPopup(
       selectedUserType,
       async (code: string, userType: 'CONSUMER' | 'MANAGER') => {
         try {
+          console.log('📨 구글 코드 수신:', {
+            code: code.substring(0, 20) + '...',
+            userType,
+            codeLength: code.length,
+          });
+
           const socialLoginData: SocialLoginRequestDto = {
             userType,
             socialType: 'GOOGLE',
             code,
           };
 
+          console.log('🔄 socialLogin API 호출 준비:', socialLoginData);
           const result = await socialLogin(socialLoginData);
 
+          console.log('📋 socialLogin 결과:', result);
+
           if (result.success) {
+            console.log('✅ socialLogin 성공 - 분기 처리:', {
+              newUser: result.newUser,
+              hasAccessToken: !!result.accessToken,
+            });
+
             if (result.newUser) {
               // 신규 사용자인 경우 추가 정보 입력 페이지로
+              console.log('👤 신규 사용자 처리 시작');
+              console.log('💾 임시 토큰 저장:', {
+                token: result.accessToken?.substring(0, 20) + '...',
+                userType,
+              });
+
               localStorage.setItem('tempSocialToken', result.accessToken || '');
               localStorage.setItem('tempUserType', userType);
 
               showToast('추가 정보를 입력해주세요.', 'info');
+              console.log('🔄 SocialSignUp 페이지로 이동');
               navigate(ROUTES.SOCIAL_SIGNUP, {
                 state: {
                   tempToken: result.accessToken,
@@ -123,17 +146,21 @@ const Login: React.FC = () => {
               });
             } else {
               // 기존 사용자인 경우 홈으로
+              console.log('🏠 기존 사용자 - 홈으로 이동');
+              showToast('로그인되었습니다.', 'success');
               navigate(ROUTES.HOME);
             }
           } else {
+            console.error('❌ socialLogin 실패:', result.error);
             showToast(result.error || 'Google 로그인에 실패했습니다.', 'error');
           }
-        } catch (error) {
-          console.error('Google login error:', error);
+        } catch (error: any) {
+          console.error('❌ Google login error:', error);
           showToast('Google 로그인 중 오류가 발생했습니다.', 'error');
         }
       },
       (error: string) => {
+        console.error('❌ Google popup error:', error);
         showToast(error, 'error');
       },
     );

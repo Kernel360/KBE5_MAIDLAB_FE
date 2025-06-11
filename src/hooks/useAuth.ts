@@ -165,11 +165,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     async (data: SocialLoginRequestDto) => {
       try {
         dispatch({ type: 'AUTH_START' });
+        console.log('🔄 useAuth socialLogin 시작:', data);
 
         const response = await authApi.socialLogin(data);
 
+        console.log('📨 socialLogin API 응답:', response);
+        console.log('🔍 응답 분석:', {
+          newUser: response.newUser,
+          accessToken: response.accessToken ? 'Present' : 'Missing',
+          expirationTime: response.expirationTime,
+        });
+
         if (response.newUser) {
           // 신규 사용자 - 추가 정보 입력 필요
+          console.log('👤 신규 사용자 감지 - 추가 정보 입력 필요');
           dispatch({ type: 'AUTH_LOGOUT' });
           return {
             success: true,
@@ -179,6 +188,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }
 
         // 기존 사용자 - 로그인 완료
+        console.log('👤 기존 사용자 감지 - 로그인 진행');
         tokenStorage.setAccessToken(response.accessToken);
         userStorage.setUserType(data.userType);
 
@@ -194,6 +204,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           accessToken: response.accessToken,
         };
       } catch (error: any) {
+        console.error('❌ useAuth socialLogin 에러:', error);
         const errorMessage =
           error.message || ERROR_MESSAGES.INVALID_CREDENTIALS;
         dispatch({ type: 'AUTH_FAILURE', payload: errorMessage });
