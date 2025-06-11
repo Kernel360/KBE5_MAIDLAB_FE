@@ -8,12 +8,7 @@ import React, {
 import { useNavigate } from 'react-router-dom';
 import { authApi } from '@/apis/auth';
 import { tokenStorage, userStorage } from '@/utils/storage';
-import {
-  ROUTES,
-  USER_TYPES,
-  SUCCESS_MESSAGES,
-  ERROR_MESSAGES,
-} from '@/constants';
+import { ROUTES, SUCCESS_MESSAGES, ERROR_MESSAGES } from '@/constants';
 import { useToast } from './useToast';
 import type {
   LoginRequestDto,
