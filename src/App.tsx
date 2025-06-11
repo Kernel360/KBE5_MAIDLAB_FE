@@ -12,6 +12,10 @@ import NotFound from '@/pages/NotFound';
 import GoogleCallback from '@/pages/GoogleCallback';
 import SocialSignUp from '@/pages/SocialSignUp';
 
+import ConsumerMyPage from '@/pages/consumer/MyPage';
+import ConsumerProfile from '@/pages/consumer/Profile';
+import ManagerList from '@/pages/consumer/ManagerList';
+
 import {
   AdminLogin,
   AdminLayout,
@@ -53,46 +57,54 @@ const App: React.FC = () => {
                 <Route path={ROUTES.BOARD_CREATE} element={<BoardCreate />} />
                 <Route path={ROUTES.BOARD_DETAIL} element={<BoardDetail />} /> */}
               {/* 소비자 페이지 (나중에 구현) */}
+              <Route
+                path={ROUTES.CONSUMER.MYPAGE}
+                element={
+                  <ProtectedRoute requiredUserType="CONSUMER">
+                    <ConsumerMyPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={ROUTES.CONSUMER.PROFILE}
+                element={
+                  <ProtectedRoute requiredUserType="CONSUMER">
+                    <ConsumerProfile />
+                  </ProtectedRoute>
+                }
+              />
               {/* <Route
-                  path={ROUTES.CONSUMER.MYPAGE}
-                  element={
-                    <ProtectedRoute requiredUserType="CONSUMER">
-                      <ConsumerMyPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path={ROUTES.CONSUMER.PROFILE}
-                  element={
-                    <ProtectedRoute requiredUserType="CONSUMER">
-                      <ConsumerProfile />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path={ROUTES.CONSUMER.RESERVATIONS}
-                  element={
-                    <ProtectedRoute requiredUserType="CONSUMER">
-                      <ConsumerReservations />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path={ROUTES.CONSUMER.RESERVATION_CREATE}
-                  element={
-                    <ProtectedRoute requiredUserType="CONSUMER">
-                      <ReservationCreate />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path={ROUTES.CONSUMER.LIKED_MANAGERS}
-                  element={
-                    <ProtectedRoute requiredUserType="CONSUMER">
-                      <LikedManagers />
-                    </ProtectedRoute>
-                  }
-                /> */}
+                path={ROUTES.CONSUMER.RESERVATIONS}
+                element={
+                  <ProtectedRoute requiredUserType="CONSUMER">
+                    <ConsumerReservations />
+                  </ProtectedRoute>
+                }
+              /> */}
+              {/* <Route
+                path={ROUTES.CONSUMER.RESERVATION_CREATE}
+                element={
+                  <ProtectedRoute requiredUserType="CONSUMER">
+                    <ReservationCreate />
+                  </ProtectedRoute>
+                }
+              /> */}
+              <Route
+                path={ROUTES.CONSUMER.LIKED_MANAGERS}
+                element={
+                  <ProtectedRoute requiredUserType="CONSUMER">
+                    <ManagerList />
+                  </ProtectedRoute>
+                }
+              /> 
+              <Route
+                path={ROUTES.CONSUMER.BLACKLIST}
+                element={
+                  <ProtectedRoute requiredUserType="CONSUMER">
+                    <ManagerList />
+                  </ProtectedRoute>
+                }
+              /> 
               {/* 매니저 라우트들 */}
               {/* <Route
               path={ROUTES.MANAGER.MYPAGE}
