@@ -20,7 +20,7 @@ export { useAdmin } from './useAdmin';
 
 // UI 관련 훅
 export { useModal } from './useModal';
-export { useToast } from './useToast';
+export { useToast, ToastProvider } from './useToast';
 export { usePagination } from './usePagination';
 export { useDebounce } from './useDebounce';
 

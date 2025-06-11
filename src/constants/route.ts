@@ -8,14 +8,14 @@ export const ROUTES = {
 
   // 소비자 페이지
   CONSUMER: {
-    MYPAGE: '/consumer/mypage',
-    PROFILE: '/consumer/profile',
-    PROFILE_EDIT: '/consumer/profile/edit',
-    RESERVATIONS: '/consumer/reservations',
-    RESERVATION_DETAIL: '/consumer/reservations/:id',
-    RESERVATION_CREATE: '/consumer/reservations/create',
-    LIKED_MANAGERS: '/consumer/likes',
-    BLACKLIST: '/consumer/blacklist',
+    MYPAGE: '/consumers/mypage',
+    PROFILE: '/consumers/profile',
+    PROFILE_EDIT: '/consumers/profile/edit',
+    RESERVATIONS: '/consumers/reservations',
+    RESERVATION_DETAIL: '/consumers/reservations/:id',
+    RESERVATION_CREATE: '/consumers/reservations/create',
+    LIKED_MANAGERS: '/consumers/likes',
+    BLACKLIST: '/consumers/blacklist',
   },
 
   // 매니저 페이지

@@ -1,10 +1,11 @@
+// utils/googleOAuth.ts - COOP 문제 완전 해결
 import { env } from './env';
 
 /**
- * 팝업 통신을 위한 localStorage 기반 메시지 시스템
+ * localStorage 기반 메시지 시스템 (COOP 우회)
  */
 const OAUTH_MESSAGE_KEY = 'google_oauth_message';
-const OAUTH_CALLBACK_KEY = 'google_oauth_callback_processed';
+const OAUTH_STATUS_KEY = 'google_oauth_status';
 
 /**
  * 구글 OAuth 로그인 URL 생성
@@ -22,12 +23,10 @@ export const generateGoogleOAuthUrl = (
     scope: 'openid profile email',
     access_type: 'offline',
     prompt: 'consent',
-    state: `userType=${userType}`, // 사용자 타입을 state로 전달
+    state: `userType=${userType}&timestamp=${Date.now()}`, // 타임스탬프 추가
   });
 
-  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
-
-  return authUrl;
+  return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
 };
 
 /**
@@ -37,13 +36,11 @@ export const extractOAuthParams = (url: string = window.location.href) => {
   const urlObj = new URL(url);
   const searchParams = urlObj.searchParams;
 
-  const params = {
+  return {
     code: searchParams.get('code'),
     error: searchParams.get('error'),
     state: searchParams.get('state'),
   };
-
-  return params;
 };
 
 /**
@@ -53,30 +50,36 @@ export const extractUserTypeFromState = (
   state: string | null,
 ): 'CONSUMER' | 'MANAGER' | null => {
   if (!state) return null;
-
   const match = state.match(/userType=([^&]+)/);
   return match ? (match[1] as 'CONSUMER' | 'MANAGER') : null;
 };
 
 /**
- * 구글 로그인 팝업 열기 (완전히 개선된 버전)
+ * 구글 로그인 팝업 열기 (COOP 문제 완전 해결)
  */
 export const openGoogleLoginPopup = (
   userType: 'CONSUMER' | 'MANAGER',
   onSuccess: (code: string, userType: 'CONSUMER' | 'MANAGER') => void,
   onError: (error: string) => void,
 ): void => {
+  console.log('🔑 구글 로그인 팝업 시작:', userType);
+
   const authUrl = generateGoogleOAuthUrl(userType);
+  const sessionId = `oauth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+  // 기존 상태 정리
+  localStorage.removeItem(OAUTH_MESSAGE_KEY);
+  localStorage.removeItem(OAUTH_STATUS_KEY);
+  localStorage.setItem(
+    OAUTH_STATUS_KEY,
+    JSON.stringify({ status: 'pending', sessionId }),
+  );
 
   // 팝업 크기 및 위치 계산
   const width = 500;
   const height = 600;
   const left = window.screenX + (window.outerWidth - width) / 2;
   const top = window.screenY + (window.outerHeight - height) / 2;
-
-  // 기존 메시지 정리
-  localStorage.removeItem(OAUTH_MESSAGE_KEY);
-  localStorage.removeItem(OAUTH_CALLBACK_KEY);
 
   const popup = window.open(
     authUrl,
@@ -90,82 +93,98 @@ export const openGoogleLoginPopup = (
   }
 
   let messageProcessed = false;
+  let checkCount = 0;
+  const maxChecks = 120; // 60초 (500ms * 120)
 
-  // localStorage를 통한 메시지 감지
+  // localStorage 메시지 감지 (COOP 우회)
   const checkMessage = () => {
-    if (messageProcessed) return true;
+    if (messageProcessed) return;
 
-    const message = localStorage.getItem(OAUTH_MESSAGE_KEY);
-    if (message) {
-      try {
+    checkCount++;
+
+    try {
+      const message = localStorage.getItem(OAUTH_MESSAGE_KEY);
+      const status = localStorage.getItem(OAUTH_STATUS_KEY);
+
+      if (message) {
         const data = JSON.parse(message);
+
+        // 세션 ID 검증 (같은 세션의 메시지인지 확인)
+        if (status) {
+          const statusData = JSON.parse(status);
+          if (statusData.sessionId !== sessionId) {
+            console.log('⚠️ 다른 세션의 메시지 무시');
+            return;
+          }
+        }
+
+        console.log('📨 OAuth 메시지 수신:', data);
         localStorage.removeItem(OAUTH_MESSAGE_KEY);
+        localStorage.removeItem(OAUTH_STATUS_KEY);
         messageProcessed = true;
+
+        clearInterval(messageInterval);
+
+        // 팝업 닫기 시도 (에러 무시)
+        setTimeout(() => {
+          try {
+            if (popup && typeof popup.close === 'function') {
+              popup.close();
+            }
+          } catch (e: any) {
+            // COOP 에러 무시
+          }
+        }, 100);
 
         if (data.type === 'GOOGLE_AUTH_SUCCESS') {
           onSuccess(data.code, data.userType);
         } else if (data.type === 'GOOGLE_AUTH_ERROR') {
           onError(data.error);
         }
-
-        return true; // 메시지 처리됨
-      } catch (error) {
-        console.error('OAuth message parsing error:', error);
+        return;
       }
-    }
-    return false; // 메시지 없음
-  };
 
-  // 주기적으로 메시지 확인
-  const messageInterval = setInterval(() => {
-    if (checkMessage()) {
-      clearInterval(messageInterval);
-      clearInterval(timeoutInterval);
+      // 타임아웃 체크
+      if (checkCount >= maxChecks) {
+        console.log('⏰ OAuth 타임아웃');
+        localStorage.removeItem(OAUTH_MESSAGE_KEY);
+        localStorage.removeItem(OAUTH_STATUS_KEY);
+        messageProcessed = true;
+        clearInterval(messageInterval);
 
-      // 팝업 닫기 시도
-      try {
-        if (popup && !popup.closed) {
-          popup.close();
+        try {
+          if (popup && typeof popup.close === 'function') {
+            popup.close();
+          }
+        } catch (e: any) {
+          // COOP 에러 무시
         }
-      } catch (error) {
-        // 팝업 닫기 실패해도 무시
-      }
-    }
-  }, 500);
 
-  // 30초 타임아웃 설정 (COOP 문제로 popup.closed 접근 불가하므로)
-  const timeoutInterval = setTimeout(() => {
-    if (!messageProcessed) {
-      clearInterval(messageInterval);
-      messageProcessed = true;
-
-      // 콜백이 처리되었는지 확인
-      const callbackProcessed = localStorage.getItem(OAUTH_CALLBACK_KEY);
-      if (!callbackProcessed) {
         onError('로그인 시간이 초과되었습니다. 다시 시도해주세요.');
       }
-
-      // 팝업 닫기 시도
-      try {
-        if (popup && !popup.closed) {
-          popup.close();
-        }
-      } catch (error) {
-        // 팝업 닫기 실패해도 무시
-      }
+    } catch (error: any) {
+      console.error('❌ OAuth 메시지 체크 에러:', error);
     }
-  }, 30000); // 30초 타임아웃
+  };
+
+  // 500ms마다 메시지 확인
+  const messageInterval = setInterval(checkMessage, 500);
 };
 
 /**
- * 구글 로그인 콜백 처리 (수정된 버전)
+ * 구글 로그인 콜백 처리 (GoogleCallback 페이지에서 사용)
  */
 export const handleGoogleOAuthCallback = () => {
+  console.log('📞 OAuth 콜백 처리 시작');
+
   const { code, error, state } = extractOAuthParams();
   const userType = extractUserTypeFromState(state);
 
-  // 콜백 처리됨을 표시
-  localStorage.setItem(OAUTH_CALLBACK_KEY, 'true');
+  console.log('📋 OAuth 파라미터:', {
+    code: code?.substring(0, 10) + '...',
+    error,
+    userType,
+  });
 
   let message;
 
@@ -188,6 +207,7 @@ export const handleGoogleOAuthCallback = () => {
       error: '사용자 타입 정보가 없습니다.',
     };
   } else {
+    console.log('✅ OAuth 성공');
     message = {
       type: 'GOOGLE_AUTH_SUCCESS',
       code,
@@ -195,20 +215,29 @@ export const handleGoogleOAuthCallback = () => {
     };
   }
 
-  // localStorage를 통해 메시지 전달
+  // localStorage로 부모 창에 메시지 전달
   localStorage.setItem(OAUTH_MESSAGE_KEY, JSON.stringify(message));
 
-  // 팝업 닫기
-  try {
-    window.close();
-  } catch (error) {}
+  // 상태 업데이트
+  const currentStatus = localStorage.getItem(OAUTH_STATUS_KEY);
+  if (currentStatus) {
+    const statusData = JSON.parse(currentStatus);
+    statusData.status = 'completed';
+    localStorage.setItem(OAUTH_STATUS_KEY, JSON.stringify(statusData));
+  }
 
-  // fallback: postMessage도 시도 (COOP가 허용하는 경우)
-  try {
-    if (window.opener && !window.opener.closed) {
-      window.opener.postMessage(message, window.location.origin);
+  console.log('📤 메시지 localStorage에 저장 완료');
+
+  // 팝업 닫기 - 지연을 두고 시도
+  setTimeout(() => {
+    try {
+      if (typeof window.close === 'function') {
+        window.close();
+      }
+    } catch (error: any) {
+      // COOP 에러 무시
     }
-  } catch (error) {}
+  }, 200);
 };
 
 /**
@@ -234,5 +263,5 @@ export const validateGoogleOAuthConfig = (): {
  */
 export const cleanupOAuthStorage = () => {
   localStorage.removeItem(OAUTH_MESSAGE_KEY);
-  localStorage.removeItem(OAUTH_CALLBACK_KEY);
+  localStorage.removeItem(OAUTH_STATUS_KEY);
 };
