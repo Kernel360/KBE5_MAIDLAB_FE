@@ -1,97 +1,82 @@
 import React from 'react';
-import type { ReservationResponseDto, ReservationStatus } from '@/apis/reservation';
+import type { ReservationResponseDto } from '@/apis/reservation';
+import { RESERVATION_STATUS, RESERVATION_STATUS_LABELS, RESERVATION_STATUS_COLORS } from '@/constants';
+import { BUTTON_TEXTS } from '@/constants';
+import { formatDateTime } from '@/utils';
 
 interface ReservationCardProps {
   reservation: ReservationResponseDto;
   onClick?: () => void;
 }
 
-interface StatusBadge {
-  text: string;
-  className: string;
-}
-
-const STATUS_MAP: Record<ReservationStatus, StatusBadge> = {
-  PENDING: { text: '예정', className: 'bg-[#4CAF50] text-white' },
-  CONFIRMED: { text: '확정', className: 'bg-[#2196F3] text-white' },
-  IN_PROGRESS: { text: '진행중', className: 'bg-[#FF9800] text-white' },
-  COMPLETED: { text: '완료', className: 'bg-[#9E9E9E] text-white' },
-  CANCELLED: { text: '취소', className: 'bg-[#F44336] text-white' },
-};
-
-const DEFAULT_STATUS: StatusBadge = { text: '알 수 없음', className: 'bg-gray-400 text-white' };
-
 export const ReservationCard: React.FC<ReservationCardProps> = ({ reservation, onClick }) => {
-  console.log('Reservation data:', reservation);
-  console.log('Status:', reservation.status);
-  console.log('Status badge:', STATUS_MAP[reservation.status] || DEFAULT_STATUS);
-
-  const formatDate = (date: string) => {
-    const d = new Date(date);
-    const year = d.getFullYear();
-    const month = d.getMonth() + 1;
-    const day = d.getDate();
-    const weekDay = ['일', '월', '화', '수', '목', '금', '토'][d.getDay()];
-    return `${year}년 ${month}월 ${day}일 (${weekDay})`;
+  const getStatusBadgeStyle = (status: keyof typeof RESERVATION_STATUS) => {
+    return {
+      backgroundColor: RESERVATION_STATUS_COLORS[status] || '#9E9E9E',
+      color: 'white',
+    };
   };
 
-  const formatTime = (start: string, end: string) => {
-    return `${start} ~ ${end}`;
+  const getStatusLabel = (status: keyof typeof RESERVATION_STATUS) => {
+    return RESERVATION_STATUS_LABELS[status] || '알 수 없음';
   };
 
-  const formatPrice = (price: string) => {
-    return `${parseInt(price).toLocaleString()} 원`;
+  const renderActionButton = () => {
+    switch (reservation.status as keyof typeof RESERVATION_STATUS) {
+      case RESERVATION_STATUS.COMPLETED:
+        return (
+          <button className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded hover:bg-blue-600">
+            {BUTTON_TEXTS.WRITE_REVIEW}
+          </button>
+        );
+      case RESERVATION_STATUS.PENDING:
+      case RESERVATION_STATUS.APPROVED:
+        return (
+          <button className="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded hover:bg-red-600">
+            {BUTTON_TEXTS.CANCEL_RESERVATION}
+          </button>
+        );
+      default:
+        return (
+          <button className="px-4 py-2 text-sm font-medium text-white bg-gray-500 rounded hover:bg-gray-600">
+            {BUTTON_TEXTS.VIEW_MORE}
+          </button>
+        );
+    }
   };
-
-  const badge = STATUS_MAP[reservation.status] || DEFAULT_STATUS;
 
   return (
     <div 
-      className="bg-white rounded-lg p-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+      className="w-full p-4 mb-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer"
       onClick={onClick}
     >
       <div className="flex justify-between items-start mb-2">
-        <div className="flex flex-col">
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-base font-medium">{reservation.serviceType}</h3>
-            <span className={`px-2 py-0.5 text-xs rounded-full ${badge.className}`}>
-              {badge.text}
-            </span>
-          </div>
+        <div>
+          <h3 className="text-lg font-semibold">{reservation.serviceType}</h3>
           <p className="text-sm text-gray-600">{reservation.detailServiceType}</p>
         </div>
-        <p className="text-base font-medium text-[#FF9800]">
-          {formatPrice(reservation.totalPrice)}
+        <span 
+          className="px-3 py-1 text-sm font-medium rounded-full"
+          style={getStatusBadgeStyle(reservation.status as keyof typeof RESERVATION_STATUS)}
+        >
+          {getStatusLabel(reservation.status as keyof typeof RESERVATION_STATUS)}
+        </span>
+      </div>
+      
+      <div className="mt-4 space-y-2">
+        <p className="text-sm text-gray-600">
+          예약일시: {formatDateTime(reservation.reservationDate)}
+        </p>
+        <p className="text-sm text-gray-600">
+          서비스 시간: {reservation.startTime} - {reservation.endTime}
+        </p>
+        <p className="text-sm font-medium">
+          결제 금액: {Number(reservation.totalPrice).toLocaleString()}원
         </p>
       </div>
 
-      <div className="space-y-2 text-sm text-gray-600">
-        <div className="flex items-center gap-2">
-          <CalendarIcon className="w-4 h-4" />
-          <span>{formatDate(reservation.reservationDate)}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <ClockIcon className="w-4 h-4" />
-          <span>{formatTime(reservation.startTime, reservation.endTime)}</span>
-        </div>
-      </div>
-
-      <div className="flex gap-2 mt-4">
-        {reservation.status === 'PENDING' && (
-          <>
-            <button className="flex-1 px-4 py-2 text-sm border border-[#FF9800] text-[#FF9800] rounded-lg hover:bg-[#FFF3E0]">
-              상세보기
-            </button>
-            <button className="flex-1 px-4 py-2 text-sm border border-[#F44336] text-[#F44336] rounded-lg hover:bg-[#FFEBEE]">
-              예약취소
-            </button>
-          </>
-        )}
-        {reservation.status === 'COMPLETED' && (
-          <button className="flex-1 px-4 py-2 text-sm border border-[#FF9800] text-[#FF9800] rounded-lg hover:bg-[#FFF3E0]">
-            상세보기
-          </button>
-        )}
+      <div className="mt-4 flex justify-end">
+        {renderActionButton()}
       </div>
     </div>
   );
