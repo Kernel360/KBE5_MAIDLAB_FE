@@ -65,11 +65,11 @@ interface BoardWithId extends ConsumerBoardResponseDto {
 }
 
 // 탭 인덱스 타입
-type TabType = 'all' | 'consultation' | 'refund';
+type TabType = 'consultation' | 'refund';
 
 const BoardList = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [currentTab, setCurrentTab] = useState<TabType>('all');
+  const [currentTab, setCurrentTab] = useState<TabType>('consultation');
   const [filteredBoards, setFilteredBoards] = useState<BoardWithId[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -82,8 +82,10 @@ const BoardList = () => {
       let data: ConsumerBoardResponseDto[];
       if (tab === 'consultation') {
         data = await boardManagement.fetchConsultationBoards();
+      } else if (tab === 'refund') {
+        data = await boardManagement.fetchRefundBoards();
       } else {
-        data = await boardManagement.fetchBoards();
+        data = await boardManagement.fetchConsultationBoards();
       }
       setFilteredBoards(data as BoardWithId[]);
     } finally {
@@ -99,22 +101,16 @@ const BoardList = () => {
   // 게시글 목록 필터링
   useEffect(() => {
     if (!filteredBoards) return;
-    
+
     const filtered = filteredBoards.filter((board) => {
-      const matchesSearch = board.title.toLowerCase().includes(searchTerm.toLowerCase());
-      if (currentTab === 'refund') {
-        return matchesSearch && board.boardType === 'REFUND';
-      } else if (currentTab === 'consultation') {
-        return matchesSearch && board.boardType !== 'REFUND';
-      }
-      return matchesSearch;
+      return board.title.toLowerCase().includes(searchTerm.toLowerCase());
     });
     setFilteredBoards(filtered);
-  }, [searchTerm, currentTab]);
+  }, [searchTerm]);
 
   // 게시글 상세 페이지로 이동
   const handleViewDetail = (boardId: number) => {
-    navigate(`${ROUTES.ADMIN.BOARDS}/${boardId}`);
+    navigate(`${ROUTES.ADMIN.BOARD_DETAIL.replace(':id', boardId.toString())}`);
   };
 
   // 탭 변경 처리
@@ -132,7 +128,6 @@ const BoardList = () => {
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs value={currentTab} onChange={handleTabChange}>
-          <Tab label="전체" value="all" />
           <Tab label="상담 문의" value="consultation" />
           <Tab label="환불 문의" value="refund" />
         </Tabs>
@@ -192,7 +187,7 @@ const BoardList = () => {
                   </TableCell>
                   <TableCell align="center">
                     <Tooltip title="상세보기">
-                      <ActionButton onClick={() => handleViewDetail(board.id)}>
+                      <ActionButton onClick={() => handleViewDetail(board.boardId)}>
                         <VisibilityIcon />
                       </ActionButton>
                     </Tooltip>

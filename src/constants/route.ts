@@ -47,6 +47,7 @@ export const ROUTES = {
     EVENTS: '/admin/events',
     EVENT_CREATE: '/admin/events/create',
     EVENT_EDIT: '/admin/events/:id/edit',
+    EVENT_DETAIL: '/admin/events/:id',
     BOARDS: '/admin/boards',
     BOARD_DETAIL: '/admin/boards/:id',
   },

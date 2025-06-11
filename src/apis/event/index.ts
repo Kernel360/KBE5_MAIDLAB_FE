@@ -11,9 +11,11 @@ export interface EventRequestDto {
 export interface EventResponseDto {
   eventId: number;
   title: string;
+  mainImageUrl?: string;
   imageUrl?: string;
   content?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface EventListItem {

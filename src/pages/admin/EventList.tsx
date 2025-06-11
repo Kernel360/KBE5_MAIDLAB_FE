@@ -21,6 +21,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useState, useEffect, useCallback } from 'react';
 import { useEvent } from '@/hooks';
 import { useNavigate } from 'react-router-dom';
@@ -84,6 +85,11 @@ const EventList = () => {
     navigate(ROUTES.ADMIN.EVENT_CREATE);
   }, [navigate]);
 
+  // 이벤트 상세 조회 페이지로 이동
+  const handleView = useCallback((eventId: number) => {
+    navigate(`${ROUTES.ADMIN.EVENT_DETAIL.replace(':id', String(eventId))}`);
+  }, [navigate]);
+
   return (
     <StyledContainer>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
@@ -141,6 +147,11 @@ const EventList = () => {
                   <TableCell>{formatDate(event.createdAt)}</TableCell>
                   <TableCell>{event.updatedAt ? formatDate(event.updatedAt) : '-'}</TableCell>
                   <TableCell align="center">
+                    <Tooltip title="상세보기">
+                      <ActionButton onClick={() => handleView(event.eventId)}>
+                        <VisibilityIcon />
+                      </ActionButton>
+                    </Tooltip>
                     <Tooltip title="수정">
                       <ActionButton onClick={() => handleEdit(event.eventId)}>
                         <EditIcon />

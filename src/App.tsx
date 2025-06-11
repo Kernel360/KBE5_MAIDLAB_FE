@@ -25,6 +25,8 @@ import {
   AdminEventCreate,
   AdminBoards,
   AdminBoardDetail,
+  AdminEventEdit,
+  AdminEventDetail,
 } from '@/pages';
 
 
@@ -194,6 +196,8 @@ const App: React.FC = () => {
             {/* 이벤트 관리 */}
             <Route path="events" element={<AdminEvents />} />
             <Route path="events/create" element={<AdminEventCreate />} />
+            <Route path="events/:id/edit" element={<AdminEventEdit />} />
+            <Route path="events/:id" element={<AdminEventDetail />} />
 
             {/* 게시판 관리 */}
             <Route path="boards" element={<AdminBoards />} />
