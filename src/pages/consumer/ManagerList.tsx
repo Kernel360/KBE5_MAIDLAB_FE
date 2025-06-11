@@ -12,7 +12,7 @@ const mockFavoriteManagers = [
     profileImage: undefined,
     averageRate: 4.8,
     reviewCount: 128,
-    region: ['청소', '요리'],
+    region: ['서울', '경기도'],
     introduceText: '안녕하세요, 5년 경력의 전문 도우미입니다.'
   },
   {
@@ -21,7 +21,7 @@ const mockFavoriteManagers = [
     profileImage: undefined,
     averageRate: 4.9,
     reviewCount: 256,
-    region: ['빨래', '청소'],
+    region: ['강남'],
     introduceText: '신속하고 정확한 서비스 제공을 약속드립니다.'
   },
 ];
@@ -33,7 +33,7 @@ const mockBlacklist = [
     profileImage: undefined,
     averageRate: 3.2,
     reviewCount: 45,
-    region: ['요리'],
+    region: ['경상도'],
     introduceText: '서비스 품질이 좋지 않았습니다.'
   },
 ];
@@ -206,6 +206,18 @@ export default function ManagerList() {
                   </p>
                   {manager.introduceText && (
                     <p className="text-gray-500 mt-1">{manager.introduceText}</p>
+                  )}
+                  {manager.region && manager.region.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {manager.region.map((region) => (
+                        <span
+                          key={region}
+                          className="px-2 py-1 bg-gray-100 text-gray-600 text-sm rounded"
+                        >
+                          {region}
+                        </span>
+                      ))}
+                    </div>
                   )}
                 </div>
               </div>
