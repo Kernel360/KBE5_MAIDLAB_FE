@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { boardApi } from '@/apis/board';
 import { useToast } from './useToast';
-import type { ConsumerBoardRequestDto, ConsumerBoardResponseDto, ConsumerBoardDetailResponseDto } from '@/apis/board';
+import type { ConsumerBoardRequestDto } from '@/apis/board';
+import type { ConsumerBoardResponseDto, ConsumerBoardDetailResponseDto } from '@/apis/admin';
 
 export const useBoard = () => {
   const [boards, setBoards] = useState<ConsumerBoardResponseDto[]>([]);
@@ -26,7 +27,7 @@ export const useBoard = () => {
 
   // 게시글 상세 조회
   const fetchBoardDetail = useCallback(
-    async (boardId: number) => {
+    async (boardId: number): Promise<ConsumerBoardDetailResponseDto | null> => {
       try {
         setLoading(true);
         const data = await boardApi.getBoard(boardId);
