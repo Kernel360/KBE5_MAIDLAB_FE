@@ -45,3 +45,4 @@ export { default as AdminEventEdit } from '@/pages/admin/EventEdit';
 export { default as AdminEventDetail } from '@/pages/admin/EventDetail';
 export { default as AdminBoards } from '@/pages/admin/BoardList';
 export { default as AdminBoardDetail } from '@/pages/admin/BoardDetail';
+export { default as AdminBoardEdit } from './admin/BoardEdit';

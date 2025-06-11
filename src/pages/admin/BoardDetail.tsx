@@ -248,25 +248,28 @@ const BoardDetail = () => {
           {board.answer && !isEditing ? (
             // 답변이 있고 수정 모드가 아닌 경우
             <>
-              <Typography variant="body1" whiteSpace="pre-wrap" mb={2}>
+              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                <Box />
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  size="small"
+                  onClick={() => navigate(`${ROUTES.ADMIN.BOARD_EDIT.replace(':id', id || '')}`)}
+                >
+                  수정
+                </Button>
+              </Box>
+              <Typography variant="body1" whiteSpace="pre-wrap">
                 {board.answer.content}
               </Typography>
-              <Button
-                variant="outlined"
-                color="primary"
-                onClick={handleStartEdit}
-                disabled={submitting}
-              >
-                답변 수정
-              </Button>
             </>
           ) : (
             // 답변이 없거나 수정 모드인 경우
-            <>
+            <Box>
               <TextField
                 fullWidth
                 multiline
-                rows={4}
+                rows={6}
                 value={answer}
                 onChange={(e) => setAnswer(e.target.value)}
                 placeholder="답변을 입력하세요..."
@@ -280,26 +283,15 @@ const BoardDetail = () => {
                   onClick={handleSubmitAnswer}
                   disabled={!answer.trim() || submitting}
                 >
-                  {submitting ? (
-                    <CircularProgress size={24} color="inherit" />
-                  ) : isEditing ? (
-                    '답변 수정'
-                  ) : (
-                    '답변 등록'
-                  )}
+                  {submitting ? <CircularProgress size={24} color="inherit" /> : isEditing ? '수정' : '등록'}
                 </Button>
                 {isEditing && (
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={handleCancelEdit}
-                    disabled={submitting}
-                  >
+                  <Button variant="outlined" color="secondary" onClick={handleCancelEdit}>
                     취소
                   </Button>
                 )}
               </Box>
-            </>
+            </Box>
           )}
         </Box>
       </StyledPaper>

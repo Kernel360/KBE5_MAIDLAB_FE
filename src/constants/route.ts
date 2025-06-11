@@ -50,6 +50,7 @@ export const ROUTES = {
     EVENT_DETAIL: '/admin/events/:id',
     BOARDS: '/admin/boards',
     BOARD_DETAIL: '/admin/boards/:id',
+    BOARD_EDIT: '/admin/boards/:id/edit',
   },
 
   // 기타 페이지

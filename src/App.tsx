@@ -25,6 +25,7 @@ import {
   AdminEventCreate,
   AdminBoards,
   AdminBoardDetail,
+  AdminBoardEdit,
   AdminEventEdit,
   AdminEventDetail,
 } from '@/pages';
@@ -202,6 +203,7 @@ const App: React.FC = () => {
             {/* 게시판 관리 */}
             <Route path="boards" element={<AdminBoards />} />
             <Route path="boards/:id" element={<AdminBoardDetail />} />
+            <Route path="boards/:id/edit" element={<AdminBoardEdit />} />
 
             {/* 기본 리다이렉트 */}
             <Route index element={<AdminUserList />} />
