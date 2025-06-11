@@ -8,7 +8,7 @@ export default function BoardCreate() {
   return (
     <BoardForm
       mode="create"
-      onSuccess={() => navigate(ROUTES.BOARD.CREATE)}
+      onSuccess={() => navigate(ROUTES.BOARD.LIST)}
     />
   );
 } 
