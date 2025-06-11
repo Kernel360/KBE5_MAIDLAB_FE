@@ -54,10 +54,12 @@ export const ROUTES = {
   // 기타 페이지
   EVENTS: '/events',
   EVENT_DETAIL: '/events/:id',
-  BOARD: '/board',
-  BOARD_CREATE: '/board/create',
-  BOARD_EDIT: '/board/create',
-  BOARD_DETAIL: '/board/:id',
+  BOARD: {
+    LIST: '/board',
+    CREATE: '/board/create',
+    DETAIL: '/board/:id',
+    EDIT: '/board/:id/edit',
+  },
   NOT_FOUND: '/404',
 } as const;
 

@@ -41,6 +41,11 @@ import {
   AdminBoardDetail,
 } from '@/pages';
 
+import BoardList from '@/pages/board/BoardList';
+import BoardCreate from '@/pages/board/BoardCreate';
+import BoardDetail from '@/pages/board/BoardDetail';
+import BoardEdit from '@/pages/board/BoardEdit';
+
 // Styles
 import '@/styles/index.css';
 
@@ -360,31 +365,39 @@ const App: React.FC = () => {
                 {/* 기본 리다이렉트 */}
                 <Route index element={<AdminUserList />} />
               </Route>
-              {/* 공통 게시판 라우트들 */}
-              {/* <Route
-              path={ROUTES.BOARD}
-              element={
-                <ProtectedRoute>
-                  <BoardPage />
-                </ProtectedRoute>
-              }
-            /> */}
-              {/* <Route
-              path={ROUTES.BOARD_CREATE}
-              element={
-                <ProtectedRoute>
-                  <BoardCreatePage />
-                </ProtectedRoute>
-              }
-            /> */}
-              {/* <Route
-              path={ROUTES.BOARD_DETAIL}
-              element={
-                <ProtectedRoute>
-                  <BoardDetailPage />
-                </ProtectedRoute>
-              }
-            /> */}
+              {/* 게시판 라우트 */}
+              <Route
+                path={ROUTES.BOARD.LIST}
+                element={
+                  <ProtectedRoute requiredUserType="CONSUMER">
+                    <BoardList />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={ROUTES.BOARD.CREATE}
+                element={
+                  <ProtectedRoute requiredUserType="CONSUMER">
+                    <BoardCreate />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={ROUTES.BOARD.DETAIL}
+                element={
+                  <ProtectedRoute requiredUserType="CONSUMER">
+                    <BoardDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={ROUTES.BOARD.EDIT}
+                element={
+                  <ProtectedRoute requiredUserType="CONSUMER">
+                    <BoardEdit />
+                  </ProtectedRoute>
+                }
+              />
               {/* 404 페이지 */}
               <Route path={ROUTES.NOT_FOUND} element={<NotFound />} />
               <Route path="*" element={<NotFound />} />

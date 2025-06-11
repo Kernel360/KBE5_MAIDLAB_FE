@@ -18,6 +18,14 @@ export interface AnswerRequestDto {
   content: string;
 }
 
+// 게시글 수정 요청 타입
+export interface BoardUpdateRequestDto {
+  title: string;
+  content: string;
+  boardType: 'REFUND' | 'MANAGER' | 'SERVICE' | 'ETC';
+  images: ImageDto[];
+}
+
 // 게시판 API 함수들
 export const boardApi = {
   // 게시판 목록 조회
@@ -67,6 +75,22 @@ export const boardApi = {
         `/api/board/${boardId}/answer`,
         data,
       );
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // 게시글 수정
+  updateBoard: async (
+    boardId: number,
+    data: BoardUpdateRequestDto,
+  ): Promise<string> => {
+    try {
+      const response = await apiClient.patch<ApiResponse<string>>(
+        `/api/board/${boardId}`,
+        data,
+      );
+      return response.data.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
