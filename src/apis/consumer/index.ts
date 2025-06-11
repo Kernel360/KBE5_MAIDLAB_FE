@@ -42,6 +42,7 @@ export interface BlackListedManagerResponseDto {
   profileImage?: string;
   averageRate: number;
   introduceText?: string;
+  region: string[];
 }
 
 // 소비자 API 함수들
