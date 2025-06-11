@@ -71,12 +71,36 @@ export const authApi = {
     data: SocialLoginRequestDto,
   ): Promise<SocialLoginResponseDto> => {
     try {
+      console.log('🔗 소셜 로그인 시도:', {
+        userType: data.userType,
+        socialType: data.socialType,
+        codeLength: data.code?.length,
+        codePreview: data.code?.substring(0, 20) + '...',
+      });
+
       const response = await apiClient.post<
         ApiResponse<SocialLoginResponseDto>
       >('/api/auth/social-login', data);
+
+      console.log('✅ 소셜 로그인 성공:', {
+        newUser: response.data.data.newUser,
+        hasToken: !!response.data.data.accessToken,
+      });
       return response.data.data;
-    } catch (error) {
-      throw new Error(handleApiError(error));
+    } catch (error: any) {
+      console.error('❌ 소셜 로그인 실패:', error);
+
+      // 에러 상세 정보 로깅
+      if (error.response) {
+        console.error('📊 에러 응답:', {
+          status: error.response.status,
+          data: error.response.data,
+          headers: error.response.headers,
+        });
+      }
+
+      const errorMessage = handleApiError(error);
+      throw new Error(errorMessage);
     }
   },
 

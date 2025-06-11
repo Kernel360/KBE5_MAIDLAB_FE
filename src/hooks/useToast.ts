@@ -34,8 +34,10 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
       type: Toast['type'] = 'info',
       duration: number = 3000,
     ) => {
-      const id = Date.now().toString();
+      const id = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       const toast: Toast = { id, message, type, duration };
+
+      console.log('🍞 토스트 추가:', toast); // 디버깅 로그
 
       setToasts((prev) => [...prev, toast]);
 
@@ -50,10 +52,12 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
   );
 
   const removeToast = useCallback((id: string) => {
+    console.log('🗑️ 토스트 제거:', id); // 디버깅 로그
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
   const clearToasts = useCallback(() => {
+    console.log('🧹 모든 토스트 제거'); // 디버깅 로그
     setToasts([]);
   }, []);
 
