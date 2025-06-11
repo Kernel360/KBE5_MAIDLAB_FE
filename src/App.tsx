@@ -17,6 +17,7 @@ import SocialSignUp from '@/pages/SocialSignUp';
 import ConsumerReservations from '@/pages/reservation/ConsumerReservations';
 import ConsumerReservationCreate from '@/pages/reservation/ConsumerReservationCreate';
 import ConsumerReservationDetail from '@/pages/reservation/ConsumerReservationDetail';
+import ReviewRegister from '@/pages/consumer/ReviewRegister';
 import ManagerReservations from '@/pages/reservation/ManagerReservations';
 import ManagerReservationDetail from '@/pages/reservation/ManagerReservationDetail';
 
@@ -128,6 +129,14 @@ const App: React.FC = () => {
                 }
               />
               <Route
+              path={ROUTES.CONSUMER.REVIEW_REGISTER}
+              element={
+                <ProtectedRoute requiredUserType="CONSUMER">
+                  <ReviewRegister />
+                </ProtectedRoute>
+              }
+            />
+              <Route
                 path={ROUTES.CONSUMER.MYPAGE}
                 element={
                   <ProtectedRoute requiredUserType="CONSUMER">
@@ -162,6 +171,14 @@ const App: React.FC = () => {
                 }
               />
               <Route
+              path={ROUTES.MANAGER.RESERVATION_DETAIL}
+              element={
+                <ProtectedRoute requiredUserType="MANAGER">
+                  <ManagerReservationDetail />
+                </ProtectedRoute>
+              }
+            />
+              <Route
                 path={ROUTES.MANAGER.RESERVATION_DETAIL}
                 element={
                   <ProtectedRoute requiredUserType="MANAGER">
@@ -177,6 +194,7 @@ const App: React.FC = () => {
                   </ProtectedRoute>
                 }
               />
+              
 
               {/* Admin Routes */}
               <Route path={ROUTES.ADMIN.LOGIN} element={<AdminLogin />} />
