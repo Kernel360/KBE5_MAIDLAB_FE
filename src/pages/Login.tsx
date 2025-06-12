@@ -135,11 +135,6 @@ const Login: React.FC = () => {
                 showToast('인증 정보를 가져올 수 없습니다.', 'error');
               }
             } else {
-<<<<<<< Updated upstream
-              // 기존 사용자인 경우 홈으로
-=======
-              // 기존 사용자
->>>>>>> Stashed changes
               navigate(ROUTES.HOME);
             }
           } else {
