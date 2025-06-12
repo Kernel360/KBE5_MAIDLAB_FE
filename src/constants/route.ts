@@ -48,8 +48,10 @@ export const ROUTES = {
     EVENTS: '/admin/events',
     EVENT_CREATE: '/admin/events/create',
     EVENT_EDIT: '/admin/events/:id/edit',
+    EVENT_DETAIL: '/admin/events/:id',
     BOARDS: '/admin/boards',
     BOARD_DETAIL: '/admin/boards/:id',
+    BOARD_EDIT: '/admin/boards/:id/edit',
   },
 
   // 기타 페이지

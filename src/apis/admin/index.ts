@@ -349,19 +349,19 @@ export const adminApi = {
 
   // ===== 게시판 관리 =====
   // 전체 게시판 조회
-  getBoards: async (
-    params: PageParams = {},
-  ): Promise<ConsumerBoardResponseDto[]> => {
-    const { page = 0, size = 10 } = params;
-    try {
-      const response = await apiClient.get<
-        ApiResponse<ConsumerBoardResponseDto[]>
-      >(`/api/admin/board?page=${page}&size=${size}`);
-      return response.data.data;
-    } catch (error) {
-      throw new Error(handleApiError(error));
-    }
-  },
+  // getBoards: async (
+  //   params: PageParams = {},
+  // ): Promise<ConsumerBoardResponseDto[]> => {
+  //   const { page = 0, size = 10 } = params;
+  //   try {
+  //     const response = await apiClient.get<
+  //       ApiResponse<ConsumerBoardResponseDto[]>
+  //     >(`/api/admin/board?page=${page}&size=${size}`);
+  //     return response.data.data;
+  //   } catch (error) {
+  //     throw new Error(handleApiError(error));
+  //   }
+  // },
 
   // 상담 게시판 조회
   getConsultationBoards: async (
@@ -372,6 +372,35 @@ export const adminApi = {
       const response = await apiClient.get<
         ApiResponse<ConsumerBoardResponseDto[]>
       >(`/api/admin/board/consultation?page=${page}&size=${size}`);
+      return response.data.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // 환불 게시판 조회
+  getRefundBoards: async (
+    params: PageParams = {},
+  ): Promise<ConsumerBoardResponseDto[]> => {
+    const { page = 0, size = 10 } = params;
+    try {
+      const response = await apiClient.get<
+        ApiResponse<ConsumerBoardResponseDto[]>
+      >(`/api/admin/board/refund?page=${page}&size=${size}`);
+      return response.data.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // 게시판 상세 조회
+  getBoardDetail: async (
+    boardId: number,
+  ): Promise<ConsumerBoardDetailResponseDto> => {
+    try {
+      const response = await apiClient.get<
+        ApiResponse<ConsumerBoardDetailResponseDto>
+      >(`/api/admin/board/${boardId}`);
       return response.data.data;
     } catch (error) {
       throw new Error(handleApiError(error));

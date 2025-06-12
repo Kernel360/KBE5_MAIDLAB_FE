@@ -43,6 +43,9 @@ import {
   AdminEventCreate,
   AdminBoards,
   AdminBoardDetail,
+  AdminBoardEdit,
+  AdminEventEdit,
+  AdminEventDetail,
 } from '@/pages';
 
 // Board Pages
@@ -242,7 +245,7 @@ const App: React.FC = () => {
                 </ProtectedRoute>
               }
             /> */}
-              {/* 관리자 라우트 */}
+
               <Route
                 path={ROUTES.CONSUMER.LIKED_MANAGERS}
                 element={
@@ -288,15 +291,19 @@ const App: React.FC = () => {
                   </ProtectedRoute>
                 }
               >
-                <Route index element={<AdminUserList />} />
-                <Route path="managers/:id" element={<AdminManagerDetail />} />
-                <Route path="consumers/:id" element={<AdminConsumerDetail />} />
+                <Route path="users" element={<AdminUserList />} />
+                <Route path="users/manager/:id" element={<AdminManagerDetail />} />
+                <Route path="users/consumer/:id" element={<AdminConsumerDetail />} />
                 <Route path="reservations" element={<AdminReservationList />} />
                 <Route path="reservations/:id" element={<AdminReservationDetail />} />
                 <Route path="events" element={<AdminEvents />} />
                 <Route path="events/create" element={<AdminEventCreate />} />
+                <Route path="events/:id/edit" element={<AdminEventEdit />} />
+                <Route path="events/:id" element={<AdminEventDetail />} />
                 <Route path="boards" element={<AdminBoards />} />
                 <Route path="boards/:id" element={<AdminBoardDetail />} />
+                <Route path="boards/:id/edit" element={<AdminBoardEdit />} />
+                <Route index element={<AdminUserList />} />
               </Route>
 
               {/* Board Routes */}

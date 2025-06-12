@@ -262,6 +262,40 @@ export const useAdmin = () => {
       [showToast],
     ),
 
+    // 환불 게시판 조회
+    fetchRefundBoards: useCallback(
+      async (params?: PageParams) => {
+        try {
+          const data = await adminApi.getRefundBoards(params);
+          return data;
+        } catch (error: any) {
+          showToast(
+            error.message || '환불 게시판 조회에 실패했습니다.',
+            'error',
+          );
+          return [];
+        }
+      },
+      [showToast],
+    ),
+
+    // 게시판 상세 조회
+    fetchBoardDetail: useCallback(
+      async (boardId: number) => {
+        try {
+          const data = await adminApi.getBoardDetail(boardId);
+          return data;
+        } catch (error: any) {
+          showToast(
+            error.message || '게시글 상세 조회에 실패했습니다.',
+            'error',
+          );
+          return null;
+        }
+      },
+      [showToast],
+    ),
+
     // 답변 등록
     createAnswer: useCallback(
       async (boardId: number, data: AnswerRequestDto) => {
