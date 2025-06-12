@@ -8,14 +8,15 @@ export const ROUTES = {
 
   // 소비자 페이지
   CONSUMER: {
-    MYPAGE: '/consumers/mypage',
-    PROFILE: '/consumers/profile',
-    PROFILE_EDIT: '/consumers/profile/edit',
-    RESERVATIONS: '/consumers/reservations',
-    RESERVATION_DETAIL: '/consumers/reservations/:id',
-    RESERVATION_CREATE: '/consumers/reservations/create',
-    LIKED_MANAGERS: '/consumers/likes',
-    BLACKLIST: '/consumers/blacklist',
+    MYPAGE: '/consumer/mypage',
+    PROFILE: '/consumer/profile',
+    PROFILE_SETUP: '/consumer/profile/setup',
+    PROFILE_EDIT: '/consumer/profile/edit',
+    RESERVATIONS: '/consumer/reservations',
+    RESERVATION_DETAIL: '/consumer/reservations/:id',
+    RESERVATION_CREATE: '/consumer/reservations/create',
+    LIKED_MANAGERS: '/consumer/likes',
+    BLACKLIST: '/consumer/blacklist',
   },
 
   // 매니저 페이지
@@ -23,7 +24,7 @@ export const ROUTES = {
     MYPAGE: '/manager/mypage',
     PROFILE: '/manager/profile',
     PROFILE_EDIT: '/manager/profile/edit',
-    PROFILE_CREATE: '/manager/profile/create',
+    PROFILE_SETUP: '/manager/profile/setup',
     RESERVATIONS: '/manager/reservations',
     RESERVATION_DETAIL: '/manager/reservations/:id',
     REVIEWS: '/manager/reviews',
@@ -62,4 +63,3 @@ export const ROUTES = {
   },
   NOT_FOUND: '/404',
 } as const;
-
