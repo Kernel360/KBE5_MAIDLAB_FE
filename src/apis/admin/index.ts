@@ -22,6 +22,7 @@ export interface AdminLoginRequestDto {
 export interface PageParams {
   page?: number;
   size?: number;
+  search?: string;
 }
 
 export interface ManagerListResponseDto {
@@ -142,11 +143,11 @@ export const adminApi = {
   getManagers: async (
     params: PageParams = {},
   ): Promise<PageManagerListResponseDto> => {
-    const { page = 0, size = 10 } = params;
+    const { page = 0, size = 10, search = '' } = params;
     try {
       const response = await apiClient.get<
         ApiResponse<PageManagerListResponseDto>
-      >(`/api/admin/manager?page=${page}&size=${size}`);
+      >(`/api/admin/manager?page=${page}&size=${size}${search ? `&search=${encodeURIComponent(search)}` : ''}`);
       return response.data.data;
     } catch (error) {
       throw new Error(handleApiError(error));

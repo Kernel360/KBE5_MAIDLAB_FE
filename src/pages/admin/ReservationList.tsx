@@ -102,6 +102,7 @@ const ReservationList = () => {
     setTabValue(newValue);
     setPage(0);
     setSearchTerm('');
+    handleCloseDialog();
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -346,14 +347,14 @@ const ReservationList = () => {
           onRowsPerPageChange={handleChangeRowsPerPage}
           labelRowsPerPage="페이지당 행 수"
         />
-      </TabPanel>
 
-      <MatchingChangeDialog
-        open={openDialog}
-        matching={selectedMatching}
-        onClose={handleCloseDialog}
-        onConfirm={handleConfirmChange}
-      />
+        <MatchingChangeDialog
+          open={openDialog}
+          matching={selectedMatching}
+          onClose={handleCloseDialog}
+          onConfirm={handleConfirmChange}
+        />
+      </TabPanel>
     </StyledContainer>
   );
 };
