@@ -4,7 +4,6 @@ import type { ReservationStatus } from '@/constants/status';
 
 // 예약 관련 타입 정의
 export interface ReservationRequestDto {
-  status: ReservationStatus;
   serviceDetailTypeId: number;
   address: string;
   addressDetail: string;

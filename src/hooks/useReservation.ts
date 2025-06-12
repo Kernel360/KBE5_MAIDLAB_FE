@@ -90,7 +90,6 @@ export const useReservation = () => {
         }
 
         const formattedData: ReservationRequestDto = {
-          status: 'PENDING',  // 예약 생성 시 초기 상태
           serviceDetailTypeId: reservationData.serviceDetailTypeId,
           address: reservationData.address,
           addressDetail: reservationData.addressDetail,

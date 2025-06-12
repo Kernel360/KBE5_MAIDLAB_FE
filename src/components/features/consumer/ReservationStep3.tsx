@@ -7,7 +7,7 @@ import { SERVICE_DETAIL_TYPES } from '@/constants/service';
 interface Props {
   data: ReservationFormData;
   onBack: () => void;
-  onComplete: (finalData: ReservationFormData) => void;
+  onSubmit: () => void;
 }
 
 // int -> BigDecimal
@@ -23,7 +23,7 @@ const calculateAdditionalPrice = (serviceAdd: string[] | string | undefined): nu
   return additionalPrice;
 };
 
-const ReservationStep3: React.FC<Props> = ({ data, onBack, onComplete }) => {
+const ReservationStep3: React.FC<Props> = ({ data, onBack, onSubmit }) => {
   const [expectedPrice, setExpectedPrice] = useState(0);
   const { createReservation } = useReservation();
   const { fetchAvailableManagers } = useMatching();
@@ -78,8 +78,6 @@ const ReservationStep3: React.FC<Props> = ({ data, onBack, onComplete }) => {
     // serviceDetailType이 없는 경우 기본값으로 '대청소' 설정
     const serviceDetailType = data.serviceDetailType || '대청소';
     const serviceDetail = SERVICE_DETAIL_TYPES[serviceDetailType];
-    console.log('--------------------------------ttt  ')
-    console.log(serviceDetail)
     if (!serviceDetail) {
       alert('서비스 종류 정보가 올바르지 않습니다.');
       return;
@@ -116,7 +114,7 @@ const ReservationStep3: React.FC<Props> = ({ data, onBack, onComplete }) => {
       const result = await createReservation(reservationPayload);
       if (result.success) {
         alert('예약이 완료되었습니다.');
-        onComplete(data);
+        onSubmit();
       } else {
         alert('예약 요청 실패: ' + result.error);
       }
