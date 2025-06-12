@@ -10,6 +10,7 @@ import { SERVICE_TYPE_LABELS } from '@/constants/service';
 import { formatPrice } from '@/utils';
 import { useReservationStatus } from '@/hooks/useReservationStatus';
 import { ReservationCard } from '@/components/reservation/ReservationCard';
+import { ManagerReservationCard } from '@/components/reservation/ManagerReservationCard';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -307,10 +308,13 @@ const ManagerReservations: React.FC = () => {
             </div>
           ) : (
             paginatedReservations.map((reservation) => (
-              <ReservationCard
+              <ManagerReservationCard
                 key={reservation.reservationId}
                 reservation={reservation}
-                getStatusBadgeStyle={getStatusBadgeStyle}
+                getStatusBadgeStyle={(status) => getStatusBadgeStyle(status, reservation.reservationDate)}
+                onDetailClick={() => navigate(`/managers/reservations/${reservation.reservationId}`)}
+                onCheckIn={() => handleCheckInOutClick(reservation, true)}
+                onCheckOut={() => handleCheckInOutClick(reservation, false)}
               />
             ))
           )}

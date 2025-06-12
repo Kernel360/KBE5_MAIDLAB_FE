@@ -18,6 +18,7 @@ import ConsumerReservations from '@/pages/reservation/ConsumerReservations';
 import ConsumerReservationCreate from '@/pages/reservation/ConsumerReservationCreate';
 import ConsumerReservationDetail from '@/pages/reservation/ConsumerReservationDetail';
 import ReviewRegister from '@/pages/consumer/ReviewRegister';
+import ReviewRegisterManager from '@/pages/manager/ReviewRegister';
 import ManagerReservations from '@/pages/reservation/ManagerReservations';
 import ManagerReservationDetail from '@/pages/reservation/ManagerReservationDetail';
 
@@ -182,7 +183,7 @@ const App: React.FC = () => {
                 path={ROUTES.MANAGER.REVIEW_REGISTER}
                 element={
                   <ProtectedRoute requiredUserType="MANAGER">
-                    <ReviewRegister />
+                    <ReviewRegisterManager />
                   </ProtectedRoute>
                 }
               />

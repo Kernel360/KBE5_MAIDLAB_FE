@@ -34,7 +34,7 @@ const ManagerMatching = () => {
     try {
       const result = await respondToReservation(reservationId, { status: true });
       if (result.success) {
-        setMatchings(prev => prev.filter(matching => matching.reservationId !== reservationId));
+        await loadMatchings(); // 목록 새로고침
       }
     } catch (error) {
       console.error('예약 수락 실패:', error);
@@ -45,7 +45,7 @@ const ManagerMatching = () => {
     try {
       const result = await respondToReservation(reservationId, { status: false });
       if (result.success) {
-        setMatchings(prev => prev.filter(matching => matching.reservationId !== reservationId));
+        await loadMatchings(); // 목록 새로고침
       }
     } catch (error) {
       console.error('예약 거절 실패:', error);
@@ -53,11 +53,20 @@ const ManagerMatching = () => {
   };
 
   const formatTimeRange = (startTime: string, endTime: string) => {
-    const start = new Date(startTime);
-    const end = new Date(endTime);
-    const hours = Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60));
+    // HH:mm 형식의 시간을 파싱
+    const [startHours, startMinutes] = startTime.split(':').map(Number);
+    const [endHours, endMinutes] = endTime.split(':').map(Number);
+    
+    // 시간 차이 계산 (분 단위)
+    const startTotalMinutes = startHours * 60 + startMinutes;
+    const endTotalMinutes = endHours * 60 + endMinutes;
+    const diffMinutes = endTotalMinutes - startTotalMinutes;
+    
+    // 시간으로 변환
+    const hours = Math.round(diffMinutes / 60);
+
     return {
-      range: `${start.getHours().toString().padStart(2, '0')}:${start.getMinutes().toString().padStart(2, '0')} ~ ${end.getHours().toString().padStart(2, '0')}:${end.getMinutes().toString().padStart(2, '0')}`,
+      range: `${startTime} ~ ${endTime}`,
       hours
     };
   };
