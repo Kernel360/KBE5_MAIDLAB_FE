@@ -27,6 +27,12 @@ export interface RequestMatchingListResponseDto {
   totalPrice: string;
 }
 
+export interface MatchingResponseDto {
+  reservationId: number;
+  managerId: number;
+  matchingStatus: string;
+}
+
 // 매칭 API 함수들
 export const matchingApi = {
   // 매칭 매니저 조회

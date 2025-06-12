@@ -134,7 +134,6 @@ const ManagerReservationDetail: React.FC = () => {
               }`}>
                 {currentReservation ? RESERVATION_STATUS_LABELS[currentReservation.status] : ''}
               </span>
-              <span className="ml-2 text-gray-500">#{reservation.reservationId}</span>
             </div>
             <div className="text-sm text-gray-500">
               {formatDateTime(reservation.reservationDate)}
@@ -146,7 +145,7 @@ const ManagerReservationDetail: React.FC = () => {
             <div className="flex justify-between items-center">
               <div>
                 <h3 className="font-medium">
-                  {SERVICE_TYPE_LABELS[reservation.serviceType]} &gt;{' '}
+                  {SERVICE_TYPE_LABELS[reservation.serviceType as keyof typeof SERVICE_TYPE_LABELS]} &gt;{' '}
                   {reservation.serviceDetailType}
                 </h3>
                 <p className="text-sm text-gray-500 mt-1">

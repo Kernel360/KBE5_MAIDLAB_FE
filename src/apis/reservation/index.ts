@@ -4,6 +4,7 @@ import type { ReservationStatus } from '@/constants/status';
 
 // 예약 관련 타입 정의
 export interface ReservationRequestDto {
+  status: ReservationStatus;
   serviceDetailTypeId: number;
   address: string;
   addressDetail: string;
@@ -70,7 +71,7 @@ export interface ReviewRegisterRequestDto {
 }
 
 export interface WeeklySettlementResponseDto {
-  totalAmount: number;
+  totalAmount: string;
   settlements: SettlementResponseDto[];
 }
 
@@ -79,8 +80,8 @@ export interface SettlementResponseDto {
   serviceType: 'HOUSEKEEPING' | 'CARE';
   serviceDetailType: string;
   status: string;
-  platformFee: number;
-  amount: number;
+  platformFee: string;
+  amount: string;
 }
 
 // 예약 API 함수들

@@ -27,7 +27,7 @@ import ConsumerProfile from '@/pages/consumer/Profile';
 import ManagerList from '@/pages/consumer/ManagerList';
 
 // Manager Pages
-import { ManagerMatching } from '@/pages/matching/ManagerMatching';
+import ManagerMatching from '@/pages/matching/ManagerMatching';
 
 // Admin Pages
 import {

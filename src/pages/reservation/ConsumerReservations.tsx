@@ -26,45 +26,6 @@ const RESERVATION_FILTERS = {
     reservations.filter(r => r.status === RESERVATION_STATUS.COMPLETED),
 } as const;
 
-// Interface Segregation: 컴포넌트별 책임을 명확히 분리
-const ReservationTabs: React.FC<{
-  activeTab: TabType;
-  onTabChange: (tab: TabType) => void;
-}> = ({ activeTab, onTabChange }) => (
-  <div className="flex border-b">
-    {TABS.map((tab) => (
-      <button
-        key={tab}
-        className={`flex-1 py-3 text-sm font-medium border-b-2 ${
-          activeTab === tab
-            ? 'text-blue-600 border-blue-600'
-            : 'text-gray-500 border-transparent'
-        }`}
-        onClick={() => onTabChange(tab)}
-      >
-        {tab}
-      </button>
-    ))}
-  </div>
-);
-
-// Liskov Substitution: 예약 목록 표시 컴포넌트를 독립적으로 구성
-const ReservationList: React.FC<{
-  reservations: ReservationResponseDto[];
-  onReservationClick: (id: number) => void;
-}> = ({ reservations, onReservationClick }) => (
-  <div className="space-y-4">
-    {reservations.map((reservation) => (
-      <ReservationCard
-        key={reservation.reservationId}
-        reservation={reservation}
-        onClick={() => onReservationClick(reservation.reservationId)}
-      />
-    ))}
-  </div>
-);
-
-// Dependency Inversion: 상위 컴포넌트에서 하위 컴포넌트로 의존성 주입
 const ConsumerReservations: React.FC = () => {
   const navigate = useNavigate();
   const { reservations, loading, fetchReservations } = useReservation();
@@ -91,60 +52,107 @@ const ConsumerReservations: React.FC = () => {
     navigate(ROUTES.CONSUMER.RESERVATION_DETAIL.replace(':id', String(reservationId)));
   };
 
+  const handleReviewClick = (reservationId: number, event: React.MouseEvent) => {
+    event.stopPropagation();
+    navigate(ROUTES.CONSUMER.REVIEW_REGISTER.replace(':id', String(reservationId)));
+  };
+
   const currentReservations = filteredReservations.slice(startIndex, endIndex);
+
+  const getStatusBadgeStyle = (status: string) => {
+    switch (status) {
+      case RESERVATION_STATUS.COMPLETED:
+        return 'bg-gray-100 text-gray-600';
+      case RESERVATION_STATUS.WORKING:
+        return 'bg-blue-100 text-blue-600';
+      default:
+        return 'bg-orange-100 text-orange-600';
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 헤더 */}
-      <div className="fixed top-0 left-0 right-0 z-10 bg-white shadow">
-        <div className="flex items-center px-4 h-14">
+      <div className="max-w-3xl mx-auto p-4">
+        {/* 헤더 */}
+        <div className="flex items-center mb-6">
           <button 
             onClick={() => navigate(-1)}
             className="p-2 -ml-2"
           >
             <IoArrowBack className="w-6 h-6" />
           </button>
-          <h1 className="ml-2 text-lg font-semibold">예약 내역</h1>
+          <h1 className="text-2xl font-bold ml-2">예약 내역</h1>
         </div>
-        <ReservationTabs activeTab={activeTab} onTabChange={setActiveTab} />
-      </div>
 
-      {/* 컨텐츠 */}
-      <div className="pt-28 px-4 pb-4">
-        {loading ? (
-          <div className="flex justify-center items-center h-40">
-            <p className="text-gray-500">{INFO_MESSAGES.LOADING}</p>
-          </div>
-        ) : currentReservations.length > 0 ? (
-          <>
-            <ReservationList
-              reservations={currentReservations}
-              onReservationClick={handleReservationClick}
-            />
-            {/* 페이지네이션 */}
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2 mt-6">
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => goToPage(i)}
-                    className={`w-8 h-8 rounded-full ${
-                      currentPage === i
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-600'
-                    }`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="flex flex-col items-center justify-center h-40">
-            <p className="text-gray-500">{INFO_MESSAGES.NO_RESERVATIONS}</p>
-          </div>
-        )}
+        {/* 탭 */}
+        <div className="flex space-x-4 mb-6">
+          {TABS.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2 rounded-lg ${
+                activeTab === tab
+                  ? 'bg-orange-500 text-white'
+                  : 'bg-white text-gray-500'
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+
+        {/* 예약 목록 */}
+        <div className="space-y-4">
+          {loading ? (
+            <div className="bg-white rounded-lg shadow p-6 text-center">
+              <p className="text-gray-500">{INFO_MESSAGES.LOADING}</p>
+            </div>
+          ) : currentReservations.length > 0 ? (
+            <>
+              {currentReservations.map((reservation) => (
+                <div key={reservation.reservationId} className="relative">
+                  <ReservationCard
+                    key={reservation.reservationId}
+                    reservation={reservation}
+                    getStatusBadgeStyle={(status) => getStatusBadgeStyle(status)}
+                    onClick={() => handleReservationClick(reservation.reservationId)}
+                  />
+                  {/* 리뷰 작성 버튼 */}
+                  {!reservation.isExistReview && reservation.status === RESERVATION_STATUS.COMPLETED && (
+                    <button
+                      onClick={(e) => handleReviewClick(reservation.reservationId, e)}
+                      className="absolute bottom-6 right-6 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 shadow-md"
+                    >
+                      리뷰 작성
+                    </button>
+                  )}
+                </div>
+              ))}
+              {/* 페이지네이션 */}
+              {totalPages > 1 && (
+                <div className="flex justify-center mt-6 space-x-2">
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => goToPage(i)}
+                      className={`px-3 py-1 rounded ${
+                        currentPage === i
+                          ? 'bg-orange-500 text-white'
+                          : 'bg-white text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="bg-white rounded-lg shadow p-6 text-center">
+              <p className="text-gray-500">{INFO_MESSAGES.NO_RESERVATIONS}</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

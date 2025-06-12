@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { RESERVATION_STATUS_LABELS } from '@/constants/status';
 import { SERVICE_TYPE_LABELS, SERVICE_TYPES } from '@/constants/service';
 import { formatDateTime, formatPrice } from '@/utils';
@@ -7,24 +6,24 @@ import type { ReservationResponseDto } from '@/apis/reservation';
 
 interface ReservationCardProps {
   reservation: ReservationResponseDto;
-  getStatusBadgeStyle: (status: string, reservationDate: string) => string;
+  getStatusBadgeStyle: (status: string) => string;
+  onClick?: () => void;
 }
 
 export const ReservationCard: React.FC<ReservationCardProps> = ({
   reservation,
   getStatusBadgeStyle,
+  onClick,
 }) => {
-  const navigate = useNavigate();
-
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div 
+      className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-md transition-shadow"
+      onClick={onClick}
+    >
       <div className="flex justify-between items-start mb-4">
         <div className="flex items-center">
           <span
-            className={`px-3 py-1 text-sm rounded-full ${getStatusBadgeStyle(
-              reservation.status,
-              reservation.reservationDate
-            )}`}
+            className={`px-3 py-1 text-sm rounded-full ${getStatusBadgeStyle(reservation.status)}`}
           >
             {RESERVATION_STATUS_LABELS[reservation.status]}
           </span>
@@ -58,9 +57,7 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
 
       <div className="flex justify-end">
         <button
-          onClick={() =>
-            navigate(`/managers/reservations/${reservation.reservationId}`)
-          }
+          onClick={onClick}
           className="px-4 py-2 text-sm text-orange-500 border border-orange-500 rounded-lg hover:bg-orange-50"
         >
           상세보기
