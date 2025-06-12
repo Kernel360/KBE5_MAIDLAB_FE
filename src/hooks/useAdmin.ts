@@ -181,6 +181,23 @@ export const useAdmin = () => {
       },
       [showToast],
     ),
+
+    // 정산 상세 조회
+    fetchSettlementDetail: useCallback(
+      async (settlementId: number) => {
+        try {
+          setLoading(true);
+          const response = await adminApi.getSettlementDetail(settlementId);
+          return response.data;
+        } catch (error: any) {
+          showToast(error.message || '정산 상세 정보 조회에 실패했습니다.', 'error');
+          return null;
+        } finally {
+          setLoading(false);
+        }
+      },
+      [showToast],
+    ),
   };
 
   // 매칭 관리

@@ -41,6 +41,7 @@ export { default as AdminConsumerDetail } from '@/pages/admin/ConsumerDetail';
 export { default as AdminReservationList } from '@/pages/admin/ReservationList';
 export { default as AdminReservationDetail } from '@/pages/admin/ReservationDetail';
 export { default as AdminSettlementList } from '@/pages/admin/SettlementList';
+export { default as AdminSettlementDetail } from '@/pages/admin/SettlementDetail';
 export { default as AdminEvents } from '@/pages/admin/EventList';
 export { default as AdminEventCreate } from '@/pages/admin/EventCreate';
 export { default as AdminEventEdit } from '@/pages/admin/EventEdit';

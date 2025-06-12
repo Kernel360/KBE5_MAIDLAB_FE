@@ -431,4 +431,21 @@ export const adminApi = {
       throw new Error(handleApiError(error));
     }
   },
+
+  // 정산 상세 조회
+  getSettlementDetail: async (settlementId: number) => {
+    const response = await apiClient.get<{
+      data: {
+        settlementId: number;
+        serviceType: 'HOUSEKEEPING';
+        serviceDetailType: string;
+        status: 'PENDING' | 'APPROVED' | 'REJECTED';
+        platformFee: number;
+        amount: number;
+      };
+      message: string;
+      code: string;
+    }>(`/api/admin/reservations/settlement/${settlementId}`);
+    return response.data;
+  },
 };
