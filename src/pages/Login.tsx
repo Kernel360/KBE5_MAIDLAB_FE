@@ -74,7 +74,6 @@ const Login: React.FC = () => {
 
         const result = await login(cleanedData);
         if (result.success) {
-          showToast('로그인되었습니다.', 'success');
           navigate(ROUTES.HOME);
         }
       },
@@ -124,7 +123,6 @@ const Login: React.FC = () => {
               });
             } else {
               // 기존 사용자인 경우 홈으로
-              showToast('로그인되었습니다.', 'success');
               navigate(ROUTES.HOME);
             }
           } else {
