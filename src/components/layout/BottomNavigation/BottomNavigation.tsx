@@ -30,7 +30,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
       id: 'consultation',
       icon: MessageSquare,
       label: '상담',
-      path: ROUTES.BOARD,
+      path: ROUTES.BOARD.LIST,
     },
     {
       id: 'profile',
