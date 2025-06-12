@@ -66,7 +66,7 @@ export interface CheckInOutRequestDto {
 export interface ReviewRegisterRequestDto {
   rating: number;
   comment: string;
-  likes: boolean;
+  likes?: boolean;
 }
 
 export interface WeeklySettlementResponseDto {
