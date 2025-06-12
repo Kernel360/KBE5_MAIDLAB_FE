@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import {
   Container,
@@ -59,8 +59,18 @@ function TabPanel(props: TabPanelProps) {
 
 const ReservationList = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
-  const [tabValue, setTabValue] = useState(0);
+  const [tabValue, setTabValue] = useState(() => {
+    // 1. localStorage에서 값을 먼저 확인
+    const savedTab = localStorage.getItem('adminReservationTab');
+    if (savedTab !== null) {
+      localStorage.removeItem('adminReservationTab');
+      return parseInt(savedTab, 10);
+    }
+    // 2. location.state 확인
+    return (location.state as { previousTab?: number })?.previousTab ?? 0;
+  });
   const [reservations, setReservations] = useState<ReservationResponseDto[]>([]);
   const [matchings, setMatchings] = useState<MatchingResponseDto[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -128,11 +138,12 @@ const ReservationList = () => {
     return `${date} ${time}`;
   };
 
-  const formatPrice = (price: number) => {
+  const formatPrice = (price: number | string) => {
+    const numericPrice = typeof price === 'string' ? parseInt(price, 10) : price;
     return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
       currency: 'KRW',
-    }).format(price);
+    }).format(numericPrice);
   };
 
   const getStatusChipColor = (status: string) => {
@@ -172,6 +183,12 @@ const ReservationList = () => {
     } catch (error) {
       console.error('매니저 변경 실패:', error);
     }
+  };
+
+  const handleDetailView = (reservationId: number) => {
+    // 현재 탭 상태를 localStorage에 저장
+    localStorage.setItem('adminReservationTab', tabValue.toString());
+    navigate(`/admin/reservations/${reservationId}`);
   };
 
   if (loading) {
@@ -243,7 +260,7 @@ const ReservationList = () => {
                       <Button
                         variant="outlined"
                         size="small"
-                        onClick={() => navigate(`/admin/reservations/${reservation.reservationId}`)}
+                        onClick={() => handleDetailView(reservation.reservationId)}
                       >
                         상세보기
                       </Button>
