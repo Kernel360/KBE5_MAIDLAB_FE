@@ -39,13 +39,14 @@ import {
   AdminConsumerDetail,
   AdminReservationList,
   AdminReservationDetail,
+  AdminSettlementList,
   AdminEvents,
   AdminEventCreate,
+  AdminEventEdit,
+  AdminEventDetail,
   AdminBoards,
   AdminBoardDetail,
   AdminBoardEdit,
-  AdminEventEdit,
-  AdminEventDetail,
 } from '@/pages';
 
 // Board Pages
@@ -296,6 +297,7 @@ const App: React.FC = () => {
                 <Route path="users/consumer/:id" element={<AdminConsumerDetail />} />
                 <Route path="reservations" element={<AdminReservationList />} />
                 <Route path="reservations/:id" element={<AdminReservationDetail />} />
+                <Route path="settlements" element={<AdminSettlementList />} />
                 <Route path="events" element={<AdminEvents />} />
                 <Route path="events/create" element={<AdminEventCreate />} />
                 <Route path="events/:id/edit" element={<AdminEventEdit />} />
