@@ -165,20 +165,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     async (data: SocialLoginRequestDto) => {
       try {
         dispatch({ type: 'AUTH_START' });
-        console.log('🔄 useAuth socialLogin 시작:', data);
 
         const response = await authApi.socialLogin(data);
 
-        console.log('📨 socialLogin API 응답:', response);
-        console.log('🔍 응답 분석:', {
-          newUser: response.newUser,
-          accessToken: response.accessToken ? 'Present' : 'Missing',
-          expirationTime: response.expirationTime,
-        });
-
         if (response.newUser) {
           // 신규 사용자 - 추가 정보 입력 필요
-          console.log('👤 신규 사용자 감지 - 추가 정보 입력 필요');
           dispatch({ type: 'AUTH_LOGOUT' });
           return {
             success: true,
@@ -188,7 +179,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }
 
         // 기존 사용자 - 로그인 완료
-        console.log('👤 기존 사용자 감지 - 로그인 진행');
         tokenStorage.setAccessToken(response.accessToken);
         userStorage.setUserType(data.userType);
 
@@ -221,10 +211,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         dispatch({ type: 'AUTH_START' });
 
+        // 회원가입
         await authApi.signUp(data);
 
+        // 자동 로그인
+        const loginData = {
+          userType: data.userType,
+          phoneNumber: data.phoneNumber,
+          password: data.password,
+        };
+        const loginResponse = await authApi.login(loginData);
+
+        // 로그인 상태로 변경
+        tokenStorage.setAccessToken(loginResponse.accessToken);
+        userStorage.setUserType(data.userType);
+
+        dispatch({
+          type: 'AUTH_SUCCESS',
+          payload: { userType: data.userType as UserType },
+        });
+
         showToast(SUCCESS_MESSAGES.SIGNUP, 'success');
-        dispatch({ type: 'AUTH_LOGOUT' });
 
         return { success: true };
       } catch (error: any) {

@@ -11,6 +11,8 @@ import SignUp from '@/pages/SignUp';
 import NotFound from '@/pages/NotFound';
 import GoogleCallback from '@/pages/GoogleCallback';
 import SocialSignUp from '@/pages/SocialSignUp';
+import ManagerProfileSetup from '@/pages/ManagerProfileSetup';
+import ConsumerProfileSetup from '@/pages/ConsumerProfileSetup';
 
 import {
   AdminLogin,
@@ -53,6 +55,14 @@ const App: React.FC = () => {
                 <Route path={ROUTES.BOARD_CREATE} element={<BoardCreate />} />
                 <Route path={ROUTES.BOARD_DETAIL} element={<BoardDetail />} /> */}
               {/* 소비자 페이지 (나중에 구현) */}
+              <Route
+                path={ROUTES.CONSUMER.PROFILE_SETUP}
+                element={
+                  <ProtectedRoute requiredUserType="CONSUMER">
+                    <ConsumerProfileSetup />
+                  </ProtectedRoute>
+                }
+              />
               {/* <Route
                   path={ROUTES.CONSUMER.MYPAGE}
                   element={
@@ -60,32 +70,32 @@ const App: React.FC = () => {
                       <ConsumerMyPage />
                     </ProtectedRoute>
                   }
-                />
-                <Route
+                /> */}
+              {/* <Route
                   path={ROUTES.CONSUMER.PROFILE}
                   element={
                     <ProtectedRoute requiredUserType="CONSUMER">
                       <ConsumerProfile />
                     </ProtectedRoute>
                   }
-                />
-                <Route
+                /> */}
+              {/* <Route
                   path={ROUTES.CONSUMER.RESERVATIONS}
                   element={
                     <ProtectedRoute requiredUserType="CONSUMER">
                       <ConsumerReservations />
                     </ProtectedRoute>
                   }
-                />
-                <Route
+                /> */}
+              {/* <Route
                   path={ROUTES.CONSUMER.RESERVATION_CREATE}
                   element={
                     <ProtectedRoute requiredUserType="CONSUMER">
                       <ReservationCreate />
                     </ProtectedRoute>
                   }
-                />
-                <Route
+                /> */}
+              {/* <Route
                   path={ROUTES.CONSUMER.LIKED_MANAGERS}
                   element={
                     <ProtectedRoute requiredUserType="CONSUMER">
@@ -114,18 +124,18 @@ const App: React.FC = () => {
               path={ROUTES.MANAGER.PROFILE_EDIT}
               element={
                 <ProtectedRoute requiredUserType="MANAGER">
-                  <ManagerProfile />
+                <ManagerProfile />
                 </ProtectedRoute>
-              }
-            /> */}
-              {/* <Route
-              path={ROUTES.MANAGER.PROFILE_CREATE}
-              element={
-                <ProtectedRoute requiredUserType="MANAGER">
-                  <ManagerProfileCreate />
-                </ProtectedRoute>
-              }
-            /> */}
+                }
+                /> */}
+              <Route
+                path={ROUTES.MANAGER.PROFILE_SETUP}
+                element={
+                  <ProtectedRoute requiredUserType="MANAGER">
+                    <ManagerProfileSetup />
+                  </ProtectedRoute>
+                }
+              />
               {/* <Route
               path={ROUTES.MANAGER.RESERVATIONS}
               element={

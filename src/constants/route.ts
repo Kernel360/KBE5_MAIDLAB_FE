@@ -10,6 +10,7 @@ export const ROUTES = {
   CONSUMER: {
     MYPAGE: '/consumer/mypage',
     PROFILE: '/consumer/profile',
+    PROFILE_SETUP: '/consumer/profile/setup',
     PROFILE_EDIT: '/consumer/profile/edit',
     RESERVATIONS: '/consumer/reservations',
     RESERVATION_DETAIL: '/consumer/reservations/:id',
@@ -23,7 +24,7 @@ export const ROUTES = {
     MYPAGE: '/manager/mypage',
     PROFILE: '/manager/profile',
     PROFILE_EDIT: '/manager/profile/edit',
-    PROFILE_CREATE: '/manager/profile/create',
+    PROFILE_SETUP: '/manager/profile/setup',
     RESERVATIONS: '/manager/reservations',
     RESERVATION_DETAIL: '/manager/reservations/:id',
     REVIEWS: '/manager/reviews',
@@ -60,4 +61,3 @@ export const ROUTES = {
   BOARD_DETAIL: '/board/:id',
   NOT_FOUND: '/404',
 } as const;
-

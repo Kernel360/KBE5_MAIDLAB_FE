@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { useAuth, useForm } from '@/hooks';
+import { useAuth, useForm, useToast } from '@/hooks';
 import { ROUTES } from '@/constants';
 import type { SocialSignUpRequestDto } from '@/apis/auth';
 
@@ -9,12 +9,24 @@ const SocialSignUp: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { socialSignUp, isLoading } = useAuth();
+  const { showToast } = useToast();
 
   // URL state나 localStorage에서 임시 토큰과 사용자 정보 가져오기
   const tempToken =
     location.state?.tempToken || localStorage.getItem('tempSocialToken');
   const userType =
-    location.state?.userType || localStorage.getItem('tempUserType');
+    location.state?.userType ||
+    (localStorage.getItem('tempUserType') as 'CONSUMER' | 'MANAGER');
+
+  // 프로필 설정 페이지로 이동하는 함수
+  const navigateToProfileSetup = (userType: 'CONSUMER' | 'MANAGER') => {
+    const route =
+      userType === 'MANAGER'
+        ? ROUTES.MANAGER.PROFILE_SETUP
+        : ROUTES.CONSUMER.PROFILE_SETUP;
+
+    navigate(route, { replace: true });
+  };
 
   const { values, errors, touched, handleSubmit, setValue, setFieldTouched } =
     useForm<SocialSignUpRequestDto>({
@@ -28,33 +40,26 @@ const SocialSignUp: React.FC = () => {
       onSubmit: async (formData) => {
         if (!tempToken) {
           console.error('임시 토큰이 없습니다.');
+          showToast('인증 정보가 없습니다.', 'error');
           navigate(ROUTES.LOGIN);
           return;
         }
 
-        // 임시 토큰을 localStorage에 설정
-        const originalToken = localStorage.getItem('accessToken');
-        localStorage.setItem('accessToken', tempToken);
+        const result = await socialSignUp(formData);
 
-        try {
-          const result = await socialSignUp(formData);
-          if (result.success) {
-            // 임시 데이터 정리
-            localStorage.removeItem('tempSocialToken');
-            localStorage.removeItem('tempUserType');
-            localStorage.removeItem('accessToken'); // 임시 토큰도 제거
+        if (result.success) {
+          showToast(
+            '회원가입이 완료되었습니다. 프로필을 설정해주세요.',
+            'success',
+          );
 
-            navigate(ROUTES.LOGIN);
-          }
-        } catch (error) {
-          console.error('❌ 소셜 회원가입 에러:', error);
-        } finally {
-          // 원래 토큰 복원
-          if (originalToken) {
-            localStorage.setItem('accessToken', originalToken);
-          } else {
-            localStorage.removeItem('accessToken');
-          }
+          // 자동 로그인이 완료된 상태이므로 바로 프로필 설정으로 이동
+          setTimeout(() => {
+            navigateToProfileSetup(userType);
+          }, 1500);
+        } else {
+          console.error('소셜 회원가입 실패:', result);
+          showToast(result.error || '회원가입에 실패했습니다.', 'error');
         }
       },
     });
@@ -76,9 +81,10 @@ const SocialSignUp: React.FC = () => {
   // 임시 토큰이 없으면 로그인 페이지로 리다이렉트
   useEffect(() => {
     if (!tempToken) {
+      showToast('잘못된 접근입니다.', 'error');
       navigate(ROUTES.LOGIN);
     }
-  }, [tempToken, navigate]);
+  }, [tempToken, navigate, showToast]);
 
   if (!tempToken) {
     return null;

@@ -28,7 +28,6 @@ export const useFileUpload = (maxFiles: number = 1) => {
   const addFiles = useCallback(
     (newFiles: FileList | File[]) => {
       const filesArray = Array.from(newFiles);
-      console.log('addFiles called', newFiles);
       // 파일 개수 체크
       if (state.files.length + filesArray.length > maxFiles) {
         showToast(`최대 ${maxFiles}개의 파일만 업로드 가능합니다.`, 'error');
