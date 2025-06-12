@@ -18,6 +18,7 @@ import { useState, useEffect } from 'react';
 import { useAdmin } from '@/hooks';
 import { type MatchingResponseDto } from '../../apis/matching';
 import { type ManagerListResponseDto } from '@/apis/admin';
+import { RESERVATION_STATUS } from '@/constants/status';
 
 interface MatchingChangeDialogProps {
   open: boolean;
@@ -40,8 +41,6 @@ const MatchingChangeDialog = ({
   // 매니저 목록 조회
   useEffect(() => {
     const fetchManagers = async () => {
-      if (!open) return;
-      
       setLoading(true);
       try {
         const response = await managerManagement.fetchManagers();
@@ -59,12 +58,11 @@ const MatchingChangeDialog = ({
       fetchManagers();
     }
 
-    // 다이얼로그가 닫힐 때 상태 초기화
     if (!open) {
       setManagers([]);
       setSelectedManagerId(null);
     }
-  }, [open, managerManagement, managers.length]);
+  }, [open]);
 
   const handleConfirm = () => {
     if (selectedManagerId) {
@@ -73,7 +71,12 @@ const MatchingChangeDialog = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog 
+      open={open && matching?.matchingStatus !== RESERVATION_STATUS.PENDING} 
+      onClose={onClose} 
+      maxWidth="sm" 
+      fullWidth
+    >
       <DialogTitle>매니저 변경</DialogTitle>
       <DialogContent>
         <Box sx={{ minWidth: 400, py: 2 }}>
@@ -146,7 +149,7 @@ const MatchingChangeDialog = ({
           variant="contained"
           color="primary"
           onClick={handleConfirm}
-          disabled={!selectedManagerId}
+          disabled={!selectedManagerId || matching?.matchingStatus === RESERVATION_STATUS.PENDING}
         >
           변경
         </Button>
