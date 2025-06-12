@@ -91,7 +91,8 @@ const UserList = () => {
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
-    setPage(0); // 탭 변경 시 페이지 초기화
+    setPage(0);
+    setSearchTerm('');
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -106,7 +107,11 @@ const UserList = () => {
   const fetchConsumers = async () => {
     try {
       setLoading(true);
-      const response = await adminApi.getConsumers({ page, size: rowsPerPage });
+      const response = await adminApi.getConsumers({ 
+        page, 
+        size: rowsPerPage,
+        search: searchTerm
+      });
       setConsumerData(response);
     } catch (error) {
       console.error('Failed to fetch consumers:', error);
@@ -118,7 +123,11 @@ const UserList = () => {
   const fetchManagers = async () => {
     try {
       setLoading(true);
-      const response = await adminApi.getManagers({ page, size: rowsPerPage });
+      const response = await adminApi.getManagers({ 
+        page, 
+        size: rowsPerPage,
+        search: searchTerm
+      });
       setManagerData(response);
 
       // 각 매니저의 상세 정보를 가져옵니다
@@ -154,37 +163,12 @@ const UserList = () => {
     } else {
       fetchManagers();
     }
-  }, [tabValue, page, rowsPerPage]);
-
-  // 검색어에 따른 필터링 함수
-  const getFilteredData = () => {
-    if (!searchTerm) {
-      return tabValue === 0 ? consumerData.content : managerData.content;
-    }
-
-    const searchTermLower = searchTerm.toLowerCase();
-    
-    if (tabValue === 0) {
-      return consumerData.content.filter(
-        (consumer) => 
-          consumer.name.toLowerCase().includes(searchTermLower) ||
-          consumer.phoneNumber.includes(searchTerm)
-      );
-    } else {
-      return managerData.content.filter(
-        (manager) => 
-          manager.name.toLowerCase().includes(searchTermLower)
-      );
-    }
-  };
+  }, [tabValue, page, rowsPerPage, searchTerm]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
-    setPage(0); // 검색 시 첫 페이지로 이동
+    setPage(0);
   };
-
-  const filteredData = getFilteredData();
-  const totalFilteredCount = filteredData.length;
 
   const handleDetailView = (type: 'consumer' | 'manager', id: number) => {
     localStorage.setItem('adminUserTab', tabValue.toString());
@@ -202,24 +186,22 @@ const UserList = () => {
       );
     }
 
-    return (filteredData as ConsumerListResponseDto[])
-      .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
-      .map((consumer) => (
-        <TableRow key={consumer.uuid}>
-          <TableCell>{consumer.name}</TableCell>
-          <TableCell>{consumer.phoneNumber}</TableCell>
-          <TableCell>{consumer.uuid}</TableCell>
-          <TableCell>
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={() => handleDetailView('consumer', consumer.id)}
-            >
-              상세보기
-            </Button>
-          </TableCell>
-        </TableRow>
-      ));
+    return consumerData.content.map((consumer) => (
+      <TableRow key={consumer.uuid}>
+        <TableCell>{consumer.name}</TableCell>
+        <TableCell>{consumer.phoneNumber}</TableCell>
+        <TableCell>{consumer.uuid}</TableCell>
+        <TableCell>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => handleDetailView('consumer', consumer.id)}
+          >
+            상세보기
+          </Button>
+        </TableCell>
+      </TableRow>
+    ));
   };
 
   const renderManagerRows = () => {
@@ -233,36 +215,34 @@ const UserList = () => {
       );
     }
 
-    return (filteredData as ManagerListResponseDto[])
-      .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
-      .map((manager) => {
-        const details = managerDetails[manager.id];
-        const verificationStatus = details?.isVerified as ManagerVerificationStatus;
-        return (
-          <TableRow key={manager.uuid}>
-            <TableCell>{manager.name}</TableCell>
-            <TableCell>
-              {details?.averageRate ?? '-'}
-            </TableCell>
-            <TableCell>
-              <Chip
-                label={details ? MANAGER_VERIFICATION_LABELS[verificationStatus] : '불명'}
-                color={verificationStatus === MANAGER_VERIFICATION_STATUS.APPROVED ? 'success' : 'default'}
-                size="small"
-              />
-            </TableCell>
-            <TableCell>
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={() => handleDetailView('manager', manager.id)}
-              >
-                상세보기
-              </Button>
-            </TableCell>
-          </TableRow>
-        );
-      });
+    return managerData.content.map((manager) => {
+      const details = managerDetails[manager.id];
+      const verificationStatus = details?.isVerified as ManagerVerificationStatus;
+      return (
+        <TableRow key={manager.uuid}>
+          <TableCell>{manager.name}</TableCell>
+          <TableCell>
+            {details?.averageRate ?? '-'}
+          </TableCell>
+          <TableCell>
+            <Chip
+              label={details ? MANAGER_VERIFICATION_LABELS[verificationStatus] : '불명'}
+              color={verificationStatus === MANAGER_VERIFICATION_STATUS.APPROVED ? 'success' : 'default'}
+              size="small"
+            />
+          </TableCell>
+          <TableCell>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => handleDetailView('manager', manager.id)}
+            >
+              상세보기
+            </Button>
+          </TableCell>
+        </TableRow>
+      );
+    });
   };
 
   return (
@@ -314,7 +294,7 @@ const UserList = () => {
 
         <TablePagination
           component="div"
-          count={totalFilteredCount}
+          count={consumerData.totalElements}
           page={page}
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
@@ -359,7 +339,7 @@ const UserList = () => {
 
         <TablePagination
           component="div"
-          count={totalFilteredCount}
+          count={managerData.totalElements}
           page={page}
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
