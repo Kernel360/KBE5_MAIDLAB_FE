@@ -3,13 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import type { ReservationResponseDto } from '@/apis/reservation';
 import { useReservation } from '@/hooks/useReservation';
 import { formatDateTime } from '@/utils';
-import { RESERVATION_STATUS, RESERVATION_STATUS_LABELS, type ReservationStatus } from '@/constants/status';
-import { ROUTES } from '@/constants/route';
 import { SUCCESS_MESSAGES } from '@/constants/message';
-import { SERVICE_TYPE_LABELS } from '@/constants/service';
-import { formatPrice } from '@/utils';
 import { useReservationStatus } from '@/hooks/useReservationStatus';
-import { ReservationCard } from '@/components/reservation/ReservationCard';
 import { ManagerReservationCard } from '@/components/reservation/ManagerReservationCard';
 
 const ITEMS_PER_PAGE = 10;
@@ -134,7 +129,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 
 const ManagerReservations: React.FC = () => {
   const navigate = useNavigate();
-  const { fetchReservations, checkIn, checkOut, reservations, loading } = useReservation();
+  const { fetchReservations, checkIn, checkOut, reservations } = useReservation();
   const {
     loading: reservationStatusLoading,
     setLoading: setReservationStatusLoading,
@@ -144,7 +139,6 @@ const ManagerReservations: React.FC = () => {
     getStatusBadgeStyle,
   } = useReservationStatus();
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedStatus, setSelectedStatus] = useState<ReservationStatus | 'ALL'>('ALL');
   const [checkInOutModal, setCheckInOutModal] = useState<{
     isOpen: boolean;
     isCheckIn: boolean;
@@ -242,16 +236,6 @@ const ManagerReservations: React.FC = () => {
     startIndex + ITEMS_PER_PAGE
   );
 
-  // 예약 상태에 따른 버튼 표시 여부 확인
-  const shouldShowCheckInButton = (reservation: ReservationResponseDto) => {
-    if (reservation.status !== RESERVATION_STATUS.MATCHED) return false;
-    const today = new Date().toISOString().split('T')[0];
-    return reservation.reservationDate === today;
-  };
-
-  const shouldShowCheckOutButton = (reservation: ReservationResponseDto) => {
-    return reservation.status === RESERVATION_STATUS.WORKING;
-  };
 
   if (reservationStatusLoading) {
     return (
@@ -268,6 +252,7 @@ const ManagerReservations: React.FC = () => {
 
         {/* 탭 */}
         <div className="flex space-x-4 mb-6">
+        
           <button
             onClick={() => setReservationStatusActiveTab('scheduled')}
             className={`px-4 py-2 rounded-lg ${

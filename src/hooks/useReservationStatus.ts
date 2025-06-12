@@ -18,7 +18,8 @@ export const useReservationStatus = () => {
         return reservations.filter(
           (reservation) =>
             reservation.reservationDate >= today &&
-            reservation.status === RESERVATION_STATUS.MATCHED
+            (reservation.status === RESERVATION_STATUS.MATCHED ||
+            reservation.status === RESERVATION_STATUS.WORKING )
         );
       case 'today':
         return reservations.filter(
