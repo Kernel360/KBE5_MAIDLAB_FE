@@ -31,6 +31,22 @@ const SettlementDetail = () => {
     fetchSettlementDetail();
   }, [settlementId]);
 
+  const handleApprove = async () => {
+    if (!settlementId) return;
+    const success = await reservationManagement.approveSettlement(Number(settlementId));
+    if (success) {
+      navigate(-1);
+    }
+  };
+
+  const handleReject = async () => {
+    if (!settlementId) return;
+    const success = await reservationManagement.rejectSettlement(Number(settlementId));
+    if (success) {
+      navigate(-1);
+    }
+  };
+
   if (loading) {
     return (
       <div className="p-4">
@@ -85,9 +101,31 @@ const SettlementDetail = () => {
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
         <Typography variant="h4">정산 상세 정보</Typography>
-        <Button variant="contained" onClick={() => navigate(-1)}>
-          목록으로
-        </Button>
+        <div className="space-x-2">
+          {settlement?.status === 'PENDING' && (
+            <>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleApprove}
+                disabled={loading}
+              >
+                승인
+              </Button>
+              <Button
+                variant="contained"
+                color="error"
+                onClick={handleReject}
+                disabled={loading}
+              >
+                거부
+              </Button>
+            </>
+          )}
+          <Button variant="outlined" onClick={() => navigate(-1)} disabled={loading}>
+            목록으로
+          </Button>
+        </div>
       </div>
 
       <Card>

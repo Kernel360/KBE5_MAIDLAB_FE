@@ -448,4 +448,28 @@ export const adminApi = {
     }>(`/api/admin/reservations/settlement/${settlementId}`);
     return response.data;
   },
+
+  // 정산 승인
+  approveSettlement: async (settlementId: number): Promise<string> => {
+    try {
+      const response = await apiClient.patch<ApiResponse<string>>(
+        `/api/admin/reservations/settlement/${settlementId}/approve`
+      );
+      return response.data.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // 정산 거부
+  rejectSettlement: async (settlementId: number): Promise<string> => {
+    try {
+      const response = await apiClient.patch<ApiResponse<string>>(
+        `/api/admin/reservations/settlement/${settlementId}/reject`
+      );
+      return response.data.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
 };
