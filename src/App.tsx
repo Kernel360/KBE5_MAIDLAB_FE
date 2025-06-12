@@ -181,15 +181,9 @@ const App: React.FC = () => {
                 </ProtectedRoute>
               }
             /> */}
-              {/* 관리자 라우트 */}
+              {/* Admin Routes */}
+              <Route path={ROUTES.ADMIN.LOGIN} element={<AdminLogin />} />
               <Route
-                key="admin-login"
-                path={ROUTES.ADMIN.LOGIN}
-                element={<AdminLogin />}
-              />
-              , // 관리자 대시보드 및 하위 페이지들
-              <Route
-                key="admin-dashboard"
                 path={ROUTES.ADMIN.DASHBOARD}
                 element={
                   <ProtectedRoute requiredUserType="ADMIN">
@@ -197,38 +191,17 @@ const App: React.FC = () => {
                   </ProtectedRoute>
                 }
               >
-                {/* 회원 관리 */}
                 <Route path="users" element={<AdminUserList />} />
-                <Route
-                  path="users/manager/:id"
-                  element={<AdminManagerDetail />}
-                />
-                <Route
-                  path="users/consumer/:id"
-                  element={<AdminConsumerDetail />}
-                />
-
-                {/* 예약 관리 */}
+                <Route path="users/manager/:id" element={<AdminManagerDetail />} />
+                <Route path="users/consumer/:id" element={<AdminConsumerDetail />} />
                 <Route path="reservations" element={<AdminReservationList />} />
-                <Route
-                  path="reservations/:id"
-                  element={<AdminReservationDetail />}
-                />
-
-            {/* 이벤트 관리 */}
-            <Route path="events" element={<AdminEvents />} />
-            <Route path="events/create" element={<AdminEventCreate />} />
-            <Route path="events/:id/edit" element={<AdminEventEdit />} />
-            <Route path="events/:id" element={<AdminEventDetail />} />
-
-            {/* 게시판 관리 */}
-            <Route path="boards" element={<AdminBoards />} />
-            <Route path="boards/:id" element={<AdminBoardDetail />} />
-            <Route path="boards/:id/edit" element={<AdminBoardEdit />} />
-
-                {/* 기본 리다이렉트 */}
-                <Route index element={<AdminUserList />} />
+                <Route path="reservations/:id" element={<AdminReservationDetail />} />
+                <Route path="events" element={<AdminEvents />} />
+                <Route path="events/create" element={<AdminEventCreate />} />
+                <Route path="boards" element={<AdminBoards />} />
+                <Route path="boards/:id" element={<AdminBoardDetail />} />
               </Route>
+
               {/* 공통 게시판 라우트들 */}
               {/* <Route
               path={ROUTES.BOARD}
