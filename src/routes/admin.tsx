@@ -9,6 +9,7 @@ import {
   AdminConsumerDetail,
   AdminReservationList,
   AdminReservationDetail,
+  AdminSettlementList,
   AdminEvents,
   AdminEventCreate,
   AdminBoards,
@@ -34,6 +35,7 @@ export const AdminRoutes = () => (
       <Route path="users/consumer/:id" element={<AdminConsumerDetail />} />
       <Route path="reservations" element={<AdminReservationList />} />
       <Route path="reservations/:id" element={<AdminReservationDetail />} />
+      <Route path="settlements" element={<AdminSettlementList />} />
       <Route path="events" element={<AdminEvents />} />
       <Route path="events/create" element={<AdminEventCreate />} />
       <Route path="events/:id/edit" element={<AdminEventEdit />} />

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import {
   Container,
@@ -49,6 +49,8 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
 const ReservationDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const previousTab = (location.state as { previousTab?: number })?.previousTab ?? 0;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reservation, setReservation] = useState<ReservationDetailResponseDto | null>(null);
@@ -75,11 +77,16 @@ const ReservationDetail = () => {
     fetchReservationDetail();
   }, [id]);
 
-  const formatPrice = (price: number) => {
+  const formatPrice = (price: string | number) => {
+    const numericPrice = typeof price === 'string' ? parseInt(price, 10) : price;
     return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
       currency: 'KRW',
-    }).format(price);
+    }).format(numericPrice);
+  };
+
+  const handleBack = () => {
+    navigate('/admin/reservations', { state: { previousTab } });
   };
 
   if (loading) {
@@ -98,7 +105,7 @@ const ReservationDetail = () => {
         <Typography color="error" gutterBottom>
           {error}
         </Typography>
-        <StyledButton variant="contained" onClick={() => navigate(-1)}>
+        <StyledButton variant="contained" onClick={handleBack}>
           돌아가기
         </StyledButton>
       </StyledContainer>
@@ -109,7 +116,7 @@ const ReservationDetail = () => {
     return (
       <StyledContainer>
         <Typography>예약을 찾을 수 없습니다.</Typography>
-        <StyledButton variant="contained" onClick={() => navigate(-1)}>
+        <StyledButton variant="contained" onClick={handleBack}>
           돌아가기
         </StyledButton>
       </StyledContainer>
@@ -122,7 +129,7 @@ const ReservationDetail = () => {
         <Typography variant="h5" component="h1">
           예약 상세 정보
         </Typography>
-        <StyledButton variant="contained" onClick={() => navigate(-1)}>
+        <StyledButton variant="contained" onClick={handleBack}>
           목록으로
         </StyledButton>
       </Box>

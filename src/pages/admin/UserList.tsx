@@ -11,7 +11,7 @@ import type {
 import { adminApi } from '../../apis/admin';
 import { MANAGER_VERIFICATION_LABELS, MANAGER_VERIFICATION_STATUS, type ManagerVerificationStatus } from '../../constants/status';
 import { Box, Container, Typography, Tabs, Tab, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Button, TextField, InputAdornment, Chip, CircularProgress } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -53,7 +53,16 @@ function TabPanel(props: TabPanelProps) {
 }
 
 const UserList = () => {
-  const [tabValue, setTabValue] = useState(0);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [tabValue, setTabValue] = useState(() => {
+    const savedTab = localStorage.getItem('adminUserTab');
+    if (savedTab !== null) {
+      localStorage.removeItem('adminUserTab');
+      return parseInt(savedTab, 10);
+    }
+    return (location.state as { previousTab?: number })?.previousTab ?? 0;
+  });
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -79,7 +88,6 @@ const UserList = () => {
     empty: true,
   });
   const [managerDetails, setManagerDetails] = useState<Record<number, ManagerResponseDto>>({});
-  const navigate = useNavigate();
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -178,6 +186,11 @@ const UserList = () => {
   const filteredData = getFilteredData();
   const totalFilteredCount = filteredData.length;
 
+  const handleDetailView = (type: 'consumer' | 'manager', id: number) => {
+    localStorage.setItem('adminUserTab', tabValue.toString());
+    navigate(`/admin/users/${type}/${id}`);
+  };
+
   const renderConsumerRows = () => {
     if (loading) {
       return (
@@ -200,7 +213,7 @@ const UserList = () => {
             <Button
               variant="outlined"
               size="small"
-              onClick={() => navigate(`/admin/users/consumer/${consumer.id}`)}
+              onClick={() => handleDetailView('consumer', consumer.id)}
             >
               상세보기
             </Button>
@@ -242,7 +255,7 @@ const UserList = () => {
               <Button
                 variant="outlined"
                 size="small"
-                onClick={() => navigate(`/admin/users/manager/${manager.id}`)}
+                onClick={() => handleDetailView('manager', manager.id)}
               >
                 상세보기
               </Button>

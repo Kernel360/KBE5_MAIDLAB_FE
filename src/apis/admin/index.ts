@@ -6,7 +6,12 @@ import type {
 } from '../reservation';
 import type { MatchingResponseDto } from '../matching';
 import type { ConsumerProfileResponseDto } from '../consumer';
-import type { AnswerRequestDto } from '../board';
+import type { 
+  ImageDto,
+  ConsumerBoardResponseDto,
+  ConsumerBoardDetailResponseDto,
+  AnswerRequestDto 
+} from '../board';
 
 // 관리자 관련 타입 정의
 export interface AdminLoginRequestDto {
@@ -90,31 +95,9 @@ export interface AdminWeeklySettlementResponseDto {
   };
 }
 
-export interface ConsumerBoardResponseDto {
-  boardId: number;
-  title: string;
-  content: string;
-  answered: boolean;
-  boardType: 'REFUND' | 'MANAGER' | 'SERVICE' | 'ETC';
-}
-
-export interface ImageDto {
-  imagePath: string;
-  name: string;
-}
-
+// 게시판 관련 타입 정의
 export interface AnswerResponseDto {
   content: string;
-}
-
-export interface ConsumerBoardDetailResponseDto {
-  boardId: number,
-  title: string;
-  content: string;
-  answered: boolean;
-  boardType: 'REFUND' | 'MANAGER' | 'SERVICE' | 'ETC';
-  images: ImageDto[];
-  answer?: AnswerResponseDto;
 }
 
 // 관리자 API 함수들
@@ -349,29 +332,26 @@ export const adminApi = {
 
   // ===== 게시판 관리 =====
   // 전체 게시판 조회
-  // getBoards: async (
-  //   params: PageParams = {},
-  // ): Promise<ConsumerBoardResponseDto[]> => {
-  //   const { page = 0, size = 10 } = params;
-  //   try {
-  //     const response = await apiClient.get<
-  //       ApiResponse<ConsumerBoardResponseDto[]>
-  //     >(`/api/admin/board?page=${page}&size=${size}`);
-  //     return response.data.data;
-  //   } catch (error) {
-  //     throw new Error(handleApiError(error));
-  //   }
-  // },
-
-  // 상담 게시판 조회
-  getConsultationBoards: async (
+  getBoards: async (
     params: PageParams = {},
   ): Promise<ConsumerBoardResponseDto[]> => {
     const { page = 0, size = 10 } = params;
     try {
       const response = await apiClient.get<
         ApiResponse<ConsumerBoardResponseDto[]>
-      >(`/api/admin/board/consultation?page=${page}&size=${size}`);
+      >(`/api/admin/board?page=${page}&size=${size}`);
+      return response.data.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // 상담 게시판 조회
+  getConsultationBoards: async (): Promise<ConsumerBoardResponseDto[]> => {
+    try {
+      const response = await apiClient.get<ApiResponse<ConsumerBoardResponseDto[]>>(
+        '/api/admin/board/consultation',
+      );
       return response.data.data;
     } catch (error) {
       throw new Error(handleApiError(error));
@@ -379,14 +359,11 @@ export const adminApi = {
   },
 
   // 환불 게시판 조회
-  getRefundBoards: async (
-    params: PageParams = {},
-  ): Promise<ConsumerBoardResponseDto[]> => {
-    const { page = 0, size = 10 } = params;
+  getRefundBoards: async (): Promise<ConsumerBoardResponseDto[]> => {
     try {
-      const response = await apiClient.get<
-        ApiResponse<ConsumerBoardResponseDto[]>
-      >(`/api/admin/board/refund?page=${page}&size=${size}`);
+      const response = await apiClient.get<ApiResponse<ConsumerBoardResponseDto[]>>(
+        '/api/admin/board/refund',
+      );
       return response.data.data;
     } catch (error) {
       throw new Error(handleApiError(error));

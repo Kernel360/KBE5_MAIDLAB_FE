@@ -22,6 +22,7 @@ import {
   Campaign as CampaignIcon,
   Article as ArticleIcon,
   Logout as LogoutIcon,
+  AccountBalance as AccountBalanceIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
@@ -79,6 +80,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 const menuItems = [
   { text: '회원 관리', icon: <PeopleIcon />, path: '/admin/users' },
   { text: '예약 관리', icon: <CalendarIcon />, path: '/admin/reservations' },
+  { text: '정산 관리', icon: <AccountBalanceIcon />, path: '/admin/settlements' },
   { text: '이벤트 관리', icon: <CampaignIcon />, path: '/admin/events' },
   { text: '게시판 관리', icon: <ArticleIcon />, path: '/admin/boards' },
 ];
