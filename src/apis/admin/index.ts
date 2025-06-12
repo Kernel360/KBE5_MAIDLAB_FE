@@ -190,6 +190,21 @@ export const adminApi = {
     }
   },
 
+  // 매니저 상태별 조회
+  getManagersByStatus: async (
+    params: { page?: number; size?: number; status: string },
+  ): Promise<ApiResponse<PageManagerListResponseDto>> => {
+    const { page = 0, size = 10, status } = params;
+    try {
+      const response = await apiClient.get<ApiResponse<PageManagerListResponseDto>>(
+        `/api/admin/manager/status?page=${page}&size=${size}&status=${status}`,
+      );
+      return response.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
   // ===== 소비자 관리 =====
   // 소비자 계정 조회
   getConsumers: async (

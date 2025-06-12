@@ -10,7 +10,7 @@ import type {
 } from '../../apis/admin';
 import { adminApi } from '../../apis/admin';
 import { MANAGER_VERIFICATION_LABELS, MANAGER_VERIFICATION_STATUS, type ManagerVerificationStatus } from '../../constants/status';
-import { Box, Container, Typography, Tabs, Tab, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Button, TextField, InputAdornment, Chip, CircularProgress } from '@mui/material';
+import { Box, Container, Typography, Tabs, Tab, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Button, TextField, InputAdornment, Chip, CircularProgress, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 interface TabPanelProps {
@@ -24,6 +24,12 @@ const StyledContainer = styled(Container)(({ theme }) => ({
 }));
 
 const SearchBox = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  gap: theme.spacing(2),
+  marginBottom: theme.spacing(3),
+}));
+
+const FilterBox = styled(Box)(({ theme }) => ({
   display: 'flex',
   gap: theme.spacing(2),
   marginBottom: theme.spacing(3),
@@ -52,6 +58,8 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
+type ManagerStatusFilter = ManagerVerificationStatus | 'ALL';
+
 const UserList = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -67,6 +75,10 @@ const UserList = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState<ManagerStatusFilter>(() => {
+    const savedStatus = localStorage.getItem('adminManagerStatus');
+    return (savedStatus as ManagerStatusFilter) || 'ALL';
+  });
   const [consumerData, setConsumerData] = useState<PageConsumerListResponseDto>({
     content: [],
     totalElements: 0,
@@ -92,7 +104,6 @@ const UserList = () => {
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
     setPage(0);
-    setSearchTerm('');
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -101,6 +112,13 @@ const UserList = () => {
 
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleStatusChange = (event: any) => {
+    const newStatus = event.target.value as ManagerStatusFilter;
+    setSelectedStatus(newStatus);
+    localStorage.setItem('adminManagerStatus', newStatus);
     setPage(0);
   };
 
@@ -123,26 +141,39 @@ const UserList = () => {
   const fetchManagers = async () => {
     try {
       setLoading(true);
-      const response = await adminApi.getManagers({ 
-        page, 
-        size: rowsPerPage,
-        search: searchTerm
-      });
-      setManagerData(response);
+      let response;
+      
+      if (selectedStatus === 'ALL') {
+        response = await adminApi.getManagers({ 
+          page, 
+          size: rowsPerPage,
+          search: searchTerm
+        });
+        setManagerData(response);
+      } else {
+        const statusResponse = await adminApi.getManagersByStatus({ 
+          page, 
+          size: rowsPerPage,
+          status: selectedStatus
+        });
+        response = statusResponse.data;
+        setManagerData(response);
+      }
 
       // 각 매니저의 상세 정보를 가져옵니다
-      const detailsPromises = response.content.map(async (manager) => {
-        try {
-          const details = await adminApi.getManager(manager.id);
-          return { id: manager.id, details };
-        } catch (error) {
-          console.error(`Failed to fetch manager details for ID ${manager.id}:`, error);
-          return null;
-        }
-      });
+      const detailsPromises = response.content
+        .map(async (manager: ManagerListResponseDto) => {
+          try {
+            const details = await adminApi.getManager(manager.id);
+            return { id: manager.id, details };
+          } catch (error) {
+            console.error(`Failed to fetch manager details for ID ${manager.id}:`, error);
+            return null;
+          }
+        });
 
       const details = await Promise.all(detailsPromises);
-      const detailsMap = details.reduce((acc, curr) => {
+      const detailsMap = details.reduce((acc: Record<number, ManagerResponseDto>, curr: { id: number; details: ManagerResponseDto } | null) => {
         if (curr) {
           acc[curr.id] = curr.details;
         }
@@ -163,7 +194,7 @@ const UserList = () => {
     } else {
       fetchManagers();
     }
-  }, [tabValue, page, rowsPerPage, searchTerm]);
+  }, [tabValue, page, rowsPerPage, searchTerm, selectedStatus]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -172,6 +203,7 @@ const UserList = () => {
 
   const handleDetailView = (type: 'consumer' | 'manager', id: number) => {
     localStorage.setItem('adminUserTab', tabValue.toString());
+    localStorage.setItem('adminManagerStatus', selectedStatus);
     navigate(`/admin/users/${type}/${id}`);
   };
 
@@ -304,22 +336,23 @@ const UserList = () => {
       </TabPanel>
 
       <TabPanel value={tabValue} index={1}>
-        <SearchBox>
-          <TextField
-            fullWidth
-            variant="outlined"
-            placeholder="이름으로 검색"
-            value={searchTerm}
-            onChange={handleSearch}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </SearchBox>
+        <FilterBox>
+          <FormControl sx={{ minWidth: 200 }}>
+            <InputLabel>상태</InputLabel>
+            <Select
+              value={selectedStatus}
+              onChange={handleStatusChange}
+              label="상태"
+            >
+              <MenuItem value="ALL">전체</MenuItem>
+              {Object.entries(MANAGER_VERIFICATION_STATUS).map(([key, value]) => (
+                <MenuItem key={value} value={value}>
+                  {MANAGER_VERIFICATION_LABELS[value as ManagerVerificationStatus]}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </FilterBox>
 
         <TableContainer component={Paper}>
           <Table>
