@@ -20,15 +20,15 @@ export const ROUTES = {
 
   // 매니저 페이지
   MANAGER: {
-    MYPAGE: '/manager/mypage',
-    PROFILE: '/manager/profile',
-    PROFILE_EDIT: '/manager/profile/edit',
-    PROFILE_CREATE: '/manager/profile/create',
-    RESERVATIONS: '/manager/reservations',
-    RESERVATION_DETAIL: '/manager/reservations/:id',
-    REVIEW_REGISTER: '/manager/reservations/:id/review',
-    MATCHING: '/manager/matching',
-    SETTLEMENTS: '/manager/settlements',
+    MYPAGE: '/managers/mypage',
+    PROFILE: '/managers/profile',
+    PROFILE_EDIT: '/managers/profile/edit',
+    PROFILE_CREATE: '/managers/profile/create',
+    RESERVATIONS: '/managers/reservations',
+    RESERVATION_DETAIL: '/managers/reservations/:id',
+    REVIEW_REGISTER: '/managers/reservations/:id/review',
+    MATCHING: '/managers/matching',
+    SETTLEMENTS: '/managers/settlements',
   },
 
   // 관리자 페이지

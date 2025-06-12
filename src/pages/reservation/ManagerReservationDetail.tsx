@@ -1,182 +1,236 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { IoArrowBack } from 'react-icons/io5';
-import type { ReservationDetailResponseDto } from '@/apis/reservation';
 import { useReservation } from '@/hooks/useReservation';
-import { formatDateTime } from '@/utils';
+import { useReservationStatus } from '@/hooks/useReservationStatus';
+import { formatDateTime, formatPrice } from '@/utils';
+import { RESERVATION_STATUS_LABELS } from '@/constants/status';
+import { SERVICE_TYPE_LABELS } from '@/constants/service';
+import type { ReservationDetailResponseDto } from '@/apis/reservation';
 
 const ManagerReservationDetail: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { fetchReservationDetail, checkIn, checkOut } = useReservation();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { id } = useParams<{ id: string }>();
+  const { fetchReservationDetail, checkIn, checkOut, fetchReservations, reservations } = useReservation();
+  const { getStatusBadgeStyle, isCheckInAvailable, isCheckOutAvailable } = useReservationStatus();
   const [reservation, setReservation] = useState<ReservationDetailResponseDto | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState<'checkIn' | 'checkOut'>('checkIn');
 
   useEffect(() => {
-    const loadReservationDetail = async () => {
+    const getReservationInfo = async () => {
+      if (!id) return;
       try {
-        if (!id) return;
-        const data = await fetchReservationDetail(parseInt(id));
-        if (!data) {
-          throw new Error('예약 정보를 찾을 수 없습니다.');
-        }
-        setReservation(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : '예약 정보를 불러오는데 실패했습니다.');
+        setLoading(true);
+        const [detailData] = await Promise.all([
+          fetchReservationDetail(parseInt(id)),
+          fetchReservations()
+        ]);
+        setReservation(detailData);
+      } catch (error) {
+        console.error('예약 정보 조회 실패:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    loadReservationDetail();
-  }, [id, fetchReservationDetail]);
+    getReservationInfo();
+  }, [id, fetchReservationDetail, fetchReservations]);
 
-  const handleCheckInOut = async (isCheckIn: boolean) => {
-    if (!id || !reservation) return;
+  const handleCheckInOut = async () => {
+    if (!reservation || !id) return;
     
     const currentTime = new Date().toISOString();
     try {
-      if (isCheckIn) {
+      if (modalType === 'checkIn') {
         await checkIn(parseInt(id), { checkTime: currentTime });
       } else {
         await checkOut(parseInt(id), { checkTime: currentTime });
+        navigate(`/managers/reservations/${id}/review`);
       }
-      // 예약 정보 새로고침
-      const updatedData = await fetchReservationDetail(parseInt(id));
-      if (updatedData) {
-        setReservation(updatedData);
-      }
+      setShowModal(false);
+      // 상태 업데이트를 위해 상세 정보 다시 조회
+      const detailData = await fetchReservationDetail(parseInt(id));
+      setReservation(detailData);
     } catch (error) {
-      console.error('체크인/아웃 처리 실패:', error);
+      console.error('체크인/아웃 실패:', error);
     }
   };
 
+  const getStatusButton = () => {
+    if (!reservation) return null;
+
+    const currentReservation = reservations?.find(r => r.reservationId === parseInt(id || ''));
+    if (!currentReservation) return null;
+
+    if (isCheckInAvailable(currentReservation)) {
+      return (
+        <button
+          onClick={() => {
+            setModalType('checkIn');
+            setShowModal(true);
+          }}
+          className="w-full px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600"
+        >
+          체크인
+        </button>
+      );
+    }
+
+    if (isCheckOutAvailable(currentReservation)) {
+      return (
+        <button
+          onClick={() => {
+            setModalType('checkOut');
+            setShowModal(true);
+          }}
+          className="w-full px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600"
+        >
+          체크아웃
+        </button>
+      );
+    }
+
+    if (currentReservation.status === 'COMPLETED') {
+      return (
+        <div className="w-full px-4 py-2 text-center text-gray-500 bg-gray-100 rounded-lg">
+          서비스가 완료되었습니다
+        </div>
+      );
+    }
+
+    return null;
+  };
+
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex justify-center items-center">
-        <p className="text-gray-500">로딩 중...</p>
-      </div>
-    );
+    return <div className="flex items-center justify-center min-h-screen">로딩 중...</div>;
   }
 
-  if (error || !reservation) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-4">
-        <div className="bg-white rounded-lg shadow p-4">
-          <p className="text-red-500 mb-4">{error || '예약 정보를 찾을 수 없습니다.'}</p>
-          <button
-            onClick={() => navigate(-1)}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
-          >
-            돌아가기
-          </button>
-        </div>
-      </div>
-    );
+  if (!reservation) {
+    return <div className="flex items-center justify-center min-h-screen">예약 정보를 찾을 수 없습니다.</div>;
   }
+
+  const currentReservation = reservations?.find(r => r.reservationId === parseInt(id || ''));
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 헤더 */}
-      <div className="fixed top-0 left-0 right-0 z-10 bg-white shadow">
-        <div className="flex items-center px-4 h-14">
-          <button 
-            onClick={() => navigate(-1)}
-            className="p-2 -ml-2"
-          >
-            <IoArrowBack className="w-6 h-6" />
+      <div className="max-w-3xl mx-auto p-4">
+        {/* 헤더 */}
+        <div className="flex items-center mb-6">
+          <button onClick={() => navigate(-1)} className="p-2">
+            <IoArrowBack size={24} />
           </button>
-          <h1 className="ml-2 text-lg font-semibold">예약 상세</h1>
+          <h1 className="text-xl font-bold ml-2">예약 상세</h1>
         </div>
-      </div>
 
-      {/* 컨텐츠 */}
-      <div className="pt-16 pb-4">
-        {/* 예약 상태 */}
-        <div className="bg-[#FFF8E7] p-4">
-          <div className="text-center">
-            <div className="inline-block px-3 py-1 bg-green-500 text-white rounded-full text-sm mb-2">
-              오늘
+        {/* 예약 정보 카드 */}
+        <div className="bg-white rounded-lg shadow p-6">
+          {/* 상태 배지 */}
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center">
+              <span className={`px-3 py-1 text-sm rounded-full ${
+                currentReservation ? getStatusBadgeStyle(currentReservation.status, currentReservation.reservationDate) : ''
+              }`}>
+                {currentReservation ? RESERVATION_STATUS_LABELS[currentReservation.status] : ''}
+              </span>
+              <span className="ml-2 text-gray-500">#{reservation.reservationId}</span>
             </div>
-            <h2 className="text-lg font-medium">{reservation.serviceType} → {reservation.serviceDetailType}</h2>
-            <p className="text-gray-600 text-sm mt-1">예약번호: ANT-20231016-001</p>
+            <div className="text-sm text-gray-500">
+              {formatDateTime(reservation.reservationDate)}
+            </div>
           </div>
-        </div>
 
-        {/* 예약 정보 */}
-        <div className="bg-white px-4 py-5">
-          <h3 className="text-lg font-medium mb-4">예약 정보</h3>
-          <div className="space-y-4">
-            <div>
-              <p className="text-gray-500 text-sm">예약 일시</p>
-              <p className="mt-1">{formatDateTime(reservation.reservationDate)}</p>
-            </div>
-            <div>
-              <p className="text-gray-500 text-sm">서비스 시간</p>
-              <p className="mt-1">3시간 ({reservation.startTime} ~ {reservation.endTime})</p>
-            </div>
-            <div>
-              <p className="text-gray-500 text-sm">공간 크기</p>
-              <p className="mt-1">{reservation.roomSize}평방미터 / {reservation.housingInformation}</p>
-            </div>
-            {reservation.serviceAdd && (
+          {/* 서비스 정보 */}
+          <div className="border-t border-b border-gray-100 py-4 mb-4">
+            <div className="flex justify-between items-center">
               <div>
-                <p className="text-gray-500 text-sm">추가 서비스</p>
-                <p className="mt-1">{reservation.serviceAdd}</p>
+                <h3 className="font-medium">
+                  {SERVICE_TYPE_LABELS[reservation.serviceType]} &gt;{' '}
+                  {reservation.serviceDetailType}
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  {reservation.startTime} ~ {reservation.endTime}
+                </p>
               </div>
-            )}
-          </div>
-        </div>
-
-        {/* 위치 정보 */}
-        <div className="mt-2 bg-white px-4 py-5">
-          <h3 className="text-lg font-medium mb-4">위치 정보</h3>
-          <p>{reservation.address}</p>
-          <p className="text-gray-500 mt-1">{reservation.addressDetail}</p>
-        </div>
-
-        {/* 결제 정보 */}
-        <div className="mt-2 bg-white px-4 py-5">
-          <h3 className="text-lg font-medium mb-4">결제 정보</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-gray-500">기본 서비스 (3시간)</span>
-              <span>180,000 VND</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">요리 추가 (+1시간)</span>
-              <span>60,000 VND</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">성수기 할증료</span>
-              <span>30,000 VND</span>
-            </div>
-            <div className="flex justify-between items-center pt-3 border-t border-gray-200">
-              <span className="font-medium">총 결제 금액</span>
-              <span className="text-lg font-bold text-orange-500">{reservation.totalPrice} VND</span>
+              <div className="text-right">
+                <p className="font-medium">{formatPrice(reservation.totalPrice)}원</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* 고객 요청사항 */}
-        {reservation.specialRequest && (
-          <div className="mt-2 bg-white px-4 py-5">
-            <h3 className="text-lg font-medium mb-4">고객 요청사항</h3>
-            <p className="text-gray-600">{reservation.specialRequest}</p>
+          {/* 고객 정보 */}
+          <div className="mb-6">
+            <h3 className="font-medium mb-2">고객 정보</h3>
+            <div className="bg-gray-50 rounded-lg p-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">이름</p>
+                  <p className="mt-1">{reservation.managerName}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">연락처</p>
+                  <p className="mt-1">{reservation.managerPhoneNumber}</p>
+                </div>
+              </div>
+            </div>
           </div>
-        )}
 
-        {/* 하단 버튼 */}
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t">
-          <button
-            onClick={() => handleCheckInOut(true)}
-            className="w-full px-4 py-3 bg-orange-500 text-white rounded-lg"
-          >
-            체크인
-          </button>
+          {/* 주소 정보 */}
+          <div className="mb-6">
+            <h3 className="font-medium mb-2">주소</h3>
+            <div className="bg-gray-50 rounded-lg p-4">
+              <p>{reservation.address}</p>
+              <p className="text-sm text-gray-500 mt-1">{reservation.addressDetail}</p>
+            </div>
+          </div>
+
+          {/* 요청사항 */}
+          {reservation.specialRequest && (
+            <div className="mb-6">
+              <h3 className="font-medium mb-2">요청사항</h3>
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p>{reservation.specialRequest}</p>
+              </div>
+            </div>
+          )}
+
+          {/* 상태 버튼 */}
+          <div className="mt-6">
+            {getStatusButton()}
+          </div>
         </div>
       </div>
+
+      {/* 체크인/아웃 모달 */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-6 max-w-sm w-full">
+            <h2 className="text-xl font-bold mb-4">
+              {modalType === 'checkIn' ? '체크인' : '체크아웃'} 확인
+            </h2>
+            <p className="mb-6">
+              {modalType === 'checkIn'
+                ? '서비스를 시작하시겠습니까?'
+                : '서비스를 완료하시겠습니까?'}
+            </p>
+            <div className="flex space-x-4">
+              <button
+                onClick={() => setShowModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleCheckInOut}
+                className="flex-1 px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600"
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

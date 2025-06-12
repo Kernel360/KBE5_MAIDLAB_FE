@@ -179,10 +179,10 @@ const App: React.FC = () => {
               }
             />
               <Route
-                path={ROUTES.MANAGER.RESERVATION_DETAIL}
+                path={ROUTES.MANAGER.REVIEW_REGISTER}
                 element={
                   <ProtectedRoute requiredUserType="MANAGER">
-                    <ManagerReservationDetail />
+                    <ReviewRegister />
                   </ProtectedRoute>
                 }
               />
