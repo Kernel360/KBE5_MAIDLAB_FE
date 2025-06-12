@@ -40,15 +40,23 @@ export const getLocalStorage = <T>(key: string): T | null => {
     const itemStr = localStorage.getItem(key);
     if (!itemStr) return null;
 
-    const item: StorageItem<T> = JSON.parse(itemStr);
+    try {
+      // StorageItem 형식으로 저장된 데이터 처리
+      const item: StorageItem<T> = JSON.parse(itemStr);
+      if (item.value !== undefined && item.expiry !== undefined) {
+        if (Date.now() > item.expiry) {
+          localStorage.removeItem(key);
+          return null;
+        }
+        return item.value;
+      }
 
-    // 만료 시간 체크
-    if (Date.now() > item.expiry) {
-      localStorage.removeItem(key);
-      return null;
+      // 일반 JSON 데이터 처리
+      return JSON.parse(itemStr);
+    } catch {
+      // JSON 파싱 실패시 일반 문자열로 처리
+      return itemStr as unknown as T;
     }
-
-    return item.value;
   } catch (error) {
     console.error('Failed to get from localStorage:', error);
     return null;

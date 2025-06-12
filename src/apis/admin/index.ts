@@ -91,7 +91,7 @@ export interface AdminWeeklySettlementResponseDto {
 }
 
 export interface ConsumerBoardResponseDto {
-  id: number;
+  boardId: number;
   title: string;
   content: string;
   answered: boolean;
@@ -108,6 +108,7 @@ export interface AnswerResponseDto {
 }
 
 export interface ConsumerBoardDetailResponseDto {
+  boardId: number,
   title: string;
   content: string;
   answered: boolean;

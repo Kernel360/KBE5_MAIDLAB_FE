@@ -9,6 +9,12 @@ import type {
   ReviewRegisterRequestDto,
 } from '@/apis/reservation';
 
+// LocalDate + LocalTime → ISO DateTime 문자열로 변환하는 유틸리티 함수
+const toISODateTime = (date: string, time: string) => {
+  const [hours, minutes] = time.split(':').map(Number);
+  return `${date}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`;
+};
+
 export const useReservation = () => {
   const [reservations, setReservations] = useState<ReservationResponseDto[]>(
     [],
@@ -52,11 +58,44 @@ export const useReservation = () => {
 
   // 예약 생성
   const createReservation = useCallback(
-    async (reservationData: ReservationRequestDto) => {
+    async (reservationData: any) => {
       try {
         setLoading(true);
+        console.log("--------------------------------")
+        console.log("ReservationStep3에서 받은 데이터:", reservationData);
 
-        const result = await reservationApi.create(reservationData);
+        // serviceDetailTypeId 검증
+        if (!reservationData.serviceDetailTypeId) {
+          throw new Error('서비스 종류가 선택되지 않았습니다.');
+        }
+
+        // 날짜와 시간 데이터를 ISO 형식으로 변환
+        const formattedData: ReservationRequestDto = {
+          serviceDetailTypeId: reservationData.serviceDetailTypeId,
+          address: reservationData.address,
+          addressDetail: reservationData.addressDetail,
+          managerUuId: reservationData.managerUuId,
+          housingType: reservationData.housingType,
+          roomSize: reservationData.roomSize,
+          housingInformation: reservationData.housingInformation,
+          reservationDate: toISODateTime(reservationData.reservationDate, reservationData.startTime),
+          startTime: toISODateTime(reservationData.reservationDate, reservationData.startTime),
+          endTime: toISODateTime(reservationData.reservationDate, reservationData.endTime),
+          serviceAdd: reservationData.serviceAdd,
+          pet: reservationData.pet,
+          specialRequest: reservationData.specialRequest,
+          totalPrice: reservationData.totalPrice,
+        };
+
+        console.log('서버로 전송되는 데이터:', {
+          ...formattedData,
+          serviceDetailTypeId: formattedData.serviceDetailTypeId,
+          reservationDate: formattedData.reservationDate,
+          startTime: formattedData.startTime,
+          endTime: formattedData.endTime,
+        });
+
+        const result = await reservationApi.create(formattedData);
 
         // 예약 목록 새로고침
         await fetchReservations();

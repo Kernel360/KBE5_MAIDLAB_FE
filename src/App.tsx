@@ -1,21 +1,36 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import { AuthProvider, ThemeProvider, ToastProvider } from '@/hooks'; // ToastProvider 추가
-import { ProtectedRoute, ToastContainer } from '@/components/common';
+import React, { Suspense } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, ThemeProvider, ToastProvider, useAuth } from '@/hooks';
 import { ROUTES } from '@/constants';
+import { clearExpiredLocalStorage } from '@/utils';
+import '@/styles/index.css';
 
-// Pages - 개별 import로 변경
+// Pages
 import Home from '@/pages/Home';
 import Login from '@/pages/Login';
 import SignUp from '@/pages/SignUp';
 import NotFound from '@/pages/NotFound';
 import GoogleCallback from '@/pages/GoogleCallback';
 import SocialSignUp from '@/pages/SocialSignUp';
+import ManagerProfileSetup from '@/pages/ManagerProfileSetup';
+import ConsumerProfileSetup from '@/pages/ConsumerProfileSetup';
 
+// Reservation Pages
+import ConsumerReservations from '@/pages/reservation/ConsumerReservations';
+import ConsumerReservationCreate from '@/pages/reservation/ConsumerReservationCreate';
+import ConsumerReservationDetail from '@/pages/reservation/ConsumerReservationDetail';
+import ManagerReservations from '@/pages/reservation/ManagerReservations';
+import ManagerReservationDetail from '@/pages/reservation/ManagerReservationDetail';
+
+// Consumer Pages
 import ConsumerMyPage from '@/pages/consumer/MyPage';
 import ConsumerProfile from '@/pages/consumer/Profile';
 import ManagerList from '@/pages/consumer/ManagerList';
 
+// Manager Pages
+import { ManagerMatching } from '@/pages/matching/ManagerMatching';
+
+// Admin Pages
 import {
   AdminLogin,
   AdminLayout,
@@ -33,24 +48,65 @@ import {
   AdminEventDetail,
 } from '@/pages';
 
-// Styles
-import '@/styles/index.css';
+// Board Pages
+import BoardList from '@/pages/board/BoardList';
+import BoardCreate from '@/pages/board/BoardCreate';
+import BoardDetail from '@/pages/board/BoardDetail';
+import BoardEdit from '@/pages/board/BoardEdit';
 
+// Loading Component
+const LoadingSpinner: React.FC = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+  </div>
+);
+
+// Protected Route Component
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  requireAuth?: boolean;
+  requiredUserType?: 'CONSUMER' | 'MANAGER' | 'ADMIN';
+  redirectTo?: string;
+}
+
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
+  requireAuth = true,
+  requiredUserType,
+  redirectTo = ROUTES.LOGIN,
+}) => {
+  const { isAuthenticated, userType, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  if (requireAuth && !isAuthenticated) {
+    return <Navigate to={redirectTo} replace />;
+  }
+
+  if (requiredUserType && userType !== requiredUserType) {
+    return <Navigate to={ROUTES.HOME} replace />;
+  }
+
+  return <>{children}</>;
+};
+
+// Main App Component
 const App: React.FC = () => {
   return (
     <ThemeProvider>
       <ToastProvider>
-        {' '}
-        {/* ToastProvider 추가 */}
         <AuthProvider>
           <div className="App">
             <Routes>
-              {/* 공통 페이지 */}
+              {/* Common Routes */}
               <Route path={ROUTES.HOME} element={<Home />} />
               <Route path={ROUTES.LOGIN} element={<Login />} />
               <Route path={ROUTES.SIGNUP} element={<SignUp />} />
               <Route path={ROUTES.SOCIAL_SIGNUP} element={<SocialSignUp />} />
               <Route path="/google-callback" element={<GoogleCallback />} />
+
               {/* 이벤트 페이지 (나중에 구현) */}
               {/* <Route path={ROUTES.EVENTS} element={<Events />} />
                 <Route path={ROUTES.EVENT_DETAIL} element={<EventDetail />} />
@@ -61,6 +117,14 @@ const App: React.FC = () => {
                 <Route path={ROUTES.BOARD_DETAIL} element={<BoardDetail />} /> */}
               {/* 소비자 페이지 (나중에 구현) */}
               <Route
+                path={ROUTES.CONSUMER.PROFILE_SETUP}
+                element={
+                  <ProtectedRoute requiredUserType="CONSUMER">
+                    <ConsumerProfileSetup />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path={ROUTES.CONSUMER.MYPAGE}
                 element={
                   <ProtectedRoute requiredUserType="CONSUMER">
@@ -68,7 +132,7 @@ const App: React.FC = () => {
                   </ProtectedRoute>
                 }
               />
-              <Route
+                <Route
                 path={ROUTES.CONSUMER.PROFILE}
                 element={
                   <ProtectedRoute requiredUserType="CONSUMER">
@@ -76,38 +140,38 @@ const App: React.FC = () => {
                   </ProtectedRoute>
                 }
               />
-              {/* <Route
+                <Route
                 path={ROUTES.CONSUMER.RESERVATIONS}
                 element={
                   <ProtectedRoute requiredUserType="CONSUMER">
                     <ConsumerReservations />
                   </ProtectedRoute>
                 }
-              /> */}
-              {/* <Route
+              />
+              <Route
                 path={ROUTES.CONSUMER.RESERVATION_CREATE}
                 element={
                   <ProtectedRoute requiredUserType="CONSUMER">
-                    <ReservationCreate />
+                    <ConsumerReservationCreate />
                   </ProtectedRoute>
                 }
-              /> */}
+              />
               <Route
-                path={ROUTES.CONSUMER.LIKED_MANAGERS}
+                path={ROUTES.CONSUMER.RESERVATION_DETAIL}
                 element={
                   <ProtectedRoute requiredUserType="CONSUMER">
-                    <ManagerList />
+                    <ConsumerReservationDetail />
                   </ProtectedRoute>
                 }
-              /> 
-              <Route
-                path={ROUTES.CONSUMER.BLACKLIST}
-                element={
-                  <ProtectedRoute requiredUserType="CONSUMER">
-                    <ManagerList />
-                  </ProtectedRoute>
-                }
-              /> 
+              />
+              {/* <Route
+                  path={ROUTES.CONSUMER.LIKED_MANAGERS}
+                  element={
+                    <ProtectedRoute requiredUserType="CONSUMER">
+                      <LikedManagers />
+                    </ProtectedRoute>
+                  }
+                /> */}
               {/* 매니저 라우트들 */}
               {/* <Route
               path={ROUTES.MANAGER.MYPAGE}
@@ -129,18 +193,18 @@ const App: React.FC = () => {
               path={ROUTES.MANAGER.PROFILE_EDIT}
               element={
                 <ProtectedRoute requiredUserType="MANAGER">
-                  <ManagerProfile />
+                <ManagerProfile />
                 </ProtectedRoute>
-              }
-            /> */}
-              {/* <Route
-              path={ROUTES.MANAGER.PROFILE_CREATE}
-              element={
-                <ProtectedRoute requiredUserType="MANAGER">
-                  <ManagerProfileCreate />
-                </ProtectedRoute>
-              }
-            /> */}
+                }
+                /> */}
+              <Route
+                path={ROUTES.MANAGER.PROFILE_SETUP}
+                element={
+                  <ProtectedRoute requiredUserType="MANAGER">
+                    <ManagerProfileSetup />
+                  </ProtectedRoute>
+                }
+              />
               {/* <Route
               path={ROUTES.MANAGER.RESERVATIONS}
               element={
@@ -181,6 +245,42 @@ const App: React.FC = () => {
                 </ProtectedRoute>
               }
             /> */}
+
+              <Route
+                path={ROUTES.CONSUMER.LIKED_MANAGERS}
+                element={
+                  <ProtectedRoute requiredUserType="CONSUMER">
+                    <ManagerList />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Manager Routes */}
+              <Route
+                path={ROUTES.MANAGER.RESERVATIONS}
+                element={
+                  <ProtectedRoute requiredUserType="MANAGER">
+                    <ManagerReservations />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={ROUTES.MANAGER.RESERVATION_DETAIL}
+                element={
+                  <ProtectedRoute requiredUserType="MANAGER">
+                    <ManagerReservationDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path={ROUTES.MANAGER.MATCHING}
+                element={
+                  <ProtectedRoute requiredUserType="MANAGER">
+                    <ManagerMatching />
+                  </ProtectedRoute>
+                }
+              />
+
               {/* Admin Routes */}
               <Route path={ROUTES.ADMIN.LOGIN} element={<AdminLogin />} />
               <Route
@@ -198,48 +298,43 @@ const App: React.FC = () => {
                 <Route path="reservations/:id" element={<AdminReservationDetail />} />
                 <Route path="events" element={<AdminEvents />} />
                 <Route path="events/create" element={<AdminEventCreate />} />
+                <Route path="events/:id/edit" element={<AdminEventEdit />} />
+                <Route path="events/:id" element={<AdminEventDetail />} />
                 <Route path="boards" element={<AdminBoards />} />
                 <Route path="boards/:id" element={<AdminBoardDetail />} />
+                <Route path="boards/:id/edit" element={<AdminBoardEdit />} />
+                <Route index element={<AdminUserList />} />
               </Route>
 
-              {/* 공통 게시판 라우트들 */}
-              {/* <Route
-              path={ROUTES.BOARD}
-              element={
-                <ProtectedRoute>
-                  <BoardPage />
-                </ProtectedRoute>
-              }
-            /> */}
-              {/* <Route
-              path={ROUTES.BOARD_CREATE}
-              element={
-                <ProtectedRoute>
-                  <BoardCreatePage />
-                </ProtectedRoute>
-              }
-            /> */}
-              {/* <Route
-              path={ROUTES.BOARD_DETAIL}
-              element={
-                <ProtectedRoute>
-                  <BoardDetailPage />
-                </ProtectedRoute>
-              }
-            /> */}
-              {/* 404 페이지 */}
-              <Route path={ROUTES.NOT_FOUND} element={<NotFound />} />
+              {/* Board Routes */}
+              <Route path={ROUTES.BOARD.LIST} element={<BoardList />} />
+              <Route
+                path={ROUTES.BOARD.CREATE}
+                element={
+                  <ProtectedRoute>
+                    <BoardCreate />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path={ROUTES.BOARD.DETAIL} element={<BoardDetail />} />
+              <Route
+                path={ROUTES.BOARD.EDIT}
+                element={
+                  <ProtectedRoute>
+                    <BoardEdit />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* 404 Route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-
-            {/* 전역 토스트 컨테이너 */}
-            <ToastContainer />
           </div>
         </AuthProvider>
-      </ToastProvider>{' '}
-      {/* ToastProvider 닫기 */}
+      </ToastProvider>
     </ThemeProvider>
   );
 };
 
 export default App;
+

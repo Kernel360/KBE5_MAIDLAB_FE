@@ -14,6 +14,20 @@ const SignUp: React.FC = () => {
     'CONSUMER' | 'MANAGER'
   >('CONSUMER');
 
+  // 프로필 설정 페이지로 이동하는 함수
+  const navigateToProfileSetup = (userType: 'CONSUMER' | 'MANAGER') => {
+    const route =
+      userType === 'MANAGER'
+        ? ROUTES.MANAGER.PROFILE_SETUP
+        : ROUTES.CONSUMER.PROFILE_SETUP;
+
+    // skipProfileCheck=true 상태로 이동하여 프로필 체크를 우회
+    navigate(route, {
+      replace: true,
+      state: { fromSignup: true }, // 회원가입에서 온 것임을 표시
+    });
+  };
+
   const { values, errors, touched, handleSubmit, setValue, setFieldTouched } =
     useForm<
       SignUpRequestDto & {
@@ -53,9 +67,32 @@ const SignUp: React.FC = () => {
         };
 
         const result = await signUp(cleanedData);
+
         if (result.success) {
-          showToast('회원가입이 완료되었습니다.', 'success');
-          navigate(ROUTES.LOGIN);
+          // 성공 메시지 표시
+          showToast('회원가입이 완료되었습니다!', 'success');
+
+          // 매니저는 프로필 설정 필수, 수요자는 선택사항임을 알림
+          if (selectedUserType === 'MANAGER') {
+            setTimeout(() => {
+              showToast(
+                '매니저 서비스 제공을 위해 프로필을 완성해주세요.',
+                'info',
+              );
+            }, 1000);
+          } else {
+            setTimeout(() => {
+              showToast('더 나은 서비스를 위해 프로필을 설정해보세요.', 'info');
+            }, 1000);
+          }
+
+          // 자동 로그인이 완료된 상태이므로 바로 프로필 설정으로 이동
+          setTimeout(() => {
+            navigateToProfileSetup(selectedUserType);
+          }, 2000); // 토스트 메시지를 확인할 시간을 준 후 이동
+        } else {
+          console.error('회원가입 실패:', result);
+          showToast(result.error || '회원가입에 실패했습니다.', 'error');
         }
       },
     });

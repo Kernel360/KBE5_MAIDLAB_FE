@@ -53,6 +53,7 @@ export interface ProfileResponseDto {
   schedules: ScheduleListItem[];
   services: string[];
   introduceText?: string;
+  documents?: DocumentListItem[];
 }
 
 export interface MypageResponseDto {
