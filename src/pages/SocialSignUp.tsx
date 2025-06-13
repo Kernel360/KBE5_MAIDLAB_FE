@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { useAuth, useForm } from '@/hooks';
+import { useAuth, useForm, useToast } from '@/hooks';
 import { ROUTES } from '@/constants';
 import type { SocialSignUpRequestDto } from '@/apis/auth';
 
@@ -9,12 +9,43 @@ const SocialSignUp: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { socialSignUp, isLoading } = useAuth();
+  const { showToast } = useToast();
 
-  // URL state나 localStorage에서 임시 토큰과 사용자 정보 가져오기
-  const tempToken =
-    location.state?.tempToken || localStorage.getItem('tempSocialToken');
-  const userType =
-    location.state?.userType || localStorage.getItem('tempUserType');
+  // 🔧 상태 관리 개선
+  const [isValidating, setIsValidating] = useState(true);
+  const [tempToken, setTempToken] = useState<string | null>(null);
+  const [userType, setUserType] = useState<'CONSUMER' | 'MANAGER' | null>(null);
+
+  // 🔧 토큰 및 사용자 타입 검증 로직 개선
+  useEffect(() => {
+    const validateAccess = () => {
+      console.log('🔍 SocialSignUp 접근 검증 시작');
+
+      // 1. location.state에서 먼저 확인
+      let token = location.state?.tempToken;
+      let type = location.state?.userType;
+
+      // 2. localStorage에서 확인
+      if (!token) {
+        token = localStorage.getItem('tempSocialToken');
+        type = localStorage.getItem('tempUserType') as 'CONSUMER' | 'MANAGER';
+      }
+
+      if (token && type) {
+        setTempToken(token);
+        setUserType(type);
+        setIsValidating(false);
+      } else {
+        showToast('잘못된 접근입니다.', 'error');
+        navigate(ROUTES.LOGIN, { replace: true });
+      }
+    };
+
+    // 🔧 약간의 지연을 두고 검증 (OAuth 처리 완료 대기)
+    const timer = setTimeout(validateAccess, 200);
+
+    return () => clearTimeout(timer);
+  }, [location.state, navigate, showToast]);
 
   const { values, errors, touched, handleSubmit, setValue, setFieldTouched } =
     useForm<SocialSignUpRequestDto>({
@@ -26,35 +57,24 @@ const SocialSignUp: React.FC = () => {
         birth: (value) => value.length === 10, // YYYY-MM-DD
       },
       onSubmit: async (formData) => {
-        if (!tempToken) {
-          console.error('임시 토큰이 없습니다.');
+        if (!tempToken || !userType) {
+          console.error('❌ 임시 토큰 또는 사용자 타입이 없습니다:', {
+            tempToken: !!tempToken,
+            userType,
+          });
+          showToast('인증 정보가 없습니다.', 'error');
           navigate(ROUTES.LOGIN);
           return;
         }
 
-        // 임시 토큰을 localStorage에 설정
-        const originalToken = localStorage.getItem('accessToken');
-        localStorage.setItem('accessToken', tempToken);
+        const result = await socialSignUp(formData);
 
-        try {
-          const result = await socialSignUp(formData);
-          if (result.success) {
-            // 임시 데이터 정리
-            localStorage.removeItem('tempSocialToken');
-            localStorage.removeItem('tempUserType');
-            localStorage.removeItem('accessToken'); // 임시 토큰도 제거
-
-            navigate(ROUTES.LOGIN);
-          }
-        } catch (error) {
-          console.error('❌ 소셜 회원가입 에러:', error);
-        } finally {
-          // 원래 토큰 복원
-          if (originalToken) {
-            localStorage.setItem('accessToken', originalToken);
-          } else {
-            localStorage.removeItem('accessToken');
-          }
+        if (result.success) {
+          setTimeout(() => {
+            navigate(ROUTES.HOME, { replace: true });
+          }, 1500);
+        } else {
+          showToast(result.error || '회원가입에 실패했습니다.', 'error');
         }
       },
     });
@@ -73,15 +93,16 @@ const SocialSignUp: React.FC = () => {
     setValue('birth', formatted);
   };
 
-  // 임시 토큰이 없으면 로그인 페이지로 리다이렉트
-  useEffect(() => {
-    if (!tempToken) {
-      navigate(ROUTES.LOGIN);
-    }
-  }, [tempToken, navigate]);
-
-  if (!tempToken) {
-    return null;
+  // 🔧 검증 중 로딩 화면
+  if (isValidating) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">정보를 확인 중입니다...</p>
+        </div>
+      </div>
+    );
   }
 
   return (

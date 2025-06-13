@@ -24,9 +24,9 @@ import SearchIcon from '@mui/icons-material/Search';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useState, useEffect } from 'react';
 import { useAdmin } from '@/hooks';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ROUTES } from '@/constants';
-import type { ConsumerBoardResponseDto } from '@/apis/admin';
+import type { ConsumerBoardResponseDto } from '@/apis/board';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
@@ -65,11 +65,18 @@ interface BoardWithId extends ConsumerBoardResponseDto {
 }
 
 // 탭 인덱스 타입
-type TabType = 'all' | 'consultation' | 'refund';
+type TabType = 'consultation' | 'refund';
 
 const BoardList = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [currentTab, setCurrentTab] = useState<TabType>('all');
+  const location = useLocation();
+  const [currentTab, setCurrentTab] = useState<TabType>(() => {
+    const savedTab = localStorage.getItem('adminBoardTab');
+    if (savedTab !== null) {
+      localStorage.removeItem('adminBoardTab');
+      return savedTab as TabType;
+    }
+    return (location.state as { previousTab?: TabType })?.previousTab ?? 'consultation';
+  });
   const [filteredBoards, setFilteredBoards] = useState<BoardWithId[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -82,8 +89,10 @@ const BoardList = () => {
       let data: ConsumerBoardResponseDto[];
       if (tab === 'consultation') {
         data = await boardManagement.fetchConsultationBoards();
+      } else if (tab === 'refund') {
+        data = await boardManagement.fetchRefundBoards();
       } else {
-        data = await boardManagement.fetchBoards();
+        data = await boardManagement.fetchConsultationBoards();
       }
       setFilteredBoards(data as BoardWithId[]);
     } finally {
@@ -96,25 +105,10 @@ const BoardList = () => {
     fetchBoardsByTab(currentTab);
   }, [currentTab]);
 
-  // 게시글 목록 필터링
-  useEffect(() => {
-    if (!filteredBoards) return;
-    
-    const filtered = filteredBoards.filter((board) => {
-      const matchesSearch = board.title.toLowerCase().includes(searchTerm.toLowerCase());
-      if (currentTab === 'refund') {
-        return matchesSearch && board.boardType === 'REFUND';
-      } else if (currentTab === 'consultation') {
-        return matchesSearch && board.boardType !== 'REFUND';
-      }
-      return matchesSearch;
-    });
-    setFilteredBoards(filtered);
-  }, [searchTerm, currentTab]);
-
   // 게시글 상세 페이지로 이동
   const handleViewDetail = (boardId: number) => {
-    navigate(`${ROUTES.ADMIN.BOARDS}/${boardId}`);
+    localStorage.setItem('adminBoardTab', currentTab);
+    navigate(`${ROUTES.ADMIN.BOARD_DETAIL.replace(':id', boardId.toString())}`);
   };
 
   // 탭 변경 처리
@@ -132,28 +126,10 @@ const BoardList = () => {
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
         <Tabs value={currentTab} onChange={handleTabChange}>
-          <Tab label="전체" value="all" />
           <Tab label="상담 문의" value="consultation" />
           <Tab label="환불 문의" value="refund" />
         </Tabs>
       </Box>
-
-      <SearchBox>
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder="게시글 검색..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-      </SearchBox>
 
       <TableContainer component={Paper}>
         <Table>
@@ -192,7 +168,7 @@ const BoardList = () => {
                   </TableCell>
                   <TableCell align="center">
                     <Tooltip title="상세보기">
-                      <ActionButton onClick={() => handleViewDetail(board.id)}>
+                      <ActionButton onClick={() => handleViewDetail(board.boardId)}>
                         <VisibilityIcon />
                       </ActionButton>
                     </Tooltip>

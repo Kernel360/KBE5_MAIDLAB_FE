@@ -21,6 +21,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useState, useEffect, useCallback } from 'react';
 import { useEvent } from '@/hooks';
 import { useNavigate } from 'react-router-dom';
@@ -49,7 +50,6 @@ const ActionButton = styled(IconButton)(({ theme }) => ({
 }));
 
 const EventList = () => {
-  const [searchTerm, setSearchTerm] = useState('');
   const [filteredEvents, setFilteredEvents] = useState<any[]>([]);
   const { events, loading, fetchEvents, deleteEvent } = useEvent();
   const navigate = useNavigate();
@@ -58,11 +58,8 @@ const EventList = () => {
   useEffect(() => {
     if (!events) return;
     
-    const filtered = events.filter((event) =>
-      event.title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredEvents(filtered);
-  }, [events, searchTerm]);
+    setFilteredEvents(events);
+  }, [events]);
 
   // 이벤트 삭제 처리
   const handleDelete = useCallback(async (eventId: number) => {
@@ -84,6 +81,11 @@ const EventList = () => {
     navigate(ROUTES.ADMIN.EVENT_CREATE);
   }, [navigate]);
 
+  // 이벤트 상세 조회 페이지로 이동
+  const handleView = useCallback((eventId: number) => {
+    navigate(`${ROUTES.ADMIN.EVENT_DETAIL.replace(':id', String(eventId))}`);
+  }, [navigate]);
+
   return (
     <StyledContainer>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
@@ -99,23 +101,6 @@ const EventList = () => {
           이벤트 생성
         </Button>
       </Box>
-
-      <SearchBox>
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder="이벤트 검색..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-      </SearchBox>
 
       <TableContainer component={Paper}>
         <Table>
@@ -141,6 +126,11 @@ const EventList = () => {
                   <TableCell>{formatDate(event.createdAt)}</TableCell>
                   <TableCell>{event.updatedAt ? formatDate(event.updatedAt) : '-'}</TableCell>
                   <TableCell align="center">
+                    <Tooltip title="상세보기">
+                      <ActionButton onClick={() => handleView(event.eventId)}>
+                        <VisibilityIcon />
+                      </ActionButton>
+                    </Tooltip>
                     <Tooltip title="수정">
                       <ActionButton onClick={() => handleEdit(event.eventId)}>
                         <EditIcon />

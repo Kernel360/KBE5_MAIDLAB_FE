@@ -219,3 +219,62 @@ export interface UserMyPageInfo {
   isVerified?: boolean;
   point?: number;
 }
+
+/**
+ * 소비자 프로필 폼 데이터
+ */
+export interface ConsumerProfileFormData {
+  profileImage?: string;
+  address: string;
+  detailAddress: string;
+}
+
+/**
+ * 소비자 프로필 에러
+ */
+export interface ConsumerProfileErrors {
+  address?: string;
+  detailAddress?: string;
+}
+
+/**
+ * 시간 슬롯
+ */
+export interface TimeSlot {
+  day: string;
+  startTime: string;
+  endTime: string;
+}
+
+/**
+ * 문서 아이템
+ */
+export interface DocumentItem {
+  fileType: string;
+  fileName: string;
+  uploadedFileUrl: string;
+}
+
+/**
+ * 매니저 프로필 폼 데이터
+ */
+export interface ManagerProfileFormData {
+  profileImage?: string;
+  serviceTypes: string[];
+  regions: string[];
+  availableTimes: TimeSlot[];
+  introduceText: string;
+  documents: DocumentItem[];
+}
+
+/**
+ * 매니저 프로필 에러
+ */
+export interface ManagerProfileErrors {
+  profileImage?: string;
+  serviceTypes?: string;
+  regions?: string;
+  availableTimes?: string;
+  introduceText?: string;
+  documents?: string;
+}

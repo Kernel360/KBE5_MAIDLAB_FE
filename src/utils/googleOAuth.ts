@@ -113,12 +113,10 @@ export const openGoogleLoginPopup = (
         if (status) {
           const statusData = JSON.parse(status);
           if (statusData.sessionId !== sessionId) {
-            console.log('⚠️ 다른 세션의 메시지 무시');
             return;
           }
         }
 
-        console.log('📨 OAuth 메시지 수신:', data);
         localStorage.removeItem(OAUTH_MESSAGE_KEY);
         localStorage.removeItem(OAUTH_STATUS_KEY);
         messageProcessed = true;
@@ -146,7 +144,6 @@ export const openGoogleLoginPopup = (
 
       // 타임아웃 체크
       if (checkCount >= maxChecks) {
-        console.log('⏰ OAuth 타임아웃');
         localStorage.removeItem(OAUTH_MESSAGE_KEY);
         localStorage.removeItem(OAUTH_STATUS_KEY);
         messageProcessed = true;
@@ -180,28 +177,19 @@ export const handleGoogleOAuthCallback = () => {
   const { code, error, state } = extractOAuthParams();
   const userType = extractUserTypeFromState(state);
 
-  console.log('📋 OAuth 파라미터:', {
-    code: code?.substring(0, 10) + '...',
-    error,
-    userType,
-  });
-
   let message;
 
   if (error) {
-    console.error('❌ OAuth 에러:', error);
     message = {
       type: 'GOOGLE_AUTH_ERROR',
       error: `OAuth 인증 실패: ${error}`,
     };
   } else if (!code) {
-    console.error('❌ 인증 코드 없음');
     message = {
       type: 'GOOGLE_AUTH_ERROR',
       error: '인증 코드를 받지 못했습니다.',
     };
   } else if (!userType) {
-    console.error('❌ 사용자 타입 없음');
     message = {
       type: 'GOOGLE_AUTH_ERROR',
       error: '사용자 타입 정보가 없습니다.',
@@ -225,8 +213,6 @@ export const handleGoogleOAuthCallback = () => {
     statusData.status = 'completed';
     localStorage.setItem(OAUTH_STATUS_KEY, JSON.stringify(statusData));
   }
-
-  console.log('📤 메시지 localStorage에 저장 완료');
 
   // 팝업 닫기 - 지연을 두고 시도
   setTimeout(() => {

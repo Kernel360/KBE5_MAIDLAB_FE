@@ -120,8 +120,16 @@ export const VALIDATION_MESSAGES = {
     INVALID: '이름은 한글 또는 영문 2-20자로 입력해주세요.',
   },
   BIRTH: {
-    REQUIRED: '생년월일을 선택해주세요.',
-    INVALID: '올바른 생년월일을 선택해주세요.',
+    REQUIRED: '생년월일을 입력해주세요.',
+    INVALID: '올바른 생년월일을 입력해주세요.',
+    INVALID_FORMAT: '올바른 날짜 형식으로 입력해주세요 (YYYY-MM-DD)',
+    INVALID_YEAR: '1925년부터 올해까지 입력 가능합니다',
+    INVALID_MONTH: '월은 01~12 사이로 입력해주세요',
+    INVALID_DAY: '일은 01~31 사이로 입력해주세요',
+    INVALID_DATE: '존재하지 않는 날짜입니다',
+    FUTURE_DATE: '미래 날짜는 입력할 수 없습니다',
+    TOO_YOUNG: '만 14세 이상만 가입 가능합니다',
+    TOO_OLD: '올바른 생년월일을 입력해주세요',
   },
   GENDER: {
     REQUIRED: '성별을 선택해주세요.',

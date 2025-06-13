@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import {
   Container,
@@ -31,10 +31,6 @@ const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
 }));
 
-const StyledSearchField = styled(TextField)(({ theme }) => ({
-  marginBottom: theme.spacing(3),
-}));
-
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -59,11 +55,20 @@ function TabPanel(props: TabPanelProps) {
 
 const ReservationList = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
-  const [tabValue, setTabValue] = useState(0);
+  const [tabValue, setTabValue] = useState(() => {
+    // 1. localStorage에서 값을 먼저 확인
+    const savedTab = localStorage.getItem('adminReservationTab');
+    if (savedTab !== null) {
+      localStorage.removeItem('adminReservationTab');
+      return parseInt(savedTab, 10);
+    }
+    // 2. location.state 확인
+    return (location.state as { previousTab?: number })?.previousTab ?? 0;
+  });
   const [reservations, setReservations] = useState<ReservationResponseDto[]>([]);
   const [matchings, setMatchings] = useState<MatchingResponseDto[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [openDialog, setOpenDialog] = useState(false);
@@ -91,7 +96,7 @@ const ReservationList = () => {
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
     setPage(0);
-    setSearchTerm('');
+    handleCloseDialog();
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -103,36 +108,16 @@ const ReservationList = () => {
     setPage(0);
   };
 
-  const getFilteredReservations = () => {
-    if (!searchTerm) return reservations;
-
-    const searchTermLower = searchTerm.toLowerCase();
-    return reservations.filter(
-      (reservation) =>
-        reservation.serviceType.toLowerCase().includes(searchTermLower) ||
-        reservation.detailServiceType.toLowerCase().includes(searchTermLower)
-    );
-  };
-
-  const getFilteredMatchings = () => {
-    if (!searchTerm) return matchings;
-
-    const searchTermLower = searchTerm.toLowerCase();
-    return matchings.filter(
-      (matching) =>
-        matching.matchingStatus.toLowerCase().includes(searchTermLower)
-    );
-  };
-
   const formatDateTime = (date: string, time: string) => {
     return `${date} ${time}`;
   };
 
-  const formatPrice = (price: number) => {
+  const formatPrice = (price: number | string) => {
+    const numericPrice = typeof price === 'string' ? parseInt(price, 10) : price;
     return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
       currency: 'KRW',
-    }).format(price);
+    }).format(numericPrice);
   };
 
   const getStatusChipColor = (status: string) => {
@@ -160,9 +145,24 @@ const ReservationList = () => {
     setSelectedMatching(null);
   };
 
-  const handleConfirmChange = () => {
-    // TODO: 매니저 변경 로직 구현
-    handleCloseDialog();
+  const handleConfirmChange = async (managerId: number) => {
+    if (!selectedMatching) return;
+
+    try {
+      await adminApi.changeManager(selectedMatching.reservationId, managerId);
+      // 매칭 목록 새로고침
+      const matchingsData = await adminApi.getAllMatching();
+      setMatchings(matchingsData);
+      handleCloseDialog();
+    } catch (error) {
+      console.error('매니저 변경 실패:', error);
+    }
+  };
+
+  const handleDetailView = (reservationId: number) => {
+    // 현재 탭 상태를 localStorage에 저장
+    localStorage.setItem('adminReservationTab', tabValue.toString());
+    navigate(`/admin/reservations/${reservationId}`);
   };
 
   if (loading) {
@@ -191,21 +191,6 @@ const ReservationList = () => {
       </Box>
 
       <TabPanel value={tabValue} index={0}>
-        <StyledSearchField
-          fullWidth
-          variant="outlined"
-          placeholder="서비스 유형으로 검색"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -219,7 +204,7 @@ const ReservationList = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {getFilteredReservations()
+              {reservations
                 .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
                 .map((reservation) => (
                   <TableRow key={reservation.reservationId}>
@@ -234,7 +219,7 @@ const ReservationList = () => {
                       <Button
                         variant="outlined"
                         size="small"
-                        onClick={() => navigate(`/admin/reservations/${reservation.reservationId}`)}
+                        onClick={() => handleDetailView(reservation.reservationId)}
                       >
                         상세보기
                       </Button>
@@ -247,7 +232,7 @@ const ReservationList = () => {
 
         <TablePagination
           component="div"
-          count={getFilteredReservations().length}
+          count={reservations.length}
           page={page}
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
@@ -257,21 +242,6 @@ const ReservationList = () => {
       </TabPanel>
 
       <TabPanel value={tabValue} index={1}>
-        <StyledSearchField
-          fullWidth
-          variant="outlined"
-          placeholder="매칭 상태로 검색"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -283,7 +253,7 @@ const ReservationList = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {getFilteredMatchings()
+              {matchings
                 .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
                 .map((matching) => (
                   <TableRow key={matching.reservationId}>
@@ -313,21 +283,21 @@ const ReservationList = () => {
 
         <TablePagination
           component="div"
-          count={getFilteredMatchings().length}
+          count={matchings.length}
           page={page}
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
           onRowsPerPageChange={handleChangeRowsPerPage}
           labelRowsPerPage="페이지당 행 수"
         />
-      </TabPanel>
 
-      <MatchingChangeDialog
-        open={openDialog}
-        matching={selectedMatching}
-        onClose={handleCloseDialog}
-        onConfirm={handleConfirmChange}
-      />
+        <MatchingChangeDialog
+          open={openDialog}
+          matching={selectedMatching}
+          onClose={handleCloseDialog}
+          onConfirm={handleConfirmChange}
+        />
+      </TabPanel>
     </StyledContainer>
   );
 };

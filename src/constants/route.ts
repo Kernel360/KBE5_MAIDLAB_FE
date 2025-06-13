@@ -7,28 +7,30 @@ export const ROUTES = {
   GOOGLE_CALLBACK: '/google-callback',
   // 소비자 페이지
   CONSUMER: {
-    MYPAGE: '/consumers/mypage',
-    PROFILE: '/consumers/profile',
-    PROFILE_EDIT: '/consumers/profile/edit',
-    RESERVATIONS: '/consumers/reservations',
-    RESERVATION_DETAIL: '/consumers/reservations/:id',
-    RESERVATION_CREATE: '/consumers/reservations/create',
+    MYPAGE: '/consumer/mypage',
+    PROFILE: '/consumer/profile',
+    PROFILE_SETUP: '/consumer/profile/setup',
+    PROFILE_EDIT: '/consumer/profile/edit',
+    RESERVATIONS: '/consumer/reservations',
+    RESERVATION_DETAIL: '/consumer/reservations/:id',
+    RESERVATION_CREATE: '/consumer/reservations/create',
     REVIEW_REGISTER: '/consumers/reservations/:id/review',
-    LIKED_MANAGERS: '/consumers/likes',
-    BLACKLIST: '/consumers/blacklist',
+    LIKED_MANAGERS: '/consumer/likes',
+    BLACKLIST: '/consumer/blacklist',
   },
 
   // 매니저 페이지
   MANAGER: {
-    MYPAGE: '/managers/mypage',
-    PROFILE: '/managers/profile',
-    PROFILE_EDIT: '/managers/profile/edit',
-    PROFILE_CREATE: '/managers/profile/create',
-    RESERVATIONS: '/managers/reservations',
-    RESERVATION_DETAIL: '/managers/reservations/:id',
+    MYPAGE: '/manager/mypage',
+    PROFILE: '/manager/profile',
+    PROFILE_EDIT: '/manager/profile/edit',
+    PROFILE_SETUP: '/manager/profile/setup',
+    RESERVATIONS: '/manager/reservations',
+    RESERVATION_DETAIL: '/manager/reservations/:id',
     REVIEW_REGISTER: '/managers/reservations/:id/review',
-    MATCHING: '/managers/matching',
-    SETTLEMENTS: '/managers/settlements',
+    REVIEWS: '/manager/reviews',
+    MATCHING: '/manager/matching',
+    SETTLEMENTS: '/manager/settlements',
   },
 
   // 관리자 페이지
@@ -44,11 +46,14 @@ export const ROUTES = {
     RESERVATION_DETAIL: '/admin/reservations/:id',
     MATCHING: '/admin/matching',
     SETTLEMENTS: '/admin/settlements',
+    SETTLEMENT_DETAIL: '/admin/settlements/:settlementId',
     EVENTS: '/admin/events',
     EVENT_CREATE: '/admin/events/create',
     EVENT_EDIT: '/admin/events/:id/edit',
+    EVENT_DETAIL: '/admin/events/:id',
     BOARDS: '/admin/boards',
     BOARD_DETAIL: '/admin/boards/:id',
+    BOARD_EDIT: '/admin/boards/:id/edit',
   },
 
   // 기타 페이지
@@ -62,4 +67,3 @@ export const ROUTES = {
   },
   NOT_FOUND: '/404',
 } as const;
-

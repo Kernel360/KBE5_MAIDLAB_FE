@@ -177,9 +177,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         });
 
         if (response.newUser) {
-          // 신규 사용자 - 추가 정보 입력 필요
-          console.log('👤 신규 사용자 감지 - 추가 정보 입력 필요');
+          localStorage.setItem('tempSocialToken', response.accessToken);
+          localStorage.setItem('tempUserType', data.userType);
+
           dispatch({ type: 'AUTH_LOGOUT' });
+
           return {
             success: true,
             newUser: true,
@@ -201,7 +203,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         return {
           success: true,
           newUser: false,
-          accessToken: response.accessToken,
         };
       } catch (error: any) {
         console.error('❌ useAuth socialLogin 에러:', error);
@@ -212,7 +213,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         return { success: false, error: errorMessage };
       }
     },
-    [showToast, navigate],
+    [showToast],
   );
 
   // 회원가입 함수
@@ -221,10 +222,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         dispatch({ type: 'AUTH_START' });
 
+        // 회원가입
         await authApi.signUp(data);
 
+        // 자동 로그인
+        const loginData = {
+          userType: data.userType,
+          phoneNumber: data.phoneNumber,
+          password: data.password,
+        };
+        const loginResponse = await authApi.login(loginData);
+
+        // 로그인 상태로 변경
+        tokenStorage.setAccessToken(loginResponse.accessToken);
+        userStorage.setUserType(data.userType);
+
+        dispatch({
+          type: 'AUTH_SUCCESS',
+          payload: { userType: data.userType as UserType },
+        });
+
         showToast(SUCCESS_MESSAGES.SIGNUP, 'success');
-        dispatch({ type: 'AUTH_LOGOUT' });
 
         return { success: true };
       } catch (error: any) {
@@ -243,13 +261,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         dispatch({ type: 'AUTH_START' });
 
-        await authApi.socialSignUp(data);
+        // 임시 토큰을 localStorage에서 가져오기
+        const tempToken = localStorage.getItem('tempSocialToken');
+        const userType = localStorage.getItem('tempUserType') as UserType;
+
+        if (!tempToken) {
+          throw new Error('인증 정보가 없습니다.');
+        }
+
+        await authApi.socialSignUp(data, tempToken);
+
+        tokenStorage.setAccessToken(tempToken);
+        userStorage.setUserType(userType);
+
+        dispatch({
+          type: 'AUTH_SUCCESS',
+          payload: { userType: userType },
+        });
+
+        // 임시 토큰 정리
+        console.log('🧹 임시 토큰 정리');
+        localStorage.removeItem('tempSocialToken');
+        localStorage.removeItem('tempUserType');
 
         showToast(SUCCESS_MESSAGES.SIGNUP, 'success');
-        dispatch({ type: 'AUTH_LOGOUT' });
-
         return { success: true };
       } catch (error: any) {
+        console.error('❌ socialSignUp 에러:', {
+          message: error.message,
+          response: error.response,
+        });
+
         const errorMessage = error.message || ERROR_MESSAGES.UNKNOWN;
         dispatch({ type: 'AUTH_FAILURE', payload: errorMessage });
         showToast(errorMessage, 'error');

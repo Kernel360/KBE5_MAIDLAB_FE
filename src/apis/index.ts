@@ -1,9 +1,27 @@
 // 기존 API 클라이언트 수정 (디버깅 포함)
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
+import { tokenStorage } from '@/utils/storage';
 
 const BASE_URL =
-  // import.meta.env.VITE_API_BASE_URL || 'https://api-maidlab.duckdns.org';
-  'http://localhost:8080';
+  import.meta.env.VITE_API_BASE_URL || 'https://api-maidlab.duckdns.org';
+
+// API 에러 코드 매핑 (백엔드와 동일)
+const API_CODE_MESSAGES = {
+  SU: '성공',
+  VF: '입력값 검증에 실패했습니다.',
+  AF: '인증에 실패했습니다.',
+  LF: '로그인에 실패했습니다.',
+  DBE: '데이터베이스 오류가 발생했습니다.',
+  DT: '이미 가입되어있는 휴대폰번호입니다.',
+  DR: '중복된 예약입니다.',
+  WR: '올바르지 않은 주소입니다.',
+  NP: '권한이 없습니다.',
+  NR: '요청한 정보를 찾을 수 없습니다.',
+  AWC: '이미 진행중이거나 완료된 작업입니다.',
+  AC: '이미 처리된 상태입니다.',
+  AD: '삭제된 계정입니다.',
+  RF: '유효하지 않은 토큰입니다.',
+} as const;
 
 // API 에러 코드 매핑 (백엔드와 동일)
 const API_CODE_MESSAGES = {
@@ -46,6 +64,7 @@ const PUBLIC_ENDPOINTS = [
   '/api/auth/login',
   '/api/auth/sign-up',
   '/api/auth/social-login',
+  '/api/auth/social-sign-up',
   '/api/auth/refresh',
 ];
 
@@ -70,26 +89,29 @@ export const apiClient: AxiosInstance = axios.create({
 // 요청 인터셉터 - 토큰 자동 추가 (수정된 버전)
 apiClient.interceptors.request.use(
   (config) => {
-    const url = config.url || '';
-    const fullUrl = url.startsWith('http') ? url : `${BASE_URL}${url}`;
-    const isPublic = isPublicEndpoint(fullUrl);
+    const token = tokenStorage.getAccessToken();
+    const isPublicEndpoint = (url: string): boolean => {
+      const publicEndpoints = [
+        '/api/auth/login',
+        '/api/auth/sign-up',
+        '/api/auth/social-login',
+        '/api/auth/social-sign-up',
+      ];
+      return publicEndpoints.some((endpoint) => url.includes(endpoint));
+    };
 
-    if (!isPublic) {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    } else {
-      if (config.headers.Authorization) {
-        delete config.headers.Authorization;
-      }
+    if (config.url?.includes('/social-sign-up')) {
+      // Authorization 헤더가 이미 있으면 그대로 사용
+      return config;
+    }
+
+    if (token && !isPublicEndpoint(config.url || '')) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
 
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  },
+  (error) => Promise.reject(error),
 );
 
 // 응답 인터셉터 - 에러 처리 및 토큰 갱신 (동시성 처리 개선)
@@ -150,7 +172,7 @@ apiClient.interceptors.response.use(
         processQueue(refreshError, null);
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
-        window.location.href = '/admin/login';
+        window.location.href = '/';
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
