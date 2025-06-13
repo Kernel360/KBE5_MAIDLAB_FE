@@ -1,6 +1,7 @@
-import React from 'react';
-import { Home, FileText, MessageSquare, User } from 'lucide-react';
+import React, { useState } from 'react';
+import { Home, FileText, MessageSquare, User, Calendar, AlertTriangle } from 'lucide-react';
 import { ROUTES } from '@/constants';
+import { useNavigate } from 'react-router-dom';
 
 interface BottomNavigationProps {
   activeTab: 'home' | 'reservation' | 'consultation' | 'profile';
@@ -60,6 +61,56 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
               <span
                 className={`text-xs font-medium ${
                   isActive ? 'text-orange-500' : 'text-gray-400'
+                }`}
+              >
+                {label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </nav>
+  );
+};
+
+export const ManagerFooter: React.FC = () => {
+  const [activeTab, setActiveTab] = useState('home'); // 기본값 '홈' 활성화
+  const navigate = useNavigate();
+  const navItems = [
+    { id: 'home', icon: Home, label: '홈', path: ROUTES.HOME },
+    { id: 'calendar', icon: Calendar, label: '일정', path: '/manager/reservations' }, // 매니저 일정
+    { id: 'request', icon: AlertTriangle, label: '요청', path: '/manager/matching' }, // 매니저 예약요청
+    { id: 'consultation', icon: MessageSquare, label: '상담', path: '/board' }, // 매니저 상담(공통 게시판)
+    { id: 'profile', icon: User, label: '프로필', path: '/manager/profile' }, // 매니저 마이페이지
+  ];
+
+  const handleTabClick = (id: string, path: string) => {
+    setActiveTab(id);
+    if (path) navigate(path);
+  };
+
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 z-50">
+      <div className="flex items-center justify-around">
+        {navItems.map(({ id, icon: Icon, label, path }) => {
+          const isActive = activeTab === id;
+          return (
+            <button
+              key={id}
+              onClick={() => handleTabClick(id, path)}
+              className="flex flex-col items-center py-2 transition-colors focus:outline-none"
+              type="button"
+            >
+              <Icon
+                className={`w-6 h-6 mb-1 ${
+                  isActive ? 'text-[#FFA800]' : 'text-gray-400'
+                }`}
+                fill={isActive ? '#FFA800' : 'none'}
+                strokeWidth={isActive ? 2 : 1.5}
+              />
+              <span
+                className={`text-xs font-medium ${
+                  isActive ? 'text-[#FFA800]' : 'text-gray-400'
                 }`}
               >
                 {label}

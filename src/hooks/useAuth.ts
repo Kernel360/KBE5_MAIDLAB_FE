@@ -324,17 +324,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   // 로그아웃 함수
-  const logout = useCallback(() => {
-    authApi.logout().catch(() => {
-      // API 실패해도 로컬 정리는 진행
-    });
-
-    tokenStorage.clearTokens();
-    userStorage.clearUserData();
-
-    dispatch({ type: 'AUTH_LOGOUT' });
-    showToast(SUCCESS_MESSAGES.LOGOUT, 'success');
-    navigate(ROUTES.LOGIN);
+  const logout = useCallback(async () => {
+    try {
+      await authApi.logout();
+      tokenStorage.clearTokens();
+      userStorage.clearUserData();
+      dispatch({ type: 'AUTH_LOGOUT' });
+      showToast(SUCCESS_MESSAGES.LOGOUT, 'success');
+      navigate(ROUTES.LOGIN);
+    } catch (error: any) {
+      const errorMessage = error?.message || '로그아웃 중 오류가 발생했습니다.';
+      showToast(errorMessage, 'error');
+    }
   }, [showToast, navigate]);
 
   // 비밀번호 변경 함수

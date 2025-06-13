@@ -9,10 +9,11 @@ import {
 } from '@/components';
 import { ROUTES } from '@/constants';
 import { useAuth, useEvent } from '@/hooks';
+import { ManagerFooter } from '@/components/layout/BottomNavigation/BottomNavigation';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, userType } = useAuth();
   const { activeEvents, loading: eventsLoading } = useEvent();
 
   const handleServiceClick = (serviceType: string) => {
@@ -67,11 +68,16 @@ const Home: React.FC = () => {
         </div>
       </main>
 
-      <BottomNavigation
-        activeTab="home"
-        onTabClick={handleNavigation}
-        isAuthenticated={isAuthenticated}
-      />
+      {/* FooterSwitcher: userType이 MANAGER면 ManagerFooter, 아니면 기존 BottomNavigation */}
+      {userType === 'MANAGER' ? (
+        <ManagerFooter />
+      ) : (
+        <BottomNavigation
+          activeTab="home"
+          onTabClick={handleNavigation}
+          isAuthenticated={isAuthenticated}
+        />
+      )}
     </div>
   );
 };

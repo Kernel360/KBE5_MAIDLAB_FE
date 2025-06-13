@@ -2,6 +2,7 @@ import React from 'react';
 import { Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { APP_INFO, ROUTES } from '@/constants';
+import { useAuth } from '@/hooks';
 
 interface HeaderProps {
   showNotification?: boolean;
@@ -17,6 +18,7 @@ export const Header: React.FC<HeaderProps> = ({
   onLogoClick,
 }) => {
   const navigate = useNavigate();
+  const { logout, isAuthenticated } = useAuth();
 
   const handleLogoClick = () => {
     if (onLogoClick) {
@@ -39,17 +41,28 @@ export const Header: React.FC<HeaderProps> = ({
         <h1 className="text-xl font-bold text-gray-900">{title}</h1>
       </button>
 
-      {/* 알림 버튼 */}
-      {showNotification && (
-        <button
-          onClick={onNotificationClick}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors relative"
-        >
-          <Bell className="w-6 h-6 text-gray-600" />
-          {/* 알림 뱃지 (선택사항) */}
-          {/* <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div> */}
-        </button>
-      )}
+      <div className="flex items-center gap-2">
+        {/* 알림 버튼 */}
+        {showNotification && (
+          <button
+            onClick={onNotificationClick}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors relative"
+          >
+            <Bell className="w-6 h-6 text-gray-600" />
+            {/* 알림 뱃지 (선택사항) */}
+            {/* <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div> */}
+          </button>
+        )}
+        {/* 로그아웃 버튼 (로그인 상태일 때만) */}
+        {isAuthenticated && (
+          <button
+            onClick={logout}
+            className="ml-2 px-3 py-1 rounded text-sm text-gray-600 hover:text-white hover:bg-orange-500 transition-colors"
+          >
+            로그아웃
+          </button>
+        )}
+      </div>
     </header>
   );
 };
