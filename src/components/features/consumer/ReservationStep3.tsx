@@ -20,6 +20,7 @@ const calculateAdditionalPrice = (serviceAdd: string[] | string | undefined): nu
   let additionalPrice = 0;
   if (services.includes('요리')) additionalPrice += 20000;
   if (services.includes('청소도구')) additionalPrice += 10000;
+  if (services.includes('다림질')) additionalPrice += 10000;
   return additionalPrice;
 };
 
@@ -131,36 +132,113 @@ const ReservationStep3: React.FC<Props> = ({ data, onBack, onSubmit }) => {
   const additionalPrice = calculateAdditionalPrice(data.serviceAdd);
 
   return (
-    <div className="p-4 space-y-4">
-      <h2 className="text-xl font-bold">예약 확인</h2>
+    <div className="p-4 space-y-6 bg-gray-50 min-h-screen">
+      <h2 className="text-2xl font-bold mb-4 text-center">예약 정보 확인</h2>
 
-      <div className="border p-4 rounded space-y-2">
-        <p><strong>주소:</strong> {data.address} {data.addressDetail}</p>
-        <p><strong>주거 형태:</strong> {data.housingType}, {data.roomSize}평</p>
-        <p><strong>서비스 종류:</strong> {serviceDetail.name}</p>
-        <p><strong>서비스 날짜:</strong> {data.reservationDate}</p>
-        <p><strong>시간:</strong> {data.startTime} ~ {data.endTime}</p>
-        <p><strong>서비스 추가:</strong> {displayServiceAdd || '없음'}</p>
-        <p><strong>반려동물:</strong> {data.pet}</p>
-        <p><strong>요청사항:</strong> {data.specialRequest || '없음'}</p>
-        <p><strong>기타 정보:</strong> {data.housingInformation}</p>
+      {/* 예약 정보 카드 */}
+      <div className="bg-white rounded-2xl shadow-md p-6 space-y-4">
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-orange-500 text-lg">🏠</span>
+            <span className="font-semibold">주소</span>
+            <span className="text-gray-700">{data.address} {data.addressDetail}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-orange-500 text-lg">🏢</span>
+            <span className="font-semibold">주거 형태</span>
+            <span className="text-gray-700">{data.housingType}, {data.roomSize}평</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-orange-500 text-lg">🧹</span>
+            <span className="font-semibold">서비스 종류</span>
+            <span className="text-gray-700">{serviceDetail.name}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-orange-500 text-lg">📅</span>
+            <span className="font-semibold">서비스 날짜</span>
+            <span className="text-gray-700">{data.reservationDate}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-orange-500 text-lg">⏰</span>
+            <span className="font-semibold">시간</span>
+            <span className="text-gray-700">{data.startTime} ~ {data.endTime}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-orange-500 text-lg">➕</span>
+            <span className="font-semibold">서비스 추가</span>
+            <span className="text-gray-700">{displayServiceAdd || '없음'}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-orange-500 text-lg">🐾</span>
+            <span className="font-semibold">반려동물</span>
+            <span className="text-gray-700">{data.pet === 'NONE' ? '없음' : data.pet}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-orange-500 text-lg">📝</span>
+            <span className="font-semibold">요청사항</span>
+            <span className="text-gray-700">{data.specialRequest || '없음'}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-orange-500 text-lg">ℹ️</span>
+            <span className="font-semibold">기타 정보</span>
+            <span className="text-gray-700">{data.housingInformation}</span>
+          </div>
+        </div>
       </div>
 
-      <div className="border p-4 rounded space-y-2">
-        <h3 className="font-semibold">결제 요약</h3>
-        <p>기본 서비스 ({serviceDetail.name}): {serviceDetail.price.toLocaleString()}원</p>
-        {data.serviceAdd?.includes('요리') && <p>요리 추가: 20,000원</p>}
-        {data.serviceAdd?.includes('청소도구') && <p>청소도구 준비: 10,000원</p>}
-        {additionalPrice > 0 && <p>추가 서비스 총액: {additionalPrice.toLocaleString()}원</p>}
-        <p className="font-bold">총 결제 금액: {expectedPrice.toLocaleString()}원</p>
+      {/* 결제 정보 카드 */}
+      <div className="bg-white rounded-2xl shadow-md p-6 space-y-4">
+        <h3 className="text-lg font-bold text-gray-800 mb-2">결제 요약</h3>
+        <div className="flex flex-col gap-2">
+          <div className="flex justify-between items-center">
+            <span className="text-gray-700">기본 서비스 ({serviceDetail.name})</span>
+            <span className="font-semibold">{serviceDetail.price.toLocaleString()}원</span>
+          </div>
+          {displayServiceAdd?.includes('요리') && (
+            <div className="flex justify-between items-center">
+              <span className="text-gray-700">요리 추가</span>
+              <span className="font-semibold">20,000원</span>
+            </div>
+          )}
+          {displayServiceAdd?.includes('다림질') && (
+            <div className="flex justify-between items-center">
+              <span className="text-gray-700">다림질 추가</span>
+              <span className="font-semibold">10,000원</span>
+            </div>
+          )}
+          {displayServiceAdd?.includes('청소도구') && (
+            <div className="flex justify-between items-center">
+              <span className="text-gray-700">청소도구 준비</span>
+              <span className="font-semibold">10,000원</span>
+            </div>
+          )}
+          {additionalPrice > 0 && (
+            <div className="flex justify-between items-center">
+              <span className="text-gray-500">추가 서비스 총액</span>
+              <span className="font-semibold">{additionalPrice.toLocaleString()}원</span>
+            </div>
+          )}
+        </div>
+        <div className="flex justify-between items-center mt-4 p-4 rounded-xl bg-orange-50">
+          <span className="text-lg font-bold text-orange-600">총 결제 금액</span>
+          <span className="text-2xl font-extrabold text-orange-600">{expectedPrice.toLocaleString()}원</span>
+        </div>
       </div>
 
-      <button onClick={handleSubmit} className="px-4 py-2 bg-orange-500 text-white rounded">
-        예약 완료
-      </button>
-
-      <div>
-        <button onClick={onBack} className="mt-2 px-4 py-2 bg-gray-300 rounded">이전</button>
+      {/* 하단 버튼 */}
+      <div className="fixed left-0 right-0 bottom-0 bg-white p-4 flex gap-4 shadow-t z-10">
+        <button
+          onClick={onBack}
+          className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-semibold"
+        >
+          이전
+        </button>
+        <button
+          onClick={handleSubmit}
+          className="flex-1 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 font-bold"
+        >
+          예약 완료
+        </button>
       </div>
     </div>
   );
