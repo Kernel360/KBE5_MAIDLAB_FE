@@ -31,9 +31,9 @@ const ConsumerReservationCreate: React.FC = () => {
   const handleCompleteReservation = () => {setStep(1); setFormData({})}
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h1>예약 생성</h1>
-      <p>📍현재 Step: {step}</p>
+    <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-md p-8 my-8">
+      <h1 className="text-2xl font-bold mb-2">예약 생성</h1>
+      <p className="mb-6 text-gray-500">📍현재 Step: {step}</p>
       {step === 1 && <ReservationStep1 onNext={handleNextFromStep1} />}
       {step === 2 && (
         <ReservationStep2
