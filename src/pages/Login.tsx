@@ -73,9 +73,13 @@ const Login: React.FC = () => {
         }
 
         const result = await login(cleanedData);
+
+        // 🔧 useAuth에서 모든 처리를 하므로 여기서는 단순히 성공/실패만 확인
         if (result.success) {
-          navigate(ROUTES.HOME);
+          console.log('✅ 로그인 성공');
+          // 페이지 이동과 토스트는 useAuth에서 처리
         }
+        // 에러도 useAuth에서 토스트로 처리하므로 여기서는 추가 처리 불필요
       },
     });
 
@@ -93,58 +97,59 @@ const Login: React.FC = () => {
     setValue('phoneNumber', formatted);
   };
 
-  // Google 소셜 로그인 처리
+  //  Google 소셜 로그인 처리 - 토큰 저장 제거
   const handleGoogleLogin = () => {
+    console.log('🚀 Google 로그인 시작:', selectedUserType);
+
     openGoogleLoginPopup(
       selectedUserType,
       async (code: string, userType: 'CONSUMER' | 'MANAGER') => {
         try {
+          console.log('📨 구글 코드 수신:', {
+            code: code.substring(0, 20) + '...',
+            userType,
+            codeLength: code.length,
+          });
+
           const socialLoginData: SocialLoginRequestDto = {
             userType,
             socialType: 'GOOGLE',
             code,
           };
 
+          console.log('🔄 socialLogin API 호출 준비:', socialLoginData);
           const result = await socialLogin(socialLoginData);
 
+          console.log('📋 socialLogin 결과:', result);
+
           if (result.success) {
+            // 🔧 useAuth에서 이미 모든 토큰 처리를 완료했으므로 페이지 이동만 처리
             if (result.newUser) {
-              // 🔧 신규 사용자 - 토큰 저장 확실히 하기
-              const tempToken =
-                result.accessToken || localStorage.getItem('tempSocialToken');
+              showToast('추가 정보를 입력해주세요.', 'info');
+              navigate(ROUTES.SOCIAL_SIGNUP, { replace: true });
+            } else if (!result.profileCompleted) {
+              showToast('프로필을 완성해주세요.', 'info');
 
-              if (tempToken) {
-                // 🔧 추가로 localStorage에 저장 (이중 보장)
-                localStorage.setItem('tempSocialToken', tempToken);
-                localStorage.setItem('tempUserType', userType);
+              const profileRoute =
+                userType === 'MANAGER'
+                  ? '/manager/profile/setup'
+                  : '/consumer/profile/setup';
 
-                showToast('추가 정보를 입력해주세요.', 'info');
-
-                // 🔧 약간의 지연을 두고 페이지 이동
-                setTimeout(() => {
-                  navigate(ROUTES.SOCIAL_SIGNUP, {
-                    state: {
-                      tempToken,
-                      userType,
-                    },
-                    replace: true,
-                  });
-                }, 300);
-              } else {
-                console.error('❌ 토큰을 가져올 수 없음');
-                showToast('인증 정보를 가져올 수 없습니다.', 'error');
-              }
+              navigate(profileRoute, { replace: true });
             } else {
               navigate(ROUTES.HOME);
             }
           } else {
+            console.error('❌ socialLogin 실패:', result.error);
             showToast(result.error || 'Google 로그인에 실패했습니다.', 'error');
           }
         } catch (error: any) {
+          console.error('❌ Google 로그인 오류:', error);
           showToast('Google 로그인 중 오류가 발생했습니다.', 'error');
         }
       },
       (error: string) => {
+        console.error('❌ Google OAuth 팝업 오류:', error);
         showToast(error, 'error');
       },
     );

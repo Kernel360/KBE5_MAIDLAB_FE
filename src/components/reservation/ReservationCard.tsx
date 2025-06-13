@@ -1,82 +1,67 @@
 import React from 'react';
+import { RESERVATION_STATUS_LABELS } from '@/constants/status';
+import { SERVICE_TYPE_LABELS, SERVICE_TYPES } from '@/constants/service';
+import { formatDateTime, formatPrice } from '@/utils';
 import type { ReservationResponseDto } from '@/apis/reservation';
-import { RESERVATION_STATUS, RESERVATION_STATUS_LABELS, RESERVATION_STATUS_COLORS } from '@/constants';
-import { BUTTON_TEXTS } from '@/constants';
-import { formatDateTime } from '@/utils';
 
 interface ReservationCardProps {
   reservation: ReservationResponseDto;
+  getStatusBadgeStyle: (status: string) => string;
   onClick?: () => void;
 }
 
-export const ReservationCard: React.FC<ReservationCardProps> = ({ reservation, onClick }) => {
-  const getStatusBadgeStyle = (status: keyof typeof RESERVATION_STATUS) => {
-    return {
-      backgroundColor: RESERVATION_STATUS_COLORS[status] || '#9E9E9E',
-      color: 'white',
-    };
-  };
-
-  const getStatusLabel = (status: keyof typeof RESERVATION_STATUS) => {
-    return RESERVATION_STATUS_LABELS[status] || '알 수 없음';
-  };
-
-  const renderActionButton = () => {
-    switch (reservation.status as keyof typeof RESERVATION_STATUS) {
-      case RESERVATION_STATUS.COMPLETED:
-        return (
-          <button className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded hover:bg-blue-600">
-            {BUTTON_TEXTS.WRITE_REVIEW}
-          </button>
-        );
-      case RESERVATION_STATUS.PENDING:
-      case RESERVATION_STATUS.APPROVED:
-        return (
-          <button className="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded hover:bg-red-600">
-            {BUTTON_TEXTS.CANCEL_RESERVATION}
-          </button>
-        );
-      default:
-        return (
-          <button className="px-4 py-2 text-sm font-medium text-white bg-gray-500 rounded hover:bg-gray-600">
-            {BUTTON_TEXTS.VIEW_MORE}
-          </button>
-        );
-    }
-  };
-
+export const ReservationCard: React.FC<ReservationCardProps> = ({
+  reservation,
+  getStatusBadgeStyle,
+  onClick,
+}) => {
   return (
     <div 
-      className="w-full p-4 mb-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer"
+      className="bg-white rounded-lg shadow p-6 cursor-pointer hover:shadow-md transition-shadow"
       onClick={onClick}
     >
-      <div className="flex justify-between items-start mb-2">
-        <div>
-          <h3 className="text-lg font-semibold">{reservation.serviceType}</h3>
-          <p className="text-sm text-gray-600">{reservation.detailServiceType}</p>
+      <div className="flex justify-between items-start mb-4">
+        <div className="flex items-center">
+          <span
+            className={`px-3 py-1 text-sm rounded-full ${getStatusBadgeStyle(reservation.status)}`}
+          >
+            {RESERVATION_STATUS_LABELS[reservation.status]}
+          </span>
+          <span className="ml-2 text-gray-500">
+            #{reservation.reservationId}
+          </span>
         </div>
-        <span 
-          className="px-3 py-1 text-sm font-medium rounded-full"
-          style={getStatusBadgeStyle(reservation.status as keyof typeof RESERVATION_STATUS)}
-        >
-          {getStatusLabel(reservation.status as keyof typeof RESERVATION_STATUS)}
-        </span>
-      </div>
-      
-      <div className="mt-4 space-y-2">
-        <p className="text-sm text-gray-600">
-          예약일시: {formatDateTime(reservation.reservationDate)}
-        </p>
-        <p className="text-sm text-gray-600">
-          서비스 시간: {reservation.startTime} - {reservation.endTime}
-        </p>
-        <p className="text-sm font-medium">
-          결제 금액: {Number(reservation.totalPrice).toLocaleString()}원
-        </p>
+        <div className="text-sm text-gray-500">
+          {formatDateTime(reservation.reservationDate)}
+        </div>
       </div>
 
-      <div className="mt-4 flex justify-end">
-        {renderActionButton()}
+      <div className="border-t border-b border-gray-100 py-4 mb-4">
+        <div className="flex justify-between items-center">
+          <div>
+            <h3 className="font-medium">
+              {SERVICE_TYPE_LABELS[reservation.serviceType as keyof typeof SERVICE_TYPES]} &gt;{' '}
+              {reservation.detailServiceType}
+            </h3>
+            <p className="text-sm text-gray-500 mt-1">
+              {reservation.startTime} ~ {reservation.endTime}
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="font-medium">
+              {formatPrice(reservation.totalPrice)}원
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <button
+          onClick={onClick}
+          className="px-4 py-2 text-sm text-orange-500 border border-orange-500 rounded-lg hover:bg-orange-50"
+        >
+          상세보기
+        </button>
       </div>
     </div>
   );

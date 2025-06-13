@@ -70,7 +70,6 @@ const SignUp: React.FC = () => {
 
         if (result.success) {
           // 성공 메시지 표시
-          showToast('회원가입이 완료되었습니다!', 'success');
 
           // 매니저는 프로필 설정 필수, 수요자는 선택사항임을 알림
           if (selectedUserType === 'MANAGER') {

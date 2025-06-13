@@ -193,6 +193,23 @@ export interface ReservationFormData {
   chooseManager: boolean; // 직접 선택 여부
 }
 
+export interface ReservationRequestDto {
+  serviceDetailTypeId: number;
+  address: string;
+  addressDetail: string;
+  managerUuId: string;
+  housingType: string;
+  roomSize: number;
+  housingInformation: string;
+  reservationDate: string;
+  startTime: string;
+  endTime: string;
+  serviceAdd: string;
+  pet: string;
+  specialRequest: string;
+  totalPrice: string;
+}
+
 /**
  * 예약 검색 필터
  */

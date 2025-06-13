@@ -5,7 +5,6 @@ export const ROUTES = {
   SIGNUP: '/signup',
   SOCIAL_SIGNUP: '/social-signup',
   GOOGLE_CALLBACK: '/google-callback',
-
   // 소비자 페이지
   CONSUMER: {
     MYPAGE: '/consumer/mypage',
@@ -15,6 +14,7 @@ export const ROUTES = {
     RESERVATIONS: '/consumer/reservations',
     RESERVATION_DETAIL: '/consumer/reservations/:id',
     RESERVATION_CREATE: '/consumer/reservations/create',
+    REVIEW_REGISTER: '/consumers/reservations/:id/review',
     LIKED_MANAGERS: '/consumer/likes',
     BLACKLIST: '/consumer/blacklist',
   },
@@ -27,6 +27,7 @@ export const ROUTES = {
     PROFILE_SETUP: '/manager/profile/setup',
     RESERVATIONS: '/manager/reservations',
     RESERVATION_DETAIL: '/manager/reservations/:id',
+    REVIEW_REGISTER: '/managers/reservations/:id/review',
     REVIEWS: '/manager/reviews',
     MATCHING: '/manager/matching',
     SETTLEMENTS: '/manager/settlements',

@@ -1,6 +1,6 @@
 import { apiClient, type ApiResponse, handleApiError } from '../index';
 
-export type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+import type { ReservationStatus } from '@/constants/status';
 
 // 예약 관련 타입 정의
 export interface ReservationRequestDto {
@@ -22,13 +22,14 @@ export interface ReservationRequestDto {
 
 export interface ReservationResponseDto {
   reservationId: number;
+  status: ReservationStatus;
   serviceType: string;
   detailServiceType: string;
   reservationDate: string;
   startTime: string;
   endTime: string;
-  totalPrice: string;
-  status: ReservationStatus;
+  isExistReview: boolean;
+  totalPrice: number;
 }
 
 export interface ReservationDetailResponseDto {
@@ -65,11 +66,11 @@ export interface CheckInOutRequestDto {
 export interface ReviewRegisterRequestDto {
   rating: number;
   comment: string;
-  likes: boolean;
+  likes?: boolean;
 }
 
 export interface WeeklySettlementResponseDto {
-  totalAmount: number;
+  totalAmount: string;
   settlements: SettlementResponseDto[];
 }
 
@@ -78,8 +79,8 @@ export interface SettlementResponseDto {
   serviceType: 'HOUSEKEEPING' | 'CARE';
   serviceDetailType: string;
   status: string;
-  platformFee: number;
-  amount: number;
+  platformFee: string;
+  amount: string;
 }
 
 // 예약 API 함수들

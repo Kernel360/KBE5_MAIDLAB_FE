@@ -7,6 +7,7 @@ import ConsumerProfile from '@/pages/consumer/Profile';
 import ConsumerReservations from '@/pages/reservation/ConsumerReservations';
 import ConsumerReservationCreate from '@/pages/reservation/ConsumerReservationCreate';
 import ConsumerReservationDetail from '@/pages/reservation/ConsumerReservationDetail';
+import ConsumerReviewRegister from '@/pages/consumer/ReviewRegister';
 import ManagerList from '@/pages/consumer/ManagerList';
 
 export const ConsumerRoutes = () => (
@@ -56,6 +57,14 @@ export const ConsumerRoutes = () => (
       element={
         <ProtectedRoute requiredUserType="CONSUMER">
           <ConsumerReservationDetail />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path={ROUTES.CONSUMER.REVIEW_REGISTER}
+      element={
+        <ProtectedRoute requiredUserType="CONSUMER">
+          <ConsumerReviewRegister />
         </ProtectedRoute>
       }
     />
