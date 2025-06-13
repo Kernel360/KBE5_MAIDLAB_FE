@@ -1,55 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/useToast';
-// import { consumerApi, type LikedManagerResponseDto, type BlackListedManagerResponseDto } from '@/apis/consumer';
-import type { LikedManagerResponseDto, BlackListedManagerResponseDto } from '@/apis/consumer';
-
-// 테스트용 목 데이터
-const mockFavoriteManagers = [
-  {
-    managerUuid: 'test-1',
-    name: '김도우미',
-    profileImage: undefined,
-    averageRate: 4.8,
-    reviewCount: 128,
-    region: ['서울', '경기도'],
-    introduceText: '안녕하세요, 5년 경력의 전문 도우미입니다.'
-  },
-  {
-    managerUuid: 'test-2',
-    name: '이도우미',
-    profileImage: undefined,
-    averageRate: 4.9,
-    reviewCount: 256,
-    region: ['강남'],
-    introduceText: '신속하고 정확한 서비스 제공을 약속드립니다.'
-  },
-];
-
-const mockBlacklist = [
-  {
-    managerUuid: 'test-3',
-    name: '박도우미',
-    profileImage: undefined,
-    averageRate: 3.2,
-    reviewCount: 45,
-    region: ['경상도'],
-    introduceText: '서비스 품질이 좋지 않았습니다.'
-  },
-];
+import { consumerApi, type LikedManagerResponseDto, type BlackListedManagerResponseDto } from '@/apis/consumer';
+import { ROUTES } from '@/constants/route';
 
 export default function ManagerList() {
   const location = useLocation();
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [favoriteManagers, setFavoriteManagers] = useState<LikedManagerResponseDto[]>(mockFavoriteManagers);
-  const [blacklistManagers, setBlacklistManagers] = useState<BlackListedManagerResponseDto[]>(mockBlacklist);
+  const [favoriteManagers, setFavoriteManagers] = useState<LikedManagerResponseDto[]>([]);
+  const [blacklistManagers, setBlacklistManagers] = useState<BlackListedManagerResponseDto[]>([]);
 
   // URL에 따라 데이터 로드
   useEffect(() => {
-    // API 호출 주석 처리
-    /*
     const loadData = async () => {
       setIsLoading(true);
       try {
@@ -67,13 +31,10 @@ export default function ManagerList() {
       }
     };
     loadData();
-    */
-  }, [location.pathname]);
+  }, [location.pathname, showToast]);
 
   // 찜한 매니저 삭제
   const handleRemoveFavorite = async (managerUuid: string) => {
-    // API 호출 주석 처리
-    /*
     try {
       await consumerApi.removeLikedManager(managerUuid);
       setFavoriteManagers(prev => prev.filter(m => m.managerUuid !== managerUuid));
@@ -81,15 +42,10 @@ export default function ManagerList() {
     } catch (error) {
       showToast('매니저 삭제에 실패했습니다.', 'error');
     }
-    */
-    setFavoriteManagers(prev => prev.filter(m => m.managerUuid !== managerUuid));
-    showToast('찜한 매니저에서 삭제되었습니다.', 'success');
   };
 
   // 블랙리스트 매니저 삭제
   const handleRemoveBlacklist = async (managerUuid: string) => {
-    // API 호출 주석 처리
-    /*
     try {
       await consumerApi.createPreference(managerUuid, { preference: true });
       setBlacklistManagers(prev => prev.filter(m => m.managerUuid !== managerUuid));
@@ -97,14 +53,15 @@ export default function ManagerList() {
     } catch (error) {
       showToast('매니저 삭제에 실패했습니다.', 'error');
     }
-    */
-    setBlacklistManagers(prev => prev.filter(m => m.managerUuid !== managerUuid));
-    showToast('블랙리스트에서 삭제되었습니다.', 'success');
   };
 
   // 탭 전환
   const handleTabChange = (tab: 'favorites' | 'blacklist') => {
-    navigate(tab === 'favorites' ? '/consumers/likes' : '/consumers/blacklist');
+    navigate(tab === 'favorites' ? ROUTES.CONSUMER.LIKED_MANAGERS : ROUTES.CONSUMER.BLACKLIST);
+  };
+
+  const handleBack = () => {
+    navigate(ROUTES.CONSUMER.MYPAGE);
   };
 
   if (isLoading) {
@@ -114,126 +71,180 @@ export default function ManagerList() {
   const isBlacklist = location.pathname.includes('blacklist');
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <div className="flex space-x-4 mb-6">
-        <button
-          className={`px-4 py-2 rounded-lg ${
-            !isBlacklist
-              ? 'bg-blue-500 text-white'
-              : 'bg-gray-200 text-gray-700'
-          }`}
-          onClick={() => handleTabChange('favorites')}
-        >
-          찜한 매니저
-        </button>
-        <button
-          className={`px-4 py-2 rounded-lg ${
-            isBlacklist
-              ? 'bg-blue-500 text-white'
-              : 'bg-gray-200 text-gray-700'
-          }`}
-          onClick={() => handleTabChange('blacklist')}
-        >
-          블랙리스트
-        </button>
+    <div className="min-h-screen bg-gray-50">
+      {/* 헤더 */}
+      <div className="fixed top-0 left-0 right-0 z-10 bg-white shadow">
+        <div className="flex items-center justify-between px-4 h-14">
+          <button 
+            onClick={handleBack}
+            className="p-2 -ml-2 hover:text-[#F97316] transition-colors"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          <h1 className="absolute left-1/2 transform -translate-x-1/2 text-lg font-semibold">
+            {isBlacklist ? '블랙리스트 도우미' : '찜한 도우미'}
+          </h1>
+          {/* 빈 div로 균형 맞추기 */}
+          <div className="w-10"></div>
+        </div>
       </div>
 
-      <div className="space-y-4">
-        {!isBlacklist ? (
-          favoriteManagers.length > 0 ? (
-            favoriteManagers.map((manager) => (
-              <div
-                key={manager.managerUuid}
-                className="flex items-center justify-between p-4 bg-white rounded-lg shadow"
-              >
-                <div className="flex items-center space-x-4">
-                  <img
-                    src={manager.profileImage || '/default-profile.png'}
-                    alt={manager.name}
-                    className="w-16 h-16 rounded-full object-cover"
-                  />
-                  <div>
-                    <h3 className="text-lg font-semibold">{manager.name}</h3>
-                    <p className="text-gray-600">
-                      평점: {manager.averageRate.toFixed(1)}
-                    </p>
-                    {manager.introduceText && (
-                      <p className="text-gray-500 mt-1">{manager.introduceText}</p>
-                    )}
-                    {manager.region && manager.region.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {manager.region.map((region) => (
-                          <span
-                            key={region}
-                            className="px-2 py-1 bg-gray-100 text-gray-600 text-sm rounded"
-                          >
-                            {region}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <button
-                  onClick={() => handleRemoveFavorite(manager.managerUuid)}
-                  className="px-4 py-2 text-red-500 hover:bg-red-50 rounded-lg"
-                >
-                  삭제
-                </button>
-              </div>
-            ))
-          ) : (
-            <div className="text-center py-8 text-gray-500">
-              찜한 매니저가 없습니다.
-            </div>
-          )
-        ) : blacklistManagers.length > 0 ? (
-          blacklistManagers.map((manager) => (
-            <div
-              key={manager.managerUuid}
-              className="flex items-center justify-between p-4 bg-white rounded-lg shadow"
+      {/* 컨텐츠 */}
+      <div className="pt-14 pb-4">
+        <div className="max-w-4xl mx-auto p-4">
+          <div className="flex w-full mb-6">
+            <button
+              className={`flex-1 py-2 rounded-l-lg transition-colors border-b-2 ${
+                !isBlacklist
+                  ? 'bg-white text-[#F97316] border-[#F97316]'
+                  : 'bg-white text-gray-600 border-transparent hover:text-[#F97316]'
+              }`}
+              onClick={() => handleTabChange('favorites')}
             >
-              <div className="flex items-center space-x-4">
-                <img
-                  src={manager.profileImage || '/default-profile.png'}
-                  alt={manager.name}
-                  className="w-16 h-16 rounded-full object-cover"
-                />
-                <div>
-                  <h3 className="text-lg font-semibold">{manager.name}</h3>
-                  <p className="text-gray-600">
-                    평점: {manager.averageRate.toFixed(1)}
-                  </p>
-                  {manager.introduceText && (
-                    <p className="text-gray-500 mt-1">{manager.introduceText}</p>
-                  )}
-                  {manager.region && manager.region.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {manager.region.map((region) => (
-                        <span
-                          key={region}
-                          className="px-2 py-1 bg-gray-100 text-gray-600 text-sm rounded"
-                        >
-                          {region}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-              <button
-                onClick={() => handleRemoveBlacklist(manager.managerUuid)}
-                className="px-4 py-2 text-red-500 hover:bg-red-50 rounded-lg"
-              >
-                삭제
-              </button>
-            </div>
-          ))
-        ) : (
-          <div className="text-center py-8 text-gray-500">
-            블랙리스트 매니저가 없습니다.
+              찜한 매니저
+            </button>
+            <button
+              className={`flex-1 py-2 rounded-r-lg transition-colors border-b-2 ${
+                isBlacklist
+                  ? 'bg-white text-[#F97316] border-[#F97316]'
+                  : 'bg-white text-gray-600 border-transparent hover:text-[#F97316]'
+              }`}
+              onClick={() => handleTabChange('blacklist')}
+            >
+              블랙리스트
+            </button>
           </div>
-        )}
+
+          <div className="space-y-4">
+            {!isBlacklist ? (
+              favoriteManagers.length > 0 ? (
+                favoriteManagers.map((manager) => (
+                  <div
+                    key={manager.managerUuid}
+                    className="flex items-center justify-between p-4 bg-white rounded-lg shadow"
+                  >
+                    <div className="flex items-center space-x-4">
+                      <div className="relative w-20 h-20">
+                        <div className="w-full h-full rounded-full bg-gray-100 relative">
+                          {manager.profileImage ? (
+                            <img
+                              src={manager.profileImage}
+                              alt=""
+                              className="w-full h-full rounded-full object-cover shadow-md"
+                            />
+                          ) : (
+                            <div className="absolute inset-0 flex items-center justify-center text-gray-500 text-sm">
+                              {manager.name}
+                            </div>
+                          )}
+                          <div className="absolute inset-0 rounded-full ring-1 ring-gray-100"></div>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-start">
+                        <h3 className="text-lg font-semibold text-left">{manager.name}</h3>
+                        <p className="text-gray-600 text-left">
+                          평점: {manager.averageRate.toFixed(1)}
+                        </p>
+                        {manager.introduceText && (
+                          <p className="text-gray-500 mt-1 text-left">
+                            {manager.introduceText.length > 15 
+                              ? `${manager.introduceText.slice(0, 15)}...` 
+                              : manager.introduceText}
+                          </p>
+                        )}
+                        {manager.region && manager.region.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {manager.region.map((region) => (
+                              <span
+                                key={region}
+                                className="px-2 py-1 bg-gray-100 text-gray-600 text-sm rounded"
+                              >
+                                {region}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleRemoveFavorite(manager.managerUuid)}
+                      className="px-4 py-2 text-red-500 hover:bg-red-50 rounded-lg"
+                    >
+                      삭제
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  찜한 매니저가 없습니다.
+                </div>
+              )
+            ) : blacklistManagers.length > 0 ? (
+              blacklistManagers.map((manager) => (
+                <div
+                  key={manager.managerUuid}
+                  className="flex items-center justify-between p-4 bg-white rounded-lg shadow"
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="relative w-20 h-20">
+                      <div className="w-full h-full rounded-full bg-gray-100 relative">
+                        {manager.profileImage ? (
+                          <img
+                            src={manager.profileImage}
+                            alt=""
+                            className="w-full h-full rounded-full object-cover shadow-md"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center text-gray-500 text-sm">
+                            {manager.name}
+                          </div>
+                        )}
+                        <div className="absolute inset-0 rounded-full ring-1 ring-gray-100"></div>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-start">
+                      <h3 className="text-lg font-semibold text-left">{manager.name}</h3>
+                      <p className="text-gray-600 text-left">
+                        평점: {manager.averageRate.toFixed(1)}
+                      </p>
+                      {manager.introduceText && (
+                        <p className="text-gray-500 mt-1 text-left">
+                          {manager.introduceText.length > 15 
+                            ? `${manager.introduceText.slice(0, 15)}...` 
+                            : manager.introduceText}
+                        </p>
+                      )}
+                      {manager.region && manager.region.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {manager.region.map((region) => (
+                            <span
+                              key={region}
+                              className="px-2 py-1 bg-gray-100 text-gray-600 text-sm rounded"
+                            >
+                              {region}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleRemoveBlacklist(manager.managerUuid)}
+                    className="px-4 py-2 text-red-500 hover:bg-red-50 rounded-lg"
+                  >
+                    삭제
+                  </button>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                블랙리스트 매니저가 없습니다.
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
