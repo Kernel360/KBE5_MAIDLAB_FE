@@ -15,6 +15,7 @@ import {
   CircularProgress,
   Chip,
   TextField,
+  Button,
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -22,6 +23,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import { useAdmin } from '@/hooks';
 import type { AdminSettlementResponseDto } from '@/apis/admin';
+import { useNavigate } from 'react-router-dom';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
@@ -48,6 +50,7 @@ const SettlementList = () => {
   const [loading, setLoading] = useState(true);
   const [totalElements, setTotalElements] = useState(0);
   const { reservationManagement } = useAdmin();
+  const navigate = useNavigate();
 
   const fetchSettlements = async () => {
     setLoading(true);
@@ -99,6 +102,10 @@ const SettlementList = () => {
     }
   };
 
+  const handleViewDetail = (settlementId: number) => {
+    navigate(`/admin/settlements/${settlementId}`);
+  };
+
   if (loading) {
     return (
       <StyledContainer>
@@ -142,6 +149,7 @@ const SettlementList = () => {
                 <TableCell>상태</TableCell>
                 <TableCell align="right">금액</TableCell>
                 <TableCell>생성일</TableCell>
+                <TableCell align="center">상세</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -159,11 +167,20 @@ const SettlementList = () => {
                   </TableCell>
                   <TableCell align="right">{formatPrice(settlement.amount)}</TableCell>
                   <TableCell>{settlement.createdAt}</TableCell>
+                  <TableCell align="center">
+                    <Button
+                      variant="contained"
+                      size="small"
+                      onClick={() => handleViewDetail(settlement.settlementId)}
+                    >
+                      상세보기
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
               {settlements.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} align="center">
+                  <TableCell colSpan={7} align="center">
                     정산 내역이 없습니다.
                   </TableCell>
                 </TableRow>

@@ -45,6 +45,7 @@ export const ROUTES = {
     RESERVATION_DETAIL: '/admin/reservations/:id',
     MATCHING: '/admin/matching',
     SETTLEMENTS: '/admin/settlements',
+    SETTLEMENT_DETAIL: '/admin/settlements/:settlementId',
     EVENTS: '/admin/events',
     EVENT_CREATE: '/admin/events/create',
     EVENT_EDIT: '/admin/events/:id/edit',

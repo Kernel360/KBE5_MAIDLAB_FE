@@ -181,6 +181,59 @@ export const useAdmin = () => {
       },
       [showToast],
     ),
+
+    // 정산 상세 조회
+    fetchSettlementDetail: useCallback(
+      async (settlementId: number) => {
+        try {
+          setLoading(true);
+          const response = await adminApi.getSettlementDetail(settlementId);
+          return response.data;
+        } catch (error: any) {
+          showToast(error.message || '정산 상세 정보 조회에 실패했습니다.', 'error');
+          return null;
+        } finally {
+          setLoading(false);
+        }
+      },
+      [showToast],
+    ),
+
+    // 정산 승인
+    approveSettlement: useCallback(
+      async (settlementId: number) => {
+        try {
+          setLoading(true);
+          await adminApi.approveSettlement(settlementId);
+          showToast('정산이 승인되었습니다.', 'success');
+          return true;
+        } catch (error: any) {
+          showToast(error.message || '정산 승인에 실패했습니다.', 'error');
+          return false;
+        } finally {
+          setLoading(false);
+        }
+      },
+      [showToast],
+    ),
+
+    // 정산 거부
+    rejectSettlement: useCallback(
+      async (settlementId: number) => {
+        try {
+          setLoading(true);
+          await adminApi.rejectSettlement(settlementId);
+          showToast('정산이 거부되었습니다.', 'success');
+          return true;
+        } catch (error: any) {
+          showToast(error.message || '정산 거부에 실패했습니다.', 'error');
+          return false;
+        } finally {
+          setLoading(false);
+        }
+      },
+      [showToast],
+    ),
   };
 
   // 매칭 관리

@@ -37,29 +37,45 @@ const MatchingChangeDialog = ({
   const [managers, setManagers] = useState<ManagerListResponseDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedManagerId, setSelectedManagerId] = useState<number | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // 매니저 목록 조회
   useEffect(() => {
+    let isMounted = true;
+
     const fetchManagers = async () => {
+      if (!open || isInitialized) return;
+      
       setLoading(true);
       try {
-        const response = await managerManagement.fetchManagers();
-        if (response?.content) {
+        const response = await managerManagement.fetchManagers({ 
+          page: 0,
+          size: 100
+        });
+        
+        if (isMounted && response?.content) {
           setManagers(response.content);
+          setIsInitialized(true);
         }
       } catch (error) {
         console.error('Error fetching managers:', error);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
-    if (open && managers.length === 0) {
-      fetchManagers();
-    }
+    fetchManagers();
 
+    return () => {
+      isMounted = false;
+    };
+  }, [open, managerManagement, isInitialized]);
+
+  // 다이얼로그가 닫힐 때만 상태 초기화
+  useEffect(() => {
     if (!open) {
-      setManagers([]);
       setSelectedManagerId(null);
     }
   }, [open]);
@@ -95,52 +111,54 @@ const MatchingChangeDialog = ({
           )}
 
           <Typography variant="subtitle1" gutterBottom>
-            매니저 목록
+            매니저 목록 {managers.length > 0 && `(${managers.length}명)`}
           </Typography>
           
-          {loading ? (
-            <Box display="flex" justifyContent="center" py={3}>
-              <CircularProgress />
-            </Box>
-          ) : (
-            <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-              {managers.map((manager) => (
-                <ListItem
-                  key={manager.id}
-                  alignItems="flex-start"
-                  sx={{
-                    cursor: 'pointer',
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                    },
-                  }}
-                  onClick={() => setSelectedManagerId(manager.id)}
-                >
-                  <ListItemAvatar>
-                    <Radio
-                      checked={selectedManagerId === manager.id}
-                      onChange={() => setSelectedManagerId(manager.id)}
+          <Box sx={{ maxHeight: 400, overflow: 'auto' }}>
+            {loading ? (
+              <Box display="flex" justifyContent="center" py={3}>
+                <CircularProgress />
+              </Box>
+            ) : (
+              <List>
+                {managers.map((manager) => (
+                  <ListItem
+                    key={manager.id}
+                    alignItems="flex-start"
+                    sx={{
+                      cursor: 'pointer',
+                      '&:hover': {
+                        bgcolor: 'action.hover',
+                      },
+                    }}
+                    onClick={() => setSelectedManagerId(manager.id)}
+                  >
+                    <ListItemAvatar>
+                      <Radio
+                        checked={selectedManagerId === manager.id}
+                        onChange={() => setSelectedManagerId(manager.id)}
+                      />
+                    </ListItemAvatar>
+                    <ListItemAvatar>
+                      <Avatar alt={manager.name} />
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={manager.name}
+                      secondary={
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          color="text.secondary"
+                        >
+                          ID: {manager.id}
+                        </Typography>
+                      }
                     />
-                  </ListItemAvatar>
-                  <ListItemAvatar>
-                    <Avatar alt={manager.name} />
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={manager.name}
-                    secondary={
-                      <Typography
-                        component="span"
-                        variant="body2"
-                        color="text.secondary"
-                      >
-                        ID: {manager.id}
-                      </Typography>
-                    }
-                  />
-                </ListItem>
-              ))}
-            </List>
-          )}
+                  </ListItem>
+                ))}
+              </List>
+            )}
+          </Box>
         </Box>
       </DialogContent>
       <DialogActions>

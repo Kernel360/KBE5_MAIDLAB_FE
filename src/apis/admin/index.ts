@@ -22,6 +22,7 @@ export interface AdminLoginRequestDto {
 export interface PageParams {
   page?: number;
   size?: number;
+  search?: string;
 }
 
 export interface ManagerListResponseDto {
@@ -142,11 +143,11 @@ export const adminApi = {
   getManagers: async (
     params: PageParams = {},
   ): Promise<PageManagerListResponseDto> => {
-    const { page = 0, size = 10 } = params;
+    const { page = 0, size = 10, search = '' } = params;
     try {
       const response = await apiClient.get<
         ApiResponse<PageManagerListResponseDto>
-      >(`/api/admin/manager?page=${page}&size=${size}`);
+      >(`/api/admin/manager?page=${page}&size=${size}${search ? `&search=${encodeURIComponent(search)}` : ''}`);
       return response.data.data;
     } catch (error) {
       throw new Error(handleApiError(error));
@@ -184,6 +185,21 @@ export const adminApi = {
         `/api/admin/manager/${managerId}/reject`,
       );
       return response.data.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // 매니저 상태별 조회
+  getManagersByStatus: async (
+    params: { page?: number; size?: number; status: string },
+  ): Promise<ApiResponse<PageManagerListResponseDto>> => {
+    const { page = 0, size = 10, status } = params;
+    try {
+      const response = await apiClient.get<ApiResponse<PageManagerListResponseDto>>(
+        `/api/admin/manager/status?page=${page}&size=${size}&status=${status}`,
+      );
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -409,6 +425,47 @@ export const adminApi = {
       const response = await apiClient.patch<ApiResponse<string>>(
         `/api/admin/board/answer/${answerId}`,
         data,
+      );
+      return response.data.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // 정산 상세 조회
+  getSettlementDetail: async (settlementId: number) => {
+    const response = await apiClient.get<{
+      data: {
+        settlementId: number;
+        serviceType: 'HOUSEKEEPING';
+        serviceDetailType: string;
+        status: 'PENDING' | 'APPROVED' | 'REJECTED';
+        platformFee: number;
+        amount: number;
+      };
+      message: string;
+      code: string;
+    }>(`/api/admin/reservations/settlement/${settlementId}`);
+    return response.data;
+  },
+
+  // 정산 승인
+  approveSettlement: async (settlementId: number): Promise<string> => {
+    try {
+      const response = await apiClient.patch<ApiResponse<string>>(
+        `/api/admin/reservations/settlement/${settlementId}/approve`
+      );
+      return response.data.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // 정산 거부
+  rejectSettlement: async (settlementId: number): Promise<string> => {
+    try {
+      const response = await apiClient.patch<ApiResponse<string>>(
+        `/api/admin/reservations/settlement/${settlementId}/reject`
       );
       return response.data.data;
     } catch (error) {
