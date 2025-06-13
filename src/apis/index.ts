@@ -3,8 +3,7 @@ import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
 import { tokenStorage } from '@/utils/storage';
 
 const BASE_URL =
-  // import.meta.env.VITE_API_BASE_URL || 'https://api-maidlab.duckdns.org';
-  'http://localhost:8080';
+  import.meta.env.VITE_API_BASE_URL || 'https://api-maidlab.duckdns.org';
 
 // API 에러 코드 매핑 (백엔드와 동일)
 const API_CODE_MESSAGES = {
