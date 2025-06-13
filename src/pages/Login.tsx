@@ -74,7 +74,6 @@ const Login: React.FC = () => {
 
         const result = await login(cleanedData);
         if (result.success) {
-          showToast('로그인되었습니다.', 'success');
           navigate(ROUTES.HOME);
         }
       },
@@ -110,21 +109,32 @@ const Login: React.FC = () => {
 
           if (result.success) {
             if (result.newUser) {
-              // 신규 사용자인 경우 추가 정보 입력 페이지로
+              // 🔧 신규 사용자 - 토큰 저장 확실히 하기
+              const tempToken =
+                result.accessToken || localStorage.getItem('tempSocialToken');
 
-              localStorage.setItem('tempSocialToken', result.accessToken || '');
-              localStorage.setItem('tempUserType', userType);
+              if (tempToken) {
+                // 🔧 추가로 localStorage에 저장 (이중 보장)
+                localStorage.setItem('tempSocialToken', tempToken);
+                localStorage.setItem('tempUserType', userType);
 
-              showToast('추가 정보를 입력해주세요.', 'info');
-              navigate(ROUTES.SOCIAL_SIGNUP, {
-                state: {
-                  tempToken: result.accessToken,
-                  userType,
-                },
-              });
+                showToast('추가 정보를 입력해주세요.', 'info');
+
+                // 🔧 약간의 지연을 두고 페이지 이동
+                setTimeout(() => {
+                  navigate(ROUTES.SOCIAL_SIGNUP, {
+                    state: {
+                      tempToken,
+                      userType,
+                    },
+                    replace: true,
+                  });
+                }, 300);
+              } else {
+                console.error('❌ 토큰을 가져올 수 없음');
+                showToast('인증 정보를 가져올 수 없습니다.', 'error');
+              }
             } else {
-              // 기존 사용자인 경우 홈으로
-              showToast('로그인되었습니다.', 'success');
               navigate(ROUTES.HOME);
             }
           } else {
