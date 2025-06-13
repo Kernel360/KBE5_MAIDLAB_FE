@@ -62,10 +62,7 @@ export const authApi = {
   // 일반 회원가입
   signUp: async (data: SignUpRequestDto): Promise<void> => {
     try {
-      const response = await apiClient.post<ApiResponse<void>>(
-        '/api/auth/sign-up',
-        data,
-      );
+      await apiClient.post<ApiResponse<void>>('/api/auth/sign-up', data);
     } catch (error: any) {
       const errorMessage = handleApiError(error);
 
@@ -104,9 +101,23 @@ export const authApi = {
   },
 
   // 소셜 회원가입
-  socialSignUp: async (data: SocialSignUpRequestDto): Promise<void> => {
+  socialSignUp: async (
+    data: SocialSignUpRequestDto,
+    tempToken: string,
+  ): Promise<void> => {
     try {
-      await apiClient.post<ApiResponse<void>>('/api/auth/social-sign-up', data);
+      await apiClient.post<ApiResponse<void>>(
+        '/api/auth/social-sign-up',
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${tempToken}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      return;
     } catch (error: any) {
       const errorMessage = handleApiError(error);
       throw new Error(errorMessage);

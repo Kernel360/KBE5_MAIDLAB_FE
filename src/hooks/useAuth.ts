@@ -169,8 +169,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         const response = await authApi.socialLogin(data);
 
         if (response.newUser) {
-          // 신규 사용자 - 추가 정보 입력 필요
+          localStorage.setItem('tempSocialToken', response.accessToken);
+          localStorage.setItem('tempUserType', data.userType);
+
           dispatch({ type: 'AUTH_LOGOUT' });
+
           return {
             success: true,
             newUser: true,
@@ -191,7 +194,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         return {
           success: true,
           newUser: false,
-          accessToken: response.accessToken,
         };
       } catch (error: any) {
         console.error('❌ useAuth socialLogin 에러:', error);
@@ -202,7 +204,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         return { success: false, error: errorMessage };
       }
     },
-    [showToast, navigate],
+    [showToast],
   );
 
   // 회원가입 함수
@@ -250,13 +252,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         dispatch({ type: 'AUTH_START' });
 
-        await authApi.socialSignUp(data);
+        // 임시 토큰을 localStorage에서 가져오기
+        const tempToken = localStorage.getItem('tempSocialToken');
+        const userType = localStorage.getItem('tempUserType') as UserType;
+
+        if (!tempToken) {
+          throw new Error('인증 정보가 없습니다.');
+        }
+
+        await authApi.socialSignUp(data, tempToken);
+
+        tokenStorage.setAccessToken(tempToken);
+        userStorage.setUserType(userType);
+
+        dispatch({
+          type: 'AUTH_SUCCESS',
+          payload: { userType: userType },
+        });
+
+        // 임시 토큰 정리
+        console.log('🧹 임시 토큰 정리');
+        localStorage.removeItem('tempSocialToken');
+        localStorage.removeItem('tempUserType');
 
         showToast(SUCCESS_MESSAGES.SIGNUP, 'success');
-        dispatch({ type: 'AUTH_LOGOUT' });
-
         return { success: true };
       } catch (error: any) {
+        console.error('❌ socialSignUp 에러:', {
+          message: error.message,
+          response: error.response,
+        });
+
         const errorMessage = error.message || ERROR_MESSAGES.UNKNOWN;
         dispatch({ type: 'AUTH_FAILURE', payload: errorMessage });
         showToast(errorMessage, 'error');
