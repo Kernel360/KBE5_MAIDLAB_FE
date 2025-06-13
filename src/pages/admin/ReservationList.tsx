@@ -31,10 +31,6 @@ const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
 }));
 
-const StyledSearchField = styled(TextField)(({ theme }) => ({
-  marginBottom: theme.spacing(3),
-}));
-
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -73,7 +69,6 @@ const ReservationList = () => {
   });
   const [reservations, setReservations] = useState<ReservationResponseDto[]>([]);
   const [matchings, setMatchings] = useState<MatchingResponseDto[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [openDialog, setOpenDialog] = useState(false);
@@ -101,7 +96,6 @@ const ReservationList = () => {
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
     setPage(0);
-    setSearchTerm('');
     handleCloseDialog();
   };
 
@@ -112,27 +106,6 @@ const ReservationList = () => {
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-  };
-
-  const getFilteredReservations = () => {
-    if (!searchTerm) return reservations;
-
-    const searchTermLower = searchTerm.toLowerCase();
-    return reservations.filter(
-      (reservation) =>
-        reservation.serviceType.toLowerCase().includes(searchTermLower) ||
-        reservation.detailServiceType.toLowerCase().includes(searchTermLower)
-    );
-  };
-
-  const getFilteredMatchings = () => {
-    if (!searchTerm) return matchings;
-
-    const searchTermLower = searchTerm.toLowerCase();
-    return matchings.filter(
-      (matching) =>
-        matching.matchingStatus.toLowerCase().includes(searchTermLower)
-    );
   };
 
   const formatDateTime = (date: string, time: string) => {
@@ -218,21 +191,6 @@ const ReservationList = () => {
       </Box>
 
       <TabPanel value={tabValue} index={0}>
-        <StyledSearchField
-          fullWidth
-          variant="outlined"
-          placeholder="서비스 유형으로 검색"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -246,7 +204,7 @@ const ReservationList = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {getFilteredReservations()
+              {reservations
                 .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
                 .map((reservation) => (
                   <TableRow key={reservation.reservationId}>
@@ -274,7 +232,7 @@ const ReservationList = () => {
 
         <TablePagination
           component="div"
-          count={getFilteredReservations().length}
+          count={reservations.length}
           page={page}
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
@@ -284,21 +242,6 @@ const ReservationList = () => {
       </TabPanel>
 
       <TabPanel value={tabValue} index={1}>
-        <StyledSearchField
-          fullWidth
-          variant="outlined"
-          placeholder="매칭 상태로 검색"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -310,7 +253,7 @@ const ReservationList = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {getFilteredMatchings()
+              {matchings
                 .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
                 .map((matching) => (
                   <TableRow key={matching.reservationId}>
@@ -340,7 +283,7 @@ const ReservationList = () => {
 
         <TablePagination
           component="div"
-          count={getFilteredMatchings().length}
+          count={matchings.length}
           page={page}
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}

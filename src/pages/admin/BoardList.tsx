@@ -68,7 +68,6 @@ interface BoardWithId extends ConsumerBoardResponseDto {
 type TabType = 'consultation' | 'refund';
 
 const BoardList = () => {
-  const [searchTerm, setSearchTerm] = useState('');
   const location = useLocation();
   const [currentTab, setCurrentTab] = useState<TabType>(() => {
     const savedTab = localStorage.getItem('adminBoardTab');
@@ -106,16 +105,6 @@ const BoardList = () => {
     fetchBoardsByTab(currentTab);
   }, [currentTab]);
 
-  // 게시글 목록 필터링
-  useEffect(() => {
-    if (!filteredBoards) return;
-
-    const filtered = filteredBoards.filter((board) => {
-      return board.title.toLowerCase().includes(searchTerm.toLowerCase());
-    });
-    setFilteredBoards(filtered);
-  }, [searchTerm]);
-
   // 게시글 상세 페이지로 이동
   const handleViewDetail = (boardId: number) => {
     localStorage.setItem('adminBoardTab', currentTab);
@@ -141,23 +130,6 @@ const BoardList = () => {
           <Tab label="환불 문의" value="refund" />
         </Tabs>
       </Box>
-
-      <SearchBox>
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder="게시글 검색..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-      </SearchBox>
 
       <TableContainer component={Paper}>
         <Table>

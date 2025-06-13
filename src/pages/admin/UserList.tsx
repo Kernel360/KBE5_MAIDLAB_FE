@@ -71,7 +71,6 @@ const UserList = () => {
     }
     return (location.state as { previousTab?: number })?.previousTab ?? 0;
   });
-  const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
@@ -128,7 +127,6 @@ const UserList = () => {
       const response = await adminApi.getConsumers({ 
         page, 
         size: rowsPerPage,
-        search: searchTerm
       });
       setConsumerData(response);
     } catch (error) {
@@ -147,7 +145,6 @@ const UserList = () => {
         response = await adminApi.getManagers({ 
           page, 
           size: rowsPerPage,
-          search: searchTerm
         });
         setManagerData(response);
       } else {
@@ -194,12 +191,7 @@ const UserList = () => {
     } else {
       fetchManagers();
     }
-  }, [tabValue, page, rowsPerPage, searchTerm, selectedStatus]);
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-    setPage(0);
-  };
+  }, [tabValue, page, rowsPerPage, selectedStatus]);
 
   const handleDetailView = (type: 'consumer' | 'manager', id: number) => {
     localStorage.setItem('adminUserTab', tabValue.toString());
@@ -291,23 +283,6 @@ const UserList = () => {
       </Box>
 
       <TabPanel value={tabValue} index={0}>
-        <SearchBox>
-          <TextField
-            fullWidth
-            variant="outlined"
-            placeholder="이름으로 검색"
-            value={searchTerm}
-            onChange={handleSearch}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </SearchBox>
-
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
