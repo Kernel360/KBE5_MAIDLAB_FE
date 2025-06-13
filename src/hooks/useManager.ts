@@ -19,8 +19,6 @@ export const useManager = () => {
       try {
         setLoading(true);
         await managerApi.createProfile(data);
-
-        showToast('프로필이 생성되었습니다.', 'success');
         return { success: true };
       } catch (error: any) {
         showToast(error.message || '프로필 생성에 실패했습니다.', 'error');
@@ -56,7 +54,6 @@ export const useManager = () => {
 
         // 프로필 새로고침
         await fetchProfile();
-        showToast('프로필이 수정되었습니다.', 'success');
 
         return { success: true };
       } catch (error: any) {
