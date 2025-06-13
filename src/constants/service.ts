@@ -107,7 +107,7 @@ export const SERVICE_DETAIL_TYPES: Record<string, ServiceDetailType> = {
   },
 } as const;
 
-₩// ===== 서비스 추가 옵션 =====
+// ===== 서비스 추가 옵션 =====
 export const SERVICE_OPTIONS = [
   { id: 'cooking', label: '요리', price: 10000, timeAdd: 60 },
   { id: 'ironing', label: '다림질', price: 10000, timeAdd: 60 },

@@ -3,25 +3,8 @@ import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
 import { tokenStorage } from '@/utils/storage';
 
 const BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'https://api-maidlab.duckdns.org';
-
-// API 에러 코드 매핑 (백엔드와 동일)
-const API_CODE_MESSAGES = {
-  SU: '성공',
-  VF: '입력값 검증에 실패했습니다.',
-  AF: '인증에 실패했습니다.',
-  LF: '로그인에 실패했습니다.',
-  DBE: '데이터베이스 오류가 발생했습니다.',
-  DT: '이미 가입되어있는 휴대폰번호입니다.',
-  DR: '중복된 예약입니다.',
-  WR: '올바르지 않은 주소입니다.',
-  NP: '권한이 없습니다.',
-  NR: '요청한 정보를 찾을 수 없습니다.',
-  AWC: '이미 진행중이거나 완료된 작업입니다.',
-  AC: '이미 처리된 상태입니다.',
-  AD: '삭제된 계정입니다.',
-  RF: '유효하지 않은 토큰입니다.',
-} as const;
+  // import.meta.env.VITE_API_BASE_URL || 'https://api-maidlab.duckdns.org';
+  'http://localhost:8080';
 
 // API 에러 코드 매핑 (백엔드와 동일)
 const API_CODE_MESSAGES = {
