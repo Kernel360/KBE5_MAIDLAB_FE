@@ -34,10 +34,12 @@ export interface ChangePwRequestDto {
 export interface LoginResponseDto {
   accessToken: string;
   expirationTime: number;
+  profileCompleted: boolean;
 }
 
 export interface SocialLoginResponseDto {
   newUser: boolean;
+  profileCompleted: boolean;
   accessToken: string;
   expirationTime: number;
 }

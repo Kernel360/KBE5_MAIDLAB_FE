@@ -70,9 +70,7 @@ const SocialSignUp: React.FC = () => {
         const result = await socialSignUp(formData);
 
         if (result.success) {
-          setTimeout(() => {
-            navigate(ROUTES.HOME, { replace: true });
-          }, 1500);
+          navigate(ROUTES.HOME, { replace: true });
         } else {
           showToast(result.error || '회원가입에 실패했습니다.', 'error');
         }

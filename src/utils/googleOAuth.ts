@@ -92,8 +92,7 @@ export const openGoogleLoginPopup = (
 
   let messageProcessed = false;
   let checkCount = 0;
-  const maxChecks = 120; // 60초 (500ms * 120)
-
+  const maxChecks = 360;
   // localStorage 메시지 감지 (COOP 우회)
   const checkMessage = () => {
     if (messageProcessed) return;
