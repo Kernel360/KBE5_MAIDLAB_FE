@@ -76,5 +76,13 @@ export const ConsumerRoutes = () => (
         </ProtectedRoute>
       }
     />
+    <Route
+      path={ROUTES.CONSUMER.BLACKLIST}
+      element={
+        <ProtectedRoute requiredUserType="CONSUMER">
+          <ManagerList />
+        </ProtectedRoute>
+      }
+    />
   </>
 );
