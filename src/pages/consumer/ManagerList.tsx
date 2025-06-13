@@ -126,18 +126,33 @@ export default function ManagerList() {
                     className="flex items-center justify-between p-4 bg-white rounded-lg shadow"
                   >
                     <div className="flex items-center space-x-4">
-                      <img
-                        src={manager.profileImage || '/default-profile.png'}
-                        alt={manager.name}
-                        className="w-16 h-16 rounded-full object-cover"
-                      />
-                      <div>
-                        <h3 className="text-lg font-semibold">{manager.name}</h3>
-                        <p className="text-gray-600">
+                      <div className="relative w-20 h-20">
+                        <div className="w-full h-full rounded-full bg-gray-100 relative">
+                          {manager.profileImage ? (
+                            <img
+                              src={manager.profileImage}
+                              alt=""
+                              className="w-full h-full rounded-full object-cover shadow-md"
+                            />
+                          ) : (
+                            <div className="absolute inset-0 flex items-center justify-center text-gray-500 text-sm">
+                              {manager.name}
+                            </div>
+                          )}
+                          <div className="absolute inset-0 rounded-full ring-1 ring-gray-100"></div>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-start">
+                        <h3 className="text-lg font-semibold text-left">{manager.name}</h3>
+                        <p className="text-gray-600 text-left">
                           평점: {manager.averageRate.toFixed(1)}
                         </p>
                         {manager.introduceText && (
-                          <p className="text-gray-500 mt-1">{manager.introduceText}</p>
+                          <p className="text-gray-500 mt-1 text-left">
+                            {manager.introduceText.length > 15 
+                              ? `${manager.introduceText.slice(0, 15)}...` 
+                              : manager.introduceText}
+                          </p>
                         )}
                         {manager.region && manager.region.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-1">
@@ -173,18 +188,33 @@ export default function ManagerList() {
                   className="flex items-center justify-between p-4 bg-white rounded-lg shadow"
                 >
                   <div className="flex items-center space-x-4">
-                    <img
-                      src={manager.profileImage || '/default-profile.png'}
-                      alt={manager.name}
-                      className="w-16 h-16 rounded-full object-cover"
-                    />
-                    <div>
-                      <h3 className="text-lg font-semibold">{manager.name}</h3>
-                      <p className="text-gray-600">
+                    <div className="relative w-20 h-20">
+                      <div className="w-full h-full rounded-full bg-gray-100 relative">
+                        {manager.profileImage ? (
+                          <img
+                            src={manager.profileImage}
+                            alt=""
+                            className="w-full h-full rounded-full object-cover shadow-md"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center text-gray-500 text-sm">
+                            {manager.name}
+                          </div>
+                        )}
+                        <div className="absolute inset-0 rounded-full ring-1 ring-gray-100"></div>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-start">
+                      <h3 className="text-lg font-semibold text-left">{manager.name}</h3>
+                      <p className="text-gray-600 text-left">
                         평점: {manager.averageRate.toFixed(1)}
                       </p>
                       {manager.introduceText && (
-                        <p className="text-gray-500 mt-1">{manager.introduceText}</p>
+                        <p className="text-gray-500 mt-1 text-left">
+                          {manager.introduceText.length > 15 
+                            ? `${manager.introduceText.slice(0, 15)}...` 
+                            : manager.introduceText}
+                        </p>
                       )}
                       {manager.region && manager.region.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-1">
