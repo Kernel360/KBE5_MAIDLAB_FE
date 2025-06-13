@@ -49,6 +49,12 @@ export const authApi = {
   // 일반 로그인
   login: async (data: LoginRequestDto): Promise<LoginResponseDto> => {
     try {
+      console.log('🔐 로그인 시도:', {
+        userType: data.userType,
+        phoneNumber:
+          data.phoneNumber.slice(0, 3) + '****' + data.phoneNumber.slice(-4),
+      });
+
       const response = await apiClient.post<ApiResponse<LoginResponseDto>>(
         '/api/auth/login',
         data,
@@ -82,6 +88,13 @@ export const authApi = {
     data: SocialLoginRequestDto,
   ): Promise<SocialLoginResponseDto> => {
     try {
+      console.log('🔗 소셜 로그인 시도:', {
+        userType: data.userType,
+        socialType: data.socialType,
+        codeLength: data.code?.length,
+        codePreview: data.code?.substring(0, 20) + '...',
+      });
+
       const response = await apiClient.post<
         ApiResponse<SocialLoginResponseDto>
       >('/api/auth/social-login', data);
@@ -129,6 +142,8 @@ export const authApi = {
   // 토큰 갱신
   refreshToken: async (): Promise<LoginResponseDto> => {
     try {
+      console.log('🔄 토큰 갱신 시도');
+
       const response =
         await apiClient.post<ApiResponse<LoginResponseDto>>(
           '/api/auth/refresh',
@@ -144,6 +159,8 @@ export const authApi = {
   // 로그아웃
   logout: async (): Promise<void> => {
     try {
+      console.log('👋 로그아웃 시도');
+
       await apiClient.post<ApiResponse<void>>('/api/auth/logout');
     } catch (error: any) {
       const errorMessage = handleApiError(error);
@@ -154,6 +171,8 @@ export const authApi = {
   // 비밀번호 변경
   changePassword: async (data: ChangePwRequestDto): Promise<void> => {
     try {
+      console.log('🔑 비밀번호 변경 시도');
+
       await apiClient.patch<ApiResponse<void>>(
         '/api/auth/change-password',
         data,
@@ -167,6 +186,8 @@ export const authApi = {
   // 회원 탈퇴
   withdraw: async (): Promise<void> => {
     try {
+      console.log('🗑️ 회원 탈퇴 시도');
+
       await apiClient.delete<ApiResponse<void>>('/api/auth/withdraw');
     } catch (error: any) {
       const errorMessage = handleApiError(error);

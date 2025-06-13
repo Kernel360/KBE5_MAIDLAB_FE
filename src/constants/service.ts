@@ -106,3 +106,21 @@ export const SERVICE_DETAIL_TYPES: Record<string, ServiceDetailType> = {
     price: 30000,
   },
 } as const;
+
+// ===== 서비스 추가 옵션 =====
+export const SERVICE_OPTIONS = [
+  { id: 'cooking', label: '요리', price: 10000, timeAdd: 60 },
+  { id: 'ironing', label: '다림질', price: 10000, timeAdd: 60 },
+  { id: 'cleaning_tools', label: '청소 도구 준비', price: 20000, timeAdd: 0 },
+] as const;
+
+export type ServiceOption = typeof SERVICE_OPTIONS[number];
+
+// ===== 평수 옵션 =====
+export const ROOM_SIZES = [
+  { id: 10, label: '10평 이하' },
+  { id: 20, label: '20평대' },
+  { id: 30, label: '30평대' },
+] as const;
+
+export type RoomSizeOption = typeof ROOM_SIZES[number];

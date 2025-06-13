@@ -24,9 +24,9 @@ import SearchIcon from '@mui/icons-material/Search';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useState, useEffect } from 'react';
 import { useAdmin } from '@/hooks';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ROUTES } from '@/constants';
-import type { ConsumerBoardResponseDto } from '@/apis/admin';
+import type { ConsumerBoardResponseDto } from '@/apis/board';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
@@ -68,8 +68,15 @@ interface BoardWithId extends ConsumerBoardResponseDto {
 type TabType = 'consultation' | 'refund';
 
 const BoardList = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [currentTab, setCurrentTab] = useState<TabType>('consultation');
+  const location = useLocation();
+  const [currentTab, setCurrentTab] = useState<TabType>(() => {
+    const savedTab = localStorage.getItem('adminBoardTab');
+    if (savedTab !== null) {
+      localStorage.removeItem('adminBoardTab');
+      return savedTab as TabType;
+    }
+    return (location.state as { previousTab?: TabType })?.previousTab ?? 'consultation';
+  });
   const [filteredBoards, setFilteredBoards] = useState<BoardWithId[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -98,18 +105,9 @@ const BoardList = () => {
     fetchBoardsByTab(currentTab);
   }, [currentTab]);
 
-  // 게시글 목록 필터링
-  useEffect(() => {
-    if (!filteredBoards) return;
-
-    const filtered = filteredBoards.filter((board) => {
-      return board.title.toLowerCase().includes(searchTerm.toLowerCase());
-    });
-    setFilteredBoards(filtered);
-  }, [searchTerm]);
-
   // 게시글 상세 페이지로 이동
   const handleViewDetail = (boardId: number) => {
+    localStorage.setItem('adminBoardTab', currentTab);
     navigate(`${ROUTES.ADMIN.BOARD_DETAIL.replace(':id', boardId.toString())}`);
   };
 
@@ -132,23 +130,6 @@ const BoardList = () => {
           <Tab label="환불 문의" value="refund" />
         </Tabs>
       </Box>
-
-      <SearchBox>
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder="게시글 검색..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-      </SearchBox>
 
       <TableContainer component={Paper}>
         <Table>

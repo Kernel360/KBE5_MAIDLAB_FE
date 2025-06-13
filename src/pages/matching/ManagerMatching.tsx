@@ -1,210 +1,157 @@
 import { useState, useEffect } from 'react';
-// import { useNavigate } from 'react-router-dom';
 import { useMatching } from '@/hooks/useMatching';
 import { useReservation } from '@/hooks/useReservation';
-// import { ROUTES } from '@/constants';
 import type { RequestMatchingListResponseDto } from '@/apis/matching';
-import { 
-  Button, 
-  Card, 
-  Typography, 
-  Box, 
-  Stack, 
-  Divider,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  IconButton
-} from '@mui/material';
+import { IoArrowBack } from 'react-icons/io5';
 import { formatDateTimeWithLocale, formatPrice } from '@/utils/format';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
-import CloseIcon from '@mui/icons-material/Close';
+import { useNavigate } from 'react-router-dom';
 
-interface ResultModalProps {
-  open: boolean;
-  onClose: () => void;
-  isAccepted: boolean;
-}
-
-const ResultModal = ({ open, onClose, isAccepted }: ResultModalProps) => (
-  <Dialog
-    open={open}
-    onClose={onClose}
-    maxWidth="xs"
-    fullWidth
-    PaperProps={{
-      sx: {
-        borderRadius: 2,
-        p: 1
-      }
-    }}
-  >
-    <DialogTitle sx={{ m: 0, p: 2, textAlign: 'center' }}>
-      <IconButton
-        aria-label="close"
-        onClick={onClose}
-        sx={{
-          position: 'absolute',
-          right: 8,
-          top: 8,
-          color: (theme) => theme.palette.grey[500],
-        }}
-      >
-        <CloseIcon />
-      </IconButton>
-    </DialogTitle>
-    <DialogContent sx={{ textAlign: 'center', py: 3 }}>
-      {isAccepted ? (
-        <>
-          <CheckCircleIcon sx={{ fontSize: 60, color: 'success.main', mb: 2 }} />
-          <Typography variant="h6">예약이 승인되었습니다</Typography>
-        </>
-      ) : (
-        <>
-          <CancelIcon sx={{ fontSize: 60, color: 'error.main', mb: 2 }} />
-          <Typography variant="h6">예약이 거절되었습니다</Typography>
-        </>
-      )}
-    </DialogContent>
-    <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
-      <Button variant="contained" onClick={onClose} sx={{ minWidth: 100 }}>
-        확인
-      </Button>
-    </DialogActions>
-  </Dialog>
-);
-
-export const ManagerMatching = () => {
-//   const navigate = useNavigate();
+const ManagerMatching = () => {
+  const navigate = useNavigate();
   const { fetchMatchings } = useMatching();
   const { respondToReservation } = useReservation();
   const [matchings, setMatchings] = useState<RequestMatchingListResponseDto[]>([]);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [isAccepted, setIsAccepted] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadMatchings();
   }, []);
 
   const loadMatchings = async () => {
-    const result = await fetchMatchings();
-    setMatchings(result);
+    setLoading(true);
+    try {
+      const result = await fetchMatchings();
+      console.log("result:", result);
+      setMatchings(result);
+    } catch (error) {
+      console.error('매칭 목록 조회 실패:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleAccept = async (reservationId: number) => {
-    const result = await respondToReservation(reservationId, { status: true });
-    if (result.success) {
-      setIsAccepted(true);
-      setModalOpen(true);
-      setMatchings(prev => prev.filter(matching => matching.reservationId !== reservationId));
+    try {
+      const result = await respondToReservation(reservationId, { status: true });
+      if (result.success) {
+        await loadMatchings(); // 목록 새로고침
+      }
+    } catch (error) {
+      console.error('예약 수락 실패:', error);
     }
   };
 
   const handleReject = async (reservationId: number) => {
-    const result = await respondToReservation(reservationId, { status: false });
-    if (result.success) {
-      setIsAccepted(false);
-      setModalOpen(true);
-      setMatchings(prev => prev.filter(matching => matching.reservationId !== reservationId));
+    try {
+      const result = await respondToReservation(reservationId, { status: false });
+      if (result.success) {
+        await loadMatchings(); // 목록 새로고침
+      }
+    } catch (error) {
+      console.error('예약 거절 실패:', error);
     }
   };
 
-  const handleCloseModal = () => {
-    setModalOpen(false);
-  };
-
   const formatTimeRange = (startTime: string, endTime: string) => {
-    const start = new Date(startTime);
-    const end = new Date(endTime);
-    return `${start.getHours()}:${String(start.getMinutes()).padStart(2, '0')} ~ ${end.getHours()}:${String(end.getMinutes()).padStart(2, '0')}`;
+    // HH:mm 형식의 시간을 파싱
+    const [startHours, startMinutes] = startTime.split(':').map(Number);
+    const [endHours, endMinutes] = endTime.split(':').map(Number);
+    
+    // 시간 차이 계산 (분 단위)
+    const startTotalMinutes = startHours * 60 + startMinutes;
+    const endTotalMinutes = endHours * 60 + endMinutes;
+    const diffMinutes = endTotalMinutes - startTotalMinutes;
+    
+    // 시간으로 변환
+    const hours = Math.round(diffMinutes / 60);
+
+    return {
+      range: `${startTime} ~ ${endTime}`,
+      hours
+    };
   };
 
   return (
-    <Box sx={{ p: 3, maxWidth: 800, mx: 'auto' }}>
-      <Typography variant="h5" sx={{ mb: 3 }}>예약 요청</Typography>
-      <Stack spacing={2}>
-        {matchings.map((matching) => (
-          <Card key={matching.reservationId} sx={{ p: 2 }}>
-            <Stack spacing={2}>
-              <Box>
-                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
-                  {matching.detailServiceType} &gt; {matching.serviceType}
-                </Typography>
-                <Stack spacing={0.5}>
-                  <Typography color="text.secondary">
-                    예약일: {formatDateTimeWithLocale(matching.reservationDate)}
-                  </Typography>
-                  <Typography color="text.secondary">
-                    서비스 시간: {formatTimeRange(matching.startTime, matching.endTime)}
-                    {' '}
-                    ({Math.round((new Date(matching.endTime).getTime() - new Date(matching.startTime).getTime()) / (1000 * 60 * 60))}시간)
-                  </Typography>
-                </Stack>
-              </Box>
-              
-              <Box>
-                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>서비스 정보</Typography>
-                <Stack spacing={0.5}>
-                  <Typography>
-                    위치: {matching.address} {matching.addressDetail}
-                  </Typography>
-                  <Typography>방 크기: {matching.roomSize}평</Typography>
-                  <Typography>
-                    반려동물: {matching.pet === 'true' ? '있음' : '없음'}
-                  </Typography>
-                </Stack>
-              </Box>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-3xl mx-auto p-4">
+        {/* 헤더 */}
+        <div className="flex items-center mb-6">
+          <button 
+            onClick={() => navigate(-1)}
+            className="p-2 -ml-2"
+          >
+            <IoArrowBack className="w-6 h-6" />
+          </button>
+          <h1 className="text-2xl font-bold ml-2">예약 요청</h1>
+        </div>
 
-              <Box>
-                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>가격 정보</Typography>
-                <Typography sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                  총 금액: {formatPrice(matching.totalPrice)}원
-                </Typography>
-              </Box>
+        {/* 매칭 목록 */}
+        <div className="space-y-4">
+          {loading ? (
+            <div className="bg-white rounded-lg shadow p-6 text-center">
+              <p className="text-gray-500">로딩 중...</p>
+            </div>
+          ) : matchings.length > 0 ? (
+            matchings.map((matching) => {
+              const { range, hours } = formatTimeRange(matching.startTime, matching.endTime);
+              return (
+                <div key={matching.reservationId} className="bg-white rounded-lg shadow p-6">
+                  {/* 서비스 정보 */}
+                  <div className="mb-6">
+                    <h3 className="text-lg font-medium mb-2">
+                      {matching.detailServiceType} &gt; {matching.serviceType}
+                    </h3>
+                    <div className="text-gray-600 space-y-1">
+                      <p>예약일: {formatDateTimeWithLocale(matching.reservationDate)}</p>
+                      <p>서비스 시간: {range} ({hours}시간)</p>
+                    </div>
+                  </div>
 
-              <Divider />
+                  {/* 위치 및 상세 정보 */}
+                  <div className="mb-6">
+                    <h3 className="text-sm font-medium text-gray-500 mb-2">서비스 정보</h3>
+                    <div className="space-y-2">
+                      <p>위치: {matching.address} {matching.addressDetail}</p>
+                      <p>방 크기: {matching.roomSize}평</p>
+                      <p>반려동물: {matching.pet === 'true' ? '있음' : '없음'}</p>
+                    </div>
+                  </div>
 
-              <Stack direction="row" spacing={2} justifyContent="flex-end">
-                <Button
-                  variant="contained"
-                  color="success"
-                  onClick={() => handleAccept(matching.reservationId)}
-                  startIcon={<CheckCircleIcon />}
-                >
-                  수락
-                </Button>
-                <Button
-                  variant="contained"
-                  color="error"
-                  onClick={() => handleReject(matching.reservationId)}
-                  startIcon={<CancelIcon />}
-                >
-                  거절
-                </Button>
-                {/* <Button
-                  variant="outlined"
-                  onClick={() => navigate(`${ROUTES.MANAGER.RESERVATION_DETAIL}`)}
-                >
-                  상세보기
-                </Button> */}
-              </Stack>
-            </Stack>
-          </Card>
-        ))}
-        {matchings.length === 0 && (
-          <Typography textAlign="center" color="text.secondary">
-            새로운 예약 요청이 없습니다.
-          </Typography>
-        )}
-      </Stack>
+                  {/* 가격 정보 */}
+                  <div className="mb-6">
+                    <h3 className="text-sm font-medium text-gray-500 mb-2">가격 정보</h3>
+                    <p className="text-lg font-bold text-orange-500">
+                      {formatPrice(matching.totalPrice)}원
+                    </p>
+                  </div>
 
-      <ResultModal
-        open={modalOpen}
-        onClose={handleCloseModal}
-        isAccepted={isAccepted}
-      />
-    </Box>
+                  {/* 버튼 */}
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => handleAccept(matching.reservationId)}
+                      className="flex-1 px-4 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+                    >
+                      수락
+                    </button>
+                    <button
+                      onClick={() => handleReject(matching.reservationId)}
+                      className="flex-1 px-4 py-3 border border-red-500 text-red-500 rounded-lg hover:bg-red-50"
+                    >
+                      거절
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="bg-white rounded-lg shadow p-6 text-center">
+              <p className="text-gray-500">새로운 예약 요청이 없습니다.</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
-}; 
+};
+
+export default ManagerMatching; 

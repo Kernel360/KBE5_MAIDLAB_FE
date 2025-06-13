@@ -6,7 +6,12 @@ import type {
 } from '../reservation';
 import type { MatchingResponseDto } from '../matching';
 import type { ConsumerProfileResponseDto } from '../consumer';
-import type { AnswerRequestDto } from '../board';
+import type { 
+  ImageDto,
+  ConsumerBoardResponseDto,
+  ConsumerBoardDetailResponseDto,
+  AnswerRequestDto 
+} from '../board';
 
 // 관리자 관련 타입 정의
 export interface AdminLoginRequestDto {
@@ -17,6 +22,7 @@ export interface AdminLoginRequestDto {
 export interface PageParams {
   page?: number;
   size?: number;
+  search?: string;
 }
 
 export interface ManagerListResponseDto {
@@ -90,31 +96,9 @@ export interface AdminWeeklySettlementResponseDto {
   };
 }
 
-export interface ConsumerBoardResponseDto {
-  boardId: number;
-  title: string;
-  content: string;
-  answered: boolean;
-  boardType: 'REFUND' | 'MANAGER' | 'SERVICE' | 'ETC';
-}
-
-export interface ImageDto {
-  imagePath: string;
-  name: string;
-}
-
+// 게시판 관련 타입 정의
 export interface AnswerResponseDto {
   content: string;
-}
-
-export interface ConsumerBoardDetailResponseDto {
-  boardId: number,
-  title: string;
-  content: string;
-  answered: boolean;
-  boardType: 'REFUND' | 'MANAGER' | 'SERVICE' | 'ETC';
-  images: ImageDto[];
-  answer?: AnswerResponseDto;
 }
 
 // 관리자 API 함수들
@@ -159,11 +143,11 @@ export const adminApi = {
   getManagers: async (
     params: PageParams = {},
   ): Promise<PageManagerListResponseDto> => {
-    const { page = 0, size = 10 } = params;
+    const { page = 0, size = 10, search = '' } = params;
     try {
       const response = await apiClient.get<
         ApiResponse<PageManagerListResponseDto>
-      >(`/api/admin/manager?page=${page}&size=${size}`);
+      >(`/api/admin/manager?page=${page}&size=${size}${search ? `&search=${encodeURIComponent(search)}` : ''}`);
       return response.data.data;
     } catch (error) {
       throw new Error(handleApiError(error));
@@ -201,6 +185,21 @@ export const adminApi = {
         `/api/admin/manager/${managerId}/reject`,
       );
       return response.data.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // 매니저 상태별 조회
+  getManagersByStatus: async (
+    params: { page?: number; size?: number; status: string },
+  ): Promise<ApiResponse<PageManagerListResponseDto>> => {
+    const { page = 0, size = 10, status } = params;
+    try {
+      const response = await apiClient.get<ApiResponse<PageManagerListResponseDto>>(
+        `/api/admin/manager/status?page=${page}&size=${size}&status=${status}`,
+      );
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -349,29 +348,26 @@ export const adminApi = {
 
   // ===== 게시판 관리 =====
   // 전체 게시판 조회
-  // getBoards: async (
-  //   params: PageParams = {},
-  // ): Promise<ConsumerBoardResponseDto[]> => {
-  //   const { page = 0, size = 10 } = params;
-  //   try {
-  //     const response = await apiClient.get<
-  //       ApiResponse<ConsumerBoardResponseDto[]>
-  //     >(`/api/admin/board?page=${page}&size=${size}`);
-  //     return response.data.data;
-  //   } catch (error) {
-  //     throw new Error(handleApiError(error));
-  //   }
-  // },
-
-  // 상담 게시판 조회
-  getConsultationBoards: async (
+  getBoards: async (
     params: PageParams = {},
   ): Promise<ConsumerBoardResponseDto[]> => {
     const { page = 0, size = 10 } = params;
     try {
       const response = await apiClient.get<
         ApiResponse<ConsumerBoardResponseDto[]>
-      >(`/api/admin/board/consultation?page=${page}&size=${size}`);
+      >(`/api/admin/board?page=${page}&size=${size}`);
+      return response.data.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // 상담 게시판 조회
+  getConsultationBoards: async (): Promise<ConsumerBoardResponseDto[]> => {
+    try {
+      const response = await apiClient.get<ApiResponse<ConsumerBoardResponseDto[]>>(
+        '/api/admin/board/consultation',
+      );
       return response.data.data;
     } catch (error) {
       throw new Error(handleApiError(error));
@@ -379,14 +375,11 @@ export const adminApi = {
   },
 
   // 환불 게시판 조회
-  getRefundBoards: async (
-    params: PageParams = {},
-  ): Promise<ConsumerBoardResponseDto[]> => {
-    const { page = 0, size = 10 } = params;
+  getRefundBoards: async (): Promise<ConsumerBoardResponseDto[]> => {
     try {
-      const response = await apiClient.get<
-        ApiResponse<ConsumerBoardResponseDto[]>
-      >(`/api/admin/board/refund?page=${page}&size=${size}`);
+      const response = await apiClient.get<ApiResponse<ConsumerBoardResponseDto[]>>(
+        '/api/admin/board/refund',
+      );
       return response.data.data;
     } catch (error) {
       throw new Error(handleApiError(error));
@@ -432,6 +425,47 @@ export const adminApi = {
       const response = await apiClient.patch<ApiResponse<string>>(
         `/api/admin/board/answer/${answerId}`,
         data,
+      );
+      return response.data.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // 정산 상세 조회
+  getSettlementDetail: async (settlementId: number) => {
+    const response = await apiClient.get<{
+      data: {
+        settlementId: number;
+        serviceType: 'HOUSEKEEPING';
+        serviceDetailType: string;
+        status: 'PENDING' | 'APPROVED' | 'REJECTED';
+        platformFee: number;
+        amount: number;
+      };
+      message: string;
+      code: string;
+    }>(`/api/admin/reservations/settlement/${settlementId}`);
+    return response.data;
+  },
+
+  // 정산 승인
+  approveSettlement: async (settlementId: number): Promise<string> => {
+    try {
+      const response = await apiClient.patch<ApiResponse<string>>(
+        `/api/admin/reservations/settlement/${settlementId}/approve`
+      );
+      return response.data.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // 정산 거부
+  rejectSettlement: async (settlementId: number): Promise<string> => {
+    try {
+      const response = await apiClient.patch<ApiResponse<string>>(
+        `/api/admin/reservations/settlement/${settlementId}/reject`
       );
       return response.data.data;
     } catch (error) {

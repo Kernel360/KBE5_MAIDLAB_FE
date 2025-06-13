@@ -9,13 +9,84 @@ import {
 } from '@/utils';
 import { VALIDATION_MESSAGES } from '@/constants';
 
-export type ValidatorKey = 'phone' | 'email' | 'password' | 'name' | 'required';
+export type ValidatorKey =
+  | 'phone'
+  | 'email'
+  | 'password'
+  | 'name'
+  | 'required'
+  | 'birth';
 
 export type ValidatorFunction = (value: any) => string | null;
 
 export type ValidationRule = ValidatorKey | ValidatorFunction;
 
 export const useValidation = () => {
+  // 생년월일 검증 함수
+  const validateBirth = useCallback((birthStr: string): string | null => {
+    // 1. 필수 값 체크
+    if (!validateRequired(birthStr)) {
+      return VALIDATION_MESSAGES.BIRTH.REQUIRED;
+    }
+
+    // 2. 포맷 검사 (YYYY-MM-DD)
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(birthStr)) {
+      return VALIDATION_MESSAGES.BIRTH.INVALID_FORMAT;
+    }
+
+    const [yearStr, monthStr, dayStr] = birthStr.split('-');
+    const year = parseInt(yearStr);
+    const month = parseInt(monthStr);
+    const day = parseInt(dayStr);
+
+    // 3. 기본 범위 검사
+    if (year < 1900 || year > new Date().getFullYear()) {
+      return VALIDATION_MESSAGES.BIRTH.INVALID_YEAR;
+    }
+
+    if (month < 1 || month > 12) {
+      return VALIDATION_MESSAGES.BIRTH.INVALID_MONTH;
+    }
+
+    if (day < 1 || day > 31) {
+      return VALIDATION_MESSAGES.BIRTH.INVALID_DAY;
+    }
+
+    // 4. 실제 날짜 존재 여부 검사
+    const date = new Date(year, month - 1, day);
+    if (
+      date.getFullYear() !== year ||
+      date.getMonth() !== month - 1 ||
+      date.getDate() !== day
+    ) {
+      return VALIDATION_MESSAGES.BIRTH.INVALID_DATE;
+    }
+
+    // 5. 미래 날짜 검사
+    if (date > new Date()) {
+      return VALIDATION_MESSAGES.BIRTH.FUTURE_DATE;
+    }
+
+    // 6. 나이 제한 검사 (14세 이상, 100세 이하)
+    const today = new Date();
+    const age = today.getFullYear() - year;
+    const monthDiff = today.getMonth() - (month - 1);
+    const dayDiff = today.getDate() - day;
+
+    const actualAge =
+      monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? age - 1 : age;
+
+    if (actualAge < 14) {
+      return VALIDATION_MESSAGES.BIRTH.TOO_YOUNG;
+    }
+
+    if (actualAge > 100) {
+      return VALIDATION_MESSAGES.BIRTH.TOO_OLD;
+    }
+
+    return null;
+  }, []);
+
   // 필드별 유효성 검사 함수들
   const validators = {
     phone: useCallback((value: string): string | null => {
@@ -42,6 +113,8 @@ export const useValidation = () => {
       if (!validateName(value)) return VALIDATION_MESSAGES.NAME.INVALID;
       return null;
     }, []),
+
+    birth: validateBirth,
 
     required: useCallback((value: any): string | null => {
       return validateRequired(value) ? null : VALIDATION_MESSAGES.REQUIRED;
@@ -131,6 +204,7 @@ export const useValidation = () => {
     validateForm,
     validateReservationTimes,
     validatePasswordConfirm,
+    validateBirth, // 생년월일 검증 직접 접근용
     // 직접 접근용 (reservationTime은 별도 함수 사용)
     reservationTimeValidator,
   };

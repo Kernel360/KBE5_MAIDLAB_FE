@@ -271,6 +271,7 @@ export interface ManagerProfileFormData {
  * 매니저 프로필 에러
  */
 export interface ManagerProfileErrors {
+  profileImage?: string;
   serviceTypes?: string;
   regions?: string;
   availableTimes?: string;

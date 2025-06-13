@@ -99,21 +99,31 @@ const Login: React.FC = () => {
 
   //  Google 소셜 로그인 처리 - 토큰 저장 제거
   const handleGoogleLogin = () => {
+    console.log('🚀 Google 로그인 시작:', selectedUserType);
+
     openGoogleLoginPopup(
       selectedUserType,
       async (code: string, userType: 'CONSUMER' | 'MANAGER') => {
         try {
+          console.log('📨 구글 코드 수신:', {
+            code: code.substring(0, 20) + '...',
+            userType,
+            codeLength: code.length,
+          });
+
           const socialLoginData: SocialLoginRequestDto = {
             userType,
             socialType: 'GOOGLE',
             code,
           };
 
+          console.log('🔄 socialLogin API 호출 준비:', socialLoginData);
           const result = await socialLogin(socialLoginData);
+
+          console.log('📋 socialLogin 결과:', result);
 
           if (result.success) {
             // 🔧 useAuth에서 이미 모든 토큰 처리를 완료했으므로 페이지 이동만 처리
-
             if (result.newUser) {
               showToast('추가 정보를 입력해주세요.', 'info');
               navigate(ROUTES.SOCIAL_SIGNUP, { replace: true });
@@ -130,6 +140,7 @@ const Login: React.FC = () => {
               navigate(ROUTES.HOME);
             }
           } else {
+            console.error('❌ socialLogin 실패:', result.error);
             showToast(result.error || 'Google 로그인에 실패했습니다.', 'error');
           }
         } catch (error: any) {

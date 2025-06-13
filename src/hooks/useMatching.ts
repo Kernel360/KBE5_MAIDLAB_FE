@@ -5,14 +5,14 @@ import { useToast } from './useToast';
 import type {
   MatchingRequestDto,
   AvailableManagerResponseDto,
-  MatchingResponseDto,
+  RequestMatchingListResponseDto,
 } from '@/apis/matching';
 
 export const useMatching = () => {
   const [availableManagers, setAvailableManagers] = useState<
     AvailableManagerResponseDto[]
   >([]);
-  const [matchings, setMatchings] = useState<MatchingResponseDto[]>([]);
+  const [matchings, setMatchings] = useState<RequestMatchingListResponseDto[]>([]);
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
 

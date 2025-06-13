@@ -178,8 +178,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     async (data: SocialLoginRequestDto) => {
       try {
         dispatch({ type: 'AUTH_START' });
+        console.log('🔄 useAuth socialLogin 시작:', data);
 
         const response = await authApi.socialLogin(data);
+
+        console.log('📨 socialLogin API 응답:', response);
+        console.log('🔍 응답 분석:', {
+          newUser: response.newUser,
+          accessToken: response.accessToken ? 'Present' : 'Missing',
+          expirationTime: response.expirationTime,
+        });
 
         if (response.newUser) {
           localStorage.setItem('tempSocialToken', response.accessToken);

@@ -16,7 +16,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAdmin } from '@/hooks';
 import { ROUTES } from '@/constants';
-import type { ConsumerBoardDetailResponseDto } from '@/apis/admin';
+import type { ConsumerBoardDetailResponseDto } from '@/apis/board';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
