@@ -62,6 +62,8 @@ export const openGoogleLoginPopup = (
   onSuccess: (code: string, userType: 'CONSUMER' | 'MANAGER') => void,
   onError: (error: string) => void,
 ): void => {
+  console.log('🔑 구글 로그인 팝업 시작:', userType);
+
   const authUrl = generateGoogleOAuthUrl(userType);
   const sessionId = `oauth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
@@ -170,6 +172,8 @@ export const openGoogleLoginPopup = (
  * 구글 로그인 콜백 처리 (GoogleCallback 페이지에서 사용)
  */
 export const handleGoogleOAuthCallback = () => {
+  console.log('📞 OAuth 콜백 처리 시작');
+
   const { code, error, state } = extractOAuthParams();
   const userType = extractUserTypeFromState(state);
 
@@ -191,6 +195,7 @@ export const handleGoogleOAuthCallback = () => {
       error: '사용자 타입 정보가 없습니다.',
     };
   } else {
+    console.log('✅ OAuth 성공');
     message = {
       type: 'GOOGLE_AUTH_SUCCESS',
       code,

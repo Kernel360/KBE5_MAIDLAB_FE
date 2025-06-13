@@ -165,8 +165,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     async (data: SocialLoginRequestDto) => {
       try {
         dispatch({ type: 'AUTH_START' });
+        console.log('🔄 useAuth socialLogin 시작:', data);
 
         const response = await authApi.socialLogin(data);
+
+        console.log('📨 socialLogin API 응답:', response);
+        console.log('🔍 응답 분석:', {
+          newUser: response.newUser,
+          accessToken: response.accessToken ? 'Present' : 'Missing',
+          expirationTime: response.expirationTime,
+        });
 
         if (response.newUser) {
           localStorage.setItem('tempSocialToken', response.accessToken);
@@ -182,6 +190,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }
 
         // 기존 사용자 - 로그인 완료
+        console.log('👤 기존 사용자 감지 - 로그인 진행');
         tokenStorage.setAccessToken(response.accessToken);
         userStorage.setUserType(data.userType);
 

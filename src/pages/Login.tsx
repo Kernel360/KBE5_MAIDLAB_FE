@@ -95,19 +95,35 @@ const Login: React.FC = () => {
 
   // Google 소셜 로그인 처리
   const handleGoogleLogin = () => {
+    console.log('🚀 Google 로그인 시작:', selectedUserType);
+
     openGoogleLoginPopup(
       selectedUserType,
       async (code: string, userType: 'CONSUMER' | 'MANAGER') => {
         try {
+          console.log('📨 구글 코드 수신:', {
+            code: code.substring(0, 20) + '...',
+            userType,
+            codeLength: code.length,
+          });
+
           const socialLoginData: SocialLoginRequestDto = {
             userType,
             socialType: 'GOOGLE',
             code,
           };
 
+          console.log('🔄 socialLogin API 호출 준비:', socialLoginData);
           const result = await socialLogin(socialLoginData);
 
+          console.log('📋 socialLogin 결과:', result);
+
           if (result.success) {
+            console.log('✅ socialLogin 성공 - 분기 처리:', {
+              newUser: result.newUser,
+              hasAccessToken: !!result.accessToken,
+            });
+
             if (result.newUser) {
               // 🔧 신규 사용자 - 토큰 저장 확실히 하기
               const tempToken =
@@ -138,6 +154,7 @@ const Login: React.FC = () => {
               navigate(ROUTES.HOME);
             }
           } else {
+            console.error('❌ socialLogin 실패:', result.error);
             showToast(result.error || 'Google 로그인에 실패했습니다.', 'error');
           }
         } catch (error: any) {
@@ -145,6 +162,7 @@ const Login: React.FC = () => {
         }
       },
       (error: string) => {
+        console.error('❌ Google popup error:', error);
         showToast(error, 'error');
       },
     );
