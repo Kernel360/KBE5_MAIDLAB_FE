@@ -2,6 +2,7 @@ import { Route } from 'react-router-dom';
 import { ROUTES } from '@/constants';
 import { ProtectedRoute } from '@/components/common';
 import ManagerProfileSetup from '@/pages/ManagerProfileSetup';
+import ManagerMyPage from '@/pages/manager/ManagerMyPage';
 import ManagerReservations from '@/pages/reservation/ManagerReservations';
 import ManagerReservationDetail from '@/pages/reservation/ManagerReservationDetail';
 import ManagerReviewRegister from '@/pages/manager/ReviewRegister';
@@ -14,6 +15,14 @@ export const ManagerRoutes = () => (
       element={
         <ProtectedRoute requiredUserType="MANAGER">
           <ManagerProfileSetup />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path={ROUTES.MANAGER.MYPAGE}
+      element={
+        <ProtectedRoute requiredUserType="MANAGER">
+          <ManagerMyPage />
         </ProtectedRoute>
       }
     />
