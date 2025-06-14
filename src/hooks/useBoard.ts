@@ -1,8 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { boardApi } from '@/apis/board';
 import { useToast } from './useToast';
-import type { ConsumerBoardRequestDto } from '@/apis/board';
-import type { ConsumerBoardResponseDto, ConsumerBoardDetailResponseDto } from '@/apis/admin';
+import type { 
+  BoardRequestDto,
+  ConsumerBoardResponseDto,
+  ConsumerBoardDetailResponseDto 
+} from '@/apis/board';
 
 export const useBoard = () => {
   const [boards, setBoards] = useState<ConsumerBoardResponseDto[]>([]);
@@ -47,7 +50,7 @@ export const useBoard = () => {
 
   // 게시글 작성
   const createBoard = useCallback(
-    async (data: ConsumerBoardRequestDto) => {
+    async (data: BoardRequestDto) => {
       try {
         setLoading(true);
         const result = await boardApi.createBoard(data);
@@ -59,6 +62,28 @@ export const useBoard = () => {
         return { success: true, data: result };
       } catch (error: any) {
         showToast(error.message || '게시글 등록에 실패했습니다.', 'error');
+        return { success: false, error: error.message };
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchBoards, showToast],
+  );
+
+  // 게시글 수정
+  const updateBoard = useCallback(
+    async (boardId: number, data: BoardRequestDto) => {
+      try {
+        setLoading(true);
+        const result = await boardApi.updateBoard(boardId, data);
+
+        // 목록 새로고침
+        await fetchBoards();
+        showToast('게시글이 수정되었습니다.', 'success');
+
+        return { success: true, data: result };
+      } catch (error: any) {
+        showToast(error.message || '게시글 수정에 실패했습니다.', 'error');
         return { success: false, error: error.message };
       } finally {
         setLoading(false);
@@ -95,6 +120,7 @@ export const useBoard = () => {
     fetchBoards,
     fetchBoardDetail,
     createBoard,
+    updateBoard,
     answerBoard,
   };
 };

@@ -33,7 +33,9 @@ export default function BoardItem({ board, index }: BoardItemProps) {
           {board.answered ? '답변완료' : '답변대기'}
         </span>
       </div>
-      <h2 className="text-lg font-semibold mb-2">{board.title}</h2>
+      <h2 className="text-lg font-semibold mb-2">
+        {board.title.length > 20 ? `${board.title.slice(0, 20)}...` : board.title}
+      </h2>
       <p className="text-gray-600 line-clamp-2">{board.content}</p>
     </div>
   );

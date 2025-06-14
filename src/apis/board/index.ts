@@ -21,7 +21,7 @@ export interface ConsumerBoardDetailResponseDto extends ConsumerBoardResponseDto
   };
 }
 
-export interface ConsumerBoardRequestDto {
+export interface BoardRequestDto {
   boardType: 'REFUND' | 'MANAGER' | 'SERVICE' | 'ETC';
   title: string;
   content: string;
@@ -71,7 +71,7 @@ export const boardApi = {
   },
 
   // 게시판 생성
-  createBoard: async (data: ConsumerBoardRequestDto): Promise<string> => {
+  createBoard: async (data: BoardRequestDto): Promise<string> => {
     try {
       const response = await apiClient.post<ApiResponse<string>>(
         '/api/board',
