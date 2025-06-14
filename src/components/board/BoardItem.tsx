@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/constants/route';
 import { BOARD_TYPE_LABELS, BOARD_TYPE_ICONS } from '@/constants/board';
-import type { ConsumerBoardResponseDto } from '@/apis/board';
+import type { BoardResponseDto } from '@/apis/board';
 
 interface BoardItemProps {
-  board: ConsumerBoardResponseDto;
+  board: BoardResponseDto;
   index: number;
 }
 
@@ -33,10 +33,10 @@ export default function BoardItem({ board, index }: BoardItemProps) {
           {board.answered ? '답변완료' : '답변대기'}
         </span>
       </div>
-      <h2 className="text-lg font-semibold mb-2">
+      <h2 className="text-lg font-semibold mb-2 text-left">
         {board.title.length > 20 ? `${board.title.slice(0, 20)}...` : board.title}
       </h2>
-      <p className="text-gray-600 line-clamp-2">{board.content}</p>
+      <p className="text-gray-600 line-clamp-2 text-left">{board.content}</p>
     </div>
   );
 } 

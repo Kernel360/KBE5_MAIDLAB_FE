@@ -92,6 +92,26 @@ export const useBoard = () => {
     [fetchBoards, showToast],
   );
 
+  // 게시글 삭제
+  const deleteBoard = useCallback(
+    async (boardId: number) => {
+      try {
+        setLoading(true);
+        await boardApi.deleteBoard(boardId);
+
+        // 목록 새로고침
+        await fetchBoards();
+        return { success: true };
+      } catch (error: any) {
+        showToast(error.message || '게시글 삭제에 실패했습니다.', 'error');
+        return { success: false, error: error.message };
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchBoards, showToast],
+  );
+
   // 답변 등록
   const answerBoard = useCallback(
     async (boardId: number, answer: string) => {
@@ -121,6 +141,7 @@ export const useBoard = () => {
     fetchBoardDetail,
     createBoard,
     updateBoard,
+    deleteBoard,
     answerBoard,
   };
 };

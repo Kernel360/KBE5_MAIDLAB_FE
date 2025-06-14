@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { useToast } from '@/hooks/useToast';
-import type { ImageDto } from '@/apis/admin';
+import type { ImageDto } from '@/apis/board';
 
 interface ImageUploaderProps {
   images: File[];
@@ -85,51 +85,56 @@ export default function ImageUploader({
         이미지 첨부 (선택사항, 최대 {maxImages}개)
       </label>
       <div className="space-y-4">
-        {/* 기존 이미지 미리보기 */}
-        {existingImages.length > 0 && (
-          <div className="grid grid-cols-3 gap-4">
-            {existingImages.map((image, index) => (
-              <div key={index} className="relative group">
-                <img
-                  src={image.imagePath}
-                  alt={image.name}
-                  className="w-full h-32 object-cover rounded-lg"
-                />
-                {onExistingImagesChange && (
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveExistingImage(index)}
-                    className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    ×
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* 새로 업로드한 이미지 미리보기 */}
-        {previewUrls.length > 0 && (
-          <div className="grid grid-cols-3 gap-4">
-            {previewUrls.map((url, index) => (
-              <div key={index} className="relative group">
-                <img
-                  src={url}
-                  alt={`미리보기 ${index + 1}`}
-                  className="w-full h-32 object-cover rounded-lg"
-                />
+        {/* 이미지 미리보기 그리드 */}
+        <div className="grid grid-cols-3 gap-4">
+          {/* 기존 이미지 미리보기 */}
+          {existingImages.map((image, index) => (
+            <div key={`existing-${index}`} className="relative group">
+              <img
+                src={image.imagePath}
+                alt={image.name}
+                className="w-full h-32 object-cover rounded-lg"
+              />
+              {onExistingImagesChange && (
                 <button
                   type="button"
-                  onClick={() => handleRemoveImage(index)}
+                  onClick={() => handleRemoveExistingImage(index)}
                   className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                 >
                   ×
                 </button>
-              </div>
-            ))}
-          </div>
-        )}
+              )}
+            </div>
+          ))}
+
+          {/* 새로 업로드한 이미지 미리보기 */}
+          {previewUrls.map((url, index) => (
+            <div key={`new-${index}`} className="relative group">
+              <img
+                src={url}
+                alt={`미리보기 ${index + 1}`}
+                className="w-full h-32 object-cover rounded-lg"
+              />
+              <button
+                type="button"
+                onClick={() => handleRemoveImage(index)}
+                className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+
+          {/* 빈 이미지 슬롯 */}
+          {Array.from({ length: maxImages - (existingImages.length + previewUrls.length) }).map((_, index) => (
+            <div
+              key={`empty-${index}`}
+              className="w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400"
+            >
+              이미지 추가 가능
+            </div>
+          ))}
+        </div>
 
         {/* 이미지 업로드 버튼 */}
         {images.length + existingImages.length < maxImages && (
@@ -145,7 +150,7 @@ export default function ImageUploader({
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-blue-500 hover:text-blue-500 transition-colors"
+              className="w-full p-4 border-2 border-dashed border-blue-500 rounded-lg text-blue-500"
             >
               이미지 선택하기
             </button>

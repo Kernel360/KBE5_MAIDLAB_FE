@@ -6,7 +6,7 @@ export interface ImageDto {
   name: string;
 }
 
-export interface ConsumerBoardResponseDto {
+export interface BoardResponseDto {
   boardId: number;
   title: string;
   content: string;
@@ -14,7 +14,7 @@ export interface ConsumerBoardResponseDto {
   boardType: 'REFUND' | 'MANAGER' | 'SERVICE' | 'ETC';
 }
 
-export interface ConsumerBoardDetailResponseDto extends ConsumerBoardResponseDto {
+export interface BoardDetailResponseDto extends BoardResponseDto {
   images: ImageDto[];
   answer?: {
     content: string;
@@ -44,10 +44,10 @@ export interface BoardUpdateRequestDto {
 // 게시판 API 함수들
 export const boardApi = {
   // 게시판 목록 조회
-  getBoardList: async (): Promise<ConsumerBoardResponseDto[]> => {
+  getBoardList: async (): Promise<BoardResponseDto[]> => {
     try {
       const response =
-        await apiClient.get<ApiResponse<ConsumerBoardResponseDto[]>>(
+        await apiClient.get<ApiResponse<BoardResponseDto[]>>(
           '/api/board',
         );
       return response.data.data;
@@ -59,10 +59,10 @@ export const boardApi = {
   // 게시판 상세 조회
   getBoard: async (
     boardId: number,
-  ): Promise<ConsumerBoardDetailResponseDto> => {
+  ): Promise<BoardDetailResponseDto> => {
     try {
       const response = await apiClient.get<
-        ApiResponse<ConsumerBoardDetailResponseDto>
+        ApiResponse<BoardDetailResponseDto>
       >(`/api/board/${boardId}`);
       return response.data.data;
     } catch (error) {
@@ -106,6 +106,15 @@ export const boardApi = {
         data,
       );
       return response.data.data;
+    } catch (error) {
+      throw new Error(handleApiError(error));
+    }
+  },
+
+  // 게시글 삭제
+  deleteBoard: async (boardId: number): Promise<void> => {
+    try {
+      await apiClient.delete<ApiResponse<void>>(`/api/board/${boardId}`);
     } catch (error) {
       throw new Error(handleApiError(error));
     }

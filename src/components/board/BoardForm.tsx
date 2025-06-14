@@ -145,13 +145,15 @@ export default function BoardForm({ mode, boardId, initialData, onSuccess }: Boa
       />
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <BoardTypeSelector
-          selectedType={boardType}
-          onTypeChange={setBoardType}
-        />
+        <div className="text-left">
+          <BoardTypeSelector
+            selectedType={boardType}
+            onTypeChange={setBoardType}
+          />
+        </div>
 
-        <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="text-left">
+          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2 text-left">
             제목 <span className="text-gray-500 text-xs">(최대 30자)</span>
           </label>
           <input
@@ -164,7 +166,7 @@ export default function BoardForm({ mode, boardId, initialData, onSuccess }: Boa
               }
             }}
             maxLength={30}
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-left"
             placeholder="제목을 입력해주세요 (최대 30자)"
           />
           <div className="mt-1 text-right text-sm text-gray-500">
@@ -172,8 +174,8 @@ export default function BoardForm({ mode, boardId, initialData, onSuccess }: Boa
           </div>
         </div>
 
-        <div>
-          <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="text-left">
+          <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2 text-left">
             내용 <span className="text-gray-500 text-xs">(최대 2000자)</span>
           </label>
           <textarea
@@ -186,7 +188,7 @@ export default function BoardForm({ mode, boardId, initialData, onSuccess }: Boa
             }}
             maxLength={2000}
             rows={6}
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-left"
             placeholder="문의 내용을 입력해주세요 (최대 2000자)"
           />
           <div className="mt-1 text-right text-sm text-gray-500">
@@ -194,14 +196,16 @@ export default function BoardForm({ mode, boardId, initialData, onSuccess }: Boa
           </div>
         </div>
 
-        <ImageUploader
-          images={images}
-          previewUrls={previewUrls}
-          onImagesChange={setImages}
-          onPreviewUrlsChange={setPreviewUrls}
-          existingImages={existingImages}
-          onExistingImagesChange={setExistingImages}
-        />
+        <div className="text-left">
+          <ImageUploader
+            images={images}
+            previewUrls={previewUrls}
+            onImagesChange={setImages}
+            onPreviewUrlsChange={setPreviewUrls}
+            existingImages={existingImages}
+            onExistingImagesChange={setExistingImages}
+          />
+        </div>
 
         <div className="flex justify-end space-x-4">
           <button

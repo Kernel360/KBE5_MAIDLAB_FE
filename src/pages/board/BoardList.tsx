@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/useToast';
 import { boardApi } from '@/apis/board';
 import { ROUTES } from '@/constants/route';
-import type { ConsumerBoardResponseDto } from '@/apis/board';
+import type { BoardResponseDto } from '@/apis/board';
 import BoardHeader from '@/components/board/BoardHeader';
 import BoardItem from '@/components/board/BoardItem';
 
@@ -11,7 +11,7 @@ export default function BoardList() {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
-  const [boards, setBoards] = useState<ConsumerBoardResponseDto[]>([]);
+  const [boards, setBoards] = useState<BoardResponseDto[]>([]);
 
   useEffect(() => {
     const loadBoards = async () => {
@@ -48,7 +48,7 @@ export default function BoardList() {
 
       {boards.length > 0 ? (
         <div className="space-y-4">
-          {boards.map((board: ConsumerBoardResponseDto) => (
+          {boards.map((board: BoardResponseDto) => (
             <BoardItem 
               key={board.boardId} 
               board={board} 
