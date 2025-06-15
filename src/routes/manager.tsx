@@ -6,6 +6,7 @@ import ManagerReservations from '@/pages/reservation/ManagerReservations';
 import ManagerReservationDetail from '@/pages/reservation/ManagerReservationDetail';
 import ManagerReviewRegister from '@/pages/manager/ReviewRegister';
 import ManagerMatching from '@/pages/matching/ManagerMatching';
+import ManagerSettlements from '@/pages/manager/ManagerSettlements';
 
 export const ManagerRoutes = () => (
   <>
@@ -46,6 +47,14 @@ export const ManagerRoutes = () => (
       element={
         <ProtectedRoute requiredUserType="MANAGER">
           <ManagerMatching />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path={ROUTES.MANAGER.SETTLEMENTS}
+      element={
+        <ProtectedRoute requiredUserType="MANAGER">
+          <ManagerSettlements />
         </ProtectedRoute>
       }
     />
