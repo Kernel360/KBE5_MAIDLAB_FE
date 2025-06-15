@@ -107,6 +107,7 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
   };
 
   const handleSubmit = async () => {
+    let managerUuId = form.managerUuId;
     if (!form.chooseManager) {
       try {
         const startDateTime = `${form.reservationDate}T${form.startTime}`;
@@ -119,17 +120,30 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
         };
         const managers = await fetchAvailableManagers(request);
         if (Array.isArray(managers) && managers.length > 0) {
-          setForm(prev => ({ ...prev, managerUuId: managers[0].uuid }));
+          managerUuId = managers[0].uuid;
+        } else {
+          alert('해당 시간에 가능한 매니저가 없습니다.');
+          return;
         }
       } catch (error) {
         alert('매니저 자동 배정 중 오류가 발생했습니다.');
         return;
       }
     }
-    
+
+    // petType 상태를 기반으로 string으로 변환
+    let petArr: string[] = [];
+    if (form.pet === 'DOG') petArr.push('DOG');
+    if (form.pet === 'CAT') petArr.push('CAT');
+    if (form.pet === 'ETC') petArr.push(form.pet);
+    let petString: string = petArr.length > 0 ? petArr.join(',') : 'NONE';
+
     const formData: ReservationFormData = {
       ...form,
       serviceAdd: selectedServices.join(','),
+      specialRequest: '',
+      managerUuId,
+      pet: petString as any, // Step3에서 string으로 받도록 any 처리
     };
     onSubmit(formData);
   };
@@ -211,7 +225,8 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
   const [petType, setPetType] = useState<{ dog: boolean; cat: boolean; etc: string }>({ dog: false, cat: false, etc: '' });
   const handlePetSave = () => {
     let pet: 'NONE' | 'DOG' | 'CAT' | 'ETC' = 'NONE';
-    if (petType.dog) pet = 'DOG';
+    if (petType.dog && petType.cat) pet = 'ETC';
+    else if (petType.dog) pet = 'DOG';
     else if (petType.cat) pet = 'CAT';
     else if (petType.etc) pet = 'ETC';
     setForm(prev => ({ ...prev, pet }));
@@ -307,7 +322,7 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
             type="date"
             className="p-3 border border-gray-300 rounded-lg"
             value={form.reservationDate}
-            min={format(new Date(), 'yyyy-MM-dd')}
+            min={format(addDays(new Date(), 1), 'yyyy-MM-dd')}
             onChange={(e) => setForm(prev => ({ ...prev, reservationDate: e.target.value }))}
           />
           <select
