@@ -42,7 +42,7 @@ export default function BoardList() {
   return (
     <div className="max-w-4xl mx-auto p-4">
       <BoardHeader 
-        title="문의 게시판" 
+        title="상담 게시판" 
         onBackClick={() => navigate(ROUTES.HOME)}
       />
 
