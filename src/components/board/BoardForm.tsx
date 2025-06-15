@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/useToast';
+import { useBoard } from '@/hooks/useBoard';
 import { ROUTES } from '@/constants/route';
 import { BOARD_TYPES } from '@/constants/board';
 import type { BoardType } from '@/constants/board';
-import type { ImageDto } from '@/apis/admin';
+import type { ImageDto, BoardRequestDto } from '@/apis/board';
 import BoardHeader from '@/components/board/BoardHeader';
 import BoardTypeSelector from '@/components/board/BoardTypeSelector';
 import ImageUploader from '@/components/board/ImageUploader';
@@ -24,6 +25,7 @@ interface BoardFormProps {
 export default function BoardForm({ mode, boardId, initialData, onSuccess }: BoardFormProps) {
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { createBoard, updateBoard, fetchBoardDetail } = useBoard();
   const [isLoading, setIsLoading] = useState(mode === 'edit');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [boardType, setBoardType] = useState<BoardType>(initialData?.boardType || BOARD_TYPES.ETC);
@@ -39,28 +41,13 @@ export default function BoardForm({ mode, boardId, initialData, onSuccess }: Boa
 
       try {
         setIsLoading(true);
-        // TODO: 서버 통신 구현 후 주석 해제
-        // const board = await boardApi.getBoard(boardId);
-        // setBoardType(board.boardType);
-        // setTitle(board.title);
-        // setContent(board.content);
-        // setExistingImages(board.images);
-
-        // 하드코딩된 데이터로 테스트
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        const mockBoard = {
-          boardType: BOARD_TYPES.REFUND,
-          title: '환불 문의드립니다',
-          content: '서비스 이용 중 문제가 발생하여 환불을 요청드립니다.',
-          images: [
-            { imagePath: 'https://picsum.photos/400/300', name: 'image1.jpg' },
-            { imagePath: 'https://picsum.photos/400/301', name: 'image2.jpg' },
-          ],
-        };
-        setBoardType(mockBoard.boardType);
-        setTitle(mockBoard.title);
-        setContent(mockBoard.content);
-        setExistingImages(mockBoard.images);
+        const board = await fetchBoardDetail(boardId);
+        if (board) {
+          setBoardType(board.boardType);
+          setTitle(board.title);
+          setContent(board.content);
+          setExistingImages(board.images);
+        }
       } catch (error: any) {
         showToast(error.message || '게시글을 불러오는데 실패했습니다.', 'error');
         navigate(ROUTES.BOARD.LIST);
@@ -70,7 +57,7 @@ export default function BoardForm({ mode, boardId, initialData, onSuccess }: Boa
     };
 
     loadBoard();
-  }, [mode, boardId, navigate, showToast]);
+  }, [mode, boardId, navigate, showToast, fetchBoardDetail]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,52 +75,43 @@ export default function BoardForm({ mode, boardId, initialData, onSuccess }: Boa
     try {
       setIsSubmitting(true);
 
-      // TODO: 서버 통신 구현 후 주석 해제
-      // // 이미지 업로드 및 ImageDto 생성
-      // const imageDtos: ImageDto[] = await Promise.all(
-      //   images.map(async (file) => {
-      //     // const response = await uploadImage(file);
-      //     // return { imagePath: response.path, name: file.name };
-      //     return { imagePath: URL.createObjectURL(file), name: file.name };
-      //   })
-      // );
+      // 이미지 업로드 및 ImageDto 생성
+      const imageDtos: ImageDto[] = await Promise.all(
+        images.map(async (file) => {
+          // TODO: 실제 이미지 업로드 API 구현 필요
+          // 임시로 로컬 URL을 사용
+          const imagePath = URL.createObjectURL(file);
+          return { imagePath, name: file.name };
+        })
+      );
 
-      // if (mode === 'create') {
-      //   await boardApi.createBoard({
-      //     boardType,
-      //     title,
-      //     content,
-      //     images: imageDtos,
-      //   });
-      // } else if (mode === 'edit' && boardId) {
-      //   await boardApi.updateBoard(boardId, {
-      //     boardType,
-      //     title,
-      //     content,
-      //     images: [...existingImages, ...imageDtos],
-      //   });
-      // }
-
-      // 하드코딩된 응답 처리
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log(`${mode === 'create' ? '게시글 생성' : '게시글 수정'} 요청:`, {
-        boardId,
+      const boardData: BoardRequestDto = {
         boardType,
-        title,
-        content,
-        images: [
-          ...existingImages,
-          ...images.map(file => ({ name: file.name, size: file.size })),
-        ],
-      });
+        title: title.trim(),
+        content: content.trim(),
+        images: [...existingImages, ...imageDtos],
+      };
 
-      showToast(`게시글이 ${mode === 'create' ? '등록' : '수정'}되었습니다.`, 'success');
-      if (onSuccess) {
-        onSuccess();
-      } else if (mode === 'create') {
-        navigate(ROUTES.BOARD.LIST);
+      if (mode === 'create') {
+        const result = await createBoard(boardData);
+        if (result.success) {
+          showToast('게시글이 등록되었습니다.', 'success');
+          if (onSuccess) {
+            onSuccess();
+          } else {
+            navigate(ROUTES.BOARD.LIST);
+          }
+        }
       } else if (mode === 'edit' && boardId) {
-        navigate(`/board/${boardId}`);
+        const result = await updateBoard(boardId, boardData);
+        if (result.success) {
+          showToast('게시글이 수정되었습니다.', 'success');
+          if (onSuccess) {
+            onSuccess();
+          } else {
+            navigate(`/board/${boardId}`);
+          }
+        }
       }
     } catch (error: any) {
       showToast(error.message || `게시글 ${mode === 'create' ? '등록' : '수정'}에 실패했습니다.`, 'error');
@@ -167,47 +145,67 @@ export default function BoardForm({ mode, boardId, initialData, onSuccess }: Boa
       />
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <BoardTypeSelector
-          selectedType={boardType}
-          onTypeChange={setBoardType}
-        />
+        <div className="text-left">
+          <BoardTypeSelector
+            selectedType={boardType}
+            onTypeChange={setBoardType}
+          />
+        </div>
 
-        <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-            제목
+        <div className="text-left">
+          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2 text-left">
+            제목 <span className="text-gray-500 text-xs">(최대 30자)</span>
           </label>
           <input
             type="text"
             id="title"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="제목을 입력해주세요"
+            onChange={(e) => {
+              if (e.target.value.length <= 30) {
+                setTitle(e.target.value);
+              }
+            }}
+            maxLength={30}
+            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-left"
+            placeholder="제목을 입력해주세요 (최대 30자)"
           />
+          <div className="mt-1 text-right text-sm text-gray-500">
+            {title.length}/30
+          </div>
         </div>
 
-        <div>
-          <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
-            내용
+        <div className="text-left">
+          <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2 text-left">
+            내용 <span className="text-gray-500 text-xs">(최대 2000자)</span>
           </label>
           <textarea
             id="content"
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(e) => {
+              if (e.target.value.length <= 2000) {
+                setContent(e.target.value);
+              }
+            }}
+            maxLength={2000}
             rows={6}
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="문의 내용을 입력해주세요"
+            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-left"
+            placeholder="문의 내용을 입력해주세요 (최대 2000자)"
           />
+          <div className="mt-1 text-right text-sm text-gray-500">
+            {content.length}/2000
+          </div>
         </div>
 
-        <ImageUploader
-          images={images}
-          previewUrls={previewUrls}
-          onImagesChange={setImages}
-          onPreviewUrlsChange={setPreviewUrls}
-          existingImages={existingImages}
-          onExistingImagesChange={setExistingImages}
-        />
+        <div className="text-left">
+          <ImageUploader
+            images={images}
+            previewUrls={previewUrls}
+            onImagesChange={setImages}
+            onPreviewUrlsChange={setPreviewUrls}
+            existingImages={existingImages}
+            onExistingImagesChange={setExistingImages}
+          />
+        </div>
 
         <div className="flex justify-end space-x-4">
           <button

@@ -16,7 +16,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAdmin } from '@/hooks';
 import { ROUTES } from '@/constants';
-import type { ConsumerBoardDetailResponseDto } from '@/apis/board';
+import type { BoardDetailResponseDto } from '@/apis/board';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
@@ -51,7 +51,7 @@ const BoardEdit = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { boardManagement } = useAdmin();
-  const [board, setBoard] = useState<ConsumerBoardDetailResponseDto | null>(null);
+  const [board, setBoard] = useState<BoardDetailResponseDto | null>(null);
   const [answer, setAnswer] = useState('');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
