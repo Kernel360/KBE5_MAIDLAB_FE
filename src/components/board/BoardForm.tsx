@@ -4,6 +4,7 @@ import { useToast } from '@/hooks/useToast';
 import { useBoard } from '@/hooks/useBoard';
 import { ROUTES } from '@/constants/route';
 import { BOARD_TYPES } from '@/constants/board';
+import { uploadToS3 } from '@/utils/s3';
 import type { BoardType } from '@/constants/board';
 import type { ImageDto, BoardRequestDto } from '@/apis/board';
 import BoardHeader from '@/components/board/BoardHeader';
@@ -28,6 +29,7 @@ export default function BoardForm({ mode, boardId, initialData, onSuccess }: Boa
   const { createBoard, updateBoard, fetchBoardDetail } = useBoard();
   const [isLoading, setIsLoading] = useState(mode === 'edit');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [boardType, setBoardType] = useState<BoardType>(initialData?.boardType || BOARD_TYPES.ETC);
   const [title, setTitle] = useState(initialData?.title || '');
   const [content, setContent] = useState(initialData?.content || '');
@@ -74,14 +76,18 @@ export default function BoardForm({ mode, boardId, initialData, onSuccess }: Boa
 
     try {
       setIsSubmitting(true);
+      setIsUploading(true);
 
-      // 이미지 업로드 및 ImageDto 생성
+      // 이미지 S3 업로드 및 ImageDto 생성
       const imageDtos: ImageDto[] = await Promise.all(
         images.map(async (file) => {
-          // TODO: 실제 이미지 업로드 API 구현 필요
-          // 임시로 로컬 URL을 사용
-          const imagePath = URL.createObjectURL(file);
-          return { imagePath, name: file.name };
+          try {
+            const { url } = await uploadToS3(file);
+            return { imagePath: url, name: file.name };
+          } catch (error: any) {
+            showToast(`이미지 "${file.name}" 업로드에 실패했습니다.`, 'error');
+            throw error;
+          }
         })
       );
 
@@ -117,6 +123,7 @@ export default function BoardForm({ mode, boardId, initialData, onSuccess }: Boa
       showToast(error.message || `게시글 ${mode === 'create' ? '등록' : '수정'}에 실패했습니다.`, 'error');
     } finally {
       setIsSubmitting(false);
+      setIsUploading(false);
     }
   };
 
@@ -204,6 +211,7 @@ export default function BoardForm({ mode, boardId, initialData, onSuccess }: Boa
             onPreviewUrlsChange={setPreviewUrls}
             existingImages={existingImages}
             onExistingImagesChange={setExistingImages}
+            disabled={isUploading}
           />
         </div>
 
@@ -217,19 +225,27 @@ export default function BoardForm({ mode, boardId, initialData, onSuccess }: Boa
                 navigate(`/board/${boardId}`);
               }
             }}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800"
-            disabled={isSubmitting}
+            className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+            disabled={isSubmitting || isUploading}
           >
             취소
           </button>
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
-            disabled={isSubmitting}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-blue-300"
+            disabled={isSubmitting || isUploading}
           >
-            {isSubmitting
-              ? `${mode === 'create' ? '등록' : '수정'} 중...`
-              : `${mode === 'create' ? '등록' : '수정'}하기`}
+            {isSubmitting ? (
+              <span className="flex items-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {isUploading ? '이미지 업로드 중...' : '저장 중...'}
+              </span>
+            ) : (
+              '저장하기'
+            )}
           </button>
         </div>
       </form>
