@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/useToast';
 import { useConsumer } from '@/hooks/useConsumer';
 import type { ConsumerProfileRequestDto } from '@/apis/consumer';
 import { ROUTES } from '@/constants';
+import { uploadToS3 } from '@/utils/s3';
 
 const BackButton = styled.button`
   position: absolute;
@@ -199,7 +200,7 @@ interface ProfileData {
 const DEFAULT_PROFILE_IMAGE = '/default-profile.png';
 
 const Profile: React.FC = () => {
-  const { profile, fetchProfile, updateProfile, loading, error } = useConsumer();
+  const { profile, fetchProfile, updateProfile, loading } = useConsumer();
   const [formData, setFormData] = useState<ProfileData>({
     name: '',
     phoneNumber: '',
@@ -213,6 +214,7 @@ const Profile: React.FC = () => {
   const [imageError, setImageError] = useState(false);
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const [isEditing, setIsEditing] = useState(false);
 
   // 프로필 데이터 가져오기
   useEffect(() => {
@@ -234,13 +236,6 @@ const Profile: React.FC = () => {
     }
   }, [profile]);
 
-  // 에러 발생 시 토스트 메시지 표시
-  useEffect(() => {
-    if (error) {
-      showToast(error.message || '프로필을 불러오는데 실패했습니다.', 'error');
-    }
-  }, [error, showToast]);
-
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -248,41 +243,70 @@ const Profile: React.FC = () => {
     }));
   };
 
-  const handleSave = async () => {
-    try {
-      const updateData: ConsumerProfileRequestDto = {
-        address: formData.address,
-        detailAddress: formData.detailAddress
-      };
-      await updateProfile(updateData);
-      showToast('프로필이 수정되었습니다.', 'success');
-    } catch (error: any) {
-      showToast(error.message || '프로필 수정에 실패했습니다.', 'error');
-    }
-  };
-
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // 선택한 이미지의 미리보기 URL 생성
+    // File size validation (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('이미지 크기는 5MB 이하로 업로드해주세요.', 'error');
+      return;
+    }
+
+    // Image type validation
+    if (!file.type.startsWith('image/')) {
+      showToast('이미지 파일만 업로드 가능합니다.', 'error');
+      return;
+    }
+
+    // Generate preview URL for the selected image
     const previewUrl = URL.createObjectURL(file);
     setPreviewImage(previewUrl);
 
     try {
-      const formData = new FormData();
-      formData.append('image', file);
-      // TODO: 이미지 업로드 API 구현 후 주석 해제
-      // const imageUrl = await uploadApi.uploadImage(formData);
-      // setFormData(prev => ({
-      //   ...prev,
-      //   profileImage: imageUrl
-      // }));
-      showToast('프로필 이미지가 변경되었습니다.', 'success');
+      // S3 upload only
+      const { url } = await uploadToS3(file);
+      console.log('S3에 저장된 URL:', url);
+
+      // Update formData with the new image URL
+      setFormData(prev => ({
+        ...prev,
+        profileImage: url
+      }));
+
+      showToast('이미지가 업로드되었습니다. 저장 버튼을 눌러 변경사항을 적용해주세요.', 'success');
     } catch (error: any) {
       showToast(error.message || '이미지 업로드에 실패했습니다.', 'error');
-      // 에러 발생 시 미리보기 제거
+      // Remove preview on error
       setPreviewImage(undefined);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.address || !formData.detailAddress) {
+      showToast('주소를 입력해주세요.', 'error');
+      return;
+    }
+
+    try {
+      const profileData: ConsumerProfileRequestDto = {
+        profileImage: formData.profileImage,  // Include the image URL from formData
+        address: formData.address,
+        detailAddress: formData.detailAddress
+      };
+
+      console.log('프로필 업데이트 요청 데이터:', profileData);
+      const result = await updateProfile(profileData);
+      
+      if (result.success) {
+        showToast('프로필이 업데이트되었습니다.', 'success');
+        setIsEditing(false);
+        await fetchProfile();  // Refresh profile data
+      }
+    } catch (error: any) {
+      showToast(error.message || '프로필 업데이트에 실패했습니다.', 'error');
     }
   };
 
@@ -307,6 +331,27 @@ const Profile: React.FC = () => {
       }
     };
   }, [previewImage]);
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleCancelClick = () => {
+    setIsEditing(false);
+    setPreviewImage(undefined);
+    // Reset form data to original profile data
+    if (profile) {
+      setFormData({
+        name: profile.name || '',
+        phoneNumber: profile.phoneNumber || '',
+        birth: profile.birth || '',
+        gender: profile.gender || 'MALE',
+        address: profile.address || '',
+        detailAddress: profile.detailAddress || '',
+        profileImage: profile.profileImage
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -386,7 +431,7 @@ const Profile: React.FC = () => {
           />
         </InfoGroup>
 
-        <SaveButton onClick={handleSave}>저장하기</SaveButton>
+        <SaveButton onClick={handleSubmit}>저장하기</SaveButton>
       </ProfileCard>
     </ProfileContainer>
   );

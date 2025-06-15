@@ -3,6 +3,128 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/useToast';
 import { consumerApi, type LikedManagerResponseDto, type BlackListedManagerResponseDto } from '@/apis/consumer';
 import { ROUTES } from '@/constants/route';
+import styled from 'styled-components';
+
+const ProfileImageContainer = styled.div`
+  width: 80px;
+  height: 80px;
+  min-width: 80px;
+  min-height: 80px;
+  position: relative;
+  flex-shrink: 0;
+`;
+
+const ProfileImageWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #f3f4f6;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+`;
+
+const ProfileImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+`;
+
+const ProfileFallback = styled.div`
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom right, #f3f4f6, #e5e7eb);
+  border-radius: 50%;
+`;
+
+const ProfileInitial = styled.div`
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #6b7280;
+`;
+
+const DeleteButton = styled.button`
+  width: 80px;
+  height: 36px;
+  min-width: 80px;
+  padding: 0.5rem 1rem;
+  color: #ef4444;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 22px;  /* (80px - 36px) / 2 = 22px to center vertically with profile image */
+
+  &:hover {
+    background-color: #fee2e2;
+  }
+
+  &:active {
+    background-color: #fecaca;
+  }
+`;
+
+const ManagerCard = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+`;
+
+const ManagerInfo = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex: 1;
+  min-width: 0;  /* Prevent flex item from overflowing */
+`;
+
+const RegionContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+`;
+
+const RegionTag = styled.span`
+  padding: 0.25rem 0.5rem;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  font-size: 0.875rem;
+  border-radius: 0.25rem;
+`;
+
+const ExpandButton = styled.button`
+  padding: 0.25rem 0.5rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+
+  &:hover {
+    color: #4b5563;
+  }
+`;
+
+const ExpandIcon = styled.span<{ isExpanded: boolean }>`
+  display: inline-block;
+  transition: transform 0.2s;
+  transform: rotate(${props => props.isExpanded ? '180deg' : '0deg'});
+`;
 
 export default function ManagerList() {
   const location = useLocation();
@@ -11,6 +133,8 @@ export default function ManagerList() {
   const [isLoading, setIsLoading] = useState(false);
   const [favoriteManagers, setFavoriteManagers] = useState<LikedManagerResponseDto[]>([]);
   const [blacklistManagers, setBlacklistManagers] = useState<BlackListedManagerResponseDto[]>([]);
+  const [imageLoadErrors, setImageLoadErrors] = useState<Record<string, boolean>>({});
+  const [expandedRegions, setExpandedRegions] = useState<Record<string, boolean>>({});
 
   // URL에 따라 데이터 로드
   useEffect(() => {
@@ -62,6 +186,44 @@ export default function ManagerList() {
 
   const handleBack = () => {
     navigate(ROUTES.CONSUMER.MYPAGE);
+  };
+
+  const handleImageError = (managerUuid: string) => {
+    setImageLoadErrors(prev => ({
+      ...prev,
+      [managerUuid]: true
+    }));
+  };
+
+  const toggleRegions = (managerUuid: string) => {
+    setExpandedRegions(prev => ({
+      ...prev,
+      [managerUuid]: !prev[managerUuid]
+    }));
+  };
+
+  const renderRegions = (regions: string[], managerUuid: string) => {
+    if (!regions || regions.length === 0) return null;
+
+    const isExpanded = expandedRegions[managerUuid];
+    const displayRegions = isExpanded ? regions : regions.slice(0, 3);
+    const hasMore = regions.length > 3;
+
+    return (
+      <RegionContainer>
+        {displayRegions.map((region) => (
+          <RegionTag key={region}>
+            {region}
+          </RegionTag>
+        ))}
+        {hasMore && (
+          <ExpandButton onClick={() => toggleRegions(managerUuid)}>
+            {isExpanded ? '접기' : `+${regions.length - 3}개 더보기`}
+            <ExpandIcon isExpanded={isExpanded}>▼</ExpandIcon>
+          </ExpandButton>
+        )}
+      </RegionContainer>
+    );
   };
 
   if (isLoading) {
@@ -121,28 +283,27 @@ export default function ManagerList() {
             {!isBlacklist ? (
               favoriteManagers.length > 0 ? (
                 favoriteManagers.map((manager) => (
-                  <div
-                    key={manager.managerUuid}
-                    className="flex items-center justify-between p-4 bg-white rounded-lg shadow"
-                  >
-                    <div className="flex items-center space-x-4">
-                      <div className="relative w-20 h-20">
-                        <div className="w-full h-full rounded-full bg-gray-100 relative">
-                          {manager.profileImage ? (
-                            <img
+                  <ManagerCard key={manager.managerUuid}>
+                    <ManagerInfo>
+                      <ProfileImageContainer>
+                        <ProfileImageWrapper>
+                          {manager.profileImage && !imageLoadErrors[manager.managerUuid] ? (
+                            <ProfileImage
                               src={manager.profileImage}
-                              alt=""
-                              className="w-full h-full rounded-full object-cover shadow-md"
+                              alt={`${manager.name}의 프로필`}
+                              onError={() => handleImageError(manager.managerUuid)}
+                              loading="lazy"
                             />
                           ) : (
-                            <div className="absolute inset-0 flex items-center justify-center text-gray-500 text-sm">
-                              {manager.name}
-                            </div>
+                            <ProfileFallback>
+                              <ProfileInitial>
+                                {manager.name.charAt(0)}
+                              </ProfileInitial>
+                            </ProfileFallback>
                           )}
-                          <div className="absolute inset-0 rounded-full ring-1 ring-gray-100"></div>
-                        </div>
-                      </div>
-                      <div className="flex flex-col items-start">
+                        </ProfileImageWrapper>
+                      </ProfileImageContainer>
+                      <div className="flex flex-col items-start pt-1">
                         <h3 className="text-lg font-semibold text-left">{manager.name}</h3>
                         <p className="text-gray-600 text-left">
                           평점: {manager.averageRate.toFixed(1)}
@@ -155,26 +316,14 @@ export default function ManagerList() {
                           </p>
                         )}
                         {manager.region && manager.region.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {manager.region.map((region) => (
-                              <span
-                                key={region}
-                                className="px-2 py-1 bg-gray-100 text-gray-600 text-sm rounded"
-                              >
-                                {region}
-                              </span>
-                            ))}
-                          </div>
+                          renderRegions(manager.region, manager.managerUuid)
                         )}
                       </div>
-                    </div>
-                    <button
-                      onClick={() => handleRemoveFavorite(manager.managerUuid)}
-                      className="px-4 py-2 text-red-500 hover:bg-red-50 rounded-lg"
-                    >
+                    </ManagerInfo>
+                    <DeleteButton onClick={() => handleRemoveFavorite(manager.managerUuid)}>
                       삭제
-                    </button>
-                  </div>
+                    </DeleteButton>
+                  </ManagerCard>
                 ))
               ) : (
                 <div className="text-center py-8 text-gray-500">
@@ -183,28 +332,27 @@ export default function ManagerList() {
               )
             ) : blacklistManagers.length > 0 ? (
               blacklistManagers.map((manager) => (
-                <div
-                  key={manager.managerUuid}
-                  className="flex items-center justify-between p-4 bg-white rounded-lg shadow"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="relative w-20 h-20">
-                      <div className="w-full h-full rounded-full bg-gray-100 relative">
-                        {manager.profileImage ? (
-                          <img
+                <ManagerCard key={manager.managerUuid}>
+                  <ManagerInfo>
+                    <ProfileImageContainer>
+                      <ProfileImageWrapper>
+                        {manager.profileImage && !imageLoadErrors[manager.managerUuid] ? (
+                          <ProfileImage
                             src={manager.profileImage}
-                            alt=""
-                            className="w-full h-full rounded-full object-cover shadow-md"
+                            alt={`${manager.name}의 프로필`}
+                            onError={() => handleImageError(manager.managerUuid)}
+                            loading="lazy"
                           />
                         ) : (
-                          <div className="absolute inset-0 flex items-center justify-center text-gray-500 text-sm">
-                            {manager.name}
-                          </div>
+                          <ProfileFallback>
+                            <ProfileInitial>
+                              {manager.name.charAt(0)}
+                            </ProfileInitial>
+                          </ProfileFallback>
                         )}
-                        <div className="absolute inset-0 rounded-full ring-1 ring-gray-100"></div>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-start">
+                      </ProfileImageWrapper>
+                    </ProfileImageContainer>
+                    <div className="flex flex-col items-start pt-1">
                       <h3 className="text-lg font-semibold text-left">{manager.name}</h3>
                       <p className="text-gray-600 text-left">
                         평점: {manager.averageRate.toFixed(1)}
@@ -217,26 +365,14 @@ export default function ManagerList() {
                         </p>
                       )}
                       {manager.region && manager.region.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {manager.region.map((region) => (
-                            <span
-                              key={region}
-                              className="px-2 py-1 bg-gray-100 text-gray-600 text-sm rounded"
-                            >
-                              {region}
-                            </span>
-                          ))}
-                        </div>
+                        renderRegions(manager.region, manager.managerUuid)
                       )}
                     </div>
-                  </div>
-                  <button
-                    onClick={() => handleRemoveBlacklist(manager.managerUuid)}
-                    className="px-4 py-2 text-red-500 hover:bg-red-50 rounded-lg"
-                  >
+                  </ManagerInfo>
+                  <DeleteButton onClick={() => handleRemoveBlacklist(manager.managerUuid)}>
                     삭제
-                  </button>
-                </div>
+                  </DeleteButton>
+                </ManagerCard>
               ))
             ) : (
               <div className="text-center py-8 text-gray-500">

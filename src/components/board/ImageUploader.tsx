@@ -7,10 +7,9 @@ interface ImageUploaderProps {
   previewUrls: string[];
   onImagesChange: (files: File[]) => void;
   onPreviewUrlsChange: (urls: string[]) => void;
-  existingImages?: ImageDto[];
-  onExistingImagesChange?: (images: ImageDto[]) => void;
-  maxImages?: number;
-  maxSizeMB?: number;
+  existingImages: ImageDto[];
+  onExistingImagesChange: (images: ImageDto[]) => void;
+  disabled?: boolean;
 }
 
 export default function ImageUploader({
@@ -18,13 +17,14 @@ export default function ImageUploader({
   previewUrls,
   onImagesChange,
   onPreviewUrlsChange,
-  existingImages = [],
+  existingImages,
   onExistingImagesChange,
-  maxImages = 3,
-  maxSizeMB = 5,
+  disabled = false,
 }: ImageUploaderProps) {
   const { showToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const maxImages = 3;
+  const maxSizeMB = 5;
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
@@ -95,15 +95,14 @@ export default function ImageUploader({
                 alt={image.name}
                 className="w-full h-32 object-cover rounded-lg"
               />
-              {onExistingImagesChange && (
-                <button
-                  type="button"
-                  onClick={() => handleRemoveExistingImage(index)}
-                  className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  ×
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => handleRemoveExistingImage(index)}
+                className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                disabled={disabled}
+              >
+                ×
+              </button>
             </div>
           ))}
 
@@ -119,6 +118,7 @@ export default function ImageUploader({
                 type="button"
                 onClick={() => handleRemoveImage(index)}
                 className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                disabled={disabled}
               >
                 ×
               </button>
@@ -146,11 +146,16 @@ export default function ImageUploader({
               accept="image/*"
               multiple
               className="hidden"
+              disabled={disabled}
             />
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="w-full p-4 border-2 border-dashed border-blue-500 rounded-lg text-blue-500"
+              className={`w-full p-4 border-2 border-dashed rounded-lg
+                ${disabled 
+                  ? 'border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed' 
+                  : 'border-blue-500 text-blue-500 hover:bg-blue-50'}`}
+              disabled={disabled}
             >
               이미지 선택하기
             </button>
