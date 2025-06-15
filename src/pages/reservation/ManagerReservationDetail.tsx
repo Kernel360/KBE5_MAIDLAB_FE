@@ -47,7 +47,7 @@ const ManagerReservationDetail: React.FC = () => {
         await checkIn(parseInt(id), { checkTime: currentTime });
       } else {
         await checkOut(parseInt(id), { checkTime: currentTime });
-        navigate(`/managers/reservations/${id}/review`);
+        navigate(`/manager/reservations/${id}/review`);
       }
       setShowModal(false);
       // 상태 업데이트를 위해 상세 정보 다시 조회

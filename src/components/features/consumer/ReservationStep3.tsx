@@ -13,14 +13,29 @@ interface Props {
 // int -> BigDecimal
 const toBigDecimal = (price: number) => `${price}.00`;
 
-// 추가 서비스 가격 계산
+// pet 값을 한글로 변환하는 함수
+const getPetDisplay = (pet: string) => {
+  if (!pet || pet === 'NONE') return '없음';
+  const pets = pet.split(',');
+  return pets
+    .map((p) => {
+      if (p === 'DOG') return '개';
+      if (p === 'CAT') return '고양이';
+      if (p.startsWith('ETC:')) return p.replace('ETC:', '');
+      if (p === 'ETC') return '기타';
+      return p;
+    })
+    .join(', ');
+};
+
+// 서비스 추가 가격 계산 (1시간당 1만원)
 const calculateAdditionalPrice = (serviceAdd: string[] | string | undefined): number => {
   if (!serviceAdd) return 0;
   const services = Array.isArray(serviceAdd) ? serviceAdd : serviceAdd.split(',');
+  // cooking, ironing 각각 1만원씩 추가
   let additionalPrice = 0;
-  if (services.includes('요리')) additionalPrice += 20000;
-  if (services.includes('청소도구')) additionalPrice += 10000;
-  if (services.includes('다림질')) additionalPrice += 10000;
+  if (services.includes('cooking')) additionalPrice += 10000;
+  if (services.includes('ironing')) additionalPrice += 10000;
   return additionalPrice;
 };
 
@@ -171,7 +186,7 @@ const ReservationStep3: React.FC<Props> = ({ data, onBack, onSubmit }) => {
           <div className="flex items-center gap-2">
             <span className="text-orange-500 text-lg">🐾</span>
             <span className="font-semibold">반려동물</span>
-            <span className="text-gray-700">{data.pet === 'NONE' ? '없음' : data.pet}</span>
+            <span className="text-gray-700">{getPetDisplay(data.pet)}</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-orange-500 text-lg">📝</span>

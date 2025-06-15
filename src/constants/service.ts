@@ -111,7 +111,6 @@ export const SERVICE_DETAIL_TYPES: Record<string, ServiceDetailType> = {
 export const SERVICE_OPTIONS = [
   { id: 'cooking', label: '요리', price: 10000, timeAdd: 60 },
   { id: 'ironing', label: '다림질', price: 10000, timeAdd: 60 },
-  { id: 'cleaning_tools', label: '청소 도구 준비', price: 20000, timeAdd: 0 },
 ] as const;
 
 export type ServiceOption = typeof SERVICE_OPTIONS[number];
