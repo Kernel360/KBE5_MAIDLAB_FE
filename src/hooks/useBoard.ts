@@ -3,12 +3,12 @@ import { boardApi } from '@/apis/board';
 import { useToast } from './useToast';
 import type { 
   BoardRequestDto,
-  ConsumerBoardResponseDto,
-  ConsumerBoardDetailResponseDto 
+  BoardResponseDto,
+  BoardDetailResponseDto 
 } from '@/apis/board';
 
 export const useBoard = () => {
-  const [boards, setBoards] = useState<ConsumerBoardResponseDto[]>([]);
+  const [boards, setBoards] = useState<BoardResponseDto[]>([]);
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
 
@@ -30,7 +30,7 @@ export const useBoard = () => {
 
   // 게시글 상세 조회
   const fetchBoardDetail = useCallback(
-    async (boardId: number): Promise<ConsumerBoardDetailResponseDto | null> => {
+    async (boardId: number): Promise<BoardDetailResponseDto | null> => {
       try {
         setLoading(true);
         const data = await boardApi.getBoard(boardId);

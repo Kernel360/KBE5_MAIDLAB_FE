@@ -26,7 +26,7 @@ import { useState, useEffect } from 'react';
 import { useAdmin } from '@/hooks';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ROUTES } from '@/constants';
-import type { ConsumerBoardResponseDto } from '@/apis/board';
+import type { BoardResponseDto } from '@/apis/board';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
@@ -60,7 +60,7 @@ const BOARD_TYPE_COLORS: Record<BoardType, 'error' | 'primary' | 'info' | 'defau
   ETC: 'default',
 } as const;
 
-interface BoardWithId extends ConsumerBoardResponseDto {
+interface BoardWithId extends BoardResponseDto {
   id: number;
 }
 
@@ -86,7 +86,7 @@ const BoardList = () => {
   const fetchBoardsByTab = async (tab: TabType) => {
     setLoading(true);
     try {
-      let data: ConsumerBoardResponseDto[];
+      let data: BoardResponseDto[];
       if (tab === 'consultation') {
         data = await boardManagement.fetchConsultationBoards();
       } else if (tab === 'refund') {

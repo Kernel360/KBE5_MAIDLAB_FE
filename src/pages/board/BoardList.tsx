@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/useToast';
-import { boardApi } from '@/apis/board';
+import { useBoard } from '@/hooks/useBoard';
 import { ROUTES } from '@/constants/route';
 import type { BoardResponseDto } from '@/apis/board';
 import BoardHeader from '@/components/board/BoardHeader';
@@ -9,27 +8,11 @@ import BoardItem from '@/components/board/BoardItem';
 
 export default function BoardList() {
   const navigate = useNavigate();
-  const { showToast } = useToast();
-  const [isLoading, setIsLoading] = useState(true);
-  const [boards, setBoards] = useState<BoardResponseDto[]>([]);
+  const { boards, loading: isLoading, fetchBoards } = useBoard();
 
   useEffect(() => {
-    const loadBoards = async () => {
-      try {
-        setIsLoading(true);
-        
-        const data = await boardApi.getBoardList();
-        setBoards(data);
-        setIsLoading(false);
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : '게시글 목록을 불러오는데 실패했습니다.';
-        showToast(errorMessage, 'error');
-        setIsLoading(false);
-      }
-    };
-
-    loadBoards();
-  }, [showToast]);
+    fetchBoards();
+  }, [fetchBoards]);
 
   if (isLoading) {
     return (
