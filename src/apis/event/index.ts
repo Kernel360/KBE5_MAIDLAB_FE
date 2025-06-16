@@ -57,7 +57,7 @@ export const eventApi = {
   // 이벤트 생성 (관리자용)
   createEvent: async (data: EventRequestDto): Promise<void> => {
     try {
-      await apiClient.post<ApiResponse<void>>('/api/event', data);
+      await apiClient.post<ApiResponse<void>>('/api/admin/event', data);
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -69,7 +69,7 @@ export const eventApi = {
     data: EventRequestDto,
   ): Promise<void> => {
     try {
-      await apiClient.patch<ApiResponse<void>>(`/api/event/${eventId}`, data);
+      await apiClient.patch<ApiResponse<void>>(`/api/admin/event/${eventId}`, data);
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -78,7 +78,7 @@ export const eventApi = {
   // 이벤트 삭제 (관리자용)
   deleteEvent: async (eventId: number): Promise<void> => {
     try {
-      await apiClient.delete<ApiResponse<void>>(`/api/event/${eventId}`);
+      await apiClient.delete<ApiResponse<void>>(`/api/admin/event/${eventId}`);
     } catch (error) {
       throw new Error(handleApiError(error));
     }

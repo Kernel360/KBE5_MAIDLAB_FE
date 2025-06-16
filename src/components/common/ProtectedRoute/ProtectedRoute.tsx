@@ -16,6 +16,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requireAuth = true,
   requiredUserType,
   redirectTo = ROUTES.LOGIN,
+
 }) => {
   const { isAuthenticated, userType, isLoading } = useAuth();
 
@@ -43,7 +44,10 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         ? ROUTES.CONSUMER.MYPAGE
         : userType === 'MANAGER'
           ? ROUTES.MANAGER.MYPAGE
-          : ROUTES.HOME;
+          : userType === 'ADMIN'
+            ? ROUTES.ADMIN.DASHBOARD
+            : ROUTES.LOGIN;
+
 
     return <Navigate to={defaultPage} replace />;
   }

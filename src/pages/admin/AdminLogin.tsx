@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Box, Button, Container, TextField, Typography, Paper, Alert } from '@mui/material';
@@ -52,8 +51,7 @@ const AdminLogin = () => {
 
       // 로그인 성공시 페이지 이동
       if (result.success) {
-        const from = (location.state as { from?: Location })?.from?.pathname || '/admin/users';
-        navigate('/admin/users');
+        navigate('/admin');
       } else {
         // 로그인 실패시 에러 표시 (이미 토스트로 표시되지만 추가로 표시하고 싶다면)
         setError(result.error || '로그인에 실패했습니다.');
