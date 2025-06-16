@@ -18,6 +18,7 @@ import {
   AdminBoardEdit,
   AdminEventEdit,
   AdminEventDetail,
+  Dashboard,
 } from '@/pages';
 //import AdminSettlementDetail from '@/pages/admin/SettlementDetail';
 
@@ -46,7 +47,7 @@ export const AdminRoutes = () => (
       <Route path="boards" element={<AdminBoards />} />
       <Route path="boards/:id" element={<AdminBoardDetail />} />
       <Route path="boards/:id/edit" element={<AdminBoardEdit />} />
-      <Route index element={<AdminUserList />} />
+      <Route index element={<Dashboard />} />
     </Route>
   </>
 );
