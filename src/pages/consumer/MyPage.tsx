@@ -1,77 +1,47 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import {
+  ArrowLeft,
+  User,
+  Settings,
+  FileText,
+  MessageCircle,
+  Share2,
+  ChevronRight,
+  LogOut,
+  CreditCard,
+  Ticket,
+  Coins,
+  Heart,
+  Ban,
+  Star,
+  Users,
+} from 'lucide-react';
 import { useConsumer } from '@/hooks/useConsumer';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
-import { ProfileSection } from '@/components/features/consumer/mypage/ProfileSection';
-import MenuGrid from '@/components/features/consumer/mypage/MenuGrid';
 import type { ConsumerMyPageDto } from '@/apis/consumer';
 import { ROUTES } from '@/constants';
 import { CONFIRM_MESSAGES } from '@/constants/message';
 
-const PageContainer = styled.div`
-  min-height: 100vh;
-  background-color: #f5f5f5;
-`;
+interface MenuItemProps {
+  icon: React.ReactNode;
+  title: string;
+  onClick: () => void;
+}
 
-const Header = styled.header`
-  position: fixed;s
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 56px;
-  background-color: white;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 16px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  z-index: 100;
-`;
-
-const BackButton = styled.button`
-  background: none;
-  border: none;
-  padding: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  color: #333;
-  font-size: 16px;
-  
-  &:hover {
-    color: #666;
-  }
-`;
-
-const LogoutButton = styled.button`
-  background: none;
-  border: none;
-  padding: 8px 16px;
-  cursor: pointer;
-  color: #666;
-  font-size: 14px;
-  
-  &:hover {
-    color: #333;
-  }
-`;
-
-const ContentContainer = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 76px 20px 20px;
-`;
-
-const LoadingContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 200px;
-  font-size: 18px;
-  color: #666;
-`;
+const MenuItem: React.FC<MenuItemProps> = ({ icon, title, onClick }) => (
+  <button
+    onClick={onClick}
+    className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+  >
+    <div className="flex items-center gap-3">
+      <div className="text-gray-600">{icon}</div>
+      <span className="text-gray-900">{title}</span>
+    </div>
+    <ChevronRight className="w-5 h-5 text-gray-400" />
+  </button>
+);
 
 const MyPage: React.FC = () => {
   const navigate = useNavigate();
@@ -106,30 +76,169 @@ const MyPage: React.FC = () => {
     }
   };
 
+  const handleProfileEdit = () => {
+    navigate(ROUTES.CONSUMER.PROFILE);
+  };
+
+  const handlePaymentMethods = () => {
+    showToast('결제수단 관리 기능은 준비 중입니다.', 'info');
+  };
+
+  const handlePromotions = () => {
+    showToast('프로모션 코드/쿠폰 기능은 준비 중입니다.', 'info');
+  };
+
+  const handlePoints = () => {
+    showToast('포인트 기능은 준비 중입니다.', 'info');
+  };
+
+  const handleLikedManagers = () => {
+    navigate(ROUTES.CONSUMER.LIKED_MANAGERS);
+  };
+
+  const handleBlacklist = () => {
+    navigate(ROUTES.CONSUMER.BLACKLIST);
+  };
+
+  const handleReviews = () => {
+    navigate(ROUTES.CONSUMER.REVIEW_REGISTER.replace(':id', 'my-reviews'));
+  };
+
+  const handleInviteFriends = () => {
+    showToast('친구 초대하기 기능은 준비 중입니다.', 'info');
+  };
+
+  const handleSettings = () => {
+    showToast('설정 기능은 준비 중입니다.', 'info');
+  };
+
   if (loading) {
     return (
-      <LoadingContainer>
-        로딩중...
-      </LoadingContainer>
+      <div className="min-h-screen bg-white flex justify-center items-center">
+        <p className="text-gray-500">로딩 중...</p>
+      </div>
     );
   }
 
   return (
-    <PageContainer>
-      <Header>
-        <BackButton onClick={handleBack}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </BackButton>
-        <h1 style={{ fontSize: '18px', fontWeight: '600' }}>마이페이지</h1>
-        <LogoutButton onClick={handleLogout}>로그아웃</LogoutButton>
-      </Header>
-      <ContentContainer>
-        <ProfileSection userInfo={userInfo} />
-        <MenuGrid />
-      </ContentContainer>
-    </PageContainer>
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b">
+        <button
+          onClick={handleBack}
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+        >
+          <ArrowLeft className="w-6 h-6" />
+        </button>
+        <h1 className="text-lg font-bold">마이페이지</h1>
+        <button
+          onClick={handleLogout}
+          className="p-2 text-gray-600 hover:text-gray-900"
+        >
+          <LogOut className="w-6 h-6" />
+        </button>
+      </div>
+
+      {/* Content */}
+      <div className="px-4 py-6">
+        <div className="max-w-md mx-auto space-y-6">
+          {/* Profile Section */}
+          <div className="text-center mb-8">
+            <div className="relative inline-block mb-4">
+              <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden mx-auto">
+                {userInfo?.profileImage ? (
+                  <img
+                    src={userInfo.profileImage}
+                    alt="프로필"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <User className="w-12 h-12 text-gray-400" />
+                )}
+              </div>
+            </div>
+
+            <h2 className="text-xl font-bold text-gray-900 mb-2">
+              {userInfo?.name || '사용자'}
+            </h2>
+
+            <div className="flex items-center justify-center gap-2 mb-6">
+              <span className="text-gray-600">포인트:</span>
+              {userInfo?.point !== undefined && (
+                <span className="text-[#FF6B00] font-medium">
+                  {userInfo.point}P
+                </span>
+              )}
+            </div>
+
+            <button
+              onClick={handleProfileEdit}
+              className="w-full py-3 bg-[#FF6B00] text-white rounded-lg font-medium hover:bg-[#FF8533] transition-colors"
+            >
+              프로필 수정
+            </button>
+          </div>
+
+          {/* Menu Items */}
+          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+            <MenuItem
+              icon={<CreditCard className="w-5 h-5" />}
+              title="결제수단 관리"
+              onClick={handlePaymentMethods}
+            />
+            <div className="border-t border-gray-200">
+              <MenuItem
+                icon={<Ticket className="w-5 h-5" />}
+                title="프로모션 코드/쿠폰"
+                onClick={handlePromotions}
+              />
+            </div>
+            <div className="border-t border-gray-200">
+              <MenuItem
+                icon={<Coins className="w-5 h-5" />}
+                title="포인트"
+                onClick={handlePoints}
+              />
+            </div>
+            <div className="border-t border-gray-200">
+              <MenuItem
+                icon={<Heart className="w-5 h-5" />}
+                title="찜한 도우미"
+                onClick={handleLikedManagers}
+              />
+            </div>
+            <div className="border-t border-gray-200">
+              <MenuItem
+                icon={<Ban className="w-5 h-5" />}
+                title="블랙리스트 도우미"
+                onClick={handleBlacklist}
+              />
+            </div>
+            <div className="border-t border-gray-200">
+              <MenuItem
+                icon={<Star className="w-5 h-5" />}
+                title="내가 쓴 리뷰"
+                onClick={handleReviews}
+              />
+            </div>
+            <div className="border-t border-gray-200">
+              <MenuItem
+                icon={<Users className="w-5 h-5" />}
+                title="친구 초대하기"
+                onClick={handleInviteFriends}
+              />
+            </div>
+            <div className="border-t border-gray-200">
+              <MenuItem
+                icon={<Settings className="w-5 h-5" />}
+                title="설정"
+                onClick={handleSettings}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

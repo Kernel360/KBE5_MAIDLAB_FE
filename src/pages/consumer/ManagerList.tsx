@@ -4,12 +4,13 @@ import { useToast } from '@/hooks/useToast';
 import { consumerApi, type LikedManagerResponseDto, type BlackListedManagerResponseDto } from '@/apis/consumer';
 import { ROUTES } from '@/constants/route';
 import styled from 'styled-components';
+import { ArrowLeft } from 'lucide-react';
 
 const ProfileImageContainer = styled.div`
-  width: 80px;
-  height: 80px;
-  min-width: 80px;
-  min-height: 80px;
+  width: 72px;
+  height: 72px;
+  min-width: 72px;
+  min-height: 72px;
   position: relative;
   flex-shrink: 0;
 `;
@@ -21,7 +22,8 @@ const ProfileImageWrapper = styled.div`
   background-color: #f3f4f6;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 2px solid white;
 `;
 
 const ProfileImage = styled.img`
@@ -37,20 +39,17 @@ const ProfileFallback = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(to bottom right, #f3f4f6, #e5e7eb);
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
   border-radius: 50%;
 `;
 
 const ProfileInitial = styled.div`
   font-size: 1.5rem;
-  font-weight: 500;
+  font-weight: 600;
   color: #6b7280;
 `;
 
 const DeleteButton = styled.button`
-  width: 80px;
-  height: 36px;
-  min-width: 80px;
   padding: 0.5rem 1rem;
   color: #ef4444;
   font-size: 0.875rem;
@@ -60,14 +59,15 @@ const DeleteButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 22px;  /* (80px - 36px) / 2 = 22px to center vertically with profile image */
+  margin-top: 1rem;
 
   &:hover {
-    background-color: #fee2e2;
+    color: #dc2626;
+    text-decoration: underline;
   }
 
   &:active {
-    background-color: #fecaca;
+    color: #b91c1c;
   }
 `;
 
@@ -75,10 +75,17 @@ const ManagerCard = styled.div`
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 1rem;
+  padding: 1.25rem;
   background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #f3f4f6;
+  transition: all 0.2s;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+  }
 `;
 
 const ManagerInfo = styled.div`
@@ -86,37 +93,43 @@ const ManagerInfo = styled.div`
   align-items: flex-start;
   gap: 1rem;
   flex: 1;
-  min-width: 0;  /* Prevent flex item from overflowing */
+  min-width: 0;
 `;
 
 const RegionContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem;
-  margin-top: 0.25rem;
+  gap: 0.375rem;
+  margin-top: 0.5rem;
 `;
 
 const RegionTag = styled.span`
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem 0.625rem;
   background-color: #f3f4f6;
   color: #4b5563;
-  font-size: 0.875rem;
-  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 1rem;
+  border: 1px solid #e5e7eb;
 `;
 
 const ExpandButton = styled.button`
   padding: 0.25rem 0.5rem;
   color: #6b7280;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
+  font-weight: 500;
   background: none;
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 0.25rem;
+  transition: all 0.2s;
 
   &:hover {
     color: #4b5563;
+    background-color: #f3f4f6;
+    border-radius: 0.375rem;
   }
 `;
 
@@ -171,7 +184,7 @@ export default function ManagerList() {
   // 블랙리스트 매니저 삭제
   const handleRemoveBlacklist = async (managerUuid: string) => {
     try {
-      await consumerApi.createPreference(managerUuid, { preference: true });
+      await consumerApi.removeLikedManager(managerUuid);
       setBlacklistManagers(prev => prev.filter(m => m.managerUuid !== managerUuid));
       showToast('블랙리스트에서 삭제되었습니다.', 'success');
     } catch (error) {
@@ -235,43 +248,41 @@ export default function ManagerList() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 헤더 */}
-      <div className="fixed top-0 left-0 right-0 z-10 bg-white shadow">
+      <div className="fixed top-0 left-0 right-0 z-10 bg-white shadow-sm">
         <div className="flex items-center justify-between px-4 h-14">
           <button 
             onClick={handleBack}
-            className="p-2 -ml-2 hover:text-[#F97316] transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <ArrowLeft className="w-6 h-6" />
           </button>
           <h1 className="absolute left-1/2 transform -translate-x-1/2 text-lg font-semibold">
             {isBlacklist ? '블랙리스트 도우미' : '찜한 도우미'}
           </h1>
-          {/* 빈 div로 균형 맞추기 */}
           <div className="w-10"></div>
         </div>
       </div>
 
       {/* 컨텐츠 */}
       <div className="pt-14 pb-4">
-        <div className="max-w-4xl mx-auto p-4">
-          <div className="flex w-full mb-6">
+        <div className="max-w-2xl mx-auto px-4">
+          {/* 탭 */}
+          <div className="flex w-full mb-6 bg-white rounded-xl p-1 shadow-sm">
             <button
-              className={`flex-1 py-2 rounded-l-lg transition-colors border-b-2 ${
+              className={`flex-1 py-2.5 rounded-lg transition-all ${
                 !isBlacklist
-                  ? 'bg-white text-[#F97316] border-[#F97316]'
-                  : 'bg-white text-gray-600 border-transparent hover:text-[#F97316]'
+                  ? 'bg-[#F97316] text-white font-medium shadow-sm'
+                  : 'text-gray-600 hover:text-[#F97316]'
               }`}
               onClick={() => handleTabChange('favorites')}
             >
               찜한 매니저
             </button>
             <button
-              className={`flex-1 py-2 rounded-r-lg transition-colors border-b-2 ${
+              className={`flex-1 py-2.5 rounded-lg transition-all ${
                 isBlacklist
-                  ? 'bg-white text-[#F97316] border-[#F97316]'
-                  : 'bg-white text-gray-600 border-transparent hover:text-[#F97316]'
+                  ? 'bg-[#F97316] text-white font-medium shadow-sm'
+                  : 'text-gray-600 hover:text-[#F97316]'
               }`}
               onClick={() => handleTabChange('blacklist')}
             >
@@ -279,7 +290,8 @@ export default function ManagerList() {
             </button>
           </div>
 
-          <div className="space-y-4">
+          {/* 매니저 목록 */}
+          <div className="space-y-3">
             {!isBlacklist ? (
               favoriteManagers.length > 0 ? (
                 favoriteManagers.map((manager) => (
@@ -304,15 +316,15 @@ export default function ManagerList() {
                         </ProfileImageWrapper>
                       </ProfileImageContainer>
                       <div className="flex flex-col items-start pt-1">
-                        <h3 className="text-lg font-semibold text-left">{manager.name}</h3>
-                        <p className="text-gray-600 text-left">
-                          평점: {manager.averageRate.toFixed(1)}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-lg font-semibold text-gray-900">{manager.name}</h3>
+                          <span className="px-2 py-0.5 bg-orange-50 text-orange-600 text-xs font-medium rounded-full">
+                            평점 {manager.averageRate.toFixed(1)}
+                          </span>
+                        </div>
                         {manager.introduceText && (
-                          <p className="text-gray-500 mt-1 text-left">
-                            {manager.introduceText.length > 15 
-                              ? `${manager.introduceText.slice(0, 15)}...` 
-                              : manager.introduceText}
+                          <p className="text-gray-600 mt-1 text-sm line-clamp-2">
+                            {manager.introduceText}
                           </p>
                         )}
                         {manager.region && manager.region.length > 0 && (
@@ -326,58 +338,72 @@ export default function ManagerList() {
                   </ManagerCard>
                 ))
               ) : (
-                <div className="text-center py-8 text-gray-500">
-                  찜한 매니저가 없습니다.
+                <div className="text-center py-12 bg-white rounded-xl shadow-sm">
+                  <div className="text-gray-400 mb-2">
+                    <svg className="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-500 font-medium">찜한 매니저가 없습니다</p>
+                  <p className="text-gray-400 text-sm mt-1">마음에 드는 도우미를 찜해보세요</p>
                 </div>
               )
-            ) : blacklistManagers.length > 0 ? (
-              blacklistManagers.map((manager) => (
-                <ManagerCard key={manager.managerUuid}>
-                  <ManagerInfo>
-                    <ProfileImageContainer>
-                      <ProfileImageWrapper>
-                        {manager.profileImage && !imageLoadErrors[manager.managerUuid] ? (
-                          <ProfileImage
-                            src={manager.profileImage}
-                            alt={`${manager.name}의 프로필`}
-                            onError={() => handleImageError(manager.managerUuid)}
-                            loading="lazy"
-                          />
-                        ) : (
-                          <ProfileFallback>
-                            <ProfileInitial>
-                              {manager.name.charAt(0)}
-                            </ProfileInitial>
-                          </ProfileFallback>
-                        )}
-                      </ProfileImageWrapper>
-                    </ProfileImageContainer>
-                    <div className="flex flex-col items-start pt-1">
-                      <h3 className="text-lg font-semibold text-left">{manager.name}</h3>
-                      <p className="text-gray-600 text-left">
-                        평점: {manager.averageRate.toFixed(1)}
-                      </p>
-                      {manager.introduceText && (
-                        <p className="text-gray-500 mt-1 text-left">
-                          {manager.introduceText.length > 15 
-                            ? `${manager.introduceText.slice(0, 15)}...` 
-                            : manager.introduceText}
-                        </p>
-                      )}
-                      {manager.region && manager.region.length > 0 && (
-                        renderRegions(manager.region, manager.managerUuid)
-                      )}
-                    </div>
-                  </ManagerInfo>
-                  <DeleteButton onClick={() => handleRemoveBlacklist(manager.managerUuid)}>
-                    삭제
-                  </DeleteButton>
-                </ManagerCard>
-              ))
             ) : (
-              <div className="text-center py-8 text-gray-500">
-                블랙리스트 매니저가 없습니다.
-              </div>
+              blacklistManagers.length > 0 ? (
+                blacklistManagers.map((manager) => (
+                  <ManagerCard key={manager.managerUuid}>
+                    <ManagerInfo>
+                      <ProfileImageContainer>
+                        <ProfileImageWrapper>
+                          {manager.profileImage && !imageLoadErrors[manager.managerUuid] ? (
+                            <ProfileImage
+                              src={manager.profileImage}
+                              alt={`${manager.name}의 프로필`}
+                              onError={() => handleImageError(manager.managerUuid)}
+                              loading="lazy"
+                            />
+                          ) : (
+                            <ProfileFallback>
+                              <ProfileInitial>
+                                {manager.name.charAt(0)}
+                              </ProfileInitial>
+                            </ProfileFallback>
+                          )}
+                        </ProfileImageWrapper>
+                      </ProfileImageContainer>
+                      <div className="flex flex-col items-start pt-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-lg font-semibold text-gray-900">{manager.name}</h3>
+                          <span className="px-2 py-0.5 bg-orange-50 text-orange-600 text-xs font-medium rounded-full">
+                            평점 {manager.averageRate.toFixed(1)}
+                          </span>
+                        </div>
+                        {manager.introduceText && (
+                          <p className="text-gray-600 mt-1 text-sm line-clamp-2">
+                            {manager.introduceText}
+                          </p>
+                        )}
+                        {manager.region && manager.region.length > 0 && (
+                          renderRegions(manager.region, manager.managerUuid)
+                        )}
+                      </div>
+                    </ManagerInfo>
+                    <DeleteButton onClick={() => handleRemoveBlacklist(manager.managerUuid)}>
+                      삭제
+                    </DeleteButton>
+                  </ManagerCard>
+                ))
+              ) : (
+                <div className="text-center py-12 bg-white rounded-xl shadow-sm">
+                  <div className="text-gray-400 mb-2">
+                    <svg className="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-500 font-medium">블랙리스트 매니저가 없습니다</p>
+                  <p className="text-gray-400 text-sm mt-1">블랙리스트에 추가된 도우미가 없습니다</p>
+                </div>
+              )
             )}
           </div>
         </div>
