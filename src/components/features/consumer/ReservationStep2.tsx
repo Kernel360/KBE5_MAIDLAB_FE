@@ -111,11 +111,15 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
     // 1. 주소값 체크
     if (!form.address) {
       alert('주소를 입력하세요.');
+      addressRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      addressRef.current?.focus();
       return;
     }
 
     if (!form.addressDetail) {
       alert('상세 주소를 입력하세요.');
+      addressDetailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      addressDetailRef.current?.focus();
       return;
     }
 
@@ -160,19 +164,13 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
       }
     }
 
-    // petType 상태를 기반으로 string으로 변환
-    let petArr: string[] = [];
-    if (form.pet === 'DOG') petArr.push('DOG');
-    if (form.pet === 'CAT') petArr.push('CAT');
-    if (form.pet === 'ETC') petArr.push(form.pet);
-    let petString: string = petArr.length > 0 ? petArr.join(',') : 'NONE';
-
+    // petType 상태를 기반으로 string으로 변환 (이미 form.pet에 반영됨)
     const formData: ReservationFormData = {
       ...form,
       serviceAdd: selectedServices.join(','),
       specialRequest: '',
       managerUuId,
-      pet: petString as any, // Step3에서 string으로 받도록 any 처리
+      pet: form.pet as any,
     };
     onSubmit(formData);
   };
@@ -249,14 +247,18 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
   // 반려동물 모달 내용
   const [petType, setPetType] = useState<{ dog: boolean; cat: boolean; etc: string }>({ dog: false, cat: false, etc: '' });
   const handlePetSave = () => {
-    let pet: 'NONE' | 'DOG' | 'CAT' | 'ETC' = 'NONE';
-    if (petType.dog && petType.cat) pet = 'ETC';
-    else if (petType.dog) pet = 'DOG';
-    else if (petType.cat) pet = 'CAT';
-    else if (petType.etc) pet = 'ETC';
-    setForm(prev => ({ ...prev, pet }));
+    // 선택된 반려동물 값을 모두 배열로 수집
+    const pets: string[] = [];
+    if (petType.dog) pets.push('DOG');
+    if (petType.cat) pets.push('CAT');
+    if (petType.etc.trim()) pets.push(petType.etc.trim());
+    setForm(prev => ({ ...prev, pet: pets.length > 0 ? (pets.join(',') as any) : 'NONE' }));
     setPetModal(false);
   };
+
+  // 주소, 상세주소 등 유효성 검사 시 해당 input으로 스크롤 이동
+  const addressRef = React.useRef<HTMLInputElement>(null);
+  const addressDetailRef = React.useRef<HTMLInputElement>(null);
 
   return (
     <>
@@ -275,6 +277,7 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
               placeholder="서울특별시 서초구 서초대로 74길 29"
               value={form.address}
               onChange={(e) => setForm(prev => ({ ...prev, address: e.target.value }))}
+              ref={addressRef}
             />
             <button
               onClick={handleAddressSearch}
@@ -289,6 +292,7 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
             placeholder="상세 주소 입력"
             value={form.addressDetail}
             onChange={(e) => setForm(prev => ({ ...prev, addressDetail: e.target.value }))}
+            ref={addressDetailRef}
           />
         </div>
 
