@@ -1,191 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Upload, User } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
 import { useConsumer } from '@/hooks/useConsumer';
 import type { ConsumerProfileRequestDto } from '@/apis/consumer';
 import { ROUTES } from '@/constants';
 import { uploadToS3 } from '@/utils/s3';
-
-const BackButton = styled.button`
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #6B7280;
-  transition: color 0.2s;
-  z-index: 10;
-
-  &:hover {
-    color: #F97316;
-  }
-
-  svg {
-    width: 24px;
-    height: 24px;
-  }
-`;
-
-const ProfileContainer = styled.div`
-  max-width: 600px;
-  margin: 40px auto;
-  position: relative;
-  padding: 0 20px;
-`;
-
-const ProfileCard = styled.div`
-  background: #FFFFFF;
-  padding: 32px;
-  border-radius: 16px;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
-`;
-
-const ProfileHeader = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 32px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #E5E7EB;
-  position: relative;
-`;
-
-const Title = styled.h1`
-  font-size: 24px;
-  font-weight: 700;
-  color: #1F2937;
-  text-align: center;
-`;
-
-const SaveButton = styled.button`
-  width: 100%;
-  padding: 14px 20px;
-  background: #F97316;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-top: 5px;
-  
-  &:hover {
-    background: #EA580C;
-  }
-  
-  &:disabled {
-    background: #9CA3AF;
-    cursor: not-allowed;
-  }
-`;
-
-const ProfileImage = styled.div`
-  width: 120px;
-  height: 120px;
-  border-radius: 60px;
-  background-color: #F3F4F6;
-  margin: 0 auto 32px;
-  position: relative;
-  cursor: pointer;
-  overflow: hidden;
-  border: 1px solid #FDBA74;
-
-  &::before {
-    content: '이미지';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #6B7280;
-    font-size: 14px;
-  }
-
-  &:hover::after {
-    content: '이미지 변경';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 6px;
-    font-size: 13px;
-    font-weight: 500;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 28px;
-  }
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-
-  input[type="file"] {
-    display: none;
-  }
-`;
-
-const InfoGroup = styled.div`
-  margin-bottom: 24px;
-  padding: 20px;
-  background: #F9FAFB;
-  border-radius: 12px;
-  border: 1px solid #E5E7EB;
-`;
-
-const Label = styled.div`
-  font-size: 14px;
-  color: #6B7280;
-  margin-bottom: 6px;
-  font-weight: 500;
-`;
-
-const Value = styled.div`
-  font-size: 16px;
-  color: #1F2937;
-  font-weight: 600;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #E5E7EB;
-  border-radius: 6px;
-  font-size: 14px;
-  color: #1F2937;
-  background-color: white;
-  transition: all 0.2s;
-  text-align: center;
-
-  &:focus {
-    outline: none;
-    border-color: #F97316;
-    box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.1);
-  }
-
-  &::placeholder {
-    color: #9CA3AF;
-  }
-
-  &:disabled {
-    background-color: #F3F4F6;
-    cursor: not-allowed;
-  }
-`;
 
 interface ProfileData {
   name: string;
@@ -212,9 +32,10 @@ const Profile: React.FC = () => {
   });
   const [previewImage, setPreviewImage] = useState<string | undefined>(undefined);
   const [imageError, setImageError] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [errors, setErrors] = useState({ address: '', detailAddress: '' });
   const { showToast } = useToast();
   const navigate = useNavigate();
-  const [isEditing, setIsEditing] = useState(false);
 
   // 프로필 데이터 가져오기
   useEffect(() => {
@@ -243,43 +64,51 @@ const Profile: React.FC = () => {
     }));
   };
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleImageUpload = async () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async (e) => {
+      const target = e.target as HTMLInputElement;
+      const file = target.files?.[0];
+      if (!file) return;
 
-    // File size validation (5MB limit)
-    if (file.size > 5 * 1024 * 1024) {
-      showToast('이미지 크기는 5MB 이하로 업로드해주세요.', 'error');
-      return;
-    }
+      // 파일 크기 검증 (5MB 제한)
+      if (file.size > 5 * 1024 * 1024) {
+        showToast('이미지 크기는 5MB 이하로 업로드해주세요.', 'error');
+        return;
+      }
 
-    // Image type validation
-    if (!file.type.startsWith('image/')) {
-      showToast('이미지 파일만 업로드 가능합니다.', 'error');
-      return;
-    }
+      // 이미지 타입 검증
+      if (!file.type.startsWith('image/')) {
+        showToast('이미지 파일만 업로드 가능합니다.', 'error');
+        return;
+      }
 
-    // Generate preview URL for the selected image
-    const previewUrl = URL.createObjectURL(file);
-    setPreviewImage(previewUrl);
+      setUploadingImage(true);
+      try {
+        // 미리보기 설정
+        const previewUrl = URL.createObjectURL(file);
+        setPreviewImage(previewUrl);
 
-    try {
-      // S3 upload only
-      const { url } = await uploadToS3(file);
-      console.log('S3에 저장된 URL:', url);
+        // S3 업로드
+        const { url } = await uploadToS3(file);
 
-      // Update formData with the new image URL
-      setFormData(prev => ({
-        ...prev,
-        profileImage: url
-      }));
+        setFormData((prev: ProfileData) => ({ ...prev, profileImage: url }));
+        showToast('프로필 이미지가 업로드되었습니다.', 'success');
+      } catch (error) {
+        console.error('이미지 업로드 실패:', error);
+        showToast('이미지 업로드에 실패했습니다.', 'error');
+        setPreviewImage('');
+      } finally {
+        setUploadingImage(false);
+      }
+    };
+    input.click();
+  };
 
-      showToast('이미지가 업로드되었습니다. 저장 버튼을 눌러 변경사항을 적용해주세요.', 'success');
-    } catch (error: any) {
-      showToast(error.message || '이미지 업로드에 실패했습니다.', 'error');
-      // Remove preview on error
-      setPreviewImage(undefined);
-    }
+  const isFormValid = (): boolean => {
+    return !errors.address && !errors.detailAddress;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -292,19 +121,14 @@ const Profile: React.FC = () => {
 
     try {
       const profileData: ConsumerProfileRequestDto = {
-        profileImage: formData.profileImage,  // Include the image URL from formData
+        profileImage: formData.profileImage,
         address: formData.address,
         detailAddress: formData.detailAddress
       };
 
       console.log('프로필 업데이트 요청 데이터:', profileData);
-      const result = await updateProfile(profileData);
-      
-      if (result.success) {
-        showToast('프로필이 업데이트되었습니다.', 'success');
-        setIsEditing(false);
-        await fetchProfile();  // Refresh profile data
-      }
+      await updateProfile(profileData);
+      await fetchProfile();  // Refresh profile data
     } catch (error: any) {
       showToast(error.message || '프로필 업데이트에 실패했습니다.', 'error');
     }
@@ -332,108 +156,195 @@ const Profile: React.FC = () => {
     };
   }, [previewImage]);
 
-  const handleEditClick = () => {
-    setIsEditing(true);
-  };
-
-  const handleCancelClick = () => {
-    setIsEditing(false);
-    setPreviewImage(undefined);
-    // Reset form data to original profile data
-    if (profile) {
-      setFormData({
-        name: profile.name || '',
-        phoneNumber: profile.phoneNumber || '',
-        birth: profile.birth || '',
-        gender: profile.gender || 'MALE',
-        address: profile.address || '',
-        detailAddress: profile.detailAddress || '',
-        profileImage: profile.profileImage
-      });
-    }
-  };
-
   if (loading) {
     return (
-      <ProfileContainer>
-        <ProfileCard>
-          <div style={{ textAlign: 'center', padding: '40px' }}>
-            로딩중...
-          </div>
-        </ProfileCard>
-      </ProfileContainer>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+      </div>
     );
   }
 
   return (
-    <ProfileContainer>
-      <BackButton onClick={() => navigate(ROUTES.CONSUMER.MYPAGE)}>
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-        </svg>
-      </BackButton>
-      <ProfileCard>
-        <ProfileHeader>
-          <Title>프로필</Title>
-        </ProfileHeader>
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b">
+        <button
+          onClick={() => navigate(ROUTES.CONSUMER.MYPAGE)}
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+        >
+          <ArrowLeft className="w-6 h-6" />
+        </button>
+        <h1 className="text-lg font-bold">프로필 수정</h1>
+        <div className="w-10" />
+      </div>
 
-        <label htmlFor="profile-image">
-          <ProfileImage>
-            <img
-              src={imageError ? DEFAULT_PROFILE_IMAGE : (previewImage || formData.profileImage || DEFAULT_PROFILE_IMAGE)}
-              alt=""
-              onError={handleImageError}
-            />
-            <input
-              id="profile-image"
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-            />
-          </ProfileImage>
-        </label>
+      <div className="px-4 py-6">
+        <div className="max-w-md mx-auto space-y-6">
+          {/* 프로필 이미지 */}
+          <div className="text-center">
+            <div className="relative inline-block">
+              <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+                {previewImage || formData.profileImage ? (
+                  <img
+                    src={imageError ? DEFAULT_PROFILE_IMAGE : (previewImage || formData.profileImage)}
+                    alt="프로필"
+                    className="w-full h-full object-cover"
+                    onError={handleImageError}
+                  />
+                ) : (
+                  <User className="w-16 h-16 text-gray-400" />
+                )}
+              </div>
+              <button
+                onClick={handleImageUpload}
+                disabled={uploadingImage}
+                className={`absolute -bottom-2 -right-2 w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white shadow-lg transition-colors ${
+                  uploadingImage
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'hover:bg-orange-600'
+                }`}
+              >
+                {uploadingImage ? (
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Upload className="w-5 h-5" />
+                )}
+              </button>
+            </div>
+            <p className="text-sm text-gray-500 mt-3">
+              프로필 사진을 설정해주세요
+            </p>
+            <p className="text-xs text-gray-400">(선택사항)</p>
+          </div>
 
-        <InfoGroup>
-          <Label>휴대폰 번호</Label>
-          <Value>{formData.phoneNumber}</Value>
-        </InfoGroup>
+          {/* 기본 정보 */}
+          <div className="space-y-4">
+            <h3 className="text-xl font-bold text-gray-900 text-center">
+              기본 정보
+            </h3>
 
-        <InfoGroup>
-          <Label>이름</Label>
-          <Value>{formData.name}</Value>
-        </InfoGroup>
+            <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  휴대폰 번호
+                </label>
+                <input
+                  type="tel"
+                  value={formData.phoneNumber}
+                  disabled
+                  className="w-full p-3 bg-white border border-gray-300 rounded-lg text-gray-500"
+                />
+              </div>
 
-        <InfoGroup>
-          <Label>성별</Label>
-          <Value>{formData.gender === 'MALE' ? '남성' : '여성'}</Value>
-        </InfoGroup>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  이름
+                </label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  disabled
+                  className="w-full p-3 bg-white border border-gray-300 rounded-lg text-gray-500"
+                />
+              </div>
 
-        <InfoGroup>
-          <Label>생년월일</Label>
-          <Value>{formData.birth}</Value>
-        </InfoGroup>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  성별
+                </label>
+                <input
+                  type="text"
+                  value={formData.gender === 'MALE' ? '남성' : '여성'}
+                  disabled
+                  className="w-full p-3 bg-white border border-gray-300 rounded-lg text-gray-500"
+                />
+              </div>
 
-        <InfoGroup>
-          <Label>주소</Label>
-          <Input
-            value={formData.address}
-            onChange={(e) => handleInputChange('address', e.target.value)}
-            placeholder="주소를 입력해주세요"
-          />
-        </InfoGroup>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  생년월일
+                </label>
+                <input
+                  type="text"
+                  value={formData.birth}
+                  disabled
+                  className="w-full p-3 bg-white border border-gray-300 rounded-lg text-gray-500"
+                />
+              </div>
+            </div>
+          </div>
 
-        <InfoGroup>
-          <Label>상세주소</Label>
-          <Input
-            value={formData.detailAddress}
-            onChange={(e) => handleInputChange('detailAddress', e.target.value)}
-            placeholder="상세주소를 입력해주세요"
-          />
-        </InfoGroup>
+          {/* 주소 설정 */}
+          <div className="space-y-4">
+            <h3 className="text-xl font-bold text-gray-900 text-center">
+              주소 설정
+            </h3>
 
-        <SaveButton onClick={handleSubmit}>저장하기</SaveButton>
-      </ProfileCard>
-    </ProfileContainer>
+            {/* 주소 입력 필드 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                주소 <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={formData.address}
+                onChange={(e) => handleInputChange('address', e.target.value)}
+                placeholder="서울특별시 서초구"
+                className={`w-full p-3 border rounded-lg transition-colors ${
+                  errors.address ? 'border-red-500' : 'border-gray-300'
+                }`}
+              />
+              {errors.address && (
+                <p className="text-red-500 text-sm mt-1">{errors.address}</p>
+              )}
+            </div>
+
+            {/* 상세 주소 */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                상세 주소 <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={formData.detailAddress}
+                onChange={(e) => handleInputChange('detailAddress', e.target.value)}
+                placeholder="상세 주소를 입력해주세요"
+                className={`w-full p-3 border rounded-lg transition-colors ${
+                  errors.detailAddress ? 'border-red-500' : 'border-gray-300'
+                }`}
+              />
+              {errors.detailAddress && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.detailAddress}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* 완료 버튼 */}
+          <div className="pt-6">
+            <button
+              onClick={handleSubmit}
+              disabled={!isFormValid() || loading || uploadingImage}
+              className={`w-full py-4 rounded-lg font-medium transition-colors ${
+                isFormValid() && !loading && !uploadingImage
+                  ? 'bg-orange-500 text-white hover:bg-orange-600'
+                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              }`}
+            >
+              {loading || uploadingImage ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  {uploadingImage ? '이미지 업로드 중...' : '저장 중...'}
+                </div>
+              ) : (
+                '저장하기'
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

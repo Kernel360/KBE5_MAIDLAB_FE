@@ -111,7 +111,7 @@ export const consumerApi = {
   removeLikedManager: async (managerUuid: string): Promise<void> => {
     try {
       await apiClient.delete<ApiResponse<void>>(
-        `/api/consumers/likes/${managerUuid}`,
+        `/api/consumers/preference/${managerUuid}`,
       );
     } catch (error) {
       throw new Error(handleApiError(error));
