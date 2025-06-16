@@ -107,6 +107,20 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
   };
 
   const handleSubmit = async () => {
+    // 1. 주소값 체크
+    if (!form.address || !form.addressDetail) {
+      alert('주소를 입력하세요.');
+      return;
+    }
+
+    // 2. 매니저 직접 선택 체크
+    if (form.chooseManager) {
+      if (!form.managerUuId) {
+        alert('매니저를 선택하세요.');
+        return;
+      }
+    }
+
     let managerUuId = form.managerUuId;
     if (!form.chooseManager) {
       try {
