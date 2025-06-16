@@ -13,6 +13,19 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useEvent } from '@/hooks';
 import { ROUTES } from '@/constants';
 import { useFileUpload } from '@/hooks';
+import type { EventResponseDto } from '@/apis/event';
+
+interface UploadResult {
+  originalName: string;
+  storedKey: string;
+  size: number;
+  type: string;
+}
+
+interface PresignedUrlResponse {
+  url: string;
+  key: string;
+}
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
@@ -45,6 +58,77 @@ const EventEdit = () => {
   });
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [eventData, setEventData] = useState<EventResponseDto | null>(null);
+  const [mainImagePreview, setMainImagePreview] = useState<string>('');
+  const [imagePreview, setImagePreview] = useState<string>('');
+
+  // S3 presigned URL 요청 함수
+  const getPresignedUrls = async (filenames: string[]): Promise<PresignedUrlResponse[]> => {
+    const response = await fetch('http://localhost:8080/api/files/presigned-urls', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        filenames: filenames
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Presigned URL 요청 실패');
+    }
+
+    const data = await response.json();
+    return data.data;
+  };
+
+  // S3에 파일 업로드 함수
+  const uploadFileToS3 = async (presignedUrl: string, file: File): Promise<Response> => {
+    const response = await fetch(presignedUrl, {
+      method: 'PUT',
+      body: file,
+      headers: {
+        'Content-Type': file.type,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('S3 업로드 실패');
+    }
+
+    return response;
+  };
+
+  // 파일 업로드 및 URL 반환 함수
+  const uploadFiles = async (files: File[]): Promise<UploadResult[]> => {
+    if (!files || files.length === 0) return [];
+
+    const filenames = Array.from(files).map(file => file.name);
+    
+    try {
+      // 1. Presigned URL 요청
+      const presignedUrls = await getPresignedUrls(filenames);
+      
+      // 2. S3에 파일 업로드
+      const uploadPromises = Array.from(files).map(async (file, index) => {
+        const presignedData = presignedUrls[index];
+        await uploadFileToS3(presignedData.url, file);
+        
+        return {
+          originalName: file.name,
+          storedKey: presignedData.key,
+          size: file.size,
+          type: file.type
+        };
+      });
+
+      const uploadResults = await Promise.all(uploadPromises);
+      return uploadResults;
+    } catch (error) {
+      console.error('파일 업로드 실패:', error);
+      throw error;
+    }
+  };
 
   // 이벤트 데이터 불러오기
   useEffect(() => {
@@ -52,14 +136,17 @@ const EventEdit = () => {
       if (!id) return;
       
       try {
-        const eventData = await fetchEventDetail(Number(id));
-        if (eventData) {
+        const eventData1 = await fetchEventDetail(Number(id));
+        if (eventData1) {
+          setEventData(eventData1);
           setFormData({
-            title: eventData.title,
-            content: eventData.content || '',
-            mainImageUrl: eventData.mainImageUrl || '',
-            imageUrl: eventData.imageUrl || '',
+            title: eventData1.title,
+            content: eventData1.content || '',
+            mainImageUrl: eventData1.mainImageUrl || '',
+            imageUrl: eventData1.imageUrl || '',
           });
+          setMainImagePreview(eventData1.mainImageUrl || '');
+          setImagePreview(eventData1.imageUrl || '');
         }
       } catch (error) {
         console.error('이벤트 데이터 로드 실패:', error);
@@ -79,18 +166,32 @@ const EventEdit = () => {
   const handleMainImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       mainImageUpload.addFiles(e.target.files);
-      const url = URL.createObjectURL(e.target.files[0]);
-      setFormData(prev => ({ ...prev, mainImageUrl: url }));
+      const file = e.target.files[0];
+      const previewUrl = URL.createObjectURL(file);
+      setMainImagePreview(previewUrl);
     }
   }, [mainImageUpload]);
 
   const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       imageUpload.addFiles(e.target.files);
-      const url = URL.createObjectURL(e.target.files[0]);
-      setFormData(prev => ({ ...prev, imageUrl: url }));
+      const file = e.target.files[0];
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
     }
   }, [imageUpload]);
+
+  // 컴포넌트 언마운트 시 URL.createObjectURL로 생성한 URL 해제
+  useEffect(() => {
+    return () => {
+      if (mainImagePreview && !mainImagePreview.startsWith('http')) {
+        URL.revokeObjectURL(mainImagePreview);
+      }
+      if (imagePreview && !imagePreview.startsWith('http')) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [mainImagePreview, imagePreview]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,10 +200,34 @@ const EventEdit = () => {
     try {
       setSubmitting(true);
 
+      // 업로드할 파일들 수집
+      const filesToUpload: File[] = [];
+      const mainImageFile = mainImageUpload.files[0];
+      const detailImageFile = imageUpload.files[0];
+
+      if (mainImageFile) filesToUpload.push(mainImageFile);
+      if (detailImageFile) filesToUpload.push(detailImageFile);
+
+      let mainImageUrlToSend = eventData?.mainImageUrl || '';
+      let imageUrlToSend = eventData?.imageUrl || '';
+
+      // 새로운 파일이 있는 경우 S3에 업로드
+      if (filesToUpload.length > 0) {
+        const uploadResults = await uploadFiles(filesToUpload);
+        
+        if (mainImageFile) {
+          mainImageUrlToSend = "https://d1llec2m3tvk5i.cloudfront.net/" + uploadResults[0].storedKey;
+        }
+        
+        if (detailImageFile) {
+          imageUrlToSend = "https://d1llec2m3tvk5i.cloudfront.net/" + uploadResults[filesToUpload.indexOf(detailImageFile)].storedKey;
+        }
+      }
+
       const result = await updateEvent(Number(id), {
         title: formData.title,
-        mainImageUrl: formData.mainImageUrl,
-        imageUrl: formData.imageUrl,
+        mainImageUrl: mainImageUrlToSend,
+        imageUrl: imageUrlToSend,
         content: formData.content,
       });
 
@@ -111,10 +236,11 @@ const EventEdit = () => {
       }
     } catch (error) {
       console.error('이벤트 수정 실패:', error);
+      alert('이벤트 수정 중 오류가 발생했습니다.');
     } finally {
       setSubmitting(false);
     }
-  }, [id, formData, updateEvent, navigate]);
+  }, [id, formData, eventData, mainImageUpload, imageUpload, updateEvent, navigate]);
 
   const handleCancel = useCallback(() => {
     if (window.confirm('수정을 취소하시겠습니까?')) {
@@ -162,8 +288,8 @@ const EventEdit = () => {
               accept="image/*"
               onChange={handleMainImageUpload}
             />
-            {formData.mainImageUrl && (
-              <ImagePreview src={formData.mainImageUrl} alt="메인 이미지 미리보기" />
+            {mainImagePreview && (
+              <ImagePreview src={mainImagePreview} alt="메인 이미지 미리보기" />
             )}
           </Box>
 
@@ -176,8 +302,8 @@ const EventEdit = () => {
               accept="image/*"
               onChange={handleImageUpload}
             />
-            {formData.imageUrl && (
-              <ImagePreview src={formData.imageUrl} alt="상세 이미지 미리보기" />
+            {imagePreview && (
+              <ImagePreview src={imagePreview} alt="상세 이미지 미리보기" />
             )}
           </Box>
 
@@ -190,25 +316,19 @@ const EventEdit = () => {
               name="content"
               value={formData.content}
               onChange={handleChange}
+              required
             />
           </Box>
 
-          <Box display="flex" gap={2} justifyContent="flex-end">
-            <Button
-              variant="outlined"
-              onClick={handleCancel}
-              disabled={submitting}
-            >
+          <Box display="flex" justifyContent="flex-end" gap={2}>
+            <Button variant="outlined" onClick={handleCancel}>
               취소
             </Button>
             <Button
               type="submit"
               variant="contained"
+              color="primary"
               disabled={submitting}
-              sx={{
-                backgroundColor: '#FF7F50',
-                '&:hover': { backgroundColor: '#FF6347' },
-              }}
             >
               {submitting ? <CircularProgress size={24} /> : '수정'}
             </Button>
