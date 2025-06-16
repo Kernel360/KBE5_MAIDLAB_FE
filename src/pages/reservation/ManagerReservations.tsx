@@ -297,7 +297,7 @@ const ManagerReservations: React.FC = () => {
                 key={reservation.reservationId}
                 reservation={reservation}
                 getStatusBadgeStyle={(status) => getStatusBadgeStyle(status, reservation.reservationDate)}
-                onDetailClick={() => navigate(`/managers/reservations/${reservation.reservationId}`)}
+                onDetailClick={() => navigate(`/manager/reservations/${reservation.reservationId}`)}
                 onCheckIn={() => handleCheckInOutClick(reservation, true)}
                 onCheckOut={() => handleCheckInOutClick(reservation, false)}
               />

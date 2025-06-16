@@ -9,6 +9,10 @@ const ReservationStep1: React.FC<Props> = ({ onNext }) => {
   const [selected, setSelected] = useState<'대청소' | '부분청소' | '기타 청소'>('대청소');
 
   const handleSelect = (type: '대청소' | '부분청소' | '기타 청소') => {
+    if (type !== '대청소') {
+      alert('서비스 준비중입니다.');
+      return;
+    }
     setSelected(type);
   };
 
@@ -31,6 +35,8 @@ const ReservationStep1: React.FC<Props> = ({ onNext }) => {
                 ? 'border-orange-500 text-orange-500 bg-orange-50'
                 : 'border-gray-300'
             }`}
+            disabled={type !== '대청소'}
+            style={type !== '대청소' ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
           >
             {type}
           </button>
