@@ -225,14 +225,14 @@ export default function BoardForm({ mode, boardId, initialData, onSuccess }: Boa
                 navigate(`/board/${boardId}`);
               }
             }}
-            className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+            className="px-4 py-2 text-[#FF6B00] hover:bg-[#FFF5EE] rounded-lg"
             disabled={isSubmitting || isUploading}
           >
             취소
           </button>
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-blue-300"
+            className="px-4 py-2 bg-[#FF6B00] text-white rounded-lg hover:bg-[#FF8533] disabled:bg-[#FFB380]"
             disabled={isSubmitting || isUploading}
           >
             {isSubmitting ? (
