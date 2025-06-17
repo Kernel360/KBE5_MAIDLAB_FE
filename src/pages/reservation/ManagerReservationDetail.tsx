@@ -7,6 +7,8 @@ import { formatDateTime, formatPrice } from '@/utils';
 import { RESERVATION_STATUS_LABELS } from '@/constants/status';
 import { SERVICE_TYPE_LABELS } from '@/constants/service';
 import type { ReservationDetailResponseDto } from '@/apis/reservation';
+import ReservationHeader from '@/components/features/consumer/ReservationHeader';
+import {ManagerFooter} from '@/components/layout/BottomNavigation/BottomNavigation';
 
 const ManagerReservationDetail: React.FC = () => {
   const navigate = useNavigate();
@@ -114,16 +116,9 @@ const ManagerReservationDetail: React.FC = () => {
   const currentReservation = reservations?.find(r => r.reservationId === parseInt(id || ''));
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-3xl mx-auto p-4">
-        {/* 헤더 */}
-        <div className="flex items-center mb-6">
-          <button onClick={() => navigate(-1)} className="p-2">
-            <IoArrowBack size={24} />
-          </button>
-          <h1 className="text-xl font-bold ml-2">예약 상세</h1>
-        </div>
-
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <ReservationHeader title="예약 상세" onBack={() => navigate(-1)} />
+      <div className="flex-1 max-w-3xl mx-auto p-4 pt-16 pb-20">
         {/* 예약 정보 카드 */}
         <div className="bg-white rounded-lg shadow p-6">
           {/* 상태 배지 */}
@@ -200,6 +195,7 @@ const ManagerReservationDetail: React.FC = () => {
           </div>
         </div>
       </div>
+      <ManagerFooter />
 
       {/* 체크인/아웃 모달 */}
       {showModal && (

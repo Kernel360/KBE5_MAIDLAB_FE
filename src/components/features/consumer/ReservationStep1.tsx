@@ -1,14 +1,17 @@
 // src/components/features/consumer/ReservationStep1.tsx
 import React, { useState } from 'react';
 import ReservationHeader from './ReservationHeader';
-
+import { BottomNavigation } from '@/components/layout/BottomNavigation/BottomNavigation';
+import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 interface Props {
   onNext: (data: { serviceType: string; serviceDetailType: string }) => void;
 }
 
 const ReservationStep1: React.FC<Props> = ({ onNext }) => {
   const [selected, setSelected] = useState<'대청소' | '부분청소' | '기타 청소'>('대청소');
-
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const handleSelect = (type: '대청소' | '부분청소' | '기타 청소') => {
     if (type !== '대청소') {
       alert('서비스 준비중입니다.');
@@ -75,6 +78,11 @@ const ReservationStep1: React.FC<Props> = ({ onNext }) => {
             다음
           </button>
         </div>
+        <BottomNavigation
+        activeTab="reservation"
+        onTabClick={navigate}
+        isAuthenticated={isAuthenticated}
+      />
       </div>
     </>
   );
