@@ -4,6 +4,7 @@ import { ProtectedRoute } from '@/components/common';
 import ConsumerProfileSetup from '@/pages/ConsumerProfileSetup';
 import ConsumerMyPage from '@/pages/consumer/MyPage';
 import ConsumerProfile from '@/pages/consumer/Profile';
+import ConsumerProfileEdit from '@/pages/consumer/ProfileEdit';
 import ConsumerReservations from '@/pages/reservation/ConsumerReservations';
 import ConsumerReservationCreate from '@/pages/reservation/ConsumerReservationCreate';
 import ConsumerReservationDetail from '@/pages/reservation/ConsumerReservationDetail';
@@ -33,6 +34,14 @@ export const ConsumerRoutes = () => (
       element={
         <ProtectedRoute requiredUserType="CONSUMER">
           <ConsumerProfile />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path={ROUTES.CONSUMER.PROFILE_EDIT}
+      element={
+        <ProtectedRoute requiredUserType="CONSUMER">
+          <ConsumerProfileEdit />
         </ProtectedRoute>
       }
     />

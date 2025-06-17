@@ -4,25 +4,18 @@ import {
   ArrowLeft,
   User,
   Settings,
-  FileText,
-  MessageCircle,
-  Share2,
   ChevronRight,
-  LogOut,
   CreditCard,
   Ticket,
   Coins,
   Heart,
   Ban,
-  Star,
   Users,
 } from 'lucide-react';
 import { useConsumer } from '@/hooks/useConsumer';
-import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
 import type { ConsumerMyPageDto } from '@/apis/consumer';
 import { ROUTES } from '@/constants';
-import { CONFIRM_MESSAGES } from '@/constants/message';
 
 interface MenuItemProps {
   icon: React.ReactNode;
@@ -46,7 +39,6 @@ const MenuItem: React.FC<MenuItemProps> = ({ icon, title, onClick }) => (
 const MyPage: React.FC = () => {
   const navigate = useNavigate();
   const { fetchMypage, loading } = useConsumer();
-  const { logout } = useAuth();
   const { showToast } = useToast();
   const [userInfo, setUserInfo] = useState<ConsumerMyPageDto | null>(null);
 
@@ -62,18 +54,6 @@ const MyPage: React.FC = () => {
 
   const handleBack = () => {
     navigate(ROUTES.HOME);
-  };
-
-  const handleLogout = async () => {
-    if (window.confirm(CONFIRM_MESSAGES.LOGOUT)) {
-      try {
-        await logout();
-        showToast('로그아웃되었습니다.', 'success');
-        navigate(ROUTES.HOME);
-      } catch (error) {
-        showToast('로그아웃 중 오류가 발생했습니다.', 'error');
-      }
-    }
   };
 
   const handleProfileEdit = () => {
@@ -100,10 +80,6 @@ const MyPage: React.FC = () => {
     navigate(ROUTES.CONSUMER.BLACKLIST);
   };
 
-  const handleReviews = () => {
-    navigate(ROUTES.CONSUMER.REVIEW_REGISTER.replace(':id', 'my-reviews'));
-  };
-
   const handleInviteFriends = () => {
     showToast('친구 초대하기 기능은 준비 중입니다.', 'info');
   };
@@ -114,16 +90,16 @@ const MyPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex justify-center items-center">
+      <div className="min-h-screen bg-gray-50 flex justify-center items-center">
         <p className="text-gray-500">로딩 중...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
+      <div className="flex items-center justify-between p-4 border-b bg-white">
         <button
           onClick={handleBack}
           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -131,12 +107,7 @@ const MyPage: React.FC = () => {
           <ArrowLeft className="w-6 h-6" />
         </button>
         <h1 className="text-lg font-bold">마이페이지</h1>
-        <button
-          onClick={handleLogout}
-          className="p-2 text-gray-600 hover:text-gray-900"
-        >
-          <LogOut className="w-6 h-6" />
-        </button>
+        <div className="w-10" />
       </div>
 
       {/* Content */}
@@ -175,7 +146,7 @@ const MyPage: React.FC = () => {
               onClick={handleProfileEdit}
               className="w-full py-3 bg-[#FF6B00] text-white rounded-lg font-medium hover:bg-[#FF8533] transition-colors"
             >
-              프로필 수정
+              프로필 조회
             </button>
           </div>
 
@@ -212,13 +183,6 @@ const MyPage: React.FC = () => {
                 icon={<Ban className="w-5 h-5" />}
                 title="블랙리스트 도우미"
                 onClick={handleBlacklist}
-              />
-            </div>
-            <div className="border-t border-gray-200">
-              <MenuItem
-                icon={<Star className="w-5 h-5" />}
-                title="내가 쓴 리뷰"
-                onClick={handleReviews}
               />
             </div>
             <div className="border-t border-gray-200">
