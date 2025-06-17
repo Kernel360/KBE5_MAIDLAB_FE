@@ -360,17 +360,21 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
               value={form.startTime}
               onChange={(e) => setForm(prev => ({ ...prev, startTime: e.target.value }))}
             >
-              {Array.from({ length: 24 }).map((_, h) =>
-                ['00', '30'].map((m) => {
-                  const time = `${String(h).padStart(2, '0')}:${m}`;
+              {Array.from({ length: 32 }).map((_, i) => {
+                const hour = 6 + Math.floor(i / 2); // 6시부터 시작
+                const minute = i % 2 === 0 ? '00' : '30';
+                const time = `${String(hour).padStart(2, '0')}:${minute}`;
+                if (hour >= 6 && hour <= 21) {
                   return (
                     <option key={time} value={time}>
                       {time}
                     </option>
                   );
-                })
-              )}
+                }
+                return null;
+              })}
             </select>
+
             <select
               className="p-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-400"
               value={form.endTime}
