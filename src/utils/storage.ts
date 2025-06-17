@@ -191,7 +191,7 @@ export const userStorage = {
   },
 
   // 사용자 정보 저장
-  setUserInfo: (userInfo: any): void => {
+  setUserInfo: <T>(userInfo: T): void => {
     setLocalStorage(STORAGE_KEYS.USER_INFO, userInfo);
   },
 

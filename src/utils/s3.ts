@@ -1,4 +1,5 @@
 import { apiClient } from '@/apis';
+import { API_ENDPOINTS } from '@/constants/api';
 
 interface PresignedUrlResponse {
   key: string;
@@ -11,7 +12,7 @@ export const uploadToS3 = async (
 ): Promise<{ key: string; url: string }> => {
   try {
     // 1. 백엔드에서 presigned URL 받기
-    const response = await apiClient.post('/api/files/presigned-urls', {
+    const response = await apiClient.post(API_ENDPOINTS.FILE.PRESIGNED_URLS, {
       filenames: [file.name],
     });
 
@@ -55,7 +56,7 @@ export const uploadMultipleFilesToS3 = async (
   try {
     // 1. 모든 파일에 대한 presigned URL 요청
     const filenames = files.map((f) => f.name);
-    const response = await apiClient.post('/api/files/presigned-urls', {
+    const response = await apiClient.post(API_ENDPOINTS.FILE.PRESIGNED_URLS, {
       filenames,
     });
 
@@ -90,6 +91,34 @@ export const uploadMultipleFilesToS3 = async (
     return uploadResults;
   } catch (error) {
     console.error('다중 파일 업로드 에러:', error);
+    throw error;
+  }
+};
+
+export const getPresignedUrls = async (
+  fileNames: string[],
+): Promise<string[]> => {
+  try {
+    const response = await apiClient.post(API_ENDPOINTS.FILE.PRESIGNED_URLS, {
+      fileNames,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.error('Error getting presigned URLs:', error);
+    throw error;
+  }
+};
+
+export const uploadFiles = async (files: File[]): Promise<string[]> => {
+  try {
+    const fileNames = files.map((file) => file.name);
+    const presignedUrls = await getPresignedUrls(fileNames);
+
+    await Promise.all(files.map((file, index) => uploadToS3(file)));
+
+    return fileNames;
+  } catch (error) {
+    console.error('Error uploading files:', error);
     throw error;
   }
 };

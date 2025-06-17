@@ -1,132 +1,80 @@
-import { apiClient, type ApiResponse, handleApiError } from '../index';
+import { apiCall } from '../index';
+import type {
+  ConsumerProfileResponse,
+  ConsumerProfileUpdateRequest,
+  ConsumerMyPageResponse,
+  LikedManagerResponse,
+  BlackListedManagerResponse,
+  PreferenceRequest,
+} from '@/types/consumer';
+import { API_ENDPOINTS } from '@/constants/api';
 
-// 소비자 관련 타입 정의
-export interface ConsumerProfileRequestDto {
-  profileImage?: string;
-  address?: string;
-  detailAddress?: string;
-}
-
-export interface ConsumerProfileResponseDto {
-  profileImage?: string;
-  phoneNumber: string;
-  name: string;
-  birth: string;
-  gender: 'MALE' | 'FEMALE';
-  address?: string;
-  detailAddress?: string;
-}
-
-export interface ConsumerMyPageDto {
-  name: string;
-  point: number;
-  profileImage?: string;
-}
-
-export interface PreferenceRequestDto {
-  preference: boolean;
-}
-
-export interface LikedManagerResponseDto {
-  managerUuid: string;
-  name: string;
-  profileImage?: string;
-  averageRate: number;
-  introduceText?: string;
-  region: string[];
-}
-
-export interface BlackListedManagerResponseDto {
-  managerUuid: string;
-  name: string;
-  profileImage?: string;
-  averageRate: number;
-  introduceText?: string;
-  region: string[];
-}
-
-// 소비자 API 함수들
 export const consumerApi = {
-  // 프로필 조회
-  getProfile: async (): Promise<ConsumerProfileResponseDto> => {
-    try {
-      const response = await apiClient.get<
-        ApiResponse<ConsumerProfileResponseDto>
-      >('/api/consumers/profile');
-      return response.data.data;
-    } catch (error) {
-      throw new Error(handleApiError(error));
-    }
+  /**
+   * 프로필 조회
+   */
+  getProfile: async (): Promise<ConsumerProfileResponse> => {
+    return apiCall<ConsumerProfileResponse>(
+      'get',
+      API_ENDPOINTS.CONSUMER.PROFILE,
+    );
   },
 
-  // 프로필 수정
-  updateProfile: async (data: ConsumerProfileRequestDto): Promise<void> => {
-    try {
-      await apiClient.patch<ApiResponse<void>>('/api/consumers/profile', data);
-    } catch (error) {
-      throw new Error(handleApiError(error));
-    }
+  /**
+   * 프로필 수정
+   */
+  updateProfile: async (data: ConsumerProfileUpdateRequest): Promise<void> => {
+    return apiCall<void>('patch', API_ENDPOINTS.CONSUMER.PROFILE, data);
   },
 
-  // 마이페이지 조회
-  getMypage: async (): Promise<ConsumerMyPageDto> => {
-    try {
-      const response = await apiClient.get<ApiResponse<ConsumerMyPageDto>>(
-        '/api/consumers/mypage',
-      );
-      return response.data.data;
-    } catch (error) {
-      throw new Error(handleApiError(error));
-    }
+  /**
+   * 마이페이지 조회
+   */
+  getMypage: async (): Promise<ConsumerMyPageResponse> => {
+    return apiCall<ConsumerMyPageResponse>(
+      'get',
+      API_ENDPOINTS.CONSUMER.MYPAGE,
+    );
   },
 
-  // 찜/블랙리스트 등록
+  /**
+   * 선호도 생성
+   */
   createPreference: async (
     managerUuid: string,
-    data: PreferenceRequestDto,
+    data: PreferenceRequest,
   ): Promise<void> => {
-    try {
-      await apiClient.post<ApiResponse<void>>(
-        `/api/consumers/preference/${managerUuid}`,
-        data,
-      );
-    } catch (error) {
-      throw new Error(handleApiError(error));
-    }
+    return apiCall<void>(
+      'post',
+      API_ENDPOINTS.CONSUMER.PREFERENCE(managerUuid),
+      data,
+    );
   },
 
-  // 찜한 매니저 조회
-  getLikedManagers: async (): Promise<LikedManagerResponseDto[]> => {
-    try {
-      const response = await apiClient.get<
-        ApiResponse<LikedManagerResponseDto[]>
-      >('/api/consumers/likes');
-      return response.data.data;
-    } catch (error) {
-      throw new Error(handleApiError(error));
-    }
+  /**
+   * 찜한 매니저 조회
+   */
+  getLikedManagers: async (): Promise<LikedManagerResponse[]> => {
+    return apiCall<LikedManagerResponse[]>('get', API_ENDPOINTS.CONSUMER.LIKES);
   },
 
-  // 찜한 매니저 삭제
+  /**
+   * 찜한 매니저 제거
+   */
   removeLikedManager: async (managerUuid: string): Promise<void> => {
-    try {
-      await apiClient.delete<ApiResponse<void>>(
-        `/api/consumers/likes/${managerUuid}`,
-      );
-    } catch (error) {
-      throw new Error(handleApiError(error));
-    }
+    return apiCall<void>(
+      'delete',
+      API_ENDPOINTS.CONSUMER.REMOVE_LIKE(managerUuid),
+    );
   },
 
-  // 블랙리스트 매니저 조회
-  getBlackListManagers: async (): Promise<BlackListedManagerResponseDto[]> => {
-    try {
-      const response = await apiClient.get<
-        ApiResponse<BlackListedManagerResponseDto[]>
-      >('/api/consumers/blacklists');
-      return response.data.data;
-    } catch (error) {
-      throw new Error(handleApiError(error));
-    }
+  /**
+   * 블랙리스트 매니저 조회
+   */
+  getBlackListManagers: async (): Promise<BlackListedManagerResponse[]> => {
+    return apiCall<BlackListedManagerResponse[]>(
+      'get',
+      API_ENDPOINTS.CONSUMER.BLACKLIST,
+    );
   },
 };

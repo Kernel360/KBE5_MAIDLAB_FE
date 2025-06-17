@@ -1,4 +1,4 @@
-// src/utils/format.ts - 포맷팅 유틸리티
+import { CURRENCY_FORMATTERS, CURRENCY } from '@/constants/service';
 
 /**
  * 숫자를 천 단위로 콤마 포맷팅
@@ -12,7 +12,7 @@ export const formatNumber = (num: number): string => {
  */
 export const formatPrice = (price: string | number): string => {
   const numPrice = typeof price === 'string' ? parseInt(price, 10) : price;
-  return numPrice.toLocaleString('ko-KR');
+  return CURRENCY_FORMATTERS[CURRENCY.KRW](numPrice);
 };
 
 /**
@@ -276,6 +276,6 @@ export const formatDateTimeWithLocale = (date: string): string => {
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-    hour12: true
+    hour12: true,
   });
 };

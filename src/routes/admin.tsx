@@ -38,7 +38,10 @@ export const AdminRoutes = () => (
       <Route path="reservations" element={<AdminReservationList />} />
       <Route path="reservations/:id" element={<AdminReservationDetail />} />
       <Route path="settlements" element={<AdminSettlementList />} />
-      <Route path="settlements/:settlementId" element={<AdminSettlementDetail />} />
+      <Route
+        path="settlements/:settlementId"
+        element={<AdminSettlementDetail />}
+      />
       <Route path="events" element={<AdminEvents />} />
       <Route path="events/create" element={<AdminEventCreate />} />
       <Route path="events/:id/edit" element={<AdminEventEdit />} />

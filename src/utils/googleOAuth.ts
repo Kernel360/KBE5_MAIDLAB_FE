@@ -1,4 +1,3 @@
-// utils/googleOAuth.ts - COOP 문제 완전 해결
 import { env } from './env';
 
 /**
@@ -95,7 +94,8 @@ export const openGoogleLoginPopup = (
   let messageProcessed = false;
   let checkCount = 0;
   const maxChecks = 360;
-  // localStorage 메시지 감지 (COOP 우회)
+  let messageInterval: NodeJS.Timeout;
+
   const checkMessage = () => {
     if (messageProcessed) return;
 
@@ -108,7 +108,6 @@ export const openGoogleLoginPopup = (
       if (message) {
         const data = JSON.parse(message);
 
-        // 세션 ID 검증 (같은 세션의 메시지인지 확인)
         if (status) {
           const statusData = JSON.parse(status);
           if (statusData.sessionId !== sessionId) {
@@ -119,10 +118,8 @@ export const openGoogleLoginPopup = (
         localStorage.removeItem(OAUTH_MESSAGE_KEY);
         localStorage.removeItem(OAUTH_STATUS_KEY);
         messageProcessed = true;
-
         clearInterval(messageInterval);
 
-        // 팝업 닫기 시도 (에러 무시)
         setTimeout(() => {
           try {
             if (popup && typeof popup.close === 'function') {
@@ -141,7 +138,6 @@ export const openGoogleLoginPopup = (
         return;
       }
 
-      // 타임아웃 체크
       if (checkCount >= maxChecks) {
         localStorage.removeItem(OAUTH_MESSAGE_KEY);
         localStorage.removeItem(OAUTH_STATUS_KEY);
@@ -164,7 +160,7 @@ export const openGoogleLoginPopup = (
   };
 
   // 500ms마다 메시지 확인
-  const messageInterval = setInterval(checkMessage, 500);
+  messageInterval = setInterval(checkMessage, 500);
 };
 
 /**
