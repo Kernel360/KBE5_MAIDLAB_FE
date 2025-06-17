@@ -44,9 +44,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         ? ROUTES.CONSUMER.MYPAGE
         : userType === 'MANAGER'
           ? ROUTES.MANAGER.MYPAGE
-          : userType === 'ADMIN'
-            ? ROUTES.ADMIN.DASHBOARD
-            : ROUTES.LOGIN;
+          : ROUTES.LOGIN;
 
 
     return <Navigate to={defaultPage} replace />;
