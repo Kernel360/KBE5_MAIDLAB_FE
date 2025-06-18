@@ -1,4 +1,4 @@
-// src/utils/common.ts - 핵심 공통 유틸리티
+import { getBreakpointValue } from '@/constants/ui';
 
 /**
  * 딜레이 함수 (Promise 기반)
@@ -26,8 +26,15 @@ export const debounce = <T extends (...args: any[]) => any>(
  * 클립보드에 텍스트 복사
  */
 export const copyToClipboard = async (text: string): Promise<boolean> => {
+  // 입력값 검증
+  if (!text || typeof text !== 'string') {
+    console.warn('copyToClipboard: 유효하지 않은 텍스트');
+    return false;
+  }
+
   try {
-    if (navigator.clipboard) {
+    // 최신 Clipboard API 사용 (HTTPS 필요)
+    if (navigator.clipboard && window.isSecureContext) {
       await navigator.clipboard.writeText(text);
       return true;
     } else {
@@ -37,16 +44,24 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
       textArea.style.position = 'fixed';
       textArea.style.left = '-999999px';
       textArea.style.top = '-999999px';
+      textArea.style.opacity = '0';
+
       document.body.appendChild(textArea);
       textArea.focus();
       textArea.select();
 
-      const result = document.execCommand('copy');
-      document.body.removeChild(textArea);
-      return result;
+      try {
+        const result = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        return result;
+      } catch (execError) {
+        console.error('execCommand 복사 실패:', execError);
+        document.body.removeChild(textArea);
+        return false;
+      }
     }
   } catch (error) {
-    console.error('Failed to copy text:', error);
+    console.error('클립보드 복사 실패:', error);
     return false;
   }
 };
@@ -104,7 +119,14 @@ export const isEmpty = (value: any): boolean => {
   if (value == null) return true;
   if (typeof value === 'string') return value.trim() === '';
   if (Array.isArray(value)) return value.length === 0;
-  if (typeof value === 'object') return Object.keys(value).length === 0;
+  if (value instanceof Date) return isNaN(value.getTime());
+  if (typeof value === 'object') {
+    // Set, Map 등도 고려
+    if (value instanceof Set || value instanceof Map) {
+      return value.size === 0;
+    }
+    return Object.keys(value).length === 0;
+  }
   return false;
 };
 
@@ -112,23 +134,24 @@ export const isEmpty = (value: any): boolean => {
  * 범위 내 랜덤 숫자 생성
  */
 export const randomBetween = (min: number, max: number): number => {
-  return Math.floor(Math.random() * (min - max + 1)) + min;
+  if (min > max) {
+    throw new Error('min은 max보다 작거나 같아야 합니다.');
+  }
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
 /**
  * 화면 크기 확인
  */
-export const getScreenSize = (): {
-  isMobile: boolean;
-  isTablet: boolean;
-  isDesktop: boolean;
-} => {
+export const getScreenSize = () => {
   const width = window.innerWidth;
+  const mdBreakpoint = getBreakpointValue('MD');
+  const lgBreakpoint = getBreakpointValue('LG');
 
   return {
-    isMobile: width < 768,
-    isTablet: width >= 768 && width < 1024,
-    isDesktop: width >= 1024,
+    isMobile: width < mdBreakpoint,
+    isTablet: width >= mdBreakpoint && width < lgBreakpoint,
+    isDesktop: width >= lgBreakpoint,
   };
 };
 

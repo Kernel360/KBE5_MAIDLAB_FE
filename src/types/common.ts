@@ -274,3 +274,12 @@ export interface KeyValue<T = any> {
   key: string;
   value: T;
 }
+
+/**
+ * 타임슬롯
+ */
+export interface TimeSlot {
+  day: string;
+  startTime: string;
+  endTime: string;
+}

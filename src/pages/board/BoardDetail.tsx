@@ -1,17 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/useToast';
-import { useBoard } from '@/hooks/useBoard';
+import { useBoard } from '@/hooks/domain/useBoard';
 import { ROUTES } from '@/constants/route';
-import { BOARD_TYPE_LABELS} from '@/constants/board';
-import type { BoardDetailResponseDto, ImageDto } from '@/apis/board';
-import BoardHeader from '@/components/board/BoardHeader';
-import AnswerSection from '@/components/board/AnswerSection';
+import { BOARD_TYPE_LABELS } from '@/constants/board';
+import type { BoardDetailResponse, ImageInfo } from '@/types/board';
+import BoardHeader from '@/components/features/board/BoardHeader';
+import AnswerSection from '@/components/features/board/AnswerSection';
 
 // 이미지 모달 컴포넌트
-const ImageModal = ({ image, onClose }: { image: ImageDto; onClose: () => void }) => {
+const ImageModal = ({
+  image,
+  onClose,
+}: {
+  image: ImageInfo;
+  onClose: () => void;
+}) => {
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4"
       onClick={onClose}
     >
@@ -38,10 +44,10 @@ export default function BoardDetail() {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { fetchBoardDetail, deleteBoard } = useBoard();
-  const [board, setBoard] = useState<BoardDetailResponseDto | null>(null);
+  const [board, setBoard] = useState<BoardDetailResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<ImageDto | null>(null);
+  const [selectedImage, setSelectedImage] = useState<ImageInfo | null>(null);
 
   useEffect(() => {
     let isComponentMounted = true;
@@ -52,7 +58,7 @@ export default function BoardDetail() {
       try {
         setIsLoading(true);
         const data = await fetchBoardDetail(parseInt(id));
-        
+
         if (!isComponentMounted) return;
 
         if (data) {
@@ -67,7 +73,10 @@ export default function BoardDetail() {
         }
       } catch (error: any) {
         if (isComponentMounted) {
-          showToast(error.message || '게시글을 불러오는데 실패했습니다.', 'error');
+          showToast(
+            error.message || '게시글을 불러오는데 실패했습니다.',
+            'error',
+          );
           setTimeout(() => {
             if (isComponentMounted) {
               navigate(ROUTES.BOARD.LIST);
@@ -179,9 +188,11 @@ export default function BoardDetail() {
         {/* 이미지 갤러리 */}
         {board.images && board.images.length > 0 && (
           <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">첨부 이미지</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              첨부 이미지
+            </h3>
             <div className="grid grid-cols-3 gap-4">
-              {board.images.map((image: ImageDto, index: number) => (
+              {board.images.map((image: ImageInfo, index: number) => (
                 <div
                   key={index}
                   className="aspect-square relative group cursor-pointer"
@@ -212,4 +223,4 @@ export default function BoardDetail() {
       </div>
     </div>
   );
-} 
+}

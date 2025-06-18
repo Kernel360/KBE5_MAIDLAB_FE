@@ -9,9 +9,6 @@ import {
   TableHead,
   TableRow,
   Typography,
-  TextField,
-  Button,
-  InputAdornment,
   IconButton,
   Tooltip,
   CircularProgress,
@@ -20,22 +17,15 @@ import {
   Tab,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import SearchIcon from '@mui/icons-material/Search';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useState, useEffect } from 'react';
 import { useAdmin } from '@/hooks';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ROUTES } from '@/constants';
-import type { BoardResponseDto } from '@/apis/board';
+import type { BoardResponse } from '@/types/board';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
-}));
-
-const SearchBox = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  gap: theme.spacing(2),
-  marginBottom: theme.spacing(3),
 }));
 
 const ActionButton = styled(IconButton)(({ theme }) => ({
@@ -53,14 +43,17 @@ const BOARD_TYPE_NAMES: Record<BoardType, string> = {
 } as const;
 
 // 게시판 타입별 칩 색상
-const BOARD_TYPE_COLORS: Record<BoardType, 'error' | 'primary' | 'info' | 'default'> = {
+const BOARD_TYPE_COLORS: Record<
+  BoardType,
+  'error' | 'primary' | 'info' | 'default'
+> = {
   REFUND: 'error',
   MANAGER: 'primary',
   SERVICE: 'info',
   ETC: 'default',
 } as const;
 
-interface BoardWithId extends BoardResponseDto {
+interface BoardWithId extends BoardResponse {
   id: number;
 }
 
@@ -75,7 +68,10 @@ const BoardList = () => {
       localStorage.removeItem('adminBoardTab');
       return savedTab as TabType;
     }
-    return (location.state as { previousTab?: TabType })?.previousTab ?? 'consultation';
+    return (
+      (location.state as { previousTab?: TabType })?.previousTab ??
+      'consultation'
+    );
   });
   const [filteredBoards, setFilteredBoards] = useState<BoardWithId[]>([]);
   const [loading, setLoading] = useState(true);
@@ -86,7 +82,7 @@ const BoardList = () => {
   const fetchBoardsByTab = async (tab: TabType) => {
     setLoading(true);
     try {
-      let data: BoardResponseDto[];
+      let data: BoardResponse[];
       if (tab === 'consultation') {
         data = await boardManagement.fetchConsultationBoards();
       } else if (tab === 'refund') {
@@ -118,7 +114,12 @@ const BoardList = () => {
 
   return (
     <StyledContainer>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Typography variant="h5" component="h1">
           게시판 관리
         </Typography>
@@ -168,7 +169,9 @@ const BoardList = () => {
                   </TableCell>
                   <TableCell align="center">
                     <Tooltip title="상세보기">
-                      <ActionButton onClick={() => handleViewDetail(board.boardId)}>
+                      <ActionButton
+                        onClick={() => handleViewDetail(board.boardId)}
+                      >
                         <VisibilityIcon />
                       </ActionButton>
                     </Tooltip>
@@ -189,4 +192,4 @@ const BoardList = () => {
   );
 };
 
-export default BoardList; 
+export default BoardList;

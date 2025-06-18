@@ -28,7 +28,10 @@ const ConsumerReservationCreate: React.FC = () => {
     setStep(2);
   };
 
-  const handleCompleteReservation = () => {setStep(1); setFormData({})}
+  const handleCompleteReservation = () => {
+    setStep(1);
+    setFormData({});
+  };
 
   return (
     <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-md p-8 my-8">

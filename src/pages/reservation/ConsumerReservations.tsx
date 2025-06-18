@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useReservation } from '@/hooks/useReservation';
+import { useReservation } from '@/hooks/domain/useReservation';
 import { usePagination } from '@/hooks/usePagination';
-import { ReservationCard } from '@/components/reservation/ReservationCard';
-import { ROUTES, RESERVATION_STATUS, PAGINATION_DEFAULTS, INFO_MESSAGES } from '@/constants';
-import { IoArrowBack } from 'react-icons/io5';
+import { ReservationCard } from '@/components/features/reservation/ReservationCard';
+import {
+  ROUTES,
+  RESERVATION_STATUS,
+  PAGINATION_DEFAULTS,
+  INFO_MESSAGES,
+} from '@/constants';
 import { useNavigate } from 'react-router-dom';
-import type { ReservationResponseDto } from '@/apis/reservation';
+import type { ReservationListResponse } from '@/types/reservation';
 import ReservationHeader from '@/components/features/consumer/ReservationHeader';
 import { BottomNavigation } from '@/components/layout/BottomNavigation/BottomNavigation';
 import { useAuth } from '@/hooks/useAuth';
@@ -16,30 +20,35 @@ const TABS: TabType[] = ['전체', '예정', '진행중', '완료'];
 
 // Open-Closed: 상태 필터링 로직을 확장 가능하게 구성
 const RESERVATION_FILTERS = {
-  전체: (reservations: ReservationResponseDto[]) => reservations,
-  예정: (reservations: ReservationResponseDto[]) => 
-    reservations.filter(r => [
-      RESERVATION_STATUS.PENDING,
-      RESERVATION_STATUS.APPROVED,
-      RESERVATION_STATUS.MATCHED,
-    ].includes(r.status as "PENDING" | "APPROVED" | "MATCHED")),
-  진행중: (reservations: ReservationResponseDto[]) =>
-    reservations.filter(r => r.status === RESERVATION_STATUS.WORKING),
-  완료: (reservations: ReservationResponseDto[]) => 
-    reservations.filter(r => r.status === RESERVATION_STATUS.COMPLETED),
+  전체: (reservations: ReservationListResponse[]) => reservations,
+  예정: (reservations: ReservationListResponse[]) =>
+    reservations.filter((r) =>
+      [
+        RESERVATION_STATUS.PENDING,
+        RESERVATION_STATUS.APPROVED,
+        RESERVATION_STATUS.MATCHED,
+      ].includes(r.status as 'PENDING' | 'APPROVED' | 'MATCHED'),
+    ),
+  진행중: (reservations: ReservationListResponse[]) =>
+    reservations.filter((r) => r.status === RESERVATION_STATUS.WORKING),
+  완료: (reservations: ReservationListResponse[]) =>
+    reservations.filter((r) => r.status === RESERVATION_STATUS.COMPLETED),
 } as const;
 
 const ConsumerReservations: React.FC = () => {
   const navigate = useNavigate();
   const { reservations, loading, fetchReservations } = useReservation();
   const [activeTab, setActiveTab] = useState<TabType>('전체');
-  const [filteredReservations, setFilteredReservations] = useState<ReservationResponseDto[]>([]);
+  const [filteredReservations, setFilteredReservations] = useState<
+    ReservationListResponse[]
+  >([]);
   const { isAuthenticated } = useAuth();
 
-  const { currentPage, totalPages, goToPage, startIndex, endIndex } = usePagination({
-    totalItems: filteredReservations.length,
-    itemsPerPage: PAGINATION_DEFAULTS.SIZE,
-  });
+  const { currentPage, totalPages, goToPage, startIndex, endIndex } =
+    usePagination({
+      totalItems: filteredReservations.length,
+      itemsPerPage: PAGINATION_DEFAULTS.SIZE,
+    });
 
   useEffect(() => {
     fetchReservations();
@@ -53,12 +62,19 @@ const ConsumerReservations: React.FC = () => {
   }, [reservations, activeTab]);
 
   const handleReservationClick = (reservationId: number) => {
-    navigate(ROUTES.CONSUMER.RESERVATION_DETAIL.replace(':id', String(reservationId)));
+    navigate(
+      ROUTES.CONSUMER.RESERVATION_DETAIL.replace(':id', String(reservationId)),
+    );
   };
 
-  const handleReviewClick = (reservationId: number, event: React.MouseEvent) => {
+  const handleReviewClick = (
+    reservationId: number,
+    event: React.MouseEvent,
+  ) => {
     event.stopPropagation();
-    navigate(ROUTES.CONSUMER.REVIEW_REGISTER.replace(':id', String(reservationId)));
+    navigate(
+      ROUTES.CONSUMER.REVIEW_REGISTER.replace(':id', String(reservationId)),
+    );
   };
 
   const currentReservations = filteredReservations.slice(startIndex, endIndex);
@@ -108,18 +124,25 @@ const ConsumerReservations: React.FC = () => {
                   <ReservationCard
                     key={reservation.reservationId}
                     reservation={reservation}
-                    getStatusBadgeStyle={(status) => getStatusBadgeStyle(status)}
-                    onClick={() => handleReservationClick(reservation.reservationId)}
+                    getStatusBadgeStyle={(status) =>
+                      getStatusBadgeStyle(status)
+                    }
+                    onClick={() =>
+                      handleReservationClick(reservation.reservationId)
+                    }
                   />
                   {/* 리뷰 작성 버튼 */}
-                  {!reservation.isExistReview && reservation.status === RESERVATION_STATUS.COMPLETED && (
-                    <button
-                      onClick={(e) => handleReviewClick(reservation.reservationId, e)}
-                      className="absolute bottom-6 right-6 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 shadow-md"
-                    >
-                      리뷰 작성
-                    </button>
-                  )}
+                  {!reservation.isExistReview &&
+                    reservation.status === RESERVATION_STATUS.COMPLETED && (
+                      <button
+                        onClick={(e) =>
+                          handleReviewClick(reservation.reservationId, e)
+                        }
+                        className="absolute bottom-6 right-6 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 shadow-md"
+                      >
+                        리뷰 작성
+                      </button>
+                    )}
                 </div>
               ))}
               {/* 페이지네이션 */}
@@ -157,4 +180,4 @@ const ConsumerReservations: React.FC = () => {
   );
 };
 
-export default ConsumerReservations; 
+export default ConsumerReservations;

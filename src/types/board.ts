@@ -1,7 +1,4 @@
-/**
- * 게시판 타입
- */
-export type BoardType = 'REFUND' | 'MANAGER' | 'SERVICE' | 'ETC';
+import type { BoardType } from '@/constants/board';
 
 /**
  * 이미지 정보
@@ -9,6 +6,16 @@ export type BoardType = 'REFUND' | 'MANAGER' | 'SERVICE' | 'ETC';
 export interface ImageInfo {
   imagePath: string;
   name: string;
+}
+
+/**
+ * 답변 정보
+ */
+export interface Answer {
+  answerId: number;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 /**
@@ -22,10 +29,20 @@ export interface BoardCreateRequest {
 }
 
 /**
+ * 게시글 수정 요청
+ */
+export interface BoardUpdateRequest {
+  title: string;
+  content: string;
+  boardType: BoardType;
+  images: ImageInfo[];
+}
+
+/**
  * 게시글 응답 (목록용)
  */
 export interface BoardResponse {
-  id: number;
+  boardId: number;
   title: string;
   content: string;
   answered: boolean;
@@ -35,20 +52,10 @@ export interface BoardResponse {
 }
 
 /**
- * 답변 정보
- */
-export interface Answer {
-  id: number;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-/**
  * 게시글 상세 응답
  */
 export interface BoardDetailResponse {
-  id: number;
+  boardId: number;
   title: string;
   content: string;
   answered: boolean;

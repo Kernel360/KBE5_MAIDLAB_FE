@@ -7,7 +7,6 @@ import {
   Button,
   CircularProgress,
   Chip,
-  IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -22,8 +21,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAdmin } from '@/hooks';
 import { ROUTES } from '@/constants';
-import { formatDate } from '@/utils';
-import type { BoardDetailResponseDto } from '@/apis/board';
+import type { BoardDetailResponse } from '@/types/board';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
@@ -57,7 +55,10 @@ const BOARD_TYPE_NAMES: Record<string, string> = {
 } as const;
 
 // 게시판 타입별 칩 색상
-const BOARD_TYPE_COLORS: Record<string, 'error' | 'primary' | 'info' | 'default'> = {
+const BOARD_TYPE_COLORS: Record<
+  string,
+  'error' | 'primary' | 'info' | 'default'
+> = {
   REFUND: 'error',
   MANAGER: 'primary',
   SERVICE: 'info',
@@ -68,7 +69,7 @@ const BoardDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { boardManagement } = useAdmin();
-  const [board, setBoard] = useState<BoardDetailResponseDto | null>(null);
+  const [board, setBoard] = useState<BoardDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [answer, setAnswer] = useState('');
   const [isEditing, setIsEditing] = useState(false);
@@ -146,14 +147,6 @@ const BoardDetail = () => {
     }
   };
 
-  // 답변 수정 모드 시작
-  const handleStartEdit = () => {
-    if (board?.answer) {
-      setAnswer(board.answer.content);
-      setIsEditing(true);
-    }
-  };
-
   // 답변 수정 취소
   const handleCancelEdit = () => {
     if (board?.answer) {
@@ -165,7 +158,12 @@ const BoardDetail = () => {
   if (loading) {
     return (
       <StyledContainer>
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="60vh"
+        >
           <CircularProgress />
         </Box>
       </StyledContainer>
@@ -184,7 +182,12 @@ const BoardDetail = () => {
 
   return (
     <StyledContainer>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Button startIcon={<ArrowBackIcon />} onClick={handleBack}>
           목록으로
         </Button>
@@ -248,13 +251,22 @@ const BoardDetail = () => {
           {board.answer && !isEditing ? (
             // 답변이 있고 수정 모드가 아닌 경우
             <>
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                mb={2}
+              >
                 <Box />
                 <Button
                   variant="outlined"
                   color="primary"
                   size="small"
-                  onClick={() => navigate(`${ROUTES.ADMIN.BOARD_EDIT.replace(':id', id || '')}`)}
+                  onClick={() =>
+                    navigate(
+                      `${ROUTES.ADMIN.BOARD_EDIT.replace(':id', id || '')}`,
+                    )
+                  }
                 >
                   수정
                 </Button>
@@ -283,10 +295,20 @@ const BoardDetail = () => {
                   onClick={handleSubmitAnswer}
                   disabled={!answer.trim() || submitting}
                 >
-                  {submitting ? <CircularProgress size={24} color="inherit" /> : isEditing ? '수정' : '등록'}
+                  {submitting ? (
+                    <CircularProgress size={24} color="inherit" />
+                  ) : isEditing ? (
+                    '수정'
+                  ) : (
+                    '등록'
+                  )}
                 </Button>
                 {isEditing && (
-                  <Button variant="outlined" color="secondary" onClick={handleCancelEdit}>
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={handleCancelEdit}
+                  >
                     취소
                   </Button>
                 )}
@@ -316,4 +338,4 @@ const BoardDetail = () => {
   );
 };
 
-export default BoardDetail; 
+export default BoardDetail;

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useMatching } from '@/hooks/useMatching';
-import { useReservation } from '@/hooks/useReservation';
-import type { RequestMatchingListResponseDto } from '@/apis/matching';
+import { useMatching } from '@/hooks/domain/useMatching';
+import { useReservation } from '@/hooks/domain/useReservation';
+import type { MatchingRequestListResponse } from '@/types/matching';
 import { IoArrowBack } from 'react-icons/io5';
 import { formatDateTimeWithLocale, formatPrice } from '@/utils/format';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +10,7 @@ const ManagerMatching = () => {
   const navigate = useNavigate();
   const { fetchMatchings } = useMatching();
   const { respondToReservation } = useReservation();
-  const [matchings, setMatchings] = useState<RequestMatchingListResponseDto[]>([]);
+  const [matchings, setMatchings] = useState<MatchingRequestListResponse[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useReservation } from '@/hooks/useReservation';
-import { IoArrowBack } from 'react-icons/io5';
+import { useReservation } from '@/hooks/domain/useReservation';
 import { SERVICE_TYPE_LABELS, SERVICE_TYPES } from '@/constants/service';
 import { formatDateTime, formatPrice } from '@/utils';
-import type { ReservationDetailResponseDto } from '@/apis/reservation';
+import type { ReservationDetailResponse } from '@/types/reservation';
 import ReservationHeader from '@/components/features/consumer/ReservationHeader';
 import { BottomNavigation } from '@/components/layout/BottomNavigation/BottomNavigation';
 import { useAuth } from '@/hooks/useAuth';
@@ -16,7 +15,8 @@ const ConsumerReservationDetail: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [reservation, setReservation] = useState<ReservationDetailResponseDto | null>(null);
+  const [reservation, setReservation] =
+    useState<ReservationDetailResponse | null>(null);
 
   useEffect(() => {
     const loadReservationDetail = async () => {
@@ -28,7 +28,11 @@ const ConsumerReservationDetail: React.FC = () => {
         }
         setReservation(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : '예약 정보를 불러오는데 실패했습니다.');
+        setError(
+          err instanceof Error
+            ? err.message
+            : '예약 정보를 불러오는데 실패했습니다.',
+        );
       } finally {
         setLoading(false);
       }
@@ -49,7 +53,9 @@ const ConsumerReservationDetail: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 p-4">
         <div className="bg-white rounded-lg shadow p-4">
-          <p className="text-red-500 mb-4">{error || '예약 정보를 찾을 수 없습니다.'}</p>
+          <p className="text-red-500 mb-4">
+            {error || '예약 정보를 찾을 수 없습니다.'}
+          </p>
           <button
             onClick={() => navigate(-1)}
             className="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
@@ -152,7 +158,7 @@ const ConsumerReservationDetail: React.FC = () => {
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t">
           <div className="max-w-3xl mx-auto flex gap-3">
             {reservation.managerPhoneNumber && (
-              <button 
+              <button
                 className="flex-1 px-4 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
                 onClick={() => window.location.href = `tel:${reservation.managerPhoneNumber}`}
               >
@@ -171,4 +177,4 @@ const ConsumerReservationDetail: React.FC = () => {
   );
 };
 
-export default ConsumerReservationDetail; 
+export default ConsumerReservationDetail;

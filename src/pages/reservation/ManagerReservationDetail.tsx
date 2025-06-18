@@ -1,21 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { IoArrowBack } from 'react-icons/io5';
-import { useReservation } from '@/hooks/useReservation';
+import { useReservation } from '@/hooks/domain/useReservation';
 import { useReservationStatus } from '@/hooks/useReservationStatus';
 import { formatDateTime, formatPrice } from '@/utils';
 import { RESERVATION_STATUS_LABELS } from '@/constants/status';
 import { SERVICE_TYPE_LABELS } from '@/constants/service';
-import type { ReservationDetailResponseDto } from '@/apis/reservation';
+import type { ReservationDetailResponse } from '@/types/reservation';
 import ReservationHeader from '@/components/features/consumer/ReservationHeader';
 import {ManagerFooter} from '@/components/layout/BottomNavigation/BottomNavigation';
 
 const ManagerReservationDetail: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const { fetchReservationDetail, checkIn, checkOut, fetchReservations, reservations } = useReservation();
-  const { getStatusBadgeStyle, isCheckInAvailable, isCheckOutAvailable } = useReservationStatus();
-  const [reservation, setReservation] = useState<ReservationDetailResponseDto | null>(null);
+  const {
+    fetchReservationDetail,
+    checkIn,
+    checkOut,
+    fetchReservations,
+    reservations,
+  } = useReservation();
+  const { getStatusBadgeStyle, isCheckInAvailable, isCheckOutAvailable } =
+    useReservationStatus();
+  const [reservation, setReservation] =
+    useState<ReservationDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState<'checkIn' | 'checkOut'>('checkIn');
@@ -27,7 +34,7 @@ const ManagerReservationDetail: React.FC = () => {
         setLoading(true);
         const [detailData] = await Promise.all([
           fetchReservationDetail(parseInt(id)),
-          fetchReservations()
+          fetchReservations(),
         ]);
         setReservation(detailData);
       } catch (error) {
@@ -42,7 +49,7 @@ const ManagerReservationDetail: React.FC = () => {
 
   const handleCheckInOut = async () => {
     if (!reservation || !id) return;
-    
+
     const currentTime = new Date().toISOString();
     try {
       if (modalType === 'checkIn') {
@@ -63,7 +70,9 @@ const ManagerReservationDetail: React.FC = () => {
   const getStatusButton = () => {
     if (!reservation) return null;
 
-    const currentReservation = reservations?.find(r => r.reservationId === parseInt(id || ''));
+    const currentReservation = reservations?.find(
+      (r) => r.reservationId === parseInt(id || ''),
+    );
     if (!currentReservation) return null;
 
     if (isCheckInAvailable(currentReservation)) {
@@ -106,14 +115,24 @@ const ManagerReservationDetail: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center min-h-screen">로딩 중...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        로딩 중...
+      </div>
+    );
   }
 
   if (!reservation) {
-    return <div className="flex items-center justify-center min-h-screen">예약 정보를 찾을 수 없습니다.</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        예약 정보를 찾을 수 없습니다.
+      </div>
+    );
   }
 
-  const currentReservation = reservations?.find(r => r.reservationId === parseInt(id || ''));
+  const currentReservation = reservations?.find(
+    (r) => r.reservationId === parseInt(id || ''),
+  );
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -124,10 +143,19 @@ const ManagerReservationDetail: React.FC = () => {
           {/* 상태 배지 */}
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center">
-              <span className={`px-3 py-1 text-sm rounded-full ${
-                currentReservation ? getStatusBadgeStyle(currentReservation.status, currentReservation.reservationDate) : ''
-              }`}>
-                {currentReservation ? RESERVATION_STATUS_LABELS[currentReservation.status] : ''}
+              <span
+                className={`px-3 py-1 text-sm rounded-full ${
+                  currentReservation
+                    ? getStatusBadgeStyle(
+                        currentReservation.status,
+                        currentReservation.reservationDate,
+                      )
+                    : ''
+                }`}
+              >
+                {currentReservation
+                  ? RESERVATION_STATUS_LABELS[currentReservation.status]
+                  : ''}
               </span>
             </div>
             <div className="text-sm text-gray-500">
@@ -140,15 +168,21 @@ const ManagerReservationDetail: React.FC = () => {
             <div className="flex justify-between items-center">
               <div>
                 <h3 className="font-medium">
-                  {SERVICE_TYPE_LABELS[reservation.serviceType as keyof typeof SERVICE_TYPE_LABELS]} &gt;{' '}
-                  {reservation.serviceDetailType}
+                  {
+                    SERVICE_TYPE_LABELS[
+                      reservation.serviceType as keyof typeof SERVICE_TYPE_LABELS
+                    ]
+                  }{' '}
+                  &gt; {reservation.serviceDetailType}
                 </h3>
                 <p className="text-sm text-gray-500 mt-1">
                   {reservation.startTime} ~ {reservation.endTime}
                 </p>
               </div>
               <div className="text-right">
-                <p className="font-medium">{formatPrice(reservation.totalPrice)}원</p>
+                <p className="font-medium">
+                  {formatPrice(reservation.totalPrice)}원
+                </p>
               </div>
             </div>
           </div>
@@ -175,7 +209,9 @@ const ManagerReservationDetail: React.FC = () => {
             <h3 className="font-medium mb-2">주소</h3>
             <div className="bg-gray-50 rounded-lg p-4">
               <p>{reservation.address}</p>
-              <p className="text-sm text-gray-500 mt-1">{reservation.addressDetail}</p>
+              <p className="text-sm text-gray-500 mt-1">
+                {reservation.addressDetail}
+              </p>
             </div>
           </div>
 
@@ -190,9 +226,7 @@ const ManagerReservationDetail: React.FC = () => {
           )}
 
           {/* 상태 버튼 */}
-          <div className="mt-6">
-            {getStatusButton()}
-          </div>
+          <div className="mt-6">{getStatusButton()}</div>
         </div>
       </div>
       <ManagerFooter />
@@ -230,4 +264,4 @@ const ManagerReservationDetail: React.FC = () => {
   );
 };
 
-export default ManagerReservationDetail; 
+export default ManagerReservationDetail;

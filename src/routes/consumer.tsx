@@ -1,7 +1,7 @@
 import { Route } from 'react-router-dom';
 import { ROUTES } from '@/constants';
 import { ProtectedRoute } from '@/components/common';
-import ConsumerProfileSetup from '@/pages/ConsumerProfileSetup';
+import ConsumerProfileSetup from '@/pages/consumer/ConsumerProfileSetup';
 import ConsumerMyPage from '@/pages/consumer/MyPage';
 import ConsumerProfile from '@/pages/consumer/Profile';
 import ConsumerProfileEdit from '@/pages/consumer/ProfileEdit';

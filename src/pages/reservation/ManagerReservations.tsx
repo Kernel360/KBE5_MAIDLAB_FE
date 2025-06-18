@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { ReservationResponseDto } from '@/apis/reservation';
-import { useReservation } from '@/hooks/useReservation';
+import type { ReservationListResponse } from '@/types/reservation';
+import { useReservation } from '@/hooks/domain/useReservation';
 import { formatDateTime } from '@/utils';
 import { SUCCESS_MESSAGES } from '@/constants/message';
 import { useReservationStatus } from '@/hooks/useReservationStatus';
-import { ManagerReservationCard } from '@/components/reservation/ManagerReservationCard';
+import { ManagerReservationCard } from '@/components/features/reservation/ManagerReservationCard';
 import ReservationHeader from '@/components/features/consumer/ReservationHeader';
 import {ManagerFooter} from '@/components/layout/BottomNavigation/BottomNavigation';
 
@@ -87,10 +87,10 @@ const CheckInOutModal: React.FC<CheckInOutModalProps> = ({
 };
 
 const ConfirmModal: React.FC<ConfirmModalProps> = ({
-  isOpen,
-  onClose,
-  isCheckIn,
-}) => {
+                                                     isOpen,
+                                                     onClose,
+                                                     isCheckIn,
+                                                   }) => {
   if (!isOpen) return null;
 
   return (
@@ -184,7 +184,7 @@ const ManagerReservations: React.FC = () => {
   }, [fetchReservations, setReservationStatusLoading]);
 
   const handleCheckInOutClick = (
-    reservation: ReservationResponseDto,
+    reservation: ReservationListResponse,
     isCheckIn: boolean
   ) => {
     setCheckInOutModal({
@@ -255,7 +255,7 @@ const ManagerReservations: React.FC = () => {
 
         {/* 탭 */}
         <div className="flex space-x-4 mb-6">
-        
+
           <button
             onClick={() => setReservationStatusActiveTab('scheduled')}
             className={`px-4 py-2 rounded-lg ${
@@ -346,4 +346,4 @@ const ManagerReservations: React.FC = () => {
   );
 };
 
-export default ManagerReservations; 
+export default ManagerReservations;

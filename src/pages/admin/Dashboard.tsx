@@ -1,5 +1,11 @@
-import React from 'react';
-import { Box, Grid, Card, CardContent, Typography, Divider } from '@mui/material';
+import {
+  Box,
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Divider,
+} from '@mui/material';
 
 const mockStats = [
   { label: '전체 회원 수', value: 1234 },
@@ -12,7 +18,11 @@ const mockStats = [
 ];
 
 const recentActivities = [
-  { type: '회원가입', desc: '홍길동(소비자)님이 가입했습니다.', date: '2024-06-01' },
+  {
+    type: '회원가입',
+    desc: '홍길동(소비자)님이 가입했습니다.',
+    date: '2024-06-01',
+  },
   { type: '예약', desc: '예약 #1023이 생성되었습니다.', date: '2024-06-01' },
   { type: '정산', desc: '5월 정산이 완료되었습니다.', date: '2024-05-31' },
   { type: '문의', desc: '새 문의글이 등록되었습니다.', date: '2024-05-31' },
@@ -46,11 +56,21 @@ const Dashboard = () => {
           <CardContent>
             {recentActivities.map((activity, idx) => (
               <Box key={idx}>
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <Typography variant="body1">[{activity.type}] {activity.desc}</Typography>
-                  <Typography variant="body2" color="text.secondary">{activity.date}</Typography>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Typography variant="body1">
+                    [{activity.type}] {activity.desc}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {activity.date}
+                  </Typography>
                 </Box>
-                {idx < recentActivities.length - 1 && <Divider sx={{ my: 1 }} />}
+                {idx < recentActivities.length - 1 && (
+                  <Divider sx={{ my: 1 }} />
+                )}
               </Box>
             ))}
           </CardContent>
@@ -60,4 +80,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard; 
+export default Dashboard;

@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import type { ReservationFormData } from '@/types/reservation';
-import { useReservation } from '@/hooks/useReservation';
-import { useMatching } from '@/hooks/useMatching';
-import { SERVICE_DETAIL_TYPES, HOUSING_TYPES, ROOM_SIZES, SERVICE_OPTIONS, PET_TYPES } from '@/constants/service';
+import { useReservation } from '@/hooks/domain/useReservation';
+import { useMatching } from '@/hooks/domain/useMatching';
+import {
+  SERVICE_DETAIL_TYPES,
+  HOUSING_TYPES,
+  ROOM_SIZES,
+  SERVICE_OPTIONS,
+  PET_TYPES,
+} from '@/constants/service';
 import ReservationHeader from './ReservationHeader';
 
 interface Props {
@@ -13,12 +19,15 @@ interface Props {
 
 const getPetDisplay = (pet: string) => {
   if (!pet || pet === 'NONE') return '없음';
-  return pet.split(',').map((p) => {
-    if (p === 'DOG') return PET_TYPES.DOG;
-    if (p === 'CAT') return PET_TYPES.CAT;
-    if (p === 'NONE') return PET_TYPES.NONE;
-    return p;
-  }).join(', ');
+  return pet
+    .split(',')
+    .map((p) => {
+      if (p === 'DOG') return PET_TYPES.DOG;
+      if (p === 'CAT') return PET_TYPES.CAT;
+      if (p === 'NONE') return PET_TYPES.NONE;
+      return p;
+    })
+    .join(', ');
 };
 
 const ReservationStep3: React.FC<Props> = ({ data, onBack, onSubmit }) => {
@@ -30,7 +39,7 @@ const ReservationStep3: React.FC<Props> = ({ data, onBack, onSubmit }) => {
       const serviceDetailType = data.serviceDetailType || '대청소';
       const serviceDetail = SERVICE_DETAIL_TYPES[serviceDetailType];
       if (!serviceDetail) return;
-      const basePrice = serviceDetail.price;
+      const basePrice = serviceDetail.basePrice;
       let additionalPrice = 0;
       if (data.serviceAdd) {
         const services = data.serviceAdd.split(',');
@@ -42,7 +51,8 @@ const ReservationStep3: React.FC<Props> = ({ data, onBack, onSubmit }) => {
     calculatePrice();
   }, [data]);
 
-  const serviceDetail = SERVICE_DETAIL_TYPES[data.serviceDetailType || '대청소'];
+  const serviceDetail =
+    SERVICE_DETAIL_TYPES[data.serviceDetailType || '대청소'];
   // int -> BigDecimal
   const toBigDecimal = (price: number) => `${price}.00`;
 
@@ -89,7 +99,6 @@ const ReservationStep3: React.FC<Props> = ({ data, onBack, onSubmit }) => {
     <>
       <ReservationHeader title="예약 정보 확인" onBack={onBack} />
       <div className="pt-16 p-4 space-y-6 max-w-lg mx-auto">
-
         {/* 주소 입력 */}
         <div className="space-y-4">
           <h3 className="text-lg font-medium">주소 입력</h3>
@@ -130,7 +139,7 @@ const ReservationStep3: React.FC<Props> = ({ data, onBack, onSubmit }) => {
             ))}
           </div>
           <div className="flex gap-2">
-            {ROOM_SIZES.map(size => (
+            {ROOM_SIZES.map((size) => (
               <button
                 key={size.id}
                 className={`flex-1 py-2 px-4 rounded-full border ${
@@ -185,7 +194,7 @@ const ReservationStep3: React.FC<Props> = ({ data, onBack, onSubmit }) => {
         <div className="space-y-4">
           <h3 className="text-lg font-medium">서비스 추가</h3>
           <div className="flex flex-wrap gap-2">
-            {SERVICE_OPTIONS.map(service => (
+            {SERVICE_OPTIONS.map((service) => (
               <button
                 key={service.id}
                 className={`py-2 px-4 rounded-full border ${
@@ -209,7 +218,9 @@ const ReservationStep3: React.FC<Props> = ({ data, onBack, onSubmit }) => {
           <h3 className="text-lg font-medium">특이 사항</h3>
           <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50">
             <span>반려동물</span>
-            <span className="text-gray-700 font-semibold">{getPetDisplay(data.pet)}</span>
+            <span className="text-gray-700 font-semibold">
+              {getPetDisplay(data.pet)}
+            </span>
           </div>
         </div>
 

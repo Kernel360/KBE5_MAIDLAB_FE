@@ -1,11 +1,11 @@
 import { Route } from 'react-router-dom';
 import { ROUTES } from '@/constants';
 import { ProtectedRoute } from '@/components/common';
-import ManagerProfileSetup from '@/pages/ManagerProfileSetup';
+import ManagerProfileSetup from '@/pages/manager/ManagerProfileSetup';
 import ManagerMyPage from '@/pages/manager/ManagerMyPage';
 import ManagerReservations from '@/pages/reservation/ManagerReservations';
 import ManagerReservationDetail from '@/pages/reservation/ManagerReservationDetail';
-import ManagerReviewRegister from '@/pages/manager/ReviewRegister';
+import ManagerReviewRegister from '@/pages/manager/ManagerReviewRegister';
 import ManagerMatching from '@/pages/matching/ManagerMatching';
 import ManagerSettlements from '@/pages/manager/ManagerSettlements';
 

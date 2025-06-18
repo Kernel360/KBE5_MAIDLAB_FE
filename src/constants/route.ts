@@ -5,6 +5,7 @@ export const ROUTES = {
   SIGNUP: '/signup',
   SOCIAL_SIGNUP: '/social-signup',
   GOOGLE_CALLBACK: '/google-callback',
+
   // 소비자 페이지
   CONSUMER: {
     MYPAGE: '/consumer/mypage',

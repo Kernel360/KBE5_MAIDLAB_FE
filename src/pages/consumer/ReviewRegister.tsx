@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useReservation } from '@/hooks/useReservation';
+import { useReservation } from '@/hooks/domain/useReservation';
 import { ROUTES } from '@/constants';
 import { LENGTH_LIMITS } from '@/constants/validation';
-import type { ReviewRegisterRequestDto } from '@/apis/reservation';
+import type { ReviewRegisterRequest } from '@/types/reservation';
 
 // 선호도 타입 정의
 type PreferenceType = 'LIKE' | 'BLACKLIST' | 'NONE';
@@ -38,9 +38,7 @@ const RatingStars: React.FC<{
         </button>
       ))}
     </div>
-    <span className="block mt-2 text-xl font-medium">
-      {rating}.0
-    </span>
+    <span className="block mt-2 text-xl font-medium">{rating}.0</span>
   </div>
 );
 
@@ -50,9 +48,7 @@ const ReviewComment: React.FC<{
   onChange: (comment: string) => void;
 }> = ({ comment, onChange }) => (
   <div>
-    <label className="block text-lg font-medium mb-2">
-      리뷰 내용
-    </label>
+    <label className="block text-lg font-medium mb-2">리뷰 내용</label>
     <textarea
       value={comment}
       onChange={(e) => onChange(e.target.value)}
@@ -119,7 +115,7 @@ const ReviewRegister: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { registerReview } = useReservation();
-  
+
   const [formData, setFormData] = useState<ReviewFormData>({
     rating: 5,
     comment: '',
@@ -134,14 +130,18 @@ const ReviewRegister: React.FC = () => {
       return;
     }
 
-    if (formData.comment.length < LENGTH_LIMITS.REVIEW_COMMENT.MIN || 
-        formData.comment.length > LENGTH_LIMITS.REVIEW_COMMENT.MAX) {
-      alert(`리뷰는 ${LENGTH_LIMITS.REVIEW_COMMENT.MIN}자 이상 ${LENGTH_LIMITS.REVIEW_COMMENT.MAX}자 이하로 작성해주세요.`);
+    if (
+      formData.comment.length < LENGTH_LIMITS.REVIEW_COMMENT.MIN ||
+      formData.comment.length > LENGTH_LIMITS.REVIEW_COMMENT.MAX
+    ) {
+      alert(
+        `리뷰는 ${LENGTH_LIMITS.REVIEW_COMMENT.MIN}자 이상 ${LENGTH_LIMITS.REVIEW_COMMENT.MAX}자 이하로 작성해주세요.`,
+      );
       return;
     }
 
     try {
-      const data: ReviewRegisterRequestDto = {
+      const data: ReviewRegisterRequest = {
         rating: formData.rating,
         comment: formData.comment,
         ...(formData.preference !== 'NONE' && {
@@ -184,7 +184,9 @@ const ReviewRegister: React.FC = () => {
 
         <PreferenceButtons
           preference={formData.preference}
-          onChange={(preference) => setFormData((prev) => ({ ...prev, preference }))}
+          onChange={(preference) =>
+            setFormData((prev) => ({ ...prev, preference }))
+          }
         />
 
         <button

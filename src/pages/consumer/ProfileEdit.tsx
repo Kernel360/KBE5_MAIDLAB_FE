@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Upload, User, Eye, EyeOff, Lock } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
-import { useConsumer } from '@/hooks/useConsumer';
+import { useConsumer } from '@/hooks/domain/useConsumer';
 import { useAuth } from '@/hooks/useAuth';
-import type { ConsumerProfileRequestDto } from '@/apis/consumer';
+import type { ConsumerProfileUpdateRequest } from '@/types/consumer';
 import { ROUTES } from '@/constants';
 import { uploadToS3 } from '@/utils/s3';
 import { validatePassword } from '@/utils/validation';
@@ -37,7 +37,7 @@ const ProfileEdit: React.FC = () => {
   const [imageError, setImageError] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [errors, setErrors] = useState({ address: '', detailAddress: '' });
-  
+
   // 비밀번호 변경 모달 상태
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordData, setPasswordData] = useState({
@@ -51,7 +51,7 @@ const ProfileEdit: React.FC = () => {
     confirmPassword: ''
   });
   const [changingPassword, setChangingPassword] = useState(false);
-  
+
   const { showToast } = useToast();
   const navigate = useNavigate();
 
@@ -80,7 +80,7 @@ const ProfileEdit: React.FC = () => {
       ...prev,
       [field]: value
     }));
-    
+
     // 에러 메시지 초기화
     if (field === 'address' && errors.address) {
       setErrors(prev => ({ ...prev, address: '' }));
@@ -143,7 +143,7 @@ const ProfileEdit: React.FC = () => {
       ...prev,
       [field]: value
     }));
-    
+
     // 에러 메시지 초기화
     if (field === 'newPassword' && passwordErrors.newPassword) {
       setPasswordErrors(prev => ({ ...prev, newPassword: '' }));
@@ -155,26 +155,26 @@ const ProfileEdit: React.FC = () => {
 
   const validatePasswordForm = (): boolean => {
     const newErrors = { newPassword: '', confirmPassword: '' };
-    
+
     if (!passwordData.newPassword.trim()) {
       newErrors.newPassword = '새 비밀번호를 입력해주세요.';
     } else if (!validatePassword(passwordData.newPassword)) {
       newErrors.newPassword = '영문과 숫자를 포함하여 8-20자로 입력해주세요.';
     }
-    
+
     if (!passwordData.confirmPassword.trim()) {
       newErrors.confirmPassword = '비밀번호 확인을 입력해주세요.';
     } else if (passwordData.newPassword !== passwordData.confirmPassword) {
       newErrors.confirmPassword = '비밀번호가 일치하지 않습니다.';
     }
-    
+
     setPasswordErrors(newErrors);
     return !newErrors.newPassword && !newErrors.confirmPassword;
   };
 
   const handlePasswordSubmit = async () => {
     if (!validatePasswordForm()) return;
-    
+
     setChangingPassword(true);
     try {
       const result = await changePassword(passwordData.newPassword);
@@ -197,7 +197,7 @@ const ProfileEdit: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // 유효성 검사
     const newErrors = { address: '', detailAddress: '' };
     if (!formData.address.trim()) {
@@ -206,14 +206,14 @@ const ProfileEdit: React.FC = () => {
     if (!formData.detailAddress.trim()) {
       newErrors.detailAddress = '상세 주소를 입력해주세요.';
     }
-    
+
     if (newErrors.address || newErrors.detailAddress) {
       setErrors(newErrors);
       return;
     }
 
     try {
-      const profileData: ConsumerProfileRequestDto = {
+      const profileData: ConsumerProfileUpdateRequest = {
         profileImage: formData.profileImage,
         address: formData.address,
         detailAddress: formData.detailAddress
@@ -435,7 +435,7 @@ const ProfileEdit: React.FC = () => {
                 '저장하기'
               )}
             </button>
-            
+
             <button
               onClick={() => navigate(ROUTES.CONSUMER.PROFILE)}
               className="w-full py-4 bg-gray-500 text-white rounded-lg font-medium hover:bg-gray-600 transition-colors"
@@ -459,7 +459,7 @@ const ProfileEdit: React.FC = () => {
                 ✕
               </button>
             </div>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">

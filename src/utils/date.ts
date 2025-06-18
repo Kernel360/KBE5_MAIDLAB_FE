@@ -1,3 +1,5 @@
+import { WEEKDAY_SHORT_LABELS, WEEKDAYS } from '@/constants/service';
+
 /**
  * 날짜를 YYYY-MM-DD 형식으로 포맷팅
  */
@@ -148,8 +150,18 @@ export const getKoreanWeekday = (date: Date | string): string => {
   const d = new Date(date);
   if (isNaN(d.getTime())) return '';
 
-  const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-  return weekdays[d.getDay()];
+  const dayIndex = d.getDay(); // 0=일요일
+  const weekdayOrder = [
+    WEEKDAYS.SUNDAY,
+    WEEKDAYS.MONDAY,
+    WEEKDAYS.TUESDAY,
+    WEEKDAYS.WEDNESDAY,
+    WEEKDAYS.THURSDAY,
+    WEEKDAYS.FRIDAY,
+    WEEKDAYS.SATURDAY,
+  ];
+
+  return WEEKDAY_SHORT_LABELS[weekdayOrder[dayIndex]];
 };
 
 /**

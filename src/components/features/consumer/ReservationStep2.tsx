@@ -1,9 +1,9 @@
 // src/components/features/consumer/ReservationStep2.tsx
 import React, { useState, useEffect } from 'react';
 import type { ReservationFormData } from '@/types/reservation';
-import { useMatching } from '@/hooks/useMatching';
-import { format, addMinutes, addDays } from 'date-fns';
-import { HOUSING_TYPES, SERVICE_OPTIONS, ROOM_SIZES, type ServiceOption } from '@/constants/service';
+import { useMatching } from '@/hooks/domain/useMatching';
+import { format, addDays } from 'date-fns';
+import { HOUSING_TYPES, SERVICE_OPTIONS, ROOM_SIZES } from '@/constants/service';
 import ReservationHeader from './ReservationHeader';
 
 interface Props {
@@ -138,7 +138,7 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
       alert('예약 날짜는 오늘 이후의 날짜로 선택해주세요.');
       return;
     }
-    
+
 
     let managerUuId = form.managerUuId;
     if (!form.chooseManager) {
@@ -298,7 +298,7 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
         {/* 주택 정보 */}
         <div className="space-y-4">
           <h3 className="text-lg font-medium">주택 정보</h3>
-          
+
           {/* 주택 유형 */}
           <div className="flex gap-2">
             {Object.entries(HOUSING_TYPES).map(([key, label]) => (

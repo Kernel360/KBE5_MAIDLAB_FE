@@ -12,7 +12,7 @@ import {
 import { useManager, useToast } from '@/hooks';
 import { LoadingSpinner } from '@/components/common';
 import { ROUTES } from '@/constants';
-import type { MypageResponseDto, ReviewListResponseDto } from '@/apis/manager';
+import type { ManagerMyPageResponse } from '@/types/manager';
 
 interface MenuItemProps {
   icon: React.ReactNode;
@@ -35,45 +35,35 @@ const MenuItem: React.FC<MenuItemProps> = ({ icon, title, onClick }) => (
 
 const ManagerMyPage: React.FC = () => {
   const navigate = useNavigate();
-  const { fetchMypage, fetchMyReviews, loading } = useManager();
+  const { fetchMypage, loading } = useManager();
   const { showToast } = useToast();
 
-  const [profileData, setProfileData] = useState<MypageResponseDto | null>(
-    null,
-  );
-  const [reviewData, setReviewData] = useState<ReviewListResponseDto | null>(
+  const [profileData, setProfileData] = useState<ManagerMyPageResponse | null>(
     null,
   );
 
-  // 페이지 로드 시 데이터 불러오기
   useEffect(() => {
     loadData();
   }, []);
 
   const loadData = async () => {
     try {
-      // 마이페이지 정보 불러오기
       const profile = await fetchMypage();
       if (profile) {
         setProfileData(profile);
-      }
-
-      // 리뷰 정보 불러오기
-      const reviews = await fetchMyReviews();
-      if (reviews) {
-        setReviewData(reviews);
       }
     } catch (error) {
       console.error('데이터 로드 실패:', error);
     }
   };
 
-  const handleProfileEdit = () => {
-    navigate(ROUTES.MANAGER.PROFILE_EDIT);
+  const handleProfile = () => {
+    navigate(ROUTES.MANAGER.PROFILE);
   };
 
+  // TODO: 정산계좌 관리 기능 추가
   const handlePaymentAccount = () => {
-    showToast('결제계좌 관리 기능을 준비 중입니다.', 'info');
+    showToast('정산계좌 관리 기능을 준비 중입니다.', 'info');
   };
 
   const handleSettlementHistory = () => {
@@ -84,15 +74,16 @@ const ManagerMyPage: React.FC = () => {
     navigate(ROUTES.MANAGER.REVIEWS);
   };
 
+  // TODO: 친구초대 기능 추가
   const handleInviteFriend = () => {
     showToast('친구 초대 기능을 준비 중입니다.', 'info');
   };
 
+  // TODO: 설정 페이지 추가
   const handleSettings = () => {
     showToast('설정 페이지를 준비 중입니다.', 'info');
   };
 
-  // 로딩 중
   if (loading) {
     return <LoadingSpinner message="마이페이지를 불러오는 중..." />;
   }
@@ -148,10 +139,10 @@ const ManagerMyPage: React.FC = () => {
             </div>
 
             <button
-              onClick={handleProfileEdit}
+              onClick={handleProfile}
               className="w-full py-3 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors"
             >
-              프로필 수정
+              프로필 보기
             </button>
           </div>
 
@@ -159,7 +150,7 @@ const ManagerMyPage: React.FC = () => {
           <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
             <MenuItem
               icon={<FileText className="w-5 h-5" />}
-              title="결제계좌 관리"
+              title="정산계좌 관리"
               onClick={handlePaymentAccount}
             />
             <div className="border-t border-gray-200">

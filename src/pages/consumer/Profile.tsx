@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, User } from 'lucide-react';
-import { useToast } from '@/hooks/useToast';
-import { useConsumer } from '@/hooks/useConsumer';
+import { useConsumer } from '@/hooks/domain/useConsumer';
 import { ROUTES } from '@/constants';
 
 interface ProfileData {
@@ -29,7 +28,6 @@ const Profile: React.FC = () => {
     profileImage: undefined
   });
   const [imageError, setImageError] = useState(false);
-  const { showToast } = useToast();
   const navigate = useNavigate();
 
   // 프로필 데이터 가져오기

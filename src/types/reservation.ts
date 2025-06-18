@@ -1,30 +1,10 @@
-/**
- * 예약 상태
- */
-export type ReservationStatus =
-  | 'PENDING' // 대기중
-  | 'APPROVED' // 승인됨
-  | 'REJECTED' // 거절됨
-  | 'MATCHED' // 매칭됨
-  | 'WORKING' // 진행중
-  | 'CANCELED' // 취소됨
-  | 'FAILURE' // 실패
-  | 'COMPLETED'; // 완료
+import type { ReservationStatus } from '@/constants/status';
+import type { HousingType, PetType, ServiceType } from '@/constants/service';
 
 /**
- * 주거 타입
+ * 예약 생성 요청 (통합)
  */
-export type HousingType = 'APT' | 'VILLA' | 'HOUSE' | 'OFFICETEL';
-
-/**
- * 반려동물 타입
- */
-export type PetType = 'NONE' | 'DOG' | 'CAT' | 'ETC';
-
-/**
- * 예약 요청
- */
-export interface ReservationRequest {
+export interface ReservationCreateRequest {
   serviceDetailTypeId: number;
   address: string;
   addressDetail: string;
@@ -42,15 +22,17 @@ export interface ReservationRequest {
 }
 
 /**
- * 예약 응답 (목록용)
+ * 예약 목록 응답 (통합)
  */
-export interface ReservationResponse {
+export interface ReservationListResponse {
   reservationId: number;
+  status: ReservationStatus;
   serviceType: string;
   detailServiceType: string;
   reservationDate: string;
   startTime: string;
   endTime: string;
+  isExistReview: boolean;
   totalPrice: number;
 }
 
@@ -100,7 +82,7 @@ export interface CheckInOutRequest {
 export interface ReviewRegisterRequest {
   rating: number;
   comment: string;
-  likes: boolean;
+  likes?: boolean;
 }
 
 /**
@@ -113,6 +95,7 @@ export interface Review {
   comment: string;
   serviceType: string;
   serviceDetailType: string;
+  createdAt: string;
 }
 
 /**
@@ -123,53 +106,23 @@ export interface ReviewListResponse {
 }
 
 /**
- * 정산 정보
+ * 정산 응답
  */
-export interface Settlement {
+export interface SettlementResponse {
   settlementId: number;
-  serviceType: 'HOUSEKEEPING' | 'CARE';
+  serviceType: ServiceType;
   serviceDetailType: string;
-  status: ReservationStatus;
+  status: string;
   platformFee: number;
   amount: number;
 }
 
 /**
- * 주간 정산 응답
+ * 주간 정산 응답 (통합)
  */
 export interface WeeklySettlementResponse {
   totalAmount: number;
-  settlements: Settlement[];
-}
-
-/**
- * 관리자용 정산 정보
- */
-export interface AdminSettlement {
-  managerName: string;
-  serviceType: 'HOUSEKEEPING' | 'CARE';
-  status: ReservationStatus;
-  amount: number;
-  createdAt: string;
-  serviceDetailType: string;
-  settlementId: number;
-}
-
-/**
- * 관리자용 주간 정산 응답
- */
-export interface AdminWeeklySettlementResponse {
-  totalAmount: number;
-  settlements: {
-    totalPages: number;
-    totalElements: number;
-    size: number;
-    content: AdminSettlement[];
-    number: number;
-    first: boolean;
-    last: boolean;
-    empty: boolean;
-  };
+  settlements: SettlementResponse[];
 }
 
 /**
@@ -193,23 +146,6 @@ export interface ReservationFormData {
   chooseManager: boolean; // 직접 선택 여부
 }
 
-export interface ReservationRequestDto {
-  serviceDetailTypeId: number;
-  address: string;
-  addressDetail: string;
-  managerUuId: string;
-  housingType: string;
-  roomSize: number;
-  housingInformation: string;
-  reservationDate: string;
-  startTime: string;
-  endTime: string;
-  serviceAdd: string;
-  pet: string;
-  specialRequest: string;
-  totalPrice: string;
-}
-
 /**
  * 예약 검색 필터
  */
@@ -221,4 +157,16 @@ export interface ReservationSearchFilter {
   endDate?: string;
   managerId?: number;
   consumerId?: number;
+}
+
+/**
+ * 예약 통계
+ */
+export interface ReservationStats {
+  totalReservations: number;
+  completedReservations: number;
+  canceledReservations: number;
+  averageRating: number;
+  totalRevenue: number;
+  statusBreakdown: Record<ReservationStatus, number>;
 }

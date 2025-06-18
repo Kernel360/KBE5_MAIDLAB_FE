@@ -7,7 +7,9 @@ interface AdminProtectedRouteProps {
   children: React.ReactNode;
 }
 
-const AdminProtectedRoute: React.FC<AdminProtectedRouteProps> = ({ children }) => {
+const AdminProtectedRoute: React.FC<AdminProtectedRouteProps> = ({
+  children,
+}) => {
   const { isAuthenticated } = useAdminAuth();
 
   if (!isAuthenticated) {

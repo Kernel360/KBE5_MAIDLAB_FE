@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { adminApi } from '../../apis/admin';
-import type { ConsumerProfileResponseDto } from '../../apis/consumer';
+import type { ConsumerProfileResponse } from '@/types/consumer';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
@@ -34,7 +34,8 @@ const ConsumerDetail = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [consumerData, setConsumerData] = useState<ConsumerProfileResponseDto | null>(null);
+  const [consumerData, setConsumerData] =
+    useState<ConsumerProfileResponse | null>(null);
 
   useEffect(() => {
     const fetchConsumerData = async () => {
@@ -43,7 +44,11 @@ const ConsumerDetail = () => {
         const data = await adminApi.getConsumer(parseInt(id));
         setConsumerData(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
+        setError(
+          err instanceof Error
+            ? err.message
+            : '데이터를 불러오는데 실패했습니다.',
+        );
       } finally {
         setLoading(false);
       }
@@ -55,7 +60,12 @@ const ConsumerDetail = () => {
   if (loading) {
     return (
       <StyledContainer>
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="60vh"
+        >
           <CircularProgress />
         </Box>
       </StyledContainer>
@@ -88,7 +98,12 @@ const ConsumerDetail = () => {
 
   return (
     <StyledContainer>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Typography variant="h5" component="h1">
           소비자 상세 정보
         </Typography>
@@ -115,7 +130,9 @@ const ConsumerDetail = () => {
                 <Typography variant="subtitle2" color="textSecondary">
                   전화번호
                 </Typography>
-                <Typography variant="body1">{consumerData.phoneNumber}</Typography>
+                <Typography variant="body1">
+                  {consumerData.phoneNumber}
+                </Typography>
               </Grid>
               <Grid item xs={12} sm={6}>
                 <Typography variant="subtitle2" color="textSecondary">
@@ -138,7 +155,8 @@ const ConsumerDetail = () => {
                   </Typography>
                   <Typography variant="body1">
                     {consumerData.address}
-                    {consumerData.detailAddress && ` ${consumerData.detailAddress}`}
+                    {consumerData.detailAddress &&
+                      ` ${consumerData.detailAddress}`}
                   </Typography>
                 </Grid>
               )}
@@ -150,4 +168,4 @@ const ConsumerDetail = () => {
   );
 };
 
-export default ConsumerDetail; 
+export default ConsumerDetail;

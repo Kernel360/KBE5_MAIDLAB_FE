@@ -48,6 +48,9 @@ export const HTTP_STATUS = {
   NOT_FOUND: 404,
   CONFLICT: 409,
   INTERNAL_SERVER_ERROR: 500,
+  BAD_GATEWAY: 502,
+  SERVICE_UNAVAILABLE: 503,
+  GATEWAY_TIMEOUT: 504,
 } as const;
 
 // ===== API 기본 설정 =====
@@ -59,7 +62,7 @@ export const API_CONFIG = {
   RETRY_DELAY: 1000,
 } as const;
 
-// ===== API 엔드포인트 =====
+// ===== API 엔드포인트 (개선된 버전) =====
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: '/api/auth/login',
@@ -81,18 +84,19 @@ export const API_ENDPOINTS = {
     MYPAGE: '/api/consumers/mypage',
     LIKES: '/api/consumers/likes',
     BLACKLIST: '/api/consumers/blacklists',
-    PREFERENCE: '/api/consumers/preference',
+    PREFERENCE: (uuid: string) => `/api/consumers/preference/${uuid}`,
+    REMOVE_LIKE: (uuid: string) => `/api/consumers/likes/${uuid}`,
   },
   RESERVATION: {
     CREATE: '/api/reservations/register',
     LIST: '/api/reservations',
-    DETAIL: '/api/reservations',
-    CANCEL: '/api/reservations',
+    DETAIL: (id: number) => `/api/reservations/${id}`,
+    CANCEL: (id: number) => `/api/reservations/${id}/cancel`,
     PRICE_CHECK: '/api/reservations/price',
-    RESPONSE: '/api/reservations',
-    CHECKIN: '/api/reservations',
-    CHECKOUT: '/api/reservations',
-    REVIEW: '/api/reservations',
+    RESPONSE: (id: number) => `/api/reservations/${id}/response`,
+    CHECKIN: (id: number) => `/api/reservations/${id}/checkin`,
+    CHECKOUT: (id: number) => `/api/reservations/${id}/checkout`,
+    REVIEW: (id: number) => `/api/reservations/${id}/review`,
     SETTLEMENTS: '/api/reservations/settlements/weekly-details',
   },
   MATCHING: {
@@ -102,15 +106,20 @@ export const API_ENDPOINTS = {
   },
   EVENT: {
     LIST: '/api/events',
-    DETAIL: '/api/event',
+    DETAIL: (id: number) => `/api/event/${id}`,
     CREATE: '/api/event',
-    UPDATE: '/api/event',
-    DELETE: '/api/event',
+    UPDATE: (id: number) => `/api/event/${id}`,
+    DELETE: (id: number) => `/api/event/${id}`,
   },
   BOARD: {
     LIST: '/api/board',
-    DETAIL: '/api/board',
+    DETAIL: (id: number) => `/api/board/${id}`,
     CREATE: '/api/board',
+    UPDATE: (id: number) => `/api/board/${id}`,
+    DELETE: (id: number) => `/api/board/${id}`,
+  },
+  FILE: {
+    PRESIGNED_URLS: '/api/files/presigned-urls',
   },
   ADMIN: {
     AUTH: {
@@ -120,19 +129,26 @@ export const API_ENDPOINTS = {
     },
     MANAGER: {
       LIST: '/api/admin/manager',
-      DETAIL: '/api/admin/manager',
-      APPROVE: '/api/admin/manager',
-      REJECT: '/api/admin/manager',
+      DETAIL: (id: number) => `/api/admin/manager/${id}`,
+      APPROVE: (id: number) => `/api/admin/manager/${id}/approve`,
+      REJECT: (id: number) => `/api/admin/manager/${id}/reject`,
+      STATUS: '/api/admin/manager/status',
     },
     CONSUMER: {
       LIST: '/api/admin/consumer',
-      DETAIL: '/api/admin/consumer',
+      DETAIL: (id: number) => `/api/admin/consumer/${id}`,
     },
     RESERVATION: {
       LIST: '/api/admin/reservations',
-      DETAIL: '/api/admin/reservations',
+      DETAIL: (id: number) => `/api/admin/reservations/${id}`,
       DAILY: '/api/admin/reservations/date',
       SETTLEMENTS: '/api/admin/reservations/settlements/weekly',
+      SETTLEMENT_DETAIL: (id: number) =>
+        `/api/admin/reservations/settlement/${id}`,
+      SETTLEMENT_APPROVE: (id: number) =>
+        `/api/admin/reservations/settlement/${id}/approve`,
+      SETTLEMENT_REJECT: (id: number) =>
+        `/api/admin/reservations/settlement/${id}/reject`,
     },
     MATCHING: {
       LIST: '/api/admin/matching',
@@ -141,8 +157,40 @@ export const API_ENDPOINTS = {
     },
     BOARD: {
       LIST: '/api/admin/board',
+      DETAIL: (id: number) => `/api/admin/board/${id}`,
       CONSULTATION: '/api/admin/board/consultation',
-      ANSWER: '/api/admin/board/answer',
+      REFUND: '/api/admin/board/refund',
+      UPDATE_ANSWER: (id: number) => `/api/admin/board/answer/${id}`,
     },
   },
 } as const;
+
+// ===== 편의 함수들 =====
+
+/**
+ * API 코드에 해당하는 한글 메시지를 반환
+ */
+export const getApiMessage = (code: ApiCode): string => {
+  return API_CODE_MESSAGES[code];
+};
+
+/**
+ * HTTP 상태 코드가 성공 범위인지 확인
+ */
+export const isSuccessStatus = (status: number): boolean => {
+  return status >= 200 && status < 300;
+};
+
+/**
+ * HTTP 상태 코드가 클라이언트 에러인지 확인
+ */
+export const isClientError = (status: number): boolean => {
+  return status >= 400 && status < 500;
+};
+
+/**
+ * HTTP 상태 코드가 서버 에러인지 확인
+ */
+export const isServerError = (status: number): boolean => {
+  return status >= 500;
+};

@@ -12,9 +12,9 @@ import {
   Ban,
   Users,
 } from 'lucide-react';
-import { useConsumer } from '@/hooks/useConsumer';
+import { useConsumer } from '@/hooks/domain/useConsumer';
 import { useToast } from '@/hooks/useToast';
-import type { ConsumerMyPageDto } from '@/apis/consumer';
+import type { ConsumerMyPageResponse } from '@/types/consumer';
 import { ROUTES } from '@/constants';
 
 interface MenuItemProps {
@@ -40,7 +40,7 @@ const MyPage: React.FC = () => {
   const navigate = useNavigate();
   const { fetchMypage, loading } = useConsumer();
   const { showToast } = useToast();
-  const [userInfo, setUserInfo] = useState<ConsumerMyPageDto | null>(null);
+  const [userInfo, setUserInfo] = useState<ConsumerMyPageResponse | null>(null);
 
   useEffect(() => {
     const loadUserInfo = async () => {

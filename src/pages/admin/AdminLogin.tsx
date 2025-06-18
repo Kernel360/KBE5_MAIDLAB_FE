@@ -32,10 +32,10 @@ const AdminLogin = () => {
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  
+
   // useAdminAuth 훅에서 필요한 것들 가져오기
   const { login, loading, isAuthenticated } = useAdminAuth();
-  
+
   const navigate = useNavigate();
   const location = useLocation();
 
