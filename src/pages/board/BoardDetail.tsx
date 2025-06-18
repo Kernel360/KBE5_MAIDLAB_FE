@@ -175,7 +175,7 @@ export default function BoardDetail() {
                     {BOARD_TYPE_LABELS[board.boardType]}
                   </span>
                   <span className="text-xs text-gray-400">
-                    {formatDate(board.updatedAt)}
+                    {formatDate(board.createdAt)}
                   </span>
                   {board.answered && (
                     <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
