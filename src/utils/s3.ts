@@ -95,12 +95,13 @@ export const uploadMultipleFilesToS3 = async (
   }
 };
 
+// Presigned URL만 가져오는 함수 (필요한 경우)
 export const getPresignedUrls = async (
   fileNames: string[],
-): Promise<string[]> => {
+): Promise<PresignedUrlResponse[]> => {
   try {
     const response = await apiClient.post(API_ENDPOINTS.FILE.PRESIGNED_URLS, {
-      fileNames,
+      filenames: fileNames, // 'fileNames' -> 'filenames'로 수정 (API 스펙에 맞춤)
     });
     return response.data.data;
   } catch (error) {
@@ -109,14 +110,35 @@ export const getPresignedUrls = async (
   }
 };
 
-export const uploadFiles = async (files: File[]): Promise<string[]> => {
+// 최적화된 다중 파일 업로드 함수 (기존 uploadMultipleFilesToS3와 동일하지만 간소화)
+export const uploadFiles = async (
+  files: File[],
+): Promise<{ key: string; url: string }[]> => {
   try {
-    const fileNames = files.map((file) => file.name);
-    const presignedUrls = await getPresignedUrls(fileNames);
+    // uploadMultipleFilesToS3 함수를 재사용하여 중복 코드 제거
+    return await uploadMultipleFilesToS3(files);
+  } catch (error) {
+    console.error('Error uploading files:', error);
+    throw error;
+  }
+};
 
-    await Promise.all(files.map((file, index) => uploadToS3(file)));
+// 단일 파일 업로드 (간소화된 버전)
+export const uploadSingleFile = async (file: File): Promise<string> => {
+  try {
+    const result = await uploadToS3(file);
+    return result.url; // URL만 반환
+  } catch (error) {
+    console.error('Error uploading single file:', error);
+    throw error;
+  }
+};
 
-    return fileNames;
+// 파일 이름들만 반환하는 버전 (기존 uploadFiles 함수의 의도된 동작)
+export const uploadFilesGetNames = async (files: File[]): Promise<string[]> => {
+  try {
+    const results = await uploadMultipleFilesToS3(files);
+    return results.map((result) => result.key); // 파일 키(이름)들만 반환
   } catch (error) {
     console.error('Error uploading files:', error);
     throw error;

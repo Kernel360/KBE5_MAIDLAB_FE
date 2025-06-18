@@ -39,6 +39,13 @@ export const boardApi = {
     boardId: number,
     data: BoardUpdateRequest,
   ): Promise<string> => {
-    return apiCall<string>('patch', `/api/board/${boardId}`, data);
+    return apiCall<string>('patch', API_ENDPOINTS.BOARD.UPDATE(boardId), data);
+  },
+
+  /**
+   * 게시글 삭제
+   */
+  deleteBoard: async (boardId: number): Promise<string> => {
+    return apiCall<string>('delete', API_ENDPOINTS.BOARD.DELETE(boardId));
   },
 };

@@ -3,73 +3,61 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/constants/route';
 
 const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 `;
 
 const MenuButton = styled.button`
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  gap: 12px;
+  padding: 20px 24px;
   background: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s;
-  min-height: 120px;
+  width: 100%;
+  
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-color: #007bff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border-color: #F97316;
   }
 `;
 
 const MenuIcon = styled.span`
   font-size: 24px;
-  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const MenuLabel = styled.span`
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
+  color: #1F2937;
 `;
 
 const menuItems = [
-  {
-    id: 'payment',
-    label: '결제수단 관리',
-    icon: '💳',
-    path: '/consumers/payment',
-  },
-  {
-    id: 'coupon',
-    label: '프로모션 코드/쿠폰',
-    icon: '🎟️',
-    path: '/consumers/coupon',
-  },
-  { id: 'point', label: '포인트', icon: '', path: '/consumer/point' },
+  { id: 'payment', label: '결제수단 관리', icon: '💳', path: '/consumers/payment' },
+  { id: 'coupon', label: '프로모션 코드/쿠폰', icon: '🎟️', path: '/consumers/coupon' },
+  { id: 'point', label: '포인트', icon: '💰', path: '/consumer/point' },
   {
     id: 'helpers',
     label: '찜한 도우미',
     icon: '❤️',
-    path: ROUTES.CONSUMER.LIKED_MANAGERS,
+    path: ROUTES.CONSUMER.LIKED_MANAGERS
   },
-  {
-    id: 'blacklist',
-    label: '블랙리스트 도우미',
-    icon: '🚫',
-    path: ROUTES.CONSUMER.BLACKLIST,
+  { 
+    id: 'blacklist', 
+    label: '블랙리스트 도우미', 
+    icon: '🚫', 
+    path: ROUTES.CONSUMER.BLACKLIST 
   },
-  {
-    id: 'invite',
-    label: '친구 초대하기',
-    icon: '👥',
-    path: '/consumer/invite',
-  },
+  { id: 'invite', label: '친구 초대하기', icon: '👥', path: '/consumer/invite' },
   { id: 'settings', label: '설정', icon: '⚙️', path: '/consumer/settings' },
 ];
 
@@ -77,13 +65,20 @@ export default function MenuGrid() {
   const navigate = useNavigate();
 
   const handleMenuClick = (path: string) => {
+    console.log('Navigating to:', path);
     navigate(path);
   };
 
   return (
     <Grid>
       {menuItems.map((item) => (
-        <MenuButton key={item.id} onClick={() => handleMenuClick(item.path)}>
+        <MenuButton
+          key={item.id}
+          onClick={() => {
+            console.log('Button clicked:', item.id, item.path);
+            handleMenuClick(item.path);
+          }}
+        >
           <MenuIcon>{item.icon}</MenuIcon>
           <MenuLabel>{item.label}</MenuLabel>
         </MenuButton>

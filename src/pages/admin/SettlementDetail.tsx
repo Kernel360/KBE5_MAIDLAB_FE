@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAdmin } from '@/hooks/useAdmin';
+import { useAdmin } from '@/hooks/domain/useAdmin';
 import { Button, Card, Skeleton, Typography } from '@mui/material';
 import { formatNumber } from '@/utils';
 

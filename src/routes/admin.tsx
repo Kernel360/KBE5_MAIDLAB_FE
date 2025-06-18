@@ -1,6 +1,6 @@
 import { Route } from 'react-router-dom';
 import { ROUTES } from '@/constants';
-import { ProtectedRoute } from '@/components/common';
+import { AdminProtectedRoute } from '@/components/common';
 import {
   AdminLogin,
   AdminLayout,
@@ -18,8 +18,8 @@ import {
   AdminBoardEdit,
   AdminEventEdit,
   AdminEventDetail,
+  Dashboard,
 } from '@/pages';
-//import AdminSettlementDetail from '@/pages/admin/SettlementDetail';
 
 export const AdminRoutes = () => (
   <>
@@ -27,9 +27,9 @@ export const AdminRoutes = () => (
     <Route
       path={ROUTES.ADMIN.DASHBOARD}
       element={
-        <ProtectedRoute requiredUserType="ADMIN">
+        <AdminProtectedRoute>
           <AdminLayout />
-        </ProtectedRoute>
+        </AdminProtectedRoute>
       }
     >
       <Route path="users" element={<AdminUserList />} />
@@ -49,7 +49,7 @@ export const AdminRoutes = () => (
       <Route path="boards" element={<AdminBoards />} />
       <Route path="boards/:id" element={<AdminBoardDetail />} />
       <Route path="boards/:id/edit" element={<AdminBoardEdit />} />
-      <Route index element={<AdminUserList />} />
+      <Route index element={<Dashboard />} />
     </Route>
   </>
 );

@@ -14,6 +14,18 @@ import { useEvent } from '@/hooks';
 import { ROUTES } from '@/constants';
 import { useFileUpload } from '@/hooks';
 
+interface UploadResult {
+  originalName: string;
+  storedKey: string;
+  size: number;
+  type: string;
+}
+
+interface PresignedUrlResponse {
+  url: string;
+  key: string;
+}
+
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
   marginBottom: theme.spacing(4),
@@ -39,22 +51,97 @@ const EventCreate = () => {
   const [formData, setFormData] = useState({
     title: '',
     content: '',
+    mainImageUrl: '',
+    imageUrl: '',
   });
   const [submitting, setSubmitting] = useState(false);
-  const [filenum, setFilenum] = useState(0); // 컴포넌트 내부로 이동
+  const [filenum, setFilenum] = useState(0);
+
+  // S3 presigned URL 요청 함수
+  const getPresignedUrls = async (filenames: string[]): Promise<PresignedUrlResponse[]> => {
+    const response = await fetch('http://localhost:8080/api/files/presigned-urls', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        filenames: filenames
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Presigned URL 요청 실패');
+    }
+
+    const data = await response.json();
+    return data.data;
+  };
+
+  // S3에 파일 업로드 함수
+  const uploadFileToS3 = async (presignedUrl: string, file: File): Promise<Response> => {
+    const response = await fetch(presignedUrl, {
+      method: 'PUT',
+      body: file,
+      headers: {
+        'Content-Type': file.type,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('S3 업로드 실패');
+    }
+
+    return response;
+  };
+
+  // 파일 업로드 및 URL 반환 함수
+  const uploadFiles = async (files: File[]): Promise<UploadResult[]> => {
+    if (!files || files.length === 0) return [];
+
+    const filenames = Array.from(files).map(file => file.name);
+    
+    try {
+      // 1. Presigned URL 요청
+      const presignedUrls = await getPresignedUrls(filenames);
+      
+      // 2. S3에 파일 업로드
+      const uploadPromises = Array.from(files).map(async (file, index) => {
+        const presignedData = presignedUrls[index];
+        await uploadFileToS3(presignedData.url, file);
+        
+        return {
+          originalName: file.name,
+          storedKey: presignedData.key,
+          size: file.size,
+          type: file.type
+        };
+      });
+
+      const uploadResults = await Promise.all(uploadPromises);
+      return uploadResults;
+    } catch (error) {
+      console.error('파일 업로드 실패:', error);
+      throw error;
+    }
+  };
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   }, []);
 
-  // 파일 업로드 핸들러 수정
   const handleMainImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       mainImageUpload.addFiles(e.target.files);
       setFilenum(1);
     }
   }, [mainImageUpload]);
+
+  const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      imageUpload.addFiles(e.target.files);
+    }
+  }, [imageUpload]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,14 +154,26 @@ const EventCreate = () => {
     try {
       setSubmitting(true);
 
-      // 이미지 업로드 로직은 실제 서버 구현에 맞게 수정 필요
-      const mainImageUrl = mainImageUpload.files[0] ? URL.createObjectURL(mainImageUpload.files[0]) : '';
-      const imageUrl = imageUpload.files[0] ? URL.createObjectURL(imageUpload.files[0]) : '';
+      // 업로드할 파일들 수집
+      const filesToUpload: File[] = [];
+      const mainImageFile = mainImageUpload.files[0];
+      const detailImageFile = imageUpload.files[0];
 
+      if (mainImageFile) filesToUpload.push(mainImageFile);
+      if (detailImageFile) filesToUpload.push(detailImageFile);
+
+      // S3에 파일 업로드
+      const uploadResults = await uploadFiles(filesToUpload);
+      
+      // 업로드 결과에서 S3 키(저장된 파일 경로) 추출
+      const mainImageUrl = uploadResults[0]?.storedKey || '';
+      const imageUrl = uploadResults[1]?.storedKey || '';
+
+      // 이벤트 생성
       const result = await createEvent({
         title: formData.title,
-        mainImageUrl,
-        imageUrl,
+        mainImageUrl: "https://d1llec2m3tvk5i.cloudfront.net/" + mainImageUrl,
+        imageUrl: "https://d1llec2m3tvk5i.cloudfront.net/" + imageUrl,
         content: formData.content,
       });
 
@@ -83,6 +182,7 @@ const EventCreate = () => {
       }
     } catch (error) {
       console.error('이벤트 생성 실패:', error);
+      alert('이벤트 생성 중 오류가 발생했습니다.');
     } finally {
       setSubmitting(false);
     }
@@ -117,60 +217,54 @@ const EventCreate = () => {
 
           <Box mb={3}>
             <Typography variant="subtitle1" gutterBottom>
-              메인 이미지 *
+              메인 이미지
             </Typography>
             <input
               type="file"
               accept="image/*"
               onChange={handleMainImageUpload}
             />
-            {mainImageUpload.previews[0] && (
-              <ImagePreview src={mainImageUpload.previews[0]} alt="메인 이미지 미리보기" />
+            {formData.mainImageUrl && (
+              <ImagePreview src={formData.mainImageUrl} alt="메인 이미지 미리보기" />
             )}
           </Box>
 
           <Box mb={3}>
             <Typography variant="subtitle1" gutterBottom>
-              상세 이미지 (선택)
+              상세 이미지
             </Typography>
             <input
               type="file"
               accept="image/*"
-              onChange={(e) => e.target.files && imageUpload.addFiles(e.target.files)}
+              onChange={handleImageUpload}
             />
-            {imageUpload.previews[0] && (
-              <ImagePreview src={imageUpload.previews[0]} alt="상세 이미지 미리보기" />
+            {formData.imageUrl && (
+              <ImagePreview src={formData.imageUrl} alt="상세 이미지 미리보기" />
             )}
           </Box>
 
           <Box mb={3}>
             <TextField
               fullWidth
+              multiline
+              rows={4}
               label="이벤트 내용"
               name="content"
               value={formData.content}
               onChange={handleChange}
-              multiline
-              rows={4}
+              required
             />
           </Box>
 
           <Box display="flex" justifyContent="flex-end" gap={2}>
-            <Button
-              variant="outlined"
-              onClick={handleCancel}
-              disabled={submitting}
-            >
+            <Button variant="outlined" onClick={handleCancel}>
               취소
             </Button>
             <Button
               type="submit"
               variant="contained"
+              color="primary"
               disabled={submitting}
-              sx={{
-                backgroundColor: '#FF7F50',
-                '&:hover': { backgroundColor: '#FF6347' },
-              }}
             >
               {submitting ? <CircularProgress size={24} /> : '생성'}
             </Button>

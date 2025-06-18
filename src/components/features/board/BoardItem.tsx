@@ -10,6 +10,7 @@ import type { BoardType } from '@/constants/board';
 
 interface BoardItemProps {
   board: BoardResponse;
+  index: number;
 }
 
 export default function BoardItem({ board }: BoardItemProps) {
@@ -50,8 +51,10 @@ export default function BoardItem({ board }: BoardItemProps) {
           {board.answered ? '답변완료' : '답변대기'}
         </span>
       </div>
-      <h2 className="text-lg font-semibold mb-2">{board.title}</h2>
-      <p className="text-gray-600 line-clamp-2">{board.content}</p>
+      <h2 className="text-lg font-semibold mb-2 text-left">
+        {board.title.length > 20 ? `${board.title.slice(0, 20)}...` : board.title}
+      </h2>
+      <p className="text-gray-600 line-clamp-2 text-left">{board.content}</p>
     </div>
   );
 }

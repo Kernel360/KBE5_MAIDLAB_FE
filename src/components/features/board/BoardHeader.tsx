@@ -22,9 +22,11 @@ export default function BoardHeader({
         {onBackClick && (
           <button
             onClick={onBackClick}
-            className="text-gray-500 hover:text-gray-700"
+            className="p-2 text-[#FF6B00] hover:bg-[#FFF5EE] rounded-lg"
           >
-            ←
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
           </button>
         )}
         <h1 className="text-2xl font-bold">{title}</h1>
@@ -32,7 +34,7 @@ export default function BoardHeader({
       {showCreateButton && (
         <button
           onClick={() => navigate(ROUTES.BOARD.CREATE)}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+          className="px-4 py-2 bg-[#FF6B00] text-white rounded-lg hover:bg-[#FF8533]"
         >
           {createButtonText}
         </button>

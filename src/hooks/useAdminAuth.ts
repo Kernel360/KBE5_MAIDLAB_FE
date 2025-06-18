@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { adminApi } from '@/apis/admin';
 import { tokenStorage, userStorage } from '@/utils/storage';
 import { useToast } from './useToast';
@@ -7,8 +7,16 @@ import type { AdminLoginRequest } from '@/types/admin';
 
 export const useAdminAuth = () => {
   const [loading, setLoading] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authTrigger, setAuthTrigger] = useState(0); // 리렌더링 트리거
   const { showToast } = useToast();
+
+  // useMemo를 사용해서 authTrigger가 변경될 때마다 재계산
+  const isAuthenticated = useMemo(() => {
+    // authTrigger를 의존성에 포함시켜서 변경 시 재계산되도록 함
+    const token = tokenStorage.getAccessToken();
+    const userType = userStorage.getUserType();
+    return !!token && userType === USER_TYPES.ADMIN;
+  }, [authTrigger]); // authTrigger를 의존성으로 추가
 
   // 관리자 로그인
   const login = useCallback(
@@ -20,10 +28,9 @@ export const useAdminAuth = () => {
 
         tokenStorage.setAccessToken(response.accessToken);
         userStorage.setUserType(USER_TYPES.ADMIN);
+        setAuthTrigger((prev) => prev + 1); // 강제 리렌더링
 
-        setIsAuthenticated(true);
         showToast(SUCCESS_MESSAGES.LOGIN, 'success');
-
         return { success: true };
       } catch (error: any) {
         const errorMessage =
@@ -46,7 +53,7 @@ export const useAdminAuth = () => {
     } finally {
       tokenStorage.clearTokens();
       userStorage.clearUserData();
-      setIsAuthenticated(false);
+      setAuthTrigger((prev) => prev + 1); // 강제 리렌더링
       showToast(SUCCESS_MESSAGES.LOGOUT, 'success');
     }
   }, [showToast]);
@@ -56,6 +63,7 @@ export const useAdminAuth = () => {
     try {
       const response = await adminApi.refreshToken();
       tokenStorage.setAccessToken(response.accessToken);
+      setAuthTrigger((prev) => prev + 1); // 강제 리렌더링
       return true;
     } catch {
       logout();

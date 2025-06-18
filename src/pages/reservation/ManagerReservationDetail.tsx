@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { IoArrowBack } from 'react-icons/io5';
 import { useReservation } from '@/hooks/domain/useReservation';
 import { useReservationStatus } from '@/hooks/useReservationStatus';
 import { formatDateTime, formatPrice } from '@/utils';
 import { RESERVATION_STATUS_LABELS } from '@/constants/status';
 import { SERVICE_TYPE_LABELS } from '@/constants/service';
 import type { ReservationDetailResponse } from '@/types/reservation';
+import ReservationHeader from '@/components/features/consumer/ReservationHeader';
+import {ManagerFooter} from '@/components/layout/BottomNavigation/BottomNavigation';
 
 const ManagerReservationDetail: React.FC = () => {
   const navigate = useNavigate();
@@ -55,7 +56,7 @@ const ManagerReservationDetail: React.FC = () => {
         await checkIn(parseInt(id), { checkTime: currentTime });
       } else {
         await checkOut(parseInt(id), { checkTime: currentTime });
-        navigate(`/managers/reservations/${id}/review`);
+        navigate(`/manager/reservations/${id}/review`);
       }
       setShowModal(false);
       // 상태 업데이트를 위해 상세 정보 다시 조회
@@ -134,16 +135,9 @@ const ManagerReservationDetail: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-3xl mx-auto p-4">
-        {/* 헤더 */}
-        <div className="flex items-center mb-6">
-          <button onClick={() => navigate(-1)} className="p-2">
-            <IoArrowBack size={24} />
-          </button>
-          <h1 className="text-xl font-bold ml-2">예약 상세</h1>
-        </div>
-
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <ReservationHeader title="예약 상세" onBack={() => navigate(-1)} />
+      <div className="flex-1 max-w-3xl mx-auto p-4 pt-16 pb-20">
         {/* 예약 정보 카드 */}
         <div className="bg-white rounded-lg shadow p-6">
           {/* 상태 배지 */}
@@ -235,6 +229,7 @@ const ManagerReservationDetail: React.FC = () => {
           <div className="mt-6">{getStatusButton()}</div>
         </div>
       </div>
+      <ManagerFooter />
 
       {/* 체크인/아웃 모달 */}
       {showModal && (

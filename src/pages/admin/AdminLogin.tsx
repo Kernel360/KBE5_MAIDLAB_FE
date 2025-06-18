@@ -1,16 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import {
-  Box,
-  Button,
-  Container,
-  TextField,
-  Typography,
-  Paper,
-  Alert,
-} from '@mui/material';
+import { Box, Button, Container, TextField, Typography, Paper, Alert } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
+import React from 'react';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
@@ -46,6 +39,18 @@ const AdminLogin = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // 인증 성공 시 자동 이동
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/admin', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
+  // 인증된 상태면 아무것도 렌더링하지 않음(무한루프 방지)
+  if (isAuthenticated) {
+    return null;
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -57,18 +62,11 @@ const AdminLogin = () => {
         password: password,
       });
 
-      // 로그인 성공시 페이지 이동
-      if (result.success) {
-        const from =
-          (location.state as { from?: Location })?.from?.pathname ||
-          '/admin/users';
-        navigate('/admin/users');
-      } else {
-        // 로그인 실패시 에러 표시 (이미 토스트로 표시되지만 추가로 표시하고 싶다면)
+      // 로그인 실패시 오류 출력
+      if (!result.success) {
         setError(result.error || '로그인에 실패했습니다.');
       }
     } catch (error) {
-      // 예상치 못한 에러 처리
       setError('로그인 중 오류가 발생했습니다.');
       console.error('Login error:', error);
     }

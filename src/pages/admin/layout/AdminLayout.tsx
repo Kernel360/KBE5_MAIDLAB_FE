@@ -23,6 +23,7 @@ import {
   Article as ArticleIcon,
   Logout as LogoutIcon,
   AccountBalance as AccountBalanceIcon,
+  PieChart as PieChartIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
@@ -78,6 +79,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 }));
 
 const menuItems = [
+  { text: '대시보드', icon: <PieChartIcon />, path: '/admin' },
   { text: '회원 관리', icon: <PeopleIcon />, path: '/admin/users' },
   { text: '예약 관리', icon: <CalendarIcon />, path: '/admin/reservations' },
   {

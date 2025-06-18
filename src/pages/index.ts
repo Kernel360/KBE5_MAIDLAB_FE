@@ -19,6 +19,7 @@ export { default as BoardDetail } from '@/pages/admin/BoardDetail';
 
 // 소비자 페이지
 export { default as ConsumerProfileSetup } from './consumer/ConsumerProfileSetup';
+export { default as ConsumerProfileEdit } from './consumer/ProfileEdit';
 // export { default as ConsumerMyPage } from './consumer/MyPage';
 // export { default as ConsumerProfile } from './consumer/Profile';
 // export { default as ConsumerReservations } from './consumer/Reservations';
@@ -77,3 +78,4 @@ export { default as AdminEventDetail } from '@/pages/admin/EventDetail';
 export { default as AdminBoards } from '@/pages/admin/BoardList';
 export { default as AdminBoardDetail } from '@/pages/admin/BoardDetail';
 export { default as AdminBoardEdit } from '@/pages/admin/BoardEdit';
+export { default as Dashboard } from '@/pages/admin/Dashboard';

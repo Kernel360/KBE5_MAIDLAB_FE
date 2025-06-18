@@ -116,6 +116,7 @@ export const API_ENDPOINTS = {
     DETAIL: (id: number) => `/api/board/${id}`,
     CREATE: '/api/board',
     UPDATE: (id: number) => `/api/board/${id}`,
+    DELETE: (id: number) => `/api/board/${id}`,
   },
   FILE: {
     PRESIGNED_URLS: '/api/files/presigned-urls',
