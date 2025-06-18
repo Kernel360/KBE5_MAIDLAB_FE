@@ -11,11 +11,11 @@ import { tokenStorage, userStorage } from '@/utils/storage';
 import { ROUTES, SUCCESS_MESSAGES, ERROR_MESSAGES } from '@/constants';
 import { useToast } from './useToast';
 import type {
-  LoginRequestDto,
-  SignUpRequestDto,
-  SocialLoginRequestDto,
-  SocialSignUpRequestDto,
-} from '@/apis/auth';
+  LoginRequest,
+  SignUpRequest,
+  SocialLoginRequest,
+  SocialSignUpRequest,
+} from '@/types/auth';
 import type { UserType } from '@/types';
 
 // 인증 상태 타입
@@ -78,10 +78,8 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
 
 // 컨텍스트 타입
 interface AuthContextType extends AuthState {
-  login: (
-    data: LoginRequestDto,
-  ) => Promise<{ success: boolean; error?: string }>;
-  socialLogin: (data: SocialLoginRequestDto) => Promise<{
+  login: (data: LoginRequest) => Promise<{ success: boolean; error?: string }>;
+  socialLogin: (data: SocialLoginRequest) => Promise<{
     success: boolean;
     newUser?: boolean;
     error?: string;
@@ -89,10 +87,10 @@ interface AuthContextType extends AuthState {
     profileCompleted?: boolean;
   }>;
   signUp: (
-    data: SignUpRequestDto,
+    data: SignUpRequest,
   ) => Promise<{ success: boolean; error?: string }>;
   socialSignUp: (
-    data: SocialSignUpRequestDto,
+    data: SocialSignUpRequest,
   ) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   resetError: () => void;
@@ -131,7 +129,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // 로그인 함수
   const login = useCallback(
-    async (data: LoginRequestDto) => {
+    async (data: LoginRequest) => {
       try {
         dispatch({ type: 'AUTH_START' });
 
@@ -175,7 +173,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // 소셜 로그인 함수
   const socialLogin = useCallback(
-    async (data: SocialLoginRequestDto) => {
+    async (data: SocialLoginRequest) => {
       try {
         dispatch({ type: 'AUTH_START' });
         console.log('🔄 useAuth socialLogin 시작:', data);
@@ -248,7 +246,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // 회원가입 함수
   const signUp = useCallback(
-    async (data: SignUpRequestDto) => {
+    async (data: SignUpRequest) => {
       try {
         dispatch({ type: 'AUTH_START' });
 
@@ -287,13 +285,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // 소셜 회원가입 함수
   const socialSignUp = useCallback(
-    async (data: SocialSignUpRequestDto) => {
+    async (data: SocialSignUpRequest) => {
       try {
         dispatch({ type: 'AUTH_START' });
 
         // 임시 토큰을 localStorage에서 가져오기
         const tempToken = localStorage.getItem('tempSocialToken');
-        const userType = localStorage.getItem('tempUserType') as UserType;
 
         if (!tempToken) {
           throw new Error('인증 정보가 없습니다.');

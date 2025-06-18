@@ -16,7 +16,7 @@ import { ROUTES } from '@/constants';
 import { formatDate } from '@/utils';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
-import type { EventResponseDto } from '@/apis/event';
+import type { EventDetailResponse } from '@/types/event';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
@@ -51,13 +51,13 @@ const EventDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { fetchEventDetail } = useEvent();
-  const [event, setEvent] = useState<EventResponseDto | null>(null);
+  const [event, setEvent] = useState<EventDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadEventData = async () => {
       if (!id) return;
-      
+
       try {
         const eventData = await fetchEventDetail(Number(id));
         if (eventData) {
@@ -82,7 +82,12 @@ const EventDetail = () => {
   if (loading) {
     return (
       <StyledContainer>
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="50vh"
+        >
           <CircularProgress />
         </Box>
       </StyledContainer>
@@ -101,7 +106,12 @@ const EventDetail = () => {
 
   return (
     <StyledContainer>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Button
           startIcon={<ArrowBackIcon />}
           onClick={() => navigate(ROUTES.ADMIN.EVENTS)}
@@ -177,4 +187,4 @@ const EventDetail = () => {
   );
 };
 
-export default EventDetail; 
+export default EventDetail;

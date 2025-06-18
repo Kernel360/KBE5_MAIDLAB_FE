@@ -1,9 +1,13 @@
 // src/components/features/consumer/ReservationStep2.tsx
 import React, { useState, useEffect } from 'react';
 import type { ReservationFormData } from '@/types/reservation';
-import { useMatching } from '@/hooks/useMatching';
-import { format, addMinutes, addDays } from 'date-fns';
-import { HOUSING_TYPES, SERVICE_OPTIONS, ROOM_SIZES, type ServiceOption } from '@/constants/service';
+import { useMatching } from '@/hooks/domain/useMatching';
+import { format } from 'date-fns';
+import {
+  HOUSING_TYPES,
+  SERVICE_OPTIONS,
+  ROOM_SIZES,
+} from '@/constants/service';
 
 interface Props {
   initialData: Partial<ReservationFormData>;
@@ -11,7 +15,11 @@ interface Props {
   onSubmit: (form: ReservationFormData) => void;
 }
 
-const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) => {
+const ReservationStep2: React.FC<Props> = ({
+  initialData,
+  onBack,
+  onSubmit,
+}) => {
   const [form, setForm] = useState<ReservationFormData>({
     serviceType: initialData.serviceType || 'HOUSEKEEPING',
     serviceDetailType: initialData.serviceDetailType || '대청소',
@@ -20,7 +28,8 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
     housingType: initialData.housingType || 'APT',
     roomSize: initialData.roomSize || 10,
     housingInformation: initialData.housingInformation || '',
-    reservationDate: initialData.reservationDate || format(new Date(), 'yyyy-MM-dd'),
+    reservationDate:
+      initialData.reservationDate || format(new Date(), 'yyyy-MM-dd'),
     startTime: initialData.startTime || '08:00',
     endTime: initialData.endTime || '11:00',
     serviceAdd: initialData.serviceAdd || '',
@@ -44,7 +53,7 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
       let totalMinutes = hours * 60 + minutes + 180; // 기본 3시간
       // 선택된 서비스에 따른 추가 시간 계산
       const additionalMinutes = selectedServices.reduce((acc, serviceId) => {
-        const service = SERVICE_OPTIONS.find(s => s.id === serviceId);
+        const service = SERVICE_OPTIONS.find((s) => s.id === serviceId);
         return acc + (service?.timeAdd || 0);
       }, 0);
       totalMinutes += additionalMinutes;
@@ -52,21 +61,21 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
       let endHours = Math.floor(totalMinutes / 60) % 24;
       let endMinutes = totalMinutes % 60;
       const endTime = `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
-      setForm(prev => ({ ...prev, endTime }));
+      setForm((prev) => ({ ...prev, endTime }));
     }
   }, [form.startTime, selectedServices]);
 
   // 서비스 선택에 따른 가격 계산
   useEffect(() => {
     const additionalPrice = selectedServices.reduce((acc, serviceId) => {
-      const service = SERVICE_OPTIONS.find(s => s.id === serviceId);
+      const service = SERVICE_OPTIONS.find((s) => s.id === serviceId);
       return acc + (service?.price || 0);
     }, 0);
     setTotalPrice(basePrice + additionalPrice);
   }, [selectedServices, basePrice]);
 
   const handleManagerToggle = () => {
-    setForm(prev => ({ ...prev, chooseManager: !prev.chooseManager }));
+    setForm((prev) => ({ ...prev, chooseManager: !prev.chooseManager }));
     if (!form.chooseManager) {
       handleManagerSelect();
     }
@@ -91,12 +100,16 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
 
       const result = await fetchAvailableManagers(request);
       if (Array.isArray(result)) {
-        setManagerList(result.map(manager => ({
-          ...manager,
-          rating: (Math.random() * 1.5 + 3.5).toFixed(1), // 임시 평점 (3.5-5.0)
-          experience: Math.floor(Math.random() * 7) + 3, // 임시 경력 (3-10년)
-          tags: ['청소', '요리', '세심함'].sort(() => Math.random() - 0.5).slice(0, 2), // 임시 태그
-        })));
+        setManagerList(
+          result.map((manager) => ({
+            ...manager,
+            rating: (Math.random() * 1.5 + 3.5).toFixed(1), // 임시 평점 (3.5-5.0)
+            experience: Math.floor(Math.random() * 7) + 3, // 임시 경력 (3-10년)
+            tags: ['청소', '요리', '세심함']
+              .sort(() => Math.random() - 0.5)
+              .slice(0, 2), // 임시 태그
+          })),
+        );
         setShowManagerModal(true);
       } else {
         alert('매니저 목록을 불러올 수 없습니다.');
@@ -119,14 +132,14 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
         };
         const managers = await fetchAvailableManagers(request);
         if (Array.isArray(managers) && managers.length > 0) {
-          setForm(prev => ({ ...prev, managerUuId: managers[0].uuid }));
+          setForm((prev) => ({ ...prev, managerUuId: managers[0].uuid }));
         }
       } catch (error) {
         alert('매니저 자동 배정 중 오류가 발생했습니다.');
         return;
       }
     }
-    
+
     const formData: ReservationFormData = {
       ...form,
       serviceAdd: selectedServices.join(','),
@@ -135,13 +148,16 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
   };
 
   // 서비스 추가 안내 모달 상태
-  const [serviceModal, setServiceModal] = useState<{open: boolean, type: string | null}>({open: false, type: null});
+  const [serviceModal, setServiceModal] = useState<{
+    open: boolean;
+    type: string | null;
+  }>({ open: false, type: null });
 
   const handleServiceToggle = (serviceId: string) => {
-    setServiceModal({open: true, type: serviceId});
-    setSelectedServices(prev => {
+    setServiceModal({ open: true, type: serviceId });
+    setSelectedServices((prev) => {
       if (prev.includes(serviceId)) {
-        return prev.filter(id => id !== serviceId);
+        return prev.filter((id) => id !== serviceId);
       }
       return [...prev, serviceId];
     });
@@ -165,11 +181,17 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
           <>
             <div>현재 서비스 예약 시간: 3시간</div>
             <div>요리만 필요한 경우 예약 시간은 변경되지 않습니다.</div>
-            <div>요리와 청소가 모두 필요하면 시스템이 자동으로 1시간을 추가합니다.</div>
+            <div>
+              요리와 청소가 모두 필요하면 시스템이 자동으로 1시간을 추가합니다.
+            </div>
           </>
         ),
         actions: [
-          { label: '확인', color: 'green', onClick: () => setServiceModal({ open: false, type: null }) },
+          {
+            label: '확인',
+            color: 'green',
+            onClick: () => setServiceModal({ open: false, type: null }),
+          },
         ],
       };
     }
@@ -181,11 +203,18 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
           <>
             <div>다림질 서비스는 기본 예약 시간에 1시간이 추가됩니다.</div>
             <div>다림질만 필요한 경우 예약 시간은 변경되지 않습니다.</div>
-            <div>다림질과 청소가 모두 필요하면 시스템이 자동으로 1시간을 추가합니다.</div>
+            <div>
+              다림질과 청소가 모두 필요하면 시스템이 자동으로 1시간을
+              추가합니다.
+            </div>
           </>
         ),
         actions: [
-          { label: '확인', color: 'green', onClick: () => setServiceModal({ open: false, type: null }) },
+          {
+            label: '확인',
+            color: 'green',
+            onClick: () => setServiceModal({ open: false, type: null }),
+          },
         ],
       };
     }
@@ -200,7 +229,11 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
           </>
         ),
         actions: [
-          { label: '확인', color: 'green', onClick: () => setServiceModal({ open: false, type: null }) },
+          {
+            label: '확인',
+            color: 'green',
+            onClick: () => setServiceModal({ open: false, type: null }),
+          },
         ],
       };
     }
@@ -208,13 +241,17 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
   };
 
   // 반려동물 모달 내용
-  const [petType, setPetType] = useState<{ dog: boolean; cat: boolean; etc: string }>({ dog: false, cat: false, etc: '' });
+  const [petType, setPetType] = useState<{
+    dog: boolean;
+    cat: boolean;
+    etc: string;
+  }>({ dog: false, cat: false, etc: '' });
   const handlePetSave = () => {
     let pet: 'NONE' | 'DOG' | 'CAT' | 'ETC' = 'NONE';
     if (petType.dog) pet = 'DOG';
     else if (petType.cat) pet = 'CAT';
     else if (petType.etc) pet = 'ETC';
-    setForm(prev => ({ ...prev, pet }));
+    setForm((prev) => ({ ...prev, pet }));
     setPetModal(false);
   };
 
@@ -232,7 +269,9 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
             className="flex-1 p-3 border border-gray-300 rounded-lg"
             placeholder="서울특별시 서초구 서초대로 74길 29"
             value={form.address}
-            onChange={(e) => setForm(prev => ({ ...prev, address: e.target.value }))}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, address: e.target.value }))
+            }
           />
           <button
             onClick={handleAddressSearch}
@@ -246,20 +285,24 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
           className="w-full p-3 border border-gray-300 rounded-lg"
           placeholder="상세 주소 입력"
           value={form.addressDetail}
-          onChange={(e) => setForm(prev => ({ ...prev, addressDetail: e.target.value }))}
+          onChange={(e) =>
+            setForm((prev) => ({ ...prev, addressDetail: e.target.value }))
+          }
         />
       </div>
 
       {/* 주택 정보 */}
       <div className="space-y-4">
         <h3 className="text-lg font-medium">주택 정보</h3>
-        
+
         {/* 주택 유형 */}
         <div className="flex gap-2">
           {Object.entries(HOUSING_TYPES).map(([key, label]) => (
             <button
               key={key}
-              onClick={() => setForm(prev => ({ ...prev, housingType: key as any }))}
+              onClick={() =>
+                setForm((prev) => ({ ...prev, housingType: key as any }))
+              }
               className={`flex-1 py-2 px-4 rounded-full border ${
                 form.housingType === key
                   ? 'bg-orange-500 text-white border-orange-500'
@@ -273,10 +316,12 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
 
         {/* 평수 */}
         <div className="flex gap-2">
-          {ROOM_SIZES.map(size => (
+          {ROOM_SIZES.map((size) => (
             <button
               key={size.id}
-              onClick={() => setForm(prev => ({ ...prev, roomSize: size.id }))}
+              onClick={() =>
+                setForm((prev) => ({ ...prev, roomSize: size.id }))
+              }
               className={`flex-1 py-2 px-4 rounded-full border ${
                 form.roomSize === size.id
                   ? 'bg-orange-500 text-white border-orange-500'
@@ -294,26 +339,34 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
           className="w-full p-3 border border-gray-300 rounded-lg"
           placeholder="현관 비밀번호, 방 갯수 등등"
           value={form.housingInformation}
-          onChange={(e) => setForm(prev => ({ ...prev, housingInformation: e.target.value }))}
+          onChange={(e) =>
+            setForm((prev) => ({ ...prev, housingInformation: e.target.value }))
+          }
         />
       </div>
 
       {/* 날짜 및 시간 */}
       <div className="space-y-4">
         <h3 className="text-lg font-medium">날짜 및 시간</h3>
-        <p className="text-sm text-gray-500">서비스를 원하는 날짜와 시간을 선택해주세요</p>
+        <p className="text-sm text-gray-500">
+          서비스를 원하는 날짜와 시간을 선택해주세요
+        </p>
         <div className="grid grid-cols-3 gap-2">
           <input
             type="date"
             className="p-3 border border-gray-300 rounded-lg"
             value={form.reservationDate}
             min={format(new Date(), 'yyyy-MM-dd')}
-            onChange={(e) => setForm(prev => ({ ...prev, reservationDate: e.target.value }))}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, reservationDate: e.target.value }))
+            }
           />
           <select
             className="p-3 border border-gray-300 rounded-lg"
             value={form.startTime}
-            onChange={(e) => setForm(prev => ({ ...prev, startTime: e.target.value }))}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, startTime: e.target.value }))
+            }
           >
             {Array.from({ length: 24 }).map((_, h) =>
               ['00', '30'].map((m) => {
@@ -323,7 +376,7 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
                     {time}
                   </option>
                 );
-              })
+              }),
             )}
           </select>
           <select
@@ -340,7 +393,7 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
       <div className="space-y-4">
         <h3 className="text-lg font-medium">서비스 추가</h3>
         <div className="flex flex-wrap gap-2">
-          {SERVICE_OPTIONS.map(service => (
+          {SERVICE_OPTIONS.map((service) => (
             <button
               key={service.id}
               onClick={() => handleServiceToggle(service.id)}
@@ -352,9 +405,7 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
             >
               {service.label}
               {service.timeAdd > 0 && (
-                <span className="ml-1 text-sm">
-                  (+{service.timeAdd}분)
-                </span>
+                <span className="ml-1 text-sm">(+{service.timeAdd}분)</span>
               )}
             </button>
           ))}
@@ -419,7 +470,9 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
                 <div
                   key={manager.uuid}
                   className={`p-4 border rounded-lg ${
-                    form.managerUuId === manager.uuid ? 'border-orange-500' : 'border-gray-200'
+                    form.managerUuId === manager.uuid
+                      ? 'border-orange-500'
+                      : 'border-gray-200'
                   }`}
                 >
                   <div className="flex items-center gap-4">
@@ -427,12 +480,19 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
                     <div>
                       <div className="flex items-center gap-2">
                         <h4 className="font-medium">{manager.name}</h4>
-                        <span className="text-orange-500">★ {manager.rating}</span>
+                        <span className="text-orange-500">
+                          ★ {manager.rating}
+                        </span>
                       </div>
-                      <p className="text-sm text-gray-600">가사 도우미 경력 {manager.experience}년</p>
+                      <p className="text-sm text-gray-600">
+                        가사 도우미 경력 {manager.experience}년
+                      </p>
                       <div className="flex gap-1 mt-1">
                         {manager.tags.map((tag: string) => (
-                          <span key={tag} className="text-xs px-2 py-1 bg-gray-100 rounded-full">
+                          <span
+                            key={tag}
+                            className="text-xs px-2 py-1 bg-gray-100 rounded-full"
+                          >
                             {tag}
                           </span>
                         ))}
@@ -441,7 +501,10 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
                   </div>
                   <button
                     onClick={() => {
-                      setForm(prev => ({ ...prev, managerUuId: manager.uuid }));
+                      setForm((prev) => ({
+                        ...prev,
+                        managerUuId: manager.uuid,
+                      }));
                       setShowManagerModal(false);
                     }}
                     className="mt-2 w-full py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
@@ -491,21 +554,31 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
       {serviceModal.open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md flex flex-col items-center animate-fade-in">
-            <div className="text-xl font-bold mb-2">{getServiceModalContent(serviceModal.type)?.title}</div>
-            <div className="text-lg font-semibold mb-4">{getServiceModalContent(serviceModal.type)?.subtitle}</div>
-            <div className="text-gray-700 text-center mb-6 space-y-1">{getServiceModalContent(serviceModal.type)?.desc}</div>
+            <div className="text-xl font-bold mb-2">
+              {getServiceModalContent(serviceModal.type)?.title}
+            </div>
+            <div className="text-lg font-semibold mb-4">
+              {getServiceModalContent(serviceModal.type)?.subtitle}
+            </div>
+            <div className="text-gray-700 text-center mb-6 space-y-1">
+              {getServiceModalContent(serviceModal.type)?.desc}
+            </div>
             <div className="flex gap-4 w-full">
-              {getServiceModalContent(serviceModal.type)?.actions.map((action, idx) => (
-                <button
-                  key={idx}
-                  onClick={action.onClick}
-                  className={`flex-1 py-3 rounded-lg font-bold text-lg ${
-                    action.color === 'green' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-900'
-                  } hover:opacity-80`}
-                >
-                  {action.label}
-                </button>
-              ))}
+              {getServiceModalContent(serviceModal.type)?.actions.map(
+                (action, idx) => (
+                  <button
+                    key={idx}
+                    onClick={action.onClick}
+                    className={`flex-1 py-3 rounded-lg font-bold text-lg ${
+                      action.color === 'green'
+                        ? 'bg-green-100 text-green-600'
+                        : 'bg-gray-100 text-gray-900'
+                    } hover:opacity-80`}
+                  >
+                    {action.label}
+                  </button>
+                ),
+              )}
             </div>
           </div>
         </div>
@@ -515,15 +588,32 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
       {petModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md flex flex-col animate-fade-in">
-            <div className="text-xl font-bold mb-2 text-center">애완동물 추가</div>
-            <div className="text-gray-600 text-center mb-4">강아지나 고양이에 알레르기가 있는 도우미를 피할 수 있도록 알려주세요.</div>
+            <div className="text-xl font-bold mb-2 text-center">
+              애완동물 추가
+            </div>
+            <div className="text-gray-600 text-center mb-4">
+              강아지나 고양이에 알레르기가 있는 도우미를 피할 수 있도록
+              알려주세요.
+            </div>
             <div className="flex gap-6 justify-center mb-4">
               <label className="flex items-center gap-2">
-                <input type="checkbox" checked={petType.dog} onChange={e => setPetType(pt => ({ ...pt, dog: e.target.checked }))} />
+                <input
+                  type="checkbox"
+                  checked={petType.dog}
+                  onChange={(e) =>
+                    setPetType((pt) => ({ ...pt, dog: e.target.checked }))
+                  }
+                />
                 <span>개</span>
               </label>
               <label className="flex items-center gap-2">
-                <input type="checkbox" checked={petType.cat} onChange={e => setPetType(pt => ({ ...pt, cat: e.target.checked }))} />
+                <input
+                  type="checkbox"
+                  checked={petType.cat}
+                  onChange={(e) =>
+                    setPetType((pt) => ({ ...pt, cat: e.target.checked }))
+                  }
+                />
                 <span>고양이</span>
               </label>
             </div>
@@ -533,7 +623,9 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
                 className="w-full p-3 border border-gray-300 rounded-lg"
                 placeholder="기타 (예: 토끼, 햄스터 등)"
                 value={petType.etc}
-                onChange={e => setPetType(pt => ({ ...pt, etc: e.target.value }))}
+                onChange={(e) =>
+                  setPetType((pt) => ({ ...pt, etc: e.target.value }))
+                }
               />
             </div>
             <button

@@ -1,11 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import { boardApi } from '@/apis/board';
-import { useToast } from './useToast';
-import type { ConsumerBoardRequestDto } from '@/apis/board';
-import type { ConsumerBoardResponseDto, ConsumerBoardDetailResponseDto } from '@/apis/admin';
+import { useToast } from '../useToast';
+import type {} from '@/apis/board';
+import type {
+  BoardCreateRequest,
+  BoardResponse,
+  BoardDetailResponse,
+} from '@/types/board';
 
 export const useBoard = () => {
-  const [boards, setBoards] = useState<ConsumerBoardResponseDto[]>([]);
+  const [boards, setBoards] = useState<BoardResponse[]>([]);
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
 
@@ -27,7 +31,7 @@ export const useBoard = () => {
 
   // 게시글 상세 조회
   const fetchBoardDetail = useCallback(
-    async (boardId: number): Promise<ConsumerBoardDetailResponseDto | null> => {
+    async (boardId: number): Promise<BoardDetailResponse | null> => {
       try {
         setLoading(true);
         const data = await boardApi.getBoard(boardId);
@@ -47,7 +51,7 @@ export const useBoard = () => {
 
   // 게시글 작성
   const createBoard = useCallback(
-    async (data: ConsumerBoardRequestDto) => {
+    async (data: BoardCreateRequest) => {
       try {
         setLoading(true);
         const result = await boardApi.createBoard(data);
@@ -67,24 +71,6 @@ export const useBoard = () => {
     [fetchBoards, showToast],
   );
 
-  // 답변 등록
-  const answerBoard = useCallback(
-    async (boardId: number, answer: string) => {
-      try {
-        setLoading(true);
-        await boardApi.answerBoard(boardId, { content: answer });
-        showToast('답변이 등록되었습니다.', 'success');
-        return true;
-      } catch (error: any) {
-        showToast(error.message || '답변 등록에 실패했습니다.', 'error');
-        return false;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [showToast],
-  );
-
   useEffect(() => {
     fetchBoards();
   }, [fetchBoards]);
@@ -95,6 +81,5 @@ export const useBoard = () => {
     fetchBoards,
     fetchBoardDetail,
     createBoard,
-    answerBoard,
   };
 };

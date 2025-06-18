@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useAuth, useForm, useToast } from '@/hooks';
 import { ROUTES } from '@/constants';
-import type { SignUpRequestDto } from '@/apis/auth';
+import type { SignUpRequest } from '@/types/auth';
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -14,23 +14,21 @@ const SignUp: React.FC = () => {
     'CONSUMER' | 'MANAGER'
   >('CONSUMER');
 
-  // 프로필 설정 페이지로 이동하는 함수
   const navigateToProfileSetup = (userType: 'CONSUMER' | 'MANAGER') => {
     const route =
       userType === 'MANAGER'
         ? ROUTES.MANAGER.PROFILE_SETUP
         : ROUTES.CONSUMER.PROFILE_SETUP;
 
-    // skipProfileCheck=true 상태로 이동하여 프로필 체크를 우회
     navigate(route, {
       replace: true,
-      state: { fromSignup: true }, // 회원가입에서 온 것임을 표시
+      state: { fromSignup: true },
     });
   };
 
   const { values, errors, touched, handleSubmit, setValue, setFieldTouched } =
     useForm<
-      SignUpRequestDto & {
+      SignUpRequest & {
         confirmPassword: string;
       }
     >({
@@ -43,6 +41,7 @@ const SignUp: React.FC = () => {
         birth: '',
         gender: 'MALE',
       },
+
       validationSchema: {
         phoneNumber: (value) => /^01[0-9]{8,9}$/.test(value.replace(/-/g, '')),
         password: (value) =>
@@ -50,14 +49,14 @@ const SignUp: React.FC = () => {
         name: (value) => value.length >= 2 && value.length <= 20,
         birth: (value) => value.length === 10, // YYYY-MM-DD
       },
+
       onSubmit: async (formData) => {
-        // 비밀번호 확인 체크
         if (formData.password !== formData.confirmPassword) {
           showToast('비밀번호가 일치하지 않습니다.', 'error');
           return;
         }
 
-        const cleanedData: SignUpRequestDto = {
+        const cleanedData: SignUpRequest = {
           userType: selectedUserType,
           phoneNumber: formData.phoneNumber.replace(/-/g, ''),
           password: formData.password,
@@ -69,9 +68,6 @@ const SignUp: React.FC = () => {
         const result = await signUp(cleanedData);
 
         if (result.success) {
-          // 성공 메시지 표시
-
-          // 매니저는 프로필 설정 필수, 수요자는 선택사항임을 알림
           if (selectedUserType === 'MANAGER') {
             setTimeout(() => {
               showToast(
@@ -85,10 +81,9 @@ const SignUp: React.FC = () => {
             }, 1000);
           }
 
-          // 자동 로그인이 완료된 상태이므로 바로 프로필 설정으로 이동
           setTimeout(() => {
             navigateToProfileSetup(selectedUserType);
-          }, 2000); // 토스트 메시지를 확인할 시간을 준 후 이동
+          }, 2000);
         } else {
           console.error('회원가입 실패:', result);
           showToast(result.error || '회원가입에 실패했습니다.', 'error');
@@ -96,7 +91,6 @@ const SignUp: React.FC = () => {
       },
     });
 
-  // 휴대폰 번호 포맷팅
   const handlePhoneChange = (value: string) => {
     const numbers = value.replace(/\D/g, '');
     let formatted = numbers;
@@ -110,7 +104,6 @@ const SignUp: React.FC = () => {
     setValue('phoneNumber', formatted);
   };
 
-  // 생년월일 포맷팅
   const handleBirthChange = (value: string) => {
     const numbers = value.replace(/\D/g, '');
     let formatted = numbers;

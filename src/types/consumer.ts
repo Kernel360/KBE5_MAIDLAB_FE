@@ -2,6 +2,15 @@ import type { BaseUser } from './user';
 import type { Gender } from '@/constants/user';
 
 /**
+ * 소비자 프로필 생성 요청
+ */
+export interface ConsumerProfileCreateRequest {
+  profileImage?: string;
+  address?: string;
+  detailAddress?: string;
+}
+
+/**
  * 소비자 프로필 수정 요청
  */
 export interface ConsumerProfileUpdateRequest {

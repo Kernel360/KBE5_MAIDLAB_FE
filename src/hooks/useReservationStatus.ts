@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { RESERVATION_STATUS } from '@/constants/status';
-import type { ReservationResponseDto } from '@/apis/reservation';
+import type { ReservationListResponse } from '@/types/reservation';
 
 export type ReservationTab = 'scheduled' | 'today' | 'completed';
 
@@ -8,29 +8,31 @@ export const useReservationStatus = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<ReservationTab>('scheduled');
 
-  const filterReservationsByTab = (reservations: ReservationResponseDto[] | null) => {
+  const filterReservationsByTab = (
+    reservations: ReservationListResponse[] | null,
+  ) => {
     if (!reservations) return [];
 
     const today = new Date().toISOString().split('T')[0];
-    
+
     switch (activeTab) {
       case 'scheduled':
         return reservations.filter(
           (reservation) =>
             reservation.reservationDate >= today &&
             (reservation.status === RESERVATION_STATUS.MATCHED ||
-            reservation.status === RESERVATION_STATUS.WORKING )
+              reservation.status === RESERVATION_STATUS.WORKING),
         );
       case 'today':
         return reservations.filter(
           (reservation) =>
             reservation.reservationDate === today &&
             (reservation.status === RESERVATION_STATUS.MATCHED ||
-             reservation.status === RESERVATION_STATUS.WORKING)
+              reservation.status === RESERVATION_STATUS.WORKING),
         );
       case 'completed':
         return reservations.filter(
-          (reservation) => reservation.status === RESERVATION_STATUS.COMPLETED
+          (reservation) => reservation.status === RESERVATION_STATUS.COMPLETED,
         );
       default:
         return [];
@@ -39,7 +41,7 @@ export const useReservationStatus = () => {
 
   const getStatusBadgeStyle = (status: string, reservationDate: string) => {
     const today = new Date().toISOString().split('T')[0];
-    
+
     if (status === RESERVATION_STATUS.COMPLETED) {
       return 'bg-gray-100 text-gray-600';
     }
@@ -49,13 +51,15 @@ export const useReservationStatus = () => {
     return 'bg-orange-100 text-orange-600';
   };
 
-  const isCheckInAvailable = (reservation: ReservationResponseDto) => {
+  const isCheckInAvailable = (reservation: ReservationListResponse) => {
     const today = new Date().toISOString().split('T')[0];
-    return reservation.status === RESERVATION_STATUS.MATCHED && 
-           reservation.reservationDate === today;
+    return (
+      reservation.status === RESERVATION_STATUS.MATCHED &&
+      reservation.reservationDate === today
+    );
   };
 
-  const isCheckOutAvailable = (reservation: ReservationResponseDto) => {
+  const isCheckOutAvailable = (reservation: ReservationListResponse) => {
     return reservation.status === RESERVATION_STATUS.WORKING;
   };
 
@@ -69,4 +73,4 @@ export const useReservationStatus = () => {
     isCheckInAvailable,
     isCheckOutAvailable,
   };
-}; 
+};

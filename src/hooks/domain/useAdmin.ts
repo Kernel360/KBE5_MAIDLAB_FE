@@ -1,8 +1,7 @@
 import { useState, useCallback } from 'react';
 import { adminApi } from '@/apis/admin';
-import type { PageParams } from '@/apis/admin';
-import type { AnswerRequestDto } from '@/apis/board';
-import { useToast } from './useToast';
+import type { AdminPageParams, AdminAnswerRequest } from '@/types/admin';
+import { useToast } from '../useToast';
 
 export const useAdmin = () => {
   const [loading, setLoading] = useState(false);
@@ -12,7 +11,7 @@ export const useAdmin = () => {
   const managerManagement = {
     // 매니저 목록 조회
     fetchManagers: useCallback(
-      async (params?: PageParams) => {
+      async (params?: AdminPageParams) => {
         try {
           setLoading(true);
           const data = await adminApi.getManagers(params);
@@ -85,7 +84,7 @@ export const useAdmin = () => {
   const consumerManagement = {
     // 소비자 목록 조회
     fetchConsumers: useCallback(
-      async (params?: PageParams) => {
+      async (params?: AdminPageParams) => {
         try {
           setLoading(true);
           const data = await adminApi.getConsumers(params);
@@ -125,7 +124,7 @@ export const useAdmin = () => {
   const reservationManagement = {
     // 전체 예약 조회
     fetchReservations: useCallback(
-      async (params?: PageParams) => {
+      async (params?: AdminPageParams) => {
         try {
           setLoading(true);
           const data = await adminApi.getReservations(params);
@@ -156,7 +155,7 @@ export const useAdmin = () => {
 
     // 일별 예약 조회
     fetchDailyReservations: useCallback(
-      async (date: string, params?: PageParams) => {
+      async (date: string, params?: AdminPageParams) => {
         try {
           const data = await adminApi.getDailyReservations(date, params);
           return data;
@@ -170,7 +169,7 @@ export const useAdmin = () => {
 
     // 주간 정산 조회
     fetchWeeklySettlements: useCallback(
-      async (startDate: string, params?: PageParams) => {
+      async (startDate: string, params?: AdminPageParams) => {
         try {
           const data = await adminApi.getWeeklySettlements(startDate, params);
           return data;
@@ -188,9 +187,12 @@ export const useAdmin = () => {
         try {
           setLoading(true);
           const response = await adminApi.getSettlementDetail(settlementId);
-          return response.data;
+          return response;
         } catch (error: any) {
-          showToast(error.message || '정산 상세 정보 조회에 실패했습니다.', 'error');
+          showToast(
+            error.message || '정산 상세 정보 조회에 실패했습니다.',
+            'error',
+          );
           return null;
         } finally {
           setLoading(false);
@@ -240,7 +242,7 @@ export const useAdmin = () => {
   const matchingManagement = {
     // 전체 매칭 조회
     fetchAllMatching: useCallback(
-      async (params?: PageParams) => {
+      async (params?: AdminPageParams) => {
         try {
           const data = await adminApi.getAllMatching(params);
           return data;
@@ -254,7 +256,7 @@ export const useAdmin = () => {
 
     // 상태별 매칭 조회
     fetchMatchingByStatus: useCallback(
-      async (status: string, params?: PageParams) => {
+      async (status: string, params?: AdminPageParams) => {
         try {
           const data = await adminApi.getMatchingByStatus(status, params);
           return data;
@@ -268,9 +270,9 @@ export const useAdmin = () => {
 
     // 매니저 변경
     changeManager: useCallback(
-      async (reservationId: number, managerId: number) => {
+      async (data: { reservationId: number; managerId: number }) => {
         try {
-          const result = await adminApi.changeManager(reservationId, managerId);
+          const result = await adminApi.changeManager(data);
           showToast('매니저가 변경되었습니다.', 'success');
           return { success: true, data: result };
         } catch (error: any) {
@@ -286,7 +288,7 @@ export const useAdmin = () => {
   const boardManagement = {
     // 전체 게시판 조회
     fetchBoards: useCallback(
-      async (params?: PageParams) => {
+      async (params?: AdminPageParams) => {
         try {
           const data = await adminApi.getBoards(params);
           return data;
@@ -299,38 +301,26 @@ export const useAdmin = () => {
     ),
 
     // 상담 게시판 조회
-    fetchConsultationBoards: useCallback(
-      async (params?: PageParams) => {
-        try {
-          const data = await adminApi.getConsultationBoards(params);
-          return data;
-        } catch (error: any) {
-          showToast(
-            error.message || '상담 게시판 조회에 실패했습니다.',
-            'error',
-          );
-          return [];
-        }
-      },
-      [showToast],
-    ),
+    fetchConsultationBoards: useCallback(async () => {
+      try {
+        const data = await adminApi.getConsultationBoards();
+        return data;
+      } catch (error: any) {
+        showToast(error.message || '상담 게시판 조회에 실패했습니다.', 'error');
+        return [];
+      }
+    }, [showToast]),
 
     // 환불 게시판 조회
-    fetchRefundBoards: useCallback(
-      async (params?: PageParams) => {
-        try {
-          const data = await adminApi.getRefundBoards(params);
-          return data;
-        } catch (error: any) {
-          showToast(
-            error.message || '환불 게시판 조회에 실패했습니다.',
-            'error',
-          );
-          return [];
-        }
-      },
-      [showToast],
-    ),
+    fetchRefundBoards: useCallback(async () => {
+      try {
+        const data = await adminApi.getRefundBoards();
+        return data;
+      } catch (error: any) {
+        showToast(error.message || '환불 게시판 조회에 실패했습니다.', 'error');
+        return [];
+      }
+    }, [showToast]),
 
     // 게시판 상세 조회
     fetchBoardDetail: useCallback(
@@ -351,7 +341,7 @@ export const useAdmin = () => {
 
     // 답변 등록
     createAnswer: useCallback(
-      async (boardId: number, data: AnswerRequestDto) => {
+      async (boardId: number, data: AdminAnswerRequest) => {
         try {
           const result = await adminApi.createAnswer(boardId, data);
           showToast('답변이 등록되었습니다.', 'success');
@@ -367,7 +357,7 @@ export const useAdmin = () => {
 
     // 답변 수정
     updateAnswer: useCallback(
-      async (answerId: number, data: AnswerRequestDto) => {
+      async (answerId: number, data: AdminAnswerRequest) => {
         try {
           const result = await adminApi.updateAnswer(answerId, data);
           showToast('답변이 수정되었습니다.', 'success');

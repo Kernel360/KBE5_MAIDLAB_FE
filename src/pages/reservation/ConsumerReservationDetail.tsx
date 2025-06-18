@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useReservation } from '@/hooks/useReservation';
+import { useReservation } from '@/hooks/domain/useReservation';
 import { IoArrowBack } from 'react-icons/io5';
 import { SERVICE_TYPE_LABELS, SERVICE_TYPES } from '@/constants/service';
 import { formatDateTime, formatPrice } from '@/utils';
-import type { ReservationDetailResponseDto } from '@/apis/reservation';
+import type { ReservationDetailResponse } from '@/types/reservation';
 
 const ConsumerReservationDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -12,7 +12,8 @@ const ConsumerReservationDetail: React.FC = () => {
   const { fetchReservationDetail } = useReservation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [reservation, setReservation] = useState<ReservationDetailResponseDto | null>(null);
+  const [reservation, setReservation] =
+    useState<ReservationDetailResponse | null>(null);
 
   useEffect(() => {
     const loadReservationDetail = async () => {
@@ -24,7 +25,11 @@ const ConsumerReservationDetail: React.FC = () => {
         }
         setReservation(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : '예약 정보를 불러오는데 실패했습니다.');
+        setError(
+          err instanceof Error
+            ? err.message
+            : '예약 정보를 불러오는데 실패했습니다.',
+        );
       } finally {
         setLoading(false);
       }
@@ -45,7 +50,9 @@ const ConsumerReservationDetail: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 p-4">
         <div className="bg-white rounded-lg shadow p-4">
-          <p className="text-red-500 mb-4">{error || '예약 정보를 찾을 수 없습니다.'}</p>
+          <p className="text-red-500 mb-4">
+            {error || '예약 정보를 찾을 수 없습니다.'}
+          </p>
           <button
             onClick={() => navigate(-1)}
             className="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
@@ -62,10 +69,7 @@ const ConsumerReservationDetail: React.FC = () => {
       <div className="max-w-3xl mx-auto p-4">
         {/* 헤더 */}
         <div className="flex items-center mb-6">
-          <button 
-            onClick={() => navigate(-1)}
-            className="p-2 -ml-2"
-          >
+          <button onClick={() => navigate(-1)} className="p-2 -ml-2">
             <IoArrowBack className="w-6 h-6" />
           </button>
           <h1 className="text-2xl font-bold ml-2">예약 상세</h1>
@@ -75,7 +79,12 @@ const ConsumerReservationDetail: React.FC = () => {
         <div className="bg-white rounded-lg shadow p-6 mb-4">
           <div className="text-center">
             <h2 className="text-lg font-medium">
-              {SERVICE_TYPE_LABELS[reservation.serviceType as keyof typeof SERVICE_TYPES]} &gt; {reservation.serviceDetailType}
+              {
+                SERVICE_TYPE_LABELS[
+                  reservation.serviceType as keyof typeof SERVICE_TYPES
+                ]
+              }{' '}
+              &gt; {reservation.serviceDetailType}
             </h2>
           </div>
         </div>
@@ -86,11 +95,15 @@ const ConsumerReservationDetail: React.FC = () => {
           <div className="space-y-4">
             <div>
               <p className="text-gray-500 text-sm">예약 일시</p>
-              <p className="mt-1">{formatDateTime(reservation.reservationDate)}</p>
+              <p className="mt-1">
+                {formatDateTime(reservation.reservationDate)}
+              </p>
             </div>
             <div>
               <p className="text-gray-500 text-sm">서비스 시간</p>
-              <p className="mt-1">{reservation.startTime} ~ {reservation.endTime}</p>
+              <p className="mt-1">
+                {reservation.startTime} ~ {reservation.endTime}
+              </p>
             </div>
             <div>
               <p className="text-gray-500 text-sm">공간 크기</p>
@@ -111,7 +124,9 @@ const ConsumerReservationDetail: React.FC = () => {
             <h3 className="text-lg font-medium mb-4">도우미 정보</h3>
             <div className="flex items-center">
               <img
-                src={reservation.managerProfileImageUrl || '/default-profile.png'}
+                src={
+                  reservation.managerProfileImageUrl || '/default-profile.png'
+                }
                 alt={reservation.managerName}
                 className="w-16 h-16 rounded-full"
               />
@@ -119,7 +134,9 @@ const ConsumerReservationDetail: React.FC = () => {
                 <p className="font-medium">{reservation.managerName}</p>
                 <div className="flex items-center mt-1">
                   <span className="text-yellow-400">★</span>
-                  <span className="ml-1">{reservation.managerAverageRate?.toFixed(1) || '0.0'}</span>
+                  <span className="ml-1">
+                    {reservation.managerAverageRate?.toFixed(1) || '0.0'}
+                  </span>
                 </div>
               </div>
             </div>
@@ -141,7 +158,7 @@ const ConsumerReservationDetail: React.FC = () => {
               <span className="text-gray-500">서비스 금액</span>
               <span>{formatPrice(Number(reservation.totalPrice))}원</span>
             </div>
-            {reservation.serviceAdd !== "NONE" && (
+            {reservation.serviceAdd !== 'NONE' && (
               <div className="flex justify-between">
                 <span className="text-gray-500">추가 서비스</span>
                 <span>{reservation.serviceAdd}</span>
@@ -149,7 +166,9 @@ const ConsumerReservationDetail: React.FC = () => {
             )}
             <div className="flex justify-between items-center pt-3 border-t border-gray-200">
               <span className="font-medium">총 결제 금액</span>
-              <span className="text-lg font-bold text-orange-500">{formatPrice(Number(reservation.totalPrice))}원</span>
+              <span className="text-lg font-bold text-orange-500">
+                {formatPrice(Number(reservation.totalPrice))}원
+              </span>
             </div>
           </div>
         </div>
@@ -158,9 +177,11 @@ const ConsumerReservationDetail: React.FC = () => {
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t">
           <div className="max-w-3xl mx-auto flex gap-3">
             {reservation.managerPhoneNumber && (
-              <button 
+              <button
                 className="flex-1 px-4 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
-                onClick={() => window.location.href = `tel:${reservation.managerPhoneNumber}`}
+                onClick={() =>
+                  (window.location.href = `tel:${reservation.managerPhoneNumber}`)
+                }
               >
                 도우미 연락
               </button>
@@ -172,4 +193,4 @@ const ConsumerReservationDetail: React.FC = () => {
   );
 };
 
-export default ConsumerReservationDetail; 
+export default ConsumerReservationDetail;

@@ -1,7 +1,8 @@
 import { apiCall, buildQueryString } from '../index';
 import type {
   MatchingRequestListResponse,
-  MatchingResponse,
+  AvailableManagerResponse,
+  MatchingRequest,
 } from '@/types/matching';
 import { API_ENDPOINTS } from '@/constants/api';
 
@@ -9,8 +10,14 @@ export const matchingApi = {
   /**
    * 매칭 매니저 조회
    */
-  getMatchingManagers: async (): Promise<MatchingResponse[]> => {
-    return apiCall<MatchingResponse[]>('get', API_ENDPOINTS.MATCHING.MANAGERS);
+  getMatchingManagers: async (
+    data: MatchingRequest,
+  ): Promise<AvailableManagerResponse[]> => {
+    return apiCall<AvailableManagerResponse[]>(
+      'get',
+      API_ENDPOINTS.MATCHING.MANAGERS,
+      data,
+    );
   },
 
   /**

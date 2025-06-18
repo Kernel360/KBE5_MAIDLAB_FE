@@ -13,7 +13,6 @@ const GoogleCallback: React.FC = () => {
       setStatus('success');
       setMessage('로그인 처리가 완료되었습니다.');
 
-      // 3초 후 팝업 닫기 시도
       setTimeout(() => {
         try {
           window.close();

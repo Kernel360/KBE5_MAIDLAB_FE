@@ -3,7 +3,7 @@ import { adminApi } from '@/apis/admin';
 import { tokenStorage, userStorage } from '@/utils/storage';
 import { useToast } from './useToast';
 import { SUCCESS_MESSAGES, ERROR_MESSAGES, USER_TYPES } from '@/constants';
-import type { AdminLoginRequestDto } from '@/apis/admin';
+import type { AdminLoginRequest } from '@/types/admin';
 
 export const useAdminAuth = () => {
   const [loading, setLoading] = useState(false);
@@ -12,7 +12,7 @@ export const useAdminAuth = () => {
 
   // 관리자 로그인
   const login = useCallback(
-    async (credentials: AdminLoginRequestDto) => {
+    async (credentials: AdminLoginRequest) => {
       try {
         setLoading(true);
 

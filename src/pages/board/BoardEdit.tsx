@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import BoardForm from '@/components/board/BoardForm';
+import BoardForm from '@/components/features/board/BoardForm';
 
 export default function BoardEdit() {
   const { id } = useParams<{ id: string }>();
@@ -17,4 +17,4 @@ export default function BoardEdit() {
       onSuccess={() => navigate(`/board/${id}`)}
     />
   );
-} 
+}

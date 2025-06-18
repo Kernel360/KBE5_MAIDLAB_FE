@@ -1,7 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { eventApi } from '@/apis/event';
-import { useToast } from './useToast';
-import type { EventRequestDto, EventListItem } from '@/apis/event';
+import { useToast } from '../useToast';
+import type {
+  EventCreateRequest,
+  EventUpdateRequest,
+  EventListItem,
+} from '@/types/event';
 
 export const useEvent = () => {
   const [events, setEvents] = useState<EventListItem[]>([]);
@@ -59,7 +63,7 @@ export const useEvent = () => {
 
   // 이벤트 생성 (관리자용) - EventRequestDto 타입 사용
   const createEvent = useCallback(
-    async (data: EventRequestDto) => {
+    async (data: EventCreateRequest) => {
       try {
         setLoading(true);
         await eventApi.createEvent(data);
@@ -80,7 +84,7 @@ export const useEvent = () => {
 
   // 이벤트 수정 (관리자용)
   const updateEvent = useCallback(
-    async (eventId: number, data: EventRequestDto) => {
+    async (eventId: number, data: EventUpdateRequest) => {
       try {
         setLoading(true);
         await eventApi.updateEvent(eventId, data);

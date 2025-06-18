@@ -10,11 +10,11 @@ import {
 import { useToast, useConsumer, useValidation } from '@/hooks';
 
 import { uploadToS3 } from '@/utils/s3';
-import type { ConsumerProfileRequestDto } from '@/apis/consumer';
 import type {
+  ConsumerProfileCreateRequest,
   ConsumerProfileFormData,
   ConsumerProfileErrors,
-} from '@/types/user';
+} from '@/types/consumer';
 
 const ConsumerProfileSetup: React.FC = () => {
   const navigate = useNavigate();
@@ -100,7 +100,7 @@ const ConsumerProfileSetup: React.FC = () => {
     if (!validateFormData()) return;
 
     try {
-      const profileData: ConsumerProfileRequestDto = {
+      const profileData: ConsumerProfileCreateRequest = {
         profileImage: formData.profileImage,
         address: formData.address,
         detailAddress: formData.detailAddress,

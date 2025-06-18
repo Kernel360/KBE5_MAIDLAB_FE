@@ -3,7 +3,7 @@ import styled from 'styled-components';
 // import { useConsumer } from '@/hooks/useConsumer';
 import { ProfileSection } from '@/components/features/consumer/mypage/ProfileSection';
 import MenuGrid from '@/components/features/consumer/mypage/MenuGrid';
-import type { ConsumerMyPageDto } from '@/apis/consumer';
+import type { ConsumerMyPageResponse } from '@/types/consumer';
 
 const MyPageContainer = styled.div`
   max-width: 1200px;
@@ -21,15 +21,17 @@ const LoadingContainer = styled.div`
 `;
 
 // 테스트용 목 데이터
-const mockUserInfo: ConsumerMyPageDto = {
+const mockUserInfo: ConsumerMyPageResponse = {
   name: '홍길동',
   point: 1000,
-  profileImage: undefined
+  profileImage: undefined,
 };
 
 const MyPage: React.FC = () => {
   // const { fetchMypage, loading } = useConsumer();
-  const [userInfo, setUserInfo] = useState<ConsumerMyPageDto | null>(mockUserInfo);
+  const [userInfo, setUserInfo] = useState<ConsumerMyPageResponse | null>(
+    mockUserInfo,
+  );
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -46,11 +48,7 @@ const MyPage: React.FC = () => {
   }, []);
 
   if (loading) {
-    return (
-      <LoadingContainer>
-        로딩중...
-      </LoadingContainer>
-    );
+    return <LoadingContainer>로딩중...</LoadingContainer>;
   }
 
   return (

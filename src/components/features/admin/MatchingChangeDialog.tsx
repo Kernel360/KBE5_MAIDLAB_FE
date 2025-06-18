@@ -16,13 +16,14 @@ import {
 } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useAdmin } from '@/hooks';
-import { type MatchingResponseDto } from '../../apis/matching';
-import { type ManagerListResponseDto } from '@/apis/admin';
+import { type MatchingResponse } from '@/types/matching';
+// ✅ 올바른 타입 import - 개별 매니저 아이템 타입
+import { type ManagerListItem } from '@/types/admin';
 import { RESERVATION_STATUS } from '@/constants/status';
 
 interface MatchingChangeDialogProps {
   open: boolean;
-  matching: MatchingResponseDto | null;
+  matching: MatchingResponse | null;
   onClose: () => void;
   onConfirm: (managerId: number) => void;
 }
@@ -34,9 +35,12 @@ const MatchingChangeDialog = ({
   onConfirm,
 }: MatchingChangeDialogProps) => {
   const { managerManagement } = useAdmin();
-  const [managers, setManagers] = useState<ManagerListResponseDto[]>([]);
+  // ✅ 매니저 배열 타입 수정
+  const [managers, setManagers] = useState<ManagerListItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedManagerId, setSelectedManagerId] = useState<number | null>(null);
+  const [selectedManagerId, setSelectedManagerId] = useState<number | null>(
+    null,
+  );
   const [isInitialized, setIsInitialized] = useState(false);
 
   // 매니저 목록 조회
@@ -45,14 +49,15 @@ const MatchingChangeDialog = ({
 
     const fetchManagers = async () => {
       if (!open || isInitialized) return;
-      
+
       setLoading(true);
       try {
-        const response = await managerManagement.fetchManagers({ 
+        const response = await managerManagement.fetchManagers({
           page: 0,
-          size: 100
+          size: 100,
         });
-        
+
+        // ✅ response.content를 사용 (ManagerListItem 배열)
         if (isMounted && response?.content) {
           setManagers(response.content);
           setIsInitialized(true);
@@ -87,10 +92,10 @@ const MatchingChangeDialog = ({
   };
 
   return (
-    <Dialog 
-      open={open && matching?.matchingStatus !== RESERVATION_STATUS.PENDING} 
-      onClose={onClose} 
-      maxWidth="sm" 
+    <Dialog
+      open={open && matching?.matchingStatus !== RESERVATION_STATUS.PENDING}
+      onClose={onClose}
+      maxWidth="sm"
       fullWidth
     >
       <DialogTitle>매니저 변경</DialogTitle>
@@ -113,7 +118,7 @@ const MatchingChangeDialog = ({
           <Typography variant="subtitle1" gutterBottom>
             매니저 목록 {managers.length > 0 && `(${managers.length}명)`}
           </Typography>
-          
+
           <Box sx={{ maxHeight: 400, overflow: 'auto' }}>
             {loading ? (
               <Box display="flex" justifyContent="center" py={3}>
@@ -167,7 +172,10 @@ const MatchingChangeDialog = ({
           variant="contained"
           color="primary"
           onClick={handleConfirm}
-          disabled={!selectedManagerId || matching?.matchingStatus === RESERVATION_STATUS.PENDING}
+          disabled={
+            !selectedManagerId ||
+            matching?.matchingStatus === RESERVATION_STATUS.PENDING
+          }
         >
           변경
         </Button>
@@ -176,4 +184,4 @@ const MatchingChangeDialog = ({
   );
 };
 
-export default MatchingChangeDialog; 
+export default MatchingChangeDialog;

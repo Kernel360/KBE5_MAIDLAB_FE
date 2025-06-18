@@ -1,7 +1,14 @@
-
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Box, Button, Container, TextField, Typography, Paper, Alert } from '@mui/material';
+import {
+  Box,
+  Button,
+  Container,
+  TextField,
+  Typography,
+  Paper,
+  Alert,
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
@@ -32,10 +39,10 @@ const AdminLogin = () => {
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  
+
   // useAdminAuth 훅에서 필요한 것들 가져오기
   const { login, loading, isAuthenticated } = useAdminAuth();
-  
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -52,7 +59,9 @@ const AdminLogin = () => {
 
       // 로그인 성공시 페이지 이동
       if (result.success) {
-        const from = (location.state as { from?: Location })?.from?.pathname || '/admin/users';
+        const from =
+          (location.state as { from?: Location })?.from?.pathname ||
+          '/admin/users';
         navigate('/admin/users');
       } else {
         // 로그인 실패시 에러 표시 (이미 토스트로 표시되지만 추가로 표시하고 싶다면)

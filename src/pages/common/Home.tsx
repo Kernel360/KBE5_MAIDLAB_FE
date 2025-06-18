@@ -34,10 +34,9 @@ const Home: React.FC = () => {
     navigate(`${ROUTES.EVENTS}/${eventId}`);
   };
 
-  // 알림 클릭 핸들러 (나중에 알림 페이지 연결)
+  // TODO: 알림 클릭 핸들러 (나중에 알림 페이지 연결)
   const handleNotificationClick = () => {
     console.log('알림 클릭');
-    // navigate('/notifications'); // 알림 페이지가 있다면
   };
 
   return (
@@ -45,11 +44,9 @@ const Home: React.FC = () => {
       <Header
         showNotification={true}
         onNotificationClick={handleNotificationClick}
-        // onLogoClick={() => navigate(ROUTES.HOME)} // 기본 동작과 동일하므로 생략 가능
       />
 
       <main className="px-4 py-6 pb-20">
-        {/* 가운데 정렬을 위한 컨테이너 추가 */}
         <div className="max-w-md mx-auto">
           <HeroSection
             onEventClick={handleEventClick}
@@ -68,7 +65,6 @@ const Home: React.FC = () => {
         </div>
       </main>
 
-      {/* FooterSwitcher: userType이 MANAGER면 ManagerFooter, 아니면 기존 BottomNavigation */}
       {userType === 'MANAGER' ? (
         <ManagerFooter />
       ) : (

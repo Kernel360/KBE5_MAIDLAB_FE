@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import type { ConsumerMyPageDto } from '@/apis/consumer';
+import type { ConsumerMyPageResponse } from '@/types/consumer';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/constants';
 
@@ -12,7 +12,7 @@ const Section = styled.section`
   padding: 20px;
   background: #fff;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
 const ProfileImage = styled.img`
@@ -54,7 +54,7 @@ const EditButton = styled.button`
 `;
 
 interface ProfileSectionProps {
-  userInfo: ConsumerMyPageDto | null;
+  userInfo: ConsumerMyPageResponse | null;
 }
 
 export const ProfileSection: React.FC<ProfileSectionProps> = ({ userInfo }) => {
@@ -66,8 +66,8 @@ export const ProfileSection: React.FC<ProfileSectionProps> = ({ userInfo }) => {
 
   return (
     <Section>
-      <ProfileImage 
-        src={userInfo?.profileImage || '/default-profile.png'} 
+      <ProfileImage
+        src={userInfo?.profileImage || '/default-profile.png'}
         alt="프로필"
       />
       <ProfileInfo>

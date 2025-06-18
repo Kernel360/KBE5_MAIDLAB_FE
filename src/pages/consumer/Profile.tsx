@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '@/constants';
+import { GENDER, type Gender } from '@/constants';
 import { useToast } from '@/hooks/useToast';
 
 const ProfileContainer = styled.div`
@@ -14,7 +13,7 @@ const ProfileCard = styled.div`
   background: #fff;
   padding: 24px;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
 const ProfileHeader = styled.div`
@@ -79,7 +78,7 @@ const ProfileImage = styled.div`
     height: 100%;
     object-fit: cover;
   }
-  input[type="file"] {
+  input[type='file'] {
     display: none;
   }
 `;
@@ -113,7 +112,7 @@ const Input = styled.input`
   &:focus {
     outline: none;
     border-color: #80bdff;
-    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
   }
 `;
 
@@ -121,7 +120,7 @@ interface ProfileData {
   name: string;
   phoneNumber: string;
   birth: string;
-  gender: 'MALE' | 'FEMALE';
+  gender: Gender;
   address: string;
   detailAddress: string;
   profileImage: string | undefined;
@@ -135,7 +134,7 @@ const initialProfile: ProfileData = {
   gender: 'MALE',
   address: '서울시 강남구 테헤란로 123',
   detailAddress: '123동 456호',
-  profileImage: undefined
+  profileImage: undefined,
 };
 
 const DEFAULT_PROFILE_IMAGE = '/default-profile.png';
@@ -145,9 +144,9 @@ const Profile: React.FC = () => {
   const { showToast } = useToast();
 
   const handleInputChange = (field: string, value: string) => {
-    setProfile(prev => ({
+    setProfile((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -175,9 +174,9 @@ const Profile: React.FC = () => {
       // const imageUrl = await uploadApi.uploadImage(formData);
 
       const imageUrl = URL.createObjectURL(file); // 임시로 로컬 URL 사용
-      setProfile(prev => ({
+      setProfile((prev) => ({
         ...prev,
-        profileImage: imageUrl
+        profileImage: imageUrl,
       }));
       showToast('프로필 이미지가 변경되었습니다.', 'success');
     } catch (error: any) {
@@ -195,9 +194,9 @@ const Profile: React.FC = () => {
 
         <label htmlFor="profile-image">
           <ProfileImage>
-            <img 
-              src={profile.profileImage || DEFAULT_PROFILE_IMAGE} 
-              alt="프로필 이미지" 
+            <img
+              src={profile.profileImage || DEFAULT_PROFILE_IMAGE}
+              alt="프로필 이미지"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 target.src = DEFAULT_PROFILE_IMAGE;
@@ -254,4 +253,4 @@ const Profile: React.FC = () => {
   );
 };
 
-export default Profile; 
+export default Profile;

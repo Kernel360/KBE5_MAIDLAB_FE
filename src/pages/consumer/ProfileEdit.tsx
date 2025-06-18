@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useConsumer } from '@/hooks/useConsumer';
-import type { ConsumerProfileRequestDto } from '@/apis/consumer';
+import { useConsumer } from '@/hooks/domain/useConsumer';
+import type { ConsumerProfileUpdateRequest } from '@/types/consumer';
 import { useNavigate } from 'react-router-dom';
 
 const Form = styled.form`
@@ -11,7 +11,7 @@ const Form = styled.form`
   background: #fff;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
 const FormGroup = styled.div`
@@ -71,9 +71,12 @@ interface ProfileFormProps {
   onCancel: () => void;
 }
 
-export const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess, onCancel }) => {
+export const ProfileForm: React.FC<ProfileFormProps> = ({
+  onSuccess,
+  onCancel,
+}) => {
   const { profile, fetchProfile, updateProfile, loading } = useConsumer();
-  const [formData, setFormData] = useState<ConsumerProfileRequestDto>({
+  const [formData, setFormData] = useState<ConsumerProfileUpdateRequest>({
     address: '',
     detailAddress: '',
   });
@@ -115,27 +118,29 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ onSuccess, onCancel })
       </FormGroup>
       <FormGroup>
         <Label>주소</Label>
-        <Input 
-          type="text" 
+        <Input
+          type="text"
           value={formData.address}
-          onChange={(e) => setFormData({...formData, address: e.target.value})}
+          onChange={(e) =>
+            setFormData({ ...formData, address: e.target.value })
+          }
         />
       </FormGroup>
       <FormGroup>
         <Label>상세주소</Label>
-        <Input 
-          type="text" 
+        <Input
+          type="text"
           value={formData.detailAddress}
-          onChange={(e) => setFormData({...formData, detailAddress: e.target.value})}
+          onChange={(e) =>
+            setFormData({ ...formData, detailAddress: e.target.value })
+          }
         />
       </FormGroup>
       <ButtonGroup>
-        <Button type="submit" className="primary">저장하기</Button>
-        <Button 
-          type="button" 
-          className="secondary"
-          onClick={onCancel}
-        >
+        <Button type="submit" className="primary">
+          저장하기
+        </Button>
+        <Button type="button" className="secondary" onClick={onCancel}>
           취소
         </Button>
       </ButtonGroup>

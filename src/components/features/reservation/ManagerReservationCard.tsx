@@ -1,11 +1,14 @@
 import React from 'react';
-import { RESERVATION_STATUS, RESERVATION_STATUS_LABELS } from '@/constants/status';
+import {
+  RESERVATION_STATUS,
+  RESERVATION_STATUS_LABELS,
+} from '@/constants/status';
 import { SERVICE_TYPE_LABELS, SERVICE_TYPES } from '@/constants/service';
 import { formatDateTime, formatPrice } from '@/utils';
-import type { ReservationResponseDto } from '@/apis/reservation';
+import type { ReservationListResponse } from '@/types/reservation';
 
 interface ManagerReservationCardProps {
-  reservation: ReservationResponseDto;
+  reservation: ReservationListResponse;
   getStatusBadgeStyle: (status: string, reservationDate: string) => string;
   onDetailClick: () => void;
   onCheckIn?: () => void;
@@ -23,13 +26,16 @@ export const ManagerReservationCard: React.FC<ManagerReservationCardProps> = ({
   const isToday = (dateString: string) => {
     const today = new Date();
     const date = new Date(dateString);
-    return date.getDate() === today.getDate() &&
+    return (
+      date.getDate() === today.getDate() &&
       date.getMonth() === today.getMonth() &&
-      date.getFullYear() === today.getFullYear();
+      date.getFullYear() === today.getFullYear()
+    );
   };
 
   // 체크인 버튼 표시 여부
-  const showCheckInButton = reservation.status === RESERVATION_STATUS.MATCHED && 
+  const showCheckInButton =
+    reservation.status === RESERVATION_STATUS.MATCHED &&
     isToday(reservation.reservationDate);
 
   // 체크아웃 버튼 표시 여부
@@ -43,7 +49,9 @@ export const ManagerReservationCard: React.FC<ManagerReservationCardProps> = ({
       }
       return '예정';
     }
-    return RESERVATION_STATUS_LABELS[status as keyof typeof RESERVATION_STATUS_LABELS];
+    return RESERVATION_STATUS_LABELS[
+      status as keyof typeof RESERVATION_STATUS_LABELS
+    ];
   };
 
   return (
@@ -63,8 +71,12 @@ export const ManagerReservationCard: React.FC<ManagerReservationCardProps> = ({
         <div className="flex justify-between items-center">
           <div>
             <h3 className="font-medium">
-              {SERVICE_TYPE_LABELS[reservation.serviceType as keyof typeof SERVICE_TYPES]} &gt;{' '}
-              {reservation.detailServiceType}
+              {
+                SERVICE_TYPE_LABELS[
+                  reservation.serviceType as keyof typeof SERVICE_TYPES
+                ]
+              }{' '}
+              &gt; {reservation.detailServiceType}
             </h3>
             <p className="text-sm text-gray-500 mt-1">
               {reservation.startTime} ~ {reservation.endTime}
@@ -104,4 +116,4 @@ export const ManagerReservationCard: React.FC<ManagerReservationCardProps> = ({
       </div>
     </div>
   );
-}; 
+};

@@ -2,19 +2,19 @@ import { useState, useCallback } from 'react';
 import { managerApi } from '@/apis/manager';
 import { consumerApi } from '@/apis/consumer';
 import { userStorage } from '@/utils';
-import { useToast } from './useToast';
+import { useToast } from '../useToast';
 import type {
-  ConsumerProfileRequestDto,
-  ConsumerProfileResponseDto,
-} from '@/apis/consumer';
+  ConsumerProfileUpdateRequest,
+  ConsumerProfileResponse,
+} from '@/types/consumer';
 import type {
-  ProfileUpdateRequestDto,
-  ProfileResponseDto,
-} from '@/apis/manager';
+  ManagerProfileUpdateRequest,
+  ManagerProfileResponse,
+} from '@/types/manager';
 
 export const useUser = () => {
   const [profile, setProfile] = useState<
-    ConsumerProfileResponseDto | ProfileResponseDto | null
+    ConsumerProfileResponse | ManagerProfileResponse | null
   >(null);
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
@@ -48,7 +48,7 @@ export const useUser = () => {
   // 프로필 수정
   const updateProfile = useCallback(
     async (
-      profileData: ConsumerProfileRequestDto | ProfileUpdateRequestDto,
+      profileData: ConsumerProfileUpdateRequest | ManagerProfileUpdateRequest,
     ) => {
       try {
         setLoading(true);
@@ -56,11 +56,11 @@ export const useUser = () => {
 
         if (userType === 'MANAGER') {
           await managerApi.updateProfile(
-            profileData as ProfileUpdateRequestDto,
+            profileData as ManagerProfileUpdateRequest,
           );
         } else if (userType === 'CONSUMER') {
           await consumerApi.updateProfile(
-            profileData as ConsumerProfileRequestDto,
+            profileData as ConsumerProfileUpdateRequest,
           );
         }
 

@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { IoArrowBack } from 'react-icons/io5';
-import { useReservation } from '@/hooks/useReservation';
+import { useReservation } from '@/hooks/domain/useReservation';
 import { ROUTES } from '@/constants/route';
-import { NUMBER_LIMITS } from '@/constants/validation';
-import type { ReservationDetailResponseDto } from '@/apis/reservation';
+import type { ReservationDetailResponse } from '@/types/reservation';
 
 const ReviewRegister: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { fetchReservationDetail, registerReview } = useReservation();
   const [loading, setLoading] = useState(true);
-  const [reservation, setReservation] = useState<ReservationDetailResponseDto | null>(null);
+  const [reservation, setReservation] =
+    useState<ReservationDetailResponse | null>(null);
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +26,11 @@ const ReviewRegister: React.FC = () => {
         }
         setReservation(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : '예약 정보를 불러오는데 실패했습니다.');
+        setError(
+          err instanceof Error
+            ? err.message
+            : '예약 정보를 불러오는데 실패했습니다.',
+        );
       } finally {
         setLoading(false);
       }
@@ -65,7 +69,9 @@ const ReviewRegister: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 p-4">
         <div className="bg-white rounded-lg shadow p-4">
-          <p className="text-red-500 mb-4">{error || '예약 정보를 찾을 수 없습니다.'}</p>
+          <p className="text-red-500 mb-4">
+            {error || '예약 정보를 찾을 수 없습니다.'}
+          </p>
           <button
             onClick={() => navigate(-1)}
             className="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
@@ -82,10 +88,7 @@ const ReviewRegister: React.FC = () => {
       {/* 헤더 */}
       <div className="fixed top-0 left-0 right-0 z-10 bg-white shadow">
         <div className="flex items-center px-4 h-14">
-          <button 
-            onClick={() => navigate(-1)}
-            className="p-2 -ml-2"
-          >
+          <button onClick={() => navigate(-1)} className="p-2 -ml-2">
             <IoArrowBack className="w-6 h-6" />
           </button>
           <h1 className="ml-2 text-lg font-semibold">리뷰 작성</h1>
@@ -100,7 +103,9 @@ const ReviewRegister: React.FC = () => {
           <div className="space-y-4">
             <div>
               <p className="text-gray-500 text-sm">서비스</p>
-              <p className="mt-1">{reservation.serviceType} → {reservation.serviceDetailType}</p>
+              <p className="mt-1">
+                {reservation.serviceType} → {reservation.serviceDetailType}
+              </p>
             </div>
             <div>
               <p className="text-gray-500 text-sm">고객 이름</p>
@@ -117,7 +122,7 @@ const ReviewRegister: React.FC = () => {
         {/* 리뷰 작성 폼 */}
         <form onSubmit={handleSubmit} className="mt-2 bg-white px-4 py-5">
           <h3 className="text-lg font-medium mb-4">리뷰 작성</h3>
-          
+
           {/* 별점 */}
           <div className="mb-6">
             <p className="text-gray-500 text-sm mb-2">별점</p>
@@ -129,7 +134,11 @@ const ReviewRegister: React.FC = () => {
                   onClick={() => setRating(star)}
                   className="text-2xl focus:outline-none"
                 >
-                  <span className={star <= rating ? 'text-yellow-400' : 'text-gray-300'}>
+                  <span
+                    className={
+                      star <= rating ? 'text-yellow-400' : 'text-gray-300'
+                    }
+                  >
                     ★
                   </span>
                 </button>
@@ -173,4 +182,4 @@ const ReviewRegister: React.FC = () => {
   );
 };
 
-export default ReviewRegister; 
+export default ReviewRegister;

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { ReservationResponseDto } from '@/apis/reservation';
-import { useReservation } from '@/hooks/useReservation';
+import type { ReservationListResponse } from '@/types/reservation';
+import { useReservation } from '@/hooks/domain/useReservation';
 import { formatDateTime } from '@/utils';
 import { SUCCESS_MESSAGES } from '@/constants/message';
 import { useReservationStatus } from '@/hooks/useReservationStatus';
-import { ManagerReservationCard } from '@/components/reservation/ManagerReservationCard';
+import { ManagerReservationCard } from '@/components/features/reservation/ManagerReservationCard';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -61,7 +61,10 @@ const CheckInOutModal: React.FC<CheckInOutModalProps> = ({
             서비스를 {isCheckIn ? '시작' : '종료'}하시겠습니까?
           </h3>
           <div className="bg-gray-50 p-4 rounded-lg mb-4">
-            <p className="font-medium">{reservationInfo.serviceType} → {reservationInfo.detailServiceType}</p>
+            <p className="font-medium">
+              {reservationInfo.serviceType} →{' '}
+              {reservationInfo.detailServiceType}
+            </p>
             <p className="text-gray-600 text-sm mt-1">{reservationInfo.time}</p>
           </div>
           <div className="flex justify-center gap-3">
@@ -113,7 +116,9 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
             </div>
           </div>
           <h3 className="text-lg font-medium mb-4">
-            {isCheckIn ? SUCCESS_MESSAGES.CHECKIN_SUCCESS : SUCCESS_MESSAGES.CHECKOUT_SUCCESS}
+            {isCheckIn
+              ? SUCCESS_MESSAGES.CHECKIN_SUCCESS
+              : SUCCESS_MESSAGES.CHECKOUT_SUCCESS}
           </h3>
           <button
             onClick={onClose}
@@ -129,7 +134,8 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 
 const ManagerReservations: React.FC = () => {
   const navigate = useNavigate();
-  const { fetchReservations, checkIn, checkOut, reservations } = useReservation();
+  const { fetchReservations, checkIn, checkOut, reservations } =
+    useReservation();
   const {
     loading: reservationStatusLoading,
     setLoading: setReservationStatusLoading,
@@ -182,8 +188,8 @@ const ManagerReservations: React.FC = () => {
   }, [fetchReservations, setReservationStatusLoading]);
 
   const handleCheckInOutClick = (
-    reservation: ReservationResponseDto,
-    isCheckIn: boolean
+    reservation: ReservationListResponse,
+    isCheckIn: boolean,
   ) => {
     setCheckInOutModal({
       isOpen: true,
@@ -203,9 +209,13 @@ const ManagerReservations: React.FC = () => {
     const currentTime = new Date().toISOString();
     try {
       if (checkInOutModal.isCheckIn) {
-        await checkIn(checkInOutModal.reservationId, { checkTime: currentTime });
+        await checkIn(checkInOutModal.reservationId, {
+          checkTime: currentTime,
+        });
       } else {
-        await checkOut(checkInOutModal.reservationId, { checkTime: currentTime });
+        await checkOut(checkInOutModal.reservationId, {
+          checkTime: currentTime,
+        });
       }
       setCheckInOutModal((prev) => ({ ...prev, isOpen: false }));
       setConfirmModal({
@@ -222,7 +232,9 @@ const ManagerReservations: React.FC = () => {
     setConfirmModal((prev) => ({ ...prev, isOpen: false }));
     if (!checkInOutModal.isCheckIn && checkInOutModal.reservationId) {
       // 체크아웃 후에만 리뷰 작성 페이지로 이동
-      navigate(`/managers/reservations/${checkInOutModal.reservationId}/review`);
+      navigate(
+        `/managers/reservations/${checkInOutModal.reservationId}/review`,
+      );
     }
   };
 
@@ -233,9 +245,8 @@ const ManagerReservations: React.FC = () => {
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const paginatedReservations = filteredReservations.slice(
     startIndex,
-    startIndex + ITEMS_PER_PAGE
+    startIndex + ITEMS_PER_PAGE,
   );
-
 
   if (reservationStatusLoading) {
     return (
@@ -252,7 +263,6 @@ const ManagerReservations: React.FC = () => {
 
         {/* 탭 */}
         <div className="flex space-x-4 mb-6">
-        
           <button
             onClick={() => setReservationStatusActiveTab('scheduled')}
             className={`px-4 py-2 rounded-lg ${
@@ -296,8 +306,14 @@ const ManagerReservations: React.FC = () => {
               <ManagerReservationCard
                 key={reservation.reservationId}
                 reservation={reservation}
-                getStatusBadgeStyle={(status) => getStatusBadgeStyle(status, reservation.reservationDate)}
-                onDetailClick={() => navigate(`/managers/reservations/${reservation.reservationId}`)}
+                getStatusBadgeStyle={(status) =>
+                  getStatusBadgeStyle(status, reservation.reservationDate)
+                }
+                onDetailClick={() =>
+                  navigate(
+                    `/managers/reservations/${reservation.reservationId}`,
+                  )
+                }
                 onCheckIn={() => handleCheckInOutClick(reservation, true)}
                 onCheckOut={() => handleCheckInOutClick(reservation, false)}
               />
@@ -328,7 +344,9 @@ const ManagerReservations: React.FC = () => {
       {/* 모달 */}
       <CheckInOutModal
         isOpen={checkInOutModal.isOpen}
-        onClose={() => setCheckInOutModal((prev) => ({ ...prev, isOpen: false }))}
+        onClose={() =>
+          setCheckInOutModal((prev) => ({ ...prev, isOpen: false }))
+        }
         onConfirm={handleCheckInOut}
         isCheckIn={checkInOutModal.isCheckIn}
         reservationInfo={checkInOutModal.reservationInfo}
@@ -342,4 +360,4 @@ const ManagerReservations: React.FC = () => {
   );
 };
 
-export default ManagerReservations; 
+export default ManagerReservations;

@@ -1,5 +1,3 @@
-// src/components/features/consumer/mypage/MenuGrid.tsx
-import React from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/constants/route';
@@ -25,7 +23,7 @@ const MenuButton = styled.button`
   min-height: 120px;
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-color: #007bff;
   }
 `;
@@ -41,22 +39,37 @@ const MenuLabel = styled.span`
 `;
 
 const menuItems = [
-  { id: 'payment', label: '결제수단 관리', icon: '💳', path: '/consumers/payment' },
-  { id: 'coupon', label: '프로모션 코드/쿠폰', icon: '🎟️', path: '/consumers/coupon' },
+  {
+    id: 'payment',
+    label: '결제수단 관리',
+    icon: '💳',
+    path: '/consumers/payment',
+  },
+  {
+    id: 'coupon',
+    label: '프로모션 코드/쿠폰',
+    icon: '🎟️',
+    path: '/consumers/coupon',
+  },
   { id: 'point', label: '포인트', icon: '', path: '/consumer/point' },
   {
     id: 'helpers',
     label: '찜한 도우미',
     icon: '❤️',
-    path: ROUTES.CONSUMER.LIKED_MANAGERS
+    path: ROUTES.CONSUMER.LIKED_MANAGERS,
   },
-  { 
-    id: 'blacklist', 
-    label: '블랙리스트 도우미', 
-    icon: '🚫', 
-    path: ROUTES.CONSUMER.BLACKLIST 
+  {
+    id: 'blacklist',
+    label: '블랙리스트 도우미',
+    icon: '🚫',
+    path: ROUTES.CONSUMER.BLACKLIST,
   },
-  { id: 'invite', label: '친구 초대하기', icon: '👥', path: '/consumer/invite' },
+  {
+    id: 'invite',
+    label: '친구 초대하기',
+    icon: '👥',
+    path: '/consumer/invite',
+  },
   { id: 'settings', label: '설정', icon: '⚙️', path: '/consumer/settings' },
 ];
 
@@ -70,10 +83,7 @@ export default function MenuGrid() {
   return (
     <Grid>
       {menuItems.map((item) => (
-        <MenuButton
-          key={item.id}
-          onClick={() => handleMenuClick(item.path)}
-        >
+        <MenuButton key={item.id} onClick={() => handleMenuClick(item.path)}>
           <MenuIcon>{item.icon}</MenuIcon>
           <MenuLabel>{item.label}</MenuLabel>
         </MenuButton>

@@ -9,60 +9,69 @@ import {
   removeLocalStorage,
 } from '@/utils/storage';
 import { openGoogleLoginPopup, cleanupOAuthStorage } from '@/utils/googleOAuth';
-import type { LoginRequestDto, SocialLoginRequestDto } from '@/apis/auth';
+import type { LoginRequest, SocialLoginRequest } from '@/types/auth';
 import type { SavedLoginInfo } from '@/types/user';
+import {
+  USER_TYPES,
+  LOGIN_USER_TYPES,
+  type LoginUserType,
+} from '@/constants/user';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const { login, socialLogin, isLoading } = useAuth();
   const { showToast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
-  const [selectedUserType, setSelectedUserType] = useState<
-    'CONSUMER' | 'MANAGER'
-  >('CONSUMER');
+  const [selectedUserType, setSelectedUserType] = useState<LoginUserType>(
+    LOGIN_USER_TYPES.CONSUMER,
+  );
 
-  // 컴포넌트 마운트 시 OAuth 관련 localStorage 정리 및 저장된 로그인 정보 불러오기
   useEffect(() => {
     cleanupOAuthStorage();
 
-    // 저장된 로그인 정보 불러오기
     const savedLoginInfo = getLocalStorage<SavedLoginInfo>(
       STORAGE_KEYS.SAVED_LOGIN_INFO,
     );
-    if (savedLoginInfo && savedLoginInfo.rememberMe) {
+
+    if (
+      savedLoginInfo &&
+      savedLoginInfo.rememberMe &&
+      savedLoginInfo.userType in LOGIN_USER_TYPES
+    ) {
       setValue('phoneNumber', savedLoginInfo.phoneNumber || '');
       setValue('rememberMe', true);
-      setSelectedUserType(savedLoginInfo.userType || 'CONSUMER');
+      setSelectedUserType(savedLoginInfo.userType as LoginUserType);
     }
   }, []);
 
   const { values, errors, touched, handleSubmit, setValue, setFieldTouched } =
-    useForm<LoginRequestDto & { rememberMe: boolean }>({
+    useForm<LoginRequest & { rememberMe: boolean }>({
       initialValues: {
         userType: 'CONSUMER',
         phoneNumber: '',
         password: '',
         rememberMe: false,
       },
+
       validationSchema: {
         phoneNumber: (value) => /^01[0-9]{8,9}$/.test(value.replace(/-/g, '')),
         password: (value) => value.length >= 8,
       },
+
       onSubmit: async (formData) => {
-        const cleanedData: LoginRequestDto = {
+        const cleanedData: LoginRequest = {
           userType: selectedUserType,
           phoneNumber: formData.phoneNumber.replace(/-/g, ''),
           password: formData.password,
         };
 
-        // 로그인 정보 기억하기 처리
         if (formData.rememberMe) {
           const loginInfo: SavedLoginInfo = {
             phoneNumber: formData.phoneNumber,
             userType: selectedUserType,
             rememberMe: true,
           };
-          // 30일 동안 저장
+
           setLocalStorage(
             STORAGE_KEYS.SAVED_LOGIN_INFO,
             loginInfo,
@@ -71,19 +80,10 @@ const Login: React.FC = () => {
         } else {
           removeLocalStorage(STORAGE_KEYS.SAVED_LOGIN_INFO);
         }
-
-        const result = await login(cleanedData);
-
-        // 🔧 useAuth에서 모든 처리를 하므로 여기서는 단순히 성공/실패만 확인
-        if (result.success) {
-          console.log('✅ 로그인 성공');
-          // 페이지 이동과 토스트는 useAuth에서 처리
-        }
-        // 에러도 useAuth에서 토스트로 처리하므로 여기서는 추가 처리 불필요
+        await login(cleanedData);
       },
     });
 
-  // 휴대폰 번호 포맷팅
   const handlePhoneChange = (value: string) => {
     const numbers = value.replace(/\D/g, '');
     let formatted = numbers;
@@ -97,33 +97,20 @@ const Login: React.FC = () => {
     setValue('phoneNumber', formatted);
   };
 
-  //  Google 소셜 로그인 처리 - 토큰 저장 제거
   const handleGoogleLogin = () => {
-    console.log('🚀 Google 로그인 시작:', selectedUserType);
-
     openGoogleLoginPopup(
       selectedUserType,
       async (code: string, userType: 'CONSUMER' | 'MANAGER') => {
         try {
-          console.log('📨 구글 코드 수신:', {
-            code: code.substring(0, 20) + '...',
-            userType,
-            codeLength: code.length,
-          });
-
-          const socialLoginData: SocialLoginRequestDto = {
+          const socialLoginData: SocialLoginRequest = {
             userType,
             socialType: 'GOOGLE',
             code,
           };
 
-          console.log('🔄 socialLogin API 호출 준비:', socialLoginData);
           const result = await socialLogin(socialLoginData);
 
-          console.log('📋 socialLogin 결과:', result);
-
           if (result.success) {
-            // 🔧 useAuth에서 이미 모든 토큰 처리를 완료했으므로 페이지 이동만 처리
             if (result.newUser) {
               showToast('추가 정보를 입력해주세요.', 'info');
               navigate(ROUTES.SOCIAL_SIGNUP, { replace: true });
@@ -131,7 +118,7 @@ const Login: React.FC = () => {
               showToast('프로필을 완성해주세요.', 'info');
 
               const profileRoute =
-                userType === 'MANAGER'
+                userType === USER_TYPES.MANAGER
                   ? '/manager/profile/setup'
                   : '/consumer/profile/setup';
 
@@ -140,16 +127,13 @@ const Login: React.FC = () => {
               navigate(ROUTES.HOME);
             }
           } else {
-            console.error('❌ socialLogin 실패:', result.error);
             showToast(result.error || 'Google 로그인에 실패했습니다.', 'error');
           }
         } catch (error: any) {
-          console.error('❌ Google 로그인 오류:', error);
           showToast('Google 로그인 중 오류가 발생했습니다.', 'error');
         }
       },
       (error: string) => {
-        console.error('❌ Google OAuth 팝업 오류:', error);
         showToast(error, 'error');
       },
     );
@@ -177,9 +161,9 @@ const Login: React.FC = () => {
           <div className="flex bg-gray-100 rounded-lg p-1 mb-6">
             <button
               type="button"
-              onClick={() => setSelectedUserType('CONSUMER')}
+              onClick={() => setSelectedUserType(LOGIN_USER_TYPES.CONSUMER)}
               className={`flex-1 py-3 px-4 rounded-md text-sm font-medium transition-colors ${
-                selectedUserType === 'CONSUMER'
+                selectedUserType === LOGIN_USER_TYPES.CONSUMER
                   ? 'bg-orange-500 text-white'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
@@ -188,9 +172,9 @@ const Login: React.FC = () => {
             </button>
             <button
               type="button"
-              onClick={() => setSelectedUserType('MANAGER')}
+              onClick={() => setSelectedUserType(LOGIN_USER_TYPES.MANAGER)}
               className={`flex-1 py-3 px-4 rounded-md text-sm font-medium transition-colors ${
-                selectedUserType === 'MANAGER'
+                selectedUserType === LOGIN_USER_TYPES.MANAGER
                   ? 'bg-orange-500 text-white'
                   : 'text-gray-600 hover:text-gray-900'
               }`}

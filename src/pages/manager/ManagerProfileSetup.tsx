@@ -25,18 +25,16 @@ import { useToast, useManager } from '@/hooks';
 import { validateDocumentFile } from '@/utils';
 import { uploadToS3 } from '@/utils/s3';
 import type {
-  ProfileRequestDto,
+  ManagerProfileCreateRequest,
   ServiceListItem,
   RegionListItem,
   ScheduleListItem,
   DocumentListItem,
-} from '@/apis/manager';
-import type {
   ManagerProfileFormData,
   ManagerProfileErrors,
-  TimeSlot,
-  DocumentItem,
-} from '@/types/user';
+  Document,
+} from '@/types/manager';
+import type { TimeSlot } from '@/types/common';
 
 const ManagerProfileSetup: React.FC = () => {
   const navigate = useNavigate();
@@ -69,20 +67,33 @@ const ManagerProfileSetup: React.FC = () => {
     },
   ];
 
-  // 서울 25개 구 중 주요 지역 - 다 넣는게 너무 많아서 줄임
+  // 서울 25개 구
   const regionOptions = [
     SEOUL_DISTRICT_LABELS.GANGNAM,
-    SEOUL_DISTRICT_LABELS.SEOCHO,
-    SEOUL_DISTRICT_LABELS.SONGPA,
     SEOUL_DISTRICT_LABELS.GANGDONG,
-    SEOUL_DISTRICT_LABELS.MAPO,
-    SEOUL_DISTRICT_LABELS.YEONGDEUNGPO,
+    SEOUL_DISTRICT_LABELS.GANGBUK,
+    SEOUL_DISTRICT_LABELS.GANGSEO,
     SEOUL_DISTRICT_LABELS.GWANAK,
+    SEOUL_DISTRICT_LABELS.GWANGJIN,
+    SEOUL_DISTRICT_LABELS.GURO,
+    SEOUL_DISTRICT_LABELS.GEUMCHEON,
+    SEOUL_DISTRICT_LABELS.NOWON,
+    SEOUL_DISTRICT_LABELS.DOBONG,
+    SEOUL_DISTRICT_LABELS.DONGDAEMUN,
     SEOUL_DISTRICT_LABELS.DONGJAK,
-    SEOUL_DISTRICT_LABELS.JUNG,
-    SEOUL_DISTRICT_LABELS.JONGNO,
-    SEOUL_DISTRICT_LABELS.YONGSAN,
+    SEOUL_DISTRICT_LABELS.MAPO,
+    SEOUL_DISTRICT_LABELS.SEODAEMUN,
+    SEOUL_DISTRICT_LABELS.SEOCHO,
     SEOUL_DISTRICT_LABELS.SEONGDONG,
+    SEOUL_DISTRICT_LABELS.SEONGBUK,
+    SEOUL_DISTRICT_LABELS.SONGPA,
+    SEOUL_DISTRICT_LABELS.YANGCHEON,
+    SEOUL_DISTRICT_LABELS.YEONGDEUNGPO,
+    SEOUL_DISTRICT_LABELS.YONGSAN,
+    SEOUL_DISTRICT_LABELS.EUNPYEONG,
+    SEOUL_DISTRICT_LABELS.JONGNO,
+    SEOUL_DISTRICT_LABELS.JUNG,
+    SEOUL_DISTRICT_LABELS.JUNGNANG,
   ];
 
   const timeSlots = [
@@ -254,7 +265,7 @@ const ManagerProfileSetup: React.FC = () => {
           // S3에 문서 업로드
           const { url } = await uploadToS3(file);
 
-          const newDoc: DocumentItem = {
+          const newDoc: Document = {
             fileType: type,
             fileName: file.name,
             uploadedFileUrl: url,
@@ -341,7 +352,7 @@ const ManagerProfileSetup: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
-      const profileData: ProfileRequestDto = {
+      const profileData: ManagerProfileCreateRequest = {
         profileImage: formData.profileImage,
         serviceTypes: formData.serviceTypes.map(
           (type): ServiceListItem => ({

@@ -3,29 +3,22 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useAuth, useForm, useToast } from '@/hooks';
 import { ROUTES } from '@/constants';
-import type { SocialSignUpRequestDto } from '@/apis/auth';
+import type { SocialSignUpRequest } from '@/types/auth';
 
 const SocialSignUp: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { socialSignUp, isLoading } = useAuth();
   const { showToast } = useToast();
-
-  // 🔧 상태 관리 개선
   const [isValidating, setIsValidating] = useState(true);
   const [tempToken, setTempToken] = useState<string | null>(null);
   const [userType, setUserType] = useState<'CONSUMER' | 'MANAGER' | null>(null);
 
-  // 🔧 토큰 및 사용자 타입 검증 로직 개선
   useEffect(() => {
     const validateAccess = () => {
-      console.log('🔍 SocialSignUp 접근 검증 시작');
-
-      // 1. location.state에서 먼저 확인
       let token = location.state?.tempToken;
       let type = location.state?.userType;
 
-      // 2. localStorage에서 확인
       if (!token) {
         token = localStorage.getItem('tempSocialToken');
         type = localStorage.getItem('tempUserType') as 'CONSUMER' | 'MANAGER';
@@ -41,14 +34,13 @@ const SocialSignUp: React.FC = () => {
       }
     };
 
-    // 🔧 약간의 지연을 두고 검증 (OAuth 처리 완료 대기)
     const timer = setTimeout(validateAccess, 200);
 
     return () => clearTimeout(timer);
   }, [location.state, navigate, showToast]);
 
   const { values, errors, touched, handleSubmit, setValue, setFieldTouched } =
-    useForm<SocialSignUpRequestDto>({
+    useForm<SocialSignUpRequest>({
       initialValues: {
         birth: '',
         gender: 'MALE',
@@ -77,7 +69,6 @@ const SocialSignUp: React.FC = () => {
       },
     });
 
-  // 생년월일 포맷팅
   const handleBirthChange = (value: string) => {
     const numbers = value.replace(/\D/g, '');
     let formatted = numbers;
@@ -91,7 +82,6 @@ const SocialSignUp: React.FC = () => {
     setValue('birth', formatted);
   };
 
-  // 🔧 검증 중 로딩 화면
   if (isValidating) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">

@@ -1,21 +1,21 @@
 import { useState, useCallback } from 'react';
 import { managerApi } from '@/apis/manager';
 import { consumerApi } from '@/apis/consumer';
-import { useToast } from './useToast';
+import { useToast } from '../useToast';
 import type {
-  ProfileRequestDto,
-  ProfileUpdateRequestDto,
-  ProfileResponseDto,
-} from '@/apis/manager';
+  ManagerProfileCreateRequest,
+  ManagerProfileUpdateRequest,
+  ManagerProfileResponse,
+} from '@/types/manager';
 
 export const useManager = () => {
-  const [profile, setProfile] = useState<ProfileResponseDto | null>(null);
+  const [profile, setProfile] = useState<ManagerProfileResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
 
   // 프로필 생성
   const createProfile = useCallback(
-    async (data: ProfileRequestDto) => {
+    async (data: ManagerProfileCreateRequest) => {
       try {
         setLoading(true);
         await managerApi.createProfile(data);
@@ -47,7 +47,7 @@ export const useManager = () => {
 
   // 프로필 수정
   const updateProfile = useCallback(
-    async (data: ProfileUpdateRequestDto) => {
+    async (data: ManagerProfileUpdateRequest) => {
       try {
         setLoading(true);
         await managerApi.updateProfile(data);

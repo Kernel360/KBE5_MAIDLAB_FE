@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/useToast';
 // import { consumerApi, type LikedManagerResponseDto, type BlackListedManagerResponseDto } from '@/apis/consumer';
-import type { LikedManagerResponseDto, BlackListedManagerResponseDto } from '@/apis/consumer';
+import type {
+  LikedManagerResponse,
+  BlackListedManagerResponse,
+} from '@/types/consumer';
 
 // 테스트용 목 데이터
 const mockFavoriteManagers = [
@@ -13,7 +16,7 @@ const mockFavoriteManagers = [
     averageRate: 4.8,
     reviewCount: 128,
     region: ['서울', '경기도'],
-    introduceText: '안녕하세요, 5년 경력의 전문 도우미입니다.'
+    introduceText: '안녕하세요, 5년 경력의 전문 도우미입니다.',
   },
   {
     managerUuid: 'test-2',
@@ -22,7 +25,7 @@ const mockFavoriteManagers = [
     averageRate: 4.9,
     reviewCount: 256,
     region: ['강남'],
-    introduceText: '신속하고 정확한 서비스 제공을 약속드립니다.'
+    introduceText: '신속하고 정확한 서비스 제공을 약속드립니다.',
   },
 ];
 
@@ -34,7 +37,7 @@ const mockBlacklist = [
     averageRate: 3.2,
     reviewCount: 45,
     region: ['경상도'],
-    introduceText: '서비스 품질이 좋지 않았습니다.'
+    introduceText: '서비스 품질이 좋지 않았습니다.',
   },
 ];
 
@@ -43,8 +46,10 @@ export default function ManagerList() {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [favoriteManagers, setFavoriteManagers] = useState<LikedManagerResponseDto[]>(mockFavoriteManagers);
-  const [blacklistManagers, setBlacklistManagers] = useState<BlackListedManagerResponseDto[]>(mockBlacklist);
+  const [favoriteManagers, setFavoriteManagers] =
+    useState<LikedManagerResponse[]>(mockFavoriteManagers);
+  const [blacklistManagers, setBlacklistManagers] =
+    useState<BlackListedManagerResponse[]>(mockBlacklist);
 
   // URL에 따라 데이터 로드
   useEffect(() => {
@@ -82,7 +87,9 @@ export default function ManagerList() {
       showToast('매니저 삭제에 실패했습니다.', 'error');
     }
     */
-    setFavoriteManagers(prev => prev.filter(m => m.managerUuid !== managerUuid));
+    setFavoriteManagers((prev) =>
+      prev.filter((m) => m.managerUuid !== managerUuid),
+    );
     showToast('찜한 매니저에서 삭제되었습니다.', 'success');
   };
 
@@ -98,7 +105,9 @@ export default function ManagerList() {
       showToast('매니저 삭제에 실패했습니다.', 'error');
     }
     */
-    setBlacklistManagers(prev => prev.filter(m => m.managerUuid !== managerUuid));
+    setBlacklistManagers((prev) =>
+      prev.filter((m) => m.managerUuid !== managerUuid),
+    );
     showToast('블랙리스트에서 삭제되었습니다.', 'success');
   };
 
@@ -108,7 +117,9 @@ export default function ManagerList() {
   };
 
   if (isLoading) {
-    return <div className="flex justify-center items-center h-64">로딩중...</div>;
+    return (
+      <div className="flex justify-center items-center h-64">로딩중...</div>
+    );
   }
 
   const isBlacklist = location.pathname.includes('blacklist');
@@ -128,9 +139,7 @@ export default function ManagerList() {
         </button>
         <button
           className={`px-4 py-2 rounded-lg ${
-            isBlacklist
-              ? 'bg-blue-500 text-white'
-              : 'bg-gray-200 text-gray-700'
+            isBlacklist ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'
           }`}
           onClick={() => handleTabChange('blacklist')}
         >
@@ -158,7 +167,9 @@ export default function ManagerList() {
                       평점: {manager.averageRate.toFixed(1)}
                     </p>
                     {manager.introduceText && (
-                      <p className="text-gray-500 mt-1">{manager.introduceText}</p>
+                      <p className="text-gray-500 mt-1">
+                        {manager.introduceText}
+                      </p>
                     )}
                     {manager.region && manager.region.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-1">
@@ -205,7 +216,9 @@ export default function ManagerList() {
                     평점: {manager.averageRate.toFixed(1)}
                   </p>
                   {manager.introduceText && (
-                    <p className="text-gray-500 mt-1">{manager.introduceText}</p>
+                    <p className="text-gray-500 mt-1">
+                      {manager.introduceText}
+                    </p>
                   )}
                   {manager.region && manager.region.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-1">
@@ -237,4 +250,4 @@ export default function ManagerList() {
       </div>
     </div>
   );
-} 
+}

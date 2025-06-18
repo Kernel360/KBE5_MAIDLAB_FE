@@ -1,22 +1,20 @@
 import { useState, useCallback } from 'react';
 import { consumerApi } from '@/apis/consumer';
-import { useToast } from './useToast';
+import { useToast } from '../useToast';
 import type {
-  ConsumerProfileRequestDto,
-  ConsumerProfileResponseDto,
-  LikedManagerResponseDto,
-  BlackListedManagerResponseDto,
-} from '@/apis/consumer';
+  ConsumerProfileUpdateRequest,
+  ConsumerProfileResponse,
+  LikedManagerResponse,
+  BlackListedManagerResponse,
+} from '@/types/consumer';
 
 export const useConsumer = () => {
-  const [profile, setProfile] = useState<ConsumerProfileResponseDto | null>(
-    null,
-  );
-  const [likedManagers, setLikedManagers] = useState<LikedManagerResponseDto[]>(
+  const [profile, setProfile] = useState<ConsumerProfileResponse | null>(null);
+  const [likedManagers, setLikedManagers] = useState<LikedManagerResponse[]>(
     [],
   );
   const [blacklistedManagers, setBlacklistedManagers] = useState<
-    BlackListedManagerResponseDto[]
+    BlackListedManagerResponse[]
   >([]);
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
@@ -38,7 +36,7 @@ export const useConsumer = () => {
 
   // 프로필 수정
   const updateProfile = useCallback(
-    async (data: ConsumerProfileRequestDto) => {
+    async (data: ConsumerProfileUpdateRequest) => {
       try {
         setLoading(true);
         await consumerApi.updateProfile(data);

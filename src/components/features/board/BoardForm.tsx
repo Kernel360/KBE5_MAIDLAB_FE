@@ -4,10 +4,10 @@ import { useToast } from '@/hooks/useToast';
 import { ROUTES } from '@/constants/route';
 import { BOARD_TYPES } from '@/constants/board';
 import type { BoardType } from '@/constants/board';
-import type { ImageDto } from '@/apis/admin';
-import BoardHeader from '@/components/board/BoardHeader';
-import BoardTypeSelector from '@/components/board/BoardTypeSelector';
-import ImageUploader from '@/components/board/ImageUploader';
+import type { ImageInfo } from '@/types/board';
+import BoardHeader from '@/components/features/board/BoardHeader';
+import BoardTypeSelector from '@/components/features/board/BoardTypeSelector';
+import ImageUploader from '@/components/features/board/ImageUploader';
 
 interface BoardFormProps {
   mode: 'create' | 'edit';
@@ -16,22 +16,31 @@ interface BoardFormProps {
     boardType: BoardType;
     title: string;
     content: string;
-    images: ImageDto[];
+    images: ImageInfo[];
   };
   onSuccess?: () => void;
 }
 
-export default function BoardForm({ mode, boardId, initialData, onSuccess }: BoardFormProps) {
+export default function BoardForm({
+  mode,
+  boardId,
+  initialData,
+  onSuccess,
+}: BoardFormProps) {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(mode === 'edit');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [boardType, setBoardType] = useState<BoardType>(initialData?.boardType || BOARD_TYPES.ETC);
+  const [boardType, setBoardType] = useState<BoardType>(
+    initialData?.boardType || BOARD_TYPES.ETC,
+  );
   const [title, setTitle] = useState(initialData?.title || '');
   const [content, setContent] = useState(initialData?.content || '');
   const [images, setImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const [existingImages, setExistingImages] = useState<ImageDto[]>(initialData?.images || []);
+  const [existingImages, setExistingImages] = useState<ImageInfo[]>(
+    initialData?.images || [],
+  );
 
   useEffect(() => {
     const loadBoard = async () => {
@@ -62,7 +71,10 @@ export default function BoardForm({ mode, boardId, initialData, onSuccess }: Boa
         setContent(mockBoard.content);
         setExistingImages(mockBoard.images);
       } catch (error: any) {
-        showToast(error.message || '게시글을 불러오는데 실패했습니다.', 'error');
+        showToast(
+          error.message || '게시글을 불러오는데 실패했습니다.',
+          'error',
+        );
         navigate(ROUTES.BOARD.LIST);
       } finally {
         setIsLoading(false);
@@ -116,18 +128,24 @@ export default function BoardForm({ mode, boardId, initialData, onSuccess }: Boa
 
       // 하드코딩된 응답 처리
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log(`${mode === 'create' ? '게시글 생성' : '게시글 수정'} 요청:`, {
-        boardId,
-        boardType,
-        title,
-        content,
-        images: [
-          ...existingImages,
-          ...images.map(file => ({ name: file.name, size: file.size })),
-        ],
-      });
+      console.log(
+        `${mode === 'create' ? '게시글 생성' : '게시글 수정'} 요청:`,
+        {
+          boardId,
+          boardType,
+          title,
+          content,
+          images: [
+            ...existingImages,
+            ...images.map((file) => ({ name: file.name, size: file.size })),
+          ],
+        },
+      );
 
-      showToast(`게시글이 ${mode === 'create' ? '등록' : '수정'}되었습니다.`, 'success');
+      showToast(
+        `게시글이 ${mode === 'create' ? '등록' : '수정'}되었습니다.`,
+        'success',
+      );
       if (onSuccess) {
         onSuccess();
       } else if (mode === 'create') {
@@ -136,7 +154,11 @@ export default function BoardForm({ mode, boardId, initialData, onSuccess }: Boa
         navigate(`/board/${boardId}`);
       }
     } catch (error: any) {
-      showToast(error.message || `게시글 ${mode === 'create' ? '등록' : '수정'}에 실패했습니다.`, 'error');
+      showToast(
+        error.message ||
+          `게시글 ${mode === 'create' ? '등록' : '수정'}에 실패했습니다.`,
+        'error',
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -173,7 +195,10 @@ export default function BoardForm({ mode, boardId, initialData, onSuccess }: Boa
         />
 
         <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+          <label
+            htmlFor="title"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
             제목
           </label>
           <input
@@ -187,7 +212,10 @@ export default function BoardForm({ mode, boardId, initialData, onSuccess }: Boa
         </div>
 
         <div>
-          <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
+          <label
+            htmlFor="content"
+            className="block text-sm font-medium text-gray-700 mb-2"
+          >
             내용
           </label>
           <textarea
@@ -237,4 +265,4 @@ export default function BoardForm({ mode, boardId, initialData, onSuccess }: Boa
       </form>
     </div>
   );
-} 
+}

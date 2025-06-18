@@ -9,14 +9,14 @@ export { useTheme, ThemeProvider } from './useTheme';
 export { useForm } from './useForm';
 
 // 데이터 관리 훅
-export { useReservation } from './useReservation';
-export { useManager } from './useManager';
-export { useMatching } from './useMatching';
-export { useBoard } from './useBoard';
-export { useEvent } from './useEvent';
-export { useUser } from './useUser';
-export { useConsumer } from './useConsumer';
-export { useAdmin } from './useAdmin';
+export { useReservation } from './domain/useReservation';
+export { useManager } from './domain/useManager';
+export { useMatching } from './domain/useMatching';
+export { useBoard } from './domain/useBoard';
+export { useEvent } from './domain/useEvent';
+export { useUser } from './domain/useUser';
+export { useConsumer } from './domain/useConsumer';
+export { useAdmin } from './domain/useAdmin';
 
 // UI 관련 훅
 export { useModal } from './useModal';

@@ -1,14 +1,14 @@
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import { useToast } from '@/hooks/useToast';
-import type { ImageDto } from '@/apis/admin';
+import type { ImageInfo } from '@/types/board';
 
 interface ImageUploaderProps {
   images: File[];
   previewUrls: string[];
   onImagesChange: (files: File[]) => void;
   onPreviewUrlsChange: (urls: string[]) => void;
-  existingImages?: ImageDto[];
-  onExistingImagesChange?: (images: ImageDto[]) => void;
+  existingImages?: ImageInfo[];
+  onExistingImagesChange?: (images: ImageInfo[]) => void;
   maxImages?: number;
   maxSizeMB?: number;
 }
@@ -32,7 +32,10 @@ export default function ImageUploader({
 
     // 이미지 개수 체크
     if (images.length + existingImages.length + files.length > maxImages) {
-      showToast(`최대 ${maxImages}개의 이미지만 업로드할 수 있습니다.`, 'error');
+      showToast(
+        `최대 ${maxImages}개의 이미지만 업로드할 수 있습니다.`,
+        'error',
+      );
       return;
     }
 
@@ -60,20 +63,20 @@ export default function ImageUploader({
   const handleRemoveImage = (index: number) => {
     const newImages = [...images];
     const newPreviewUrls = [...previewUrls];
-    
+
     // 미리보기 URL 해제
     URL.revokeObjectURL(newPreviewUrls[index]);
-    
+
     newImages.splice(index, 1);
     newPreviewUrls.splice(index, 1);
-    
+
     onImagesChange(newImages);
     onPreviewUrlsChange(newPreviewUrls);
   };
 
   const handleRemoveExistingImage = (index: number) => {
     if (!onExistingImagesChange) return;
-    
+
     const newExistingImages = [...existingImages];
     newExistingImages.splice(index, 1);
     onExistingImagesChange(newExistingImages);
@@ -154,4 +157,4 @@ export default function ImageUploader({
       </div>
     </div>
   );
-} 
+}

@@ -13,19 +13,16 @@ import {
   TableHead,
   TableRow,
   Button,
-  TextField,
-  InputAdornment,
   TablePagination,
   CircularProgress,
   Chip,
   Tabs,
   Tab,
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import { type ReservationResponseDto } from '../../apis/reservation';
-import { type MatchingResponseDto } from '../../apis/matching';
+import { type ReservationListResponse } from '@/types/reservation';
+import { type MatchingResponse } from '@/types/matching';
 import { adminApi } from '../../apis/admin';
-import MatchingChangeDialog from '../../components/admin/MatchingChangeDialog';
+import MatchingChangeDialog from '../../components/features/admin/MatchingChangeDialog';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
@@ -67,12 +64,15 @@ const ReservationList = () => {
     // 2. location.state 확인
     return (location.state as { previousTab?: number })?.previousTab ?? 0;
   });
-  const [reservations, setReservations] = useState<ReservationResponseDto[]>([]);
-  const [matchings, setMatchings] = useState<MatchingResponseDto[]>([]);
+  const [reservations, setReservations] = useState<ReservationListResponse[]>(
+    [],
+  );
+  const [matchings, setMatchings] = useState<MatchingResponse[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [openDialog, setOpenDialog] = useState(false);
-  const [selectedMatching, setSelectedMatching] = useState<MatchingResponseDto | null>(null);
+  const [selectedMatching, setSelectedMatching] =
+    useState<MatchingResponse | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -93,17 +93,19 @@ const ReservationList = () => {
     fetchData();
   }, []);
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
     setPage(0);
     handleCloseDialog();
   };
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
@@ -113,7 +115,8 @@ const ReservationList = () => {
   };
 
   const formatPrice = (price: number | string) => {
-    const numericPrice = typeof price === 'string' ? parseInt(price, 10) : price;
+    const numericPrice =
+      typeof price === 'string' ? parseInt(price, 10) : price;
     return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
       currency: 'KRW',
@@ -135,7 +138,7 @@ const ReservationList = () => {
     }
   };
 
-  const handleOpenDialog = (matching: MatchingResponseDto) => {
+  const handleOpenDialog = (matching: MatchingResponse) => {
     setSelectedMatching(matching);
     setOpenDialog(true);
   };
@@ -149,7 +152,11 @@ const ReservationList = () => {
     if (!selectedMatching) return;
 
     try {
-      await adminApi.changeManager(selectedMatching.reservationId, managerId);
+      // adminApi.changeManager는 객체 형태의 파라미터를 받습니다
+      await adminApi.changeManager({
+        reservationId: selectedMatching.reservationId,
+        managerId: managerId,
+      });
       // 매칭 목록 새로고침
       const matchingsData = await adminApi.getAllMatching();
       setMatchings(matchingsData);
@@ -168,7 +175,12 @@ const ReservationList = () => {
   if (loading) {
     return (
       <StyledContainer>
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="60vh"
+        >
           <CircularProgress />
         </Box>
       </StyledContainer>
@@ -177,14 +189,23 @@ const ReservationList = () => {
 
   return (
     <StyledContainer>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Typography variant="h5" component="h1">
           예약/매칭 관리
         </Typography>
       </Box>
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs value={tabValue} onChange={handleTabChange} aria-label="예약/매칭 관리 탭">
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
+          aria-label="예약/매칭 관리 탭"
+        >
           <Tab label="예약 목록" />
           <Tab label="매칭 관리" />
         </Tabs>
@@ -212,14 +233,19 @@ const ReservationList = () => {
                     <TableCell>{reservation.serviceType}</TableCell>
                     <TableCell>{reservation.detailServiceType}</TableCell>
                     <TableCell>
-                      {formatDateTime(reservation.reservationDate, reservation.startTime)}
+                      {formatDateTime(
+                        reservation.reservationDate,
+                        reservation.startTime,
+                      )}
                     </TableCell>
                     <TableCell>{formatPrice(reservation.totalPrice)}</TableCell>
                     <TableCell>
                       <Button
                         variant="outlined"
                         size="small"
-                        onClick={() => handleDetailView(reservation.reservationId)}
+                        onClick={() =>
+                          handleDetailView(reservation.reservationId)
+                        }
                       >
                         상세보기
                       </Button>
@@ -302,4 +328,4 @@ const ReservationList = () => {
   );
 };
 
-export default ReservationList; 
+export default ReservationList;

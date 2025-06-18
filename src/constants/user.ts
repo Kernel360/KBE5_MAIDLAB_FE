@@ -7,6 +7,15 @@ export const USER_TYPES = {
 
 export type UserType = (typeof USER_TYPES)[keyof typeof USER_TYPES];
 
+// ===== 로그인 가능한 사용자 타입 =====
+export const LOGIN_USER_TYPES = {
+  CONSUMER: USER_TYPES.CONSUMER,
+  MANAGER: USER_TYPES.MANAGER,
+} as const;
+
+export type LoginUserType =
+  (typeof LOGIN_USER_TYPES)[keyof typeof LOGIN_USER_TYPES];
+
 // ===== 성별 상수 =====
 export const GENDER = {
   MALE: 'MALE',

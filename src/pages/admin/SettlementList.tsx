@@ -14,7 +14,6 @@ import {
   TablePagination,
   CircularProgress,
   Chip,
-  TextField,
   Button,
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -22,7 +21,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import { useAdmin } from '@/hooks';
-import type { AdminSettlementResponseDto } from '@/apis/admin';
+import type { AdminSettlement } from '@/types/admin';
 import { useNavigate } from 'react-router-dom';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
@@ -45,7 +44,7 @@ const SettlementList = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [startDate, setStartDate] = useState(dayjs().startOf('week'));
-  const [settlements, setSettlements] = useState<AdminSettlementResponseDto[]>([]);
+  const [settlements, setSettlements] = useState<AdminSettlement[]>([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [totalElements, setTotalElements] = useState(0);
@@ -57,7 +56,7 @@ const SettlementList = () => {
     try {
       const data = await reservationManagement.fetchWeeklySettlements(
         startDate.format('YYYY-MM-DD'),
-        { page, size: rowsPerPage }
+        { page, size: rowsPerPage },
       );
       if (data) {
         setSettlements(data.settlements.content);
@@ -77,7 +76,9 @@ const SettlementList = () => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
@@ -109,7 +110,12 @@ const SettlementList = () => {
   if (loading) {
     return (
       <StyledContainer>
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="60vh"
+        >
           <CircularProgress />
         </Box>
       </StyledContainer>
@@ -165,7 +171,9 @@ const SettlementList = () => {
                       size="small"
                     />
                   </TableCell>
-                  <TableCell align="right">{formatPrice(settlement.amount)}</TableCell>
+                  <TableCell align="right">
+                    {formatPrice(settlement.amount)}
+                  </TableCell>
                   <TableCell>{settlement.createdAt}</TableCell>
                   <TableCell align="center">
                     <Button
@@ -204,4 +212,4 @@ const SettlementList = () => {
   );
 };
 
-export default SettlementList; 
+export default SettlementList;

@@ -1,24 +1,24 @@
 // useMatching.ts - 수정버전 (useManager 코드 제거)
 import { useState, useCallback } from 'react';
 import { matchingApi } from '@/apis/matching';
-import { useToast } from './useToast';
+import { useToast } from '../useToast';
 import type {
-  MatchingRequestDto,
-  AvailableManagerResponseDto,
-  RequestMatchingListResponseDto,
-} from '@/apis/matching';
+  MatchingRequest,
+  AvailableManagerResponse,
+  MatchingRequestListResponse,
+} from '@/types/matching';
 
 export const useMatching = () => {
   const [availableManagers, setAvailableManagers] = useState<
-    AvailableManagerResponseDto[]
+    AvailableManagerResponse[]
   >([]);
-  const [matchings, setMatchings] = useState<RequestMatchingListResponseDto[]>([]);
+  const [matchings, setMatchings] = useState<MatchingRequestListResponse[]>([]);
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
 
   // 사용 가능한 매니저 조회
   const fetchAvailableManagers = useCallback(
-    async (data: MatchingRequestDto) => {
+    async (data: MatchingRequest) => {
       try {
         setLoading(true);
         const managers = await matchingApi.getMatchingManagers(data);
