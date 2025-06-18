@@ -7,8 +7,15 @@ import type { AdminLoginRequestDto } from '@/apis/admin';
 
 export const useAdminAuth = () => {
   const [loading, setLoading] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authVersion, setAuthVersion] = useState(0); // 리렌더링 트리거
   const { showToast } = useToast();
+
+  // localStorage에서 직접 읽어서 인증 상태 계산
+  const isAuthenticated = (() => {
+    const token = tokenStorage.getAccessToken();
+    const userType = userStorage.getUserType();
+    return !!token && userType === USER_TYPES.ADMIN;
+  })();
 
   // 관리자 로그인
   const login = useCallback(
@@ -20,10 +27,9 @@ export const useAdminAuth = () => {
 
         tokenStorage.setAccessToken(response.accessToken);
         userStorage.setUserType(USER_TYPES.ADMIN);
+        setAuthVersion(v => v + 1); // 강제 리렌더링
 
-        setIsAuthenticated(true);
         showToast(SUCCESS_MESSAGES.LOGIN, 'success');
-
         return { success: true };
       } catch (error: any) {
         const errorMessage =
@@ -46,7 +52,7 @@ export const useAdminAuth = () => {
     } finally {
       tokenStorage.clearTokens();
       userStorage.clearUserData();
-      setIsAuthenticated(false);
+      setAuthVersion(v => v + 1); // 강제 리렌더링
       showToast(SUCCESS_MESSAGES.LOGOUT, 'success');
     }
   }, [showToast]);
@@ -56,6 +62,7 @@ export const useAdminAuth = () => {
     try {
       const response = await adminApi.refreshToken();
       tokenStorage.setAccessToken(response.accessToken);
+      setAuthVersion(v => v + 1); // 강제 리렌더링
       return true;
     } catch {
       logout();
