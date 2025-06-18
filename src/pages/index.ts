@@ -19,6 +19,7 @@ export { default as BoardDetail } from '@/pages/admin/BoardDetail';
 
 // 소비자 페이지 (나중에 구현)
 export { default as ConsumerProfileSetup } from './ConsumerProfileSetup';
+export { default as ConsumerProfileEdit } from './consumer/ProfileEdit';
 // export { default as ConsumerMyPage } from './consumer/MyPage';
 // export { default as ConsumerProfile } from './consumer/Profile';
 // export { default as ConsumerReservations } from './consumer/Reservations';
