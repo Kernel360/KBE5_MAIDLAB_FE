@@ -25,6 +25,28 @@ export default function BoardItem({ board }: BoardItemProps) {
     ? board.boardType
     : BOARD_TYPES.ETC; // 기본값
 
+  // 날짜 포맷팅 함수
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 1) {
+      return '오늘';
+    } else if (diffDays === 2) {
+      return '어제';
+    } else if (diffDays <= 7) {
+      return `${diffDays - 1}일 전`;
+    } else {
+      return date.toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      });
+    }
+  };
+
   return (
     <div
       onClick={() =>
@@ -39,6 +61,9 @@ export default function BoardItem({ board }: BoardItemProps) {
           <span className="text-xl">{BOARD_TYPE_ICONS[boardType] || '📝'}</span>
           <span className="text-sm text-gray-500">
             {BOARD_TYPE_LABELS[boardType] || '기타 문의'}
+          </span>
+          <span className="text-xs text-gray-400">
+            {formatDate(board.createdAt)}
           </span>
         </div>
         <span

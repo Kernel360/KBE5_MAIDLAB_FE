@@ -52,6 +52,18 @@ export default function BoardDetail() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedImage, setSelectedImage] = useState<ImageInfo | null>(null);
 
+  // 날짜 포맷팅 함수
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    
+    return `${year}/${month}/${day} ${hours}:${minutes}`;
+  };
+
   useEffect(() => {
     let isComponentMounted = true;
 
@@ -161,6 +173,9 @@ export default function BoardDetail() {
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-gray-500">
                     {BOARD_TYPE_LABELS[board.boardType]}
+                  </span>
+                  <span className="text-xs text-gray-400">
+                    {formatDate(board.updatedAt)}
                   </span>
                   {board.answered && (
                     <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
