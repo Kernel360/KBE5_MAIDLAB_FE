@@ -264,7 +264,6 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
     <>
       <ReservationHeader title="예약 정보 입력" onBack={onBack} />
       <div className="pt-16 p-4 space-y-6">
-        <h2 className="text-xl font-bold mb-6">예약 정보 입력</h2>
 
         {/* 주소 입력 */}
         <div className="space-y-4">
@@ -361,17 +360,21 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
               value={form.startTime}
               onChange={(e) => setForm(prev => ({ ...prev, startTime: e.target.value }))}
             >
-              {Array.from({ length: 24 }).map((_, h) =>
-                ['00', '30'].map((m) => {
-                  const time = `${String(h).padStart(2, '0')}:${m}`;
+              {Array.from({ length: 32 }).map((_, i) => {
+                const hour = 6 + Math.floor(i / 2); // 6시부터 시작
+                const minute = i % 2 === 0 ? '00' : '30';
+                const time = `${String(hour).padStart(2, '0')}:${minute}`;
+                if (hour >= 6 && hour <= 21) {
                   return (
                     <option key={time} value={time}>
                       {time}
                     </option>
                   );
-                })
-              )}
+                }
+                return null;
+              })}
             </select>
+
             <select
               className="p-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-400"
               value={form.endTime}
@@ -409,7 +412,7 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
 
         {/* 반려동물 유무 */}
         <div className="space-y-4">
-          <h3 className="text-lg font-medium">추가 옵션</h3>
+          <h3 className="text-lg font-medium">특이 사항</h3>
           <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
             <span>반려동물 유무</span>
             <button

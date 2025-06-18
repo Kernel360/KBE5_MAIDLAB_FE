@@ -89,7 +89,6 @@ const ReservationStep3: React.FC<Props> = ({ data, onBack, onSubmit }) => {
     <>
       <ReservationHeader title="예약 정보 확인" onBack={onBack} />
       <div className="pt-16 p-4 space-y-6 max-w-lg mx-auto">
-        <h2 className="text-xl font-bold mb-6">예약 정보 확인</h2>
 
         {/* 주소 입력 */}
         <div className="space-y-4">
@@ -207,7 +206,7 @@ const ReservationStep3: React.FC<Props> = ({ data, onBack, onSubmit }) => {
 
         {/* 반려동물 */}
         <div className="space-y-4">
-          <h3 className="text-lg font-medium">추가 옵션</h3>
+          <h3 className="text-lg font-medium">특이 사항</h3>
           <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50">
             <span>반려동물</span>
             <span className="text-gray-700 font-semibold">{getPetDisplay(data.pet)}</span>

@@ -6,6 +6,9 @@ import { ROUTES, RESERVATION_STATUS, PAGINATION_DEFAULTS, INFO_MESSAGES } from '
 import { IoArrowBack } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import type { ReservationResponseDto } from '@/apis/reservation';
+import ReservationHeader from '@/components/features/consumer/ReservationHeader';
+import { BottomNavigation } from '@/components/layout/BottomNavigation/BottomNavigation';
+import { useAuth } from '@/hooks/useAuth';
 
 // Single Responsibility: 탭 관련 상수와 타입을 분리
 type TabType = '전체' | '예정' | '진행중' | '완료';
@@ -31,6 +34,7 @@ const ConsumerReservations: React.FC = () => {
   const { reservations, loading, fetchReservations } = useReservation();
   const [activeTab, setActiveTab] = useState<TabType>('전체');
   const [filteredReservations, setFilteredReservations] = useState<ReservationResponseDto[]>([]);
+  const { isAuthenticated } = useAuth();
 
   const { currentPage, totalPages, goToPage, startIndex, endIndex } = usePagination({
     totalItems: filteredReservations.length,
@@ -71,19 +75,9 @@ const ConsumerReservations: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-3xl mx-auto p-4">
-        {/* 헤더 */}
-        <div className="flex items-center mb-6">
-          <button 
-            onClick={() => navigate(-1)}
-            className="p-2 -ml-2"
-          >
-            <IoArrowBack className="w-6 h-6" />
-          </button>
-          <h1 className="text-2xl font-bold ml-2">예약 내역</h1>
-        </div>
-
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <ReservationHeader title="예약 내역" onBack={() => navigate(-1)} />
+      <div className="flex-1 max-w-3xl mx-auto p-4 pt-16 pb-20">
         {/* 탭 */}
         <div className="flex space-x-4 mb-6">
           {TABS.map((tab) => (
@@ -154,6 +148,11 @@ const ConsumerReservations: React.FC = () => {
           )}
         </div>
       </div>
+      <BottomNavigation
+        activeTab="reservation"
+        onTabClick={navigate}
+        isAuthenticated={isAuthenticated}
+      />
     </div>
   );
 };
