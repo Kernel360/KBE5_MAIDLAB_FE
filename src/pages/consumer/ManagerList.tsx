@@ -7,249 +7,7 @@ import type {
   BlackListedManagerResponse,
 } from '@/types/consumer';
 import { ROUTES } from '@/constants/route';
-import styled from 'styled-components';
 import { ArrowLeft, Star } from 'lucide-react';
-
-const ProfileImageContainer = styled.div`
-  width: 80px;
-  height: 80px;
-  min-width: 80px;
-  min-height: 80px;
-  position: relative;
-  flex-shrink: 0;
-`;
-
-const ProfileImageWrapper = styled.div`
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 2px solid white;
-  transition: all 0.2s ease;
-
-  &:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  }
-`;
-
-const ProfileImage = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-`;
-
-const ProfileFallback = styled.div`
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
-  border-radius: 50%;
-`;
-
-const ProfileInitial = styled.div`
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #6b7280;
-`;
-
-const DeleteButton = styled.button`
-  padding: 0.5rem 1rem;
-  color: #ef4444;
-  font-size: 0.875rem;
-  font-weight: 500;
-  border-radius: 0.5rem;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 1rem;
-
-  &:hover {
-    color: #dc2626;
-    text-decoration: underline;
-  }
-
-  &:active {
-    color: #b91c1c;
-  }
-`;
-
-const ManagerCard = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  padding: 1.5rem;
-  background-color: white;
-  border-radius: 1rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #f1f5f9;
-  transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
-
-  &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    transform: translateY(-2px);
-    border-color: #e2e8f0;
-  }
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #f97316, #fb923c);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-  }
-
-  &:hover::before {
-    opacity: 1;
-  }
-`;
-
-const ManagerInfo = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  flex: 1;
-  min-width: 0;
-`;
-
-const ManagerDetails = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  flex: 1;
-  min-width: 0;
-`;
-
-const ManagerHeader = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-`;
-
-const ManagerName = styled.h3`
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0;
-  line-height: 1.4;
-`;
-
-const RatingBadge = styled.span`
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.375rem 0.75rem;
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
-  color: #92400e;
-  font-size: 0.75rem;
-  font-weight: 600;
-  border-radius: 1rem;
-  border: 1px solid #fbbf24;
-  white-space: nowrap;
-`;
-
-const IntroduceText = styled.p`
-  color: #6b7280;
-  font-size: 0.875rem;
-  line-height: 1.5;
-  margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-const ActionButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem 1rem;
-  color: #ef4444;
-  font-size: 0.875rem;
-  font-weight: 500;
-  background: none;
-  border: 1px solid #fecaca;
-  border-radius: 0.5rem;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  min-width: 60px;
-
-  &:hover {
-    background-color: #fef2f2;
-    color: #dc2626;
-    border-color: #fca5a5;
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-`;
-
-const RegionContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.375rem;
-  margin-top: 0.25rem;
-`;
-
-const RegionTag = styled.span`
-  padding: 0.25rem 0.625rem;
-  background-color: #f8fafc;
-  color: #475569;
-  font-size: 0.75rem;
-  font-weight: 500;
-  border-radius: 0.75rem;
-  border: 1px solid #e2e8f0;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background-color: #f1f5f9;
-    border-color: #cbd5e1;
-  }
-`;
-
-const ExpandButton = styled.button`
-  padding: 0.25rem 0.5rem;
-  color: #64748b;
-  font-size: 0.75rem;
-  font-weight: 500;
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  transition: all 0.2s ease;
-  border-radius: 0.375rem;
-
-  &:hover {
-    color: #475569;
-    background-color: #f1f5f9;
-  }
-`;
-
-const ExpandIcon = styled.span<{ $isExpanded: boolean }>`
-  display: inline-block;
-  transition: transform 0.2s ease;
-  transform: rotate(${(props) => (props.$isExpanded ? '180deg' : '0deg')});
-  font-size: 0.625rem;
-`;
 
 export default function ManagerList() {
   const location = useLocation();
@@ -301,11 +59,6 @@ export default function ManagerList() {
     } catch (error) {
       showToast('매니저 삭제에 실패했습니다.', 'error');
     }
-
-    setFavoriteManagers((prev) =>
-      prev.filter((m) => m.managerUuid !== managerUuid),
-    );
-    showToast('찜한 매니저에서 삭제되었습니다.', 'success');
   };
 
   // 블랙리스트 매니저 삭제
@@ -319,10 +72,6 @@ export default function ManagerList() {
     } catch (error) {
       showToast('매니저 삭제에 실패했습니다.', 'error');
     }
-    setBlacklistManagers((prev) =>
-      prev.filter((m) => m.managerUuid !== managerUuid),
-    );
-    showToast('블랙리스트에서 삭제되었습니다.', 'success');
   };
 
   // 탭 전환
@@ -360,17 +109,32 @@ export default function ManagerList() {
     const hasMore = regions.length > 3;
 
     return (
-      <RegionContainer>
+      <div className="flex flex-wrap gap-1.5">
         {displayRegions.map((region) => (
-          <RegionTag key={region}>{region}</RegionTag>
+          <span
+            key={region}
+            className="region-tag"
+          >
+            {region}
+          </span>
         ))}
         {hasMore && (
-          <ExpandButton onClick={() => toggleRegions(managerUuid)}>
+          <button
+            type="button"
+            onClick={() => toggleRegions(managerUuid)}
+            className="expand-btn"
+          >
             {isExpanded ? '접기' : `+${regions.length - 3}개 더보기`}
-            <ExpandIcon $isExpanded={isExpanded}>▼</ExpandIcon>
-          </ExpandButton>
+            <span
+              className={`inline-block transition-transform duration-200 text-[10px] ${
+                isExpanded ? 'rotate-180' : ''
+              }`}
+            >
+              ▼
+            </span>
+          </button>
         )}
-      </RegionContainer>
+      </div>
     );
   };
 
@@ -396,7 +160,7 @@ export default function ManagerList() {
           <h1 className="absolute left-1/2 transform -translate-x-1/2 text-lg font-semibold">
             {isBlacklist ? '블랙리스트 도우미' : '찜한 도우미'}
           </h1>
-          <div className="w-10"></div>
+          <div className="w-10" />
         </div>
       </div>
 
@@ -431,122 +195,73 @@ export default function ManagerList() {
           <div className="space-y-3">
             {!isBlacklist ? (
               favoriteManagers.length > 0 ? (
-                favoriteManagers.map((manager) => {
-                  const isExpanded = expandedRegions[manager.managerUuid];
-                  return (
-                    <ManagerCard
-                      key={manager.managerUuid}
-                      style={{
-                        flexDirection: 'column',
-                        alignItems: 'stretch',
-                      }}
-                    >
-                      {/* 상단: 사진, 이름/평점/내용, 삭제 버튼 */}
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          marginBottom: '1rem',
-                        }}
-                      >
-                        {/* 1. 사진 섹션 */}
-                        <ProfileImageContainer>
-                          <ProfileImageWrapper>
-                            {manager.profileImage &&
-                            !imageLoadErrors[manager.managerUuid] ? (
-                              <ProfileImage
-                                src={manager.profileImage}
-                                alt={`${manager.name}의 프로필`}
-                                onError={() =>
-                                  handleImageError(manager.managerUuid)
-                                }
-                                loading="lazy"
-                              />
-                            ) : (
-                              <ProfileFallback>
-                                <ProfileInitial>
-                                  {manager.name.charAt(0)}
-                                </ProfileInitial>
-                              </ProfileFallback>
-                            )}
-                          </ProfileImageWrapper>
-                        </ProfileImageContainer>
-
-                        {/* 2. 이름, 평점, 내용 섹션 */}
-                        <div
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            flex: 1,
-                            gap: '0.5rem',
-                            paddingLeft: '1rem',
-                            paddingRight: '1rem',
-                            alignItems: 'flex-start',
-                            height: '80px',
-                            justifyContent: 'center',
-                          }}
-                        >
-                          <ManagerName
-                            style={{
-                              textAlign: 'left',
-                              width: '100%',
-                              paddingLeft: '5px',
-                              fontSize: '1rem',
-                            }}
-                          >
-                            {manager.name}
-                          </ManagerName>
-                          <RatingBadge
-                            style={{
-                              width: 'fit-content',
-                              padding: '0.25rem 0.5rem',
-                              fontSize: '0.7rem',
-                            }}
-                          >
-                            <Star className="w-3 h-3" />
-                            <span>{manager.averageRate.toFixed(1)}</span>
-                          </RatingBadge>
-                          {manager.introduceText && (
-                            <IntroduceText
-                              style={{
-                                textAlign: 'left',
-                                width: '100%',
-                                paddingLeft: '10px',
-                                fontSize: '0.75rem',
-                                lineHeight: '1.3',
-                              }}
-                            >
-                              {manager.introduceText}
-                            </IntroduceText>
+                favoriteManagers.map((manager) => (
+                  <div
+                    key={manager.managerUuid}
+                    className="relative bg-white rounded-xl p-6 shadow-sm border border-slate-200 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 hover:border-slate-300 overflow-hidden group"
+                  >
+                    {/* 상단 그라데이션 바 */}
+                    <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-orange-500 to-orange-400 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+                    
+                    {/* 상단: 프로필, 정보, 삭제 버튼 */}
+                    <div className="flex items-center mb-4">
+                      {/* 프로필 이미지 */}
+                      <div className="w-20 h-20 min-w-[80px] min-h-[80px] relative flex-shrink-0">
+                        <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
+                          {manager.profileImage &&
+                          !imageLoadErrors[manager.managerUuid] ? (
+                            <img
+                              src={manager.profileImage}
+                              alt={`${manager.name}의 프로필`}
+                              className="w-full h-full object-cover rounded-full"
+                              onError={() => handleImageError(manager.managerUuid)}
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 rounded-full">
+                              <div className="text-xl font-semibold text-gray-500">
+                                {manager.name.charAt(0)}
+                              </div>
+                            </div>
                           )}
                         </div>
-
-                        {/* 3. 삭제 버튼 섹션 */}
-                        <ActionButton
-                          onClick={() =>
-                            handleRemoveFavorite(manager.managerUuid)
-                          }
-                          style={{ alignSelf: 'center' }}
-                        >
-                          삭제
-                        </ActionButton>
                       </div>
 
-                      {/* 하단: 리전 영역 - 전체 너비 사용 */}
-                      {manager.region && manager.region.length > 0 && (
-                        <div
-                          style={{
-                            width: '100%',
-                            paddingTop: '0.75rem',
-                            borderTop: '1px solid #e2e8f0',
-                          }}
-                        >
-                          {renderRegions(manager.region, manager.managerUuid)}
+                      {/* 매니저 정보 */}
+                      <div className="flex-1 min-w-0 px-4">
+                        <div className="flex items-center gap-3 flex-wrap mb-1">
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            {manager.name}
+                          </h3>
+                          <div className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-br from-yellow-100 to-yellow-200 text-yellow-800 text-xs font-semibold rounded-full border border-yellow-400">
+                            <Star className="w-3 h-3" />
+                            <span>{manager.averageRate.toFixed(1)}</span>
+                          </div>
                         </div>
-                      )}
-                    </ManagerCard>
-                  );
-                })
+                        {manager.introduceText && (
+                          <p className="text-sm text-gray-500 line-clamp-2">
+                            {manager.introduceText}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* 삭제 버튼 */}
+                      <button
+                        onClick={() => handleRemoveFavorite(manager.managerUuid)}
+                        className="px-4 py-2 text-red-500 text-sm font-medium border border-red-200 rounded-lg hover:bg-red-50 hover:border-red-300 transition-colors duration-200"
+                      >
+                        삭제
+                      </button>
+                    </div>
+
+                    {/* 하단: 지역 정보 */}
+                    {manager.region && manager.region.length > 0 && (
+                      <div className="pt-4 border-t border-slate-200">
+                        {renderRegions(manager.region, manager.managerUuid)}
+                      </div>
+                    )}
+                  </div>
+                ))
               ) : (
                 <div className="text-center py-12 bg-white rounded-xl shadow-sm">
                   <div className="text-gray-400 mb-2">
@@ -574,97 +289,71 @@ export default function ManagerList() {
               )
             ) : blacklistManagers.length > 0 ? (
               blacklistManagers.map((manager) => (
-                <ManagerCard
+                <div
                   key={manager.managerUuid}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}
+                  className="relative bg-white rounded-xl p-6 shadow-sm border border-slate-200 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 hover:border-slate-300 overflow-hidden group"
                 >
-                  {/* 1. 사진 섹션 */}
-                  <ProfileImageContainer>
-                    <ProfileImageWrapper>
-                      {manager.profileImage &&
-                      !imageLoadErrors[manager.managerUuid] ? (
-                        <ProfileImage
-                          src={manager.profileImage}
-                          alt={`${manager.name}의 프로필`}
-                          onError={() => handleImageError(manager.managerUuid)}
-                          loading="lazy"
-                        />
-                      ) : (
-                        <ProfileFallback>
-                          <ProfileInitial>
-                            {manager.name.charAt(0)}
-                          </ProfileInitial>
-                        </ProfileFallback>
-                      )}
-                    </ProfileImageWrapper>
-                  </ProfileImageContainer>
-
-                  {/* 2. 이름, 평점, 내용 섹션 */}
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      flex: 1,
-                      gap: '0.5rem',
-                      paddingLeft: '1rem',
-                      paddingRight: '1rem',
-                      alignItems: 'flex-start',
-                      height: '80px',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <ManagerName
-                      style={{
-                        width: '100%',
-                        textAlign: 'left',
-                        fontSize: '1rem',
-                        paddingLeft: '3px',
-                      }}
-                    >
-                      {manager.name}
-                    </ManagerName>
-                    <RatingBadge
-                      style={{
-                        width: 'fit-content',
-                        padding: '0.25rem 0.5rem',
-                        fontSize: '0.7rem',
-                      }}
-                    >
-                      <Star className="w-3 h-3" />
-                      <span>{manager.averageRate.toFixed(1)}</span>
-                    </RatingBadge>
-                    {manager.introduceText && (
-                      <IntroduceText
-                        style={{
-                          width: '100%',
-                          textAlign: 'left',
-                          fontSize: '0.75rem',
-                          lineHeight: '1.3',
-                          paddingLeft: '5px',
-                        }}
-                      >
-                        {manager.introduceText}
-                      </IntroduceText>
-                    )}
-                    {manager.region && manager.region.length > 0 && (
-                      <div style={{ marginTop: '0.5rem' }}>
-                        {renderRegions(manager.region, manager.managerUuid)}
+                  {/* 상단 그라데이션 바 */}
+                  <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-orange-500 to-orange-400 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+                  
+                  {/* 상단: 프로필, 정보, 삭제 버튼 */}
+                  <div className="flex items-center mb-4">
+                    {/* 프로필 이미지 */}
+                    <div className="w-20 h-20 min-w-[80px] min-h-[80px] relative flex-shrink-0">
+                      <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
+                        {manager.profileImage &&
+                        !imageLoadErrors[manager.managerUuid] ? (
+                          <img
+                            src={manager.profileImage}
+                            alt={`${manager.name}의 프로필`}
+                            className="w-full h-full object-cover rounded-full"
+                            onError={() => handleImageError(manager.managerUuid)}
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 rounded-full">
+                            <div className="text-xl font-semibold text-gray-500">
+                              {manager.name.charAt(0)}
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    )}
+                    </div>
+
+                    {/* 매니저 정보 */}
+                    <div className="flex-1 min-w-0 px-4">
+                      <div className="flex items-center gap-3 flex-wrap mb-1">
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          {manager.name}
+                        </h3>
+                        <div className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-br from-yellow-100 to-yellow-200 text-yellow-800 text-xs font-semibold rounded-full border border-yellow-400">
+                          <Star className="w-3 h-3" />
+                          <span>{manager.averageRate.toFixed(1)}</span>
+                        </div>
+                      </div>
+                      {manager.introduceText && (
+                        <p className="text-sm text-gray-500 line-clamp-2">
+                          {manager.introduceText}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* 삭제 버튼 */}
+                    <button
+                      onClick={() => handleRemoveBlacklist(manager.managerUuid)}
+                      className="px-4 py-2 text-red-500 text-sm font-medium border border-red-200 rounded-lg hover:bg-red-50 hover:border-red-300 transition-colors duration-200"
+                    >
+                      삭제
+                    </button>
                   </div>
 
-                  {/* 3. 삭제 버튼 섹션 */}
-                  <ActionButton
-                    onClick={() => handleRemoveBlacklist(manager.managerUuid)}
-                    style={{ alignSelf: 'center' }}
-                  >
-                    삭제
-                  </ActionButton>
-                </ManagerCard>
+                  {/* 하단: 지역 정보 */}
+                  {manager.region && manager.region.length > 0 && (
+                    <div className="pt-4 border-t border-slate-200">
+                      {renderRegions(manager.region, manager.managerUuid)}
+                    </div>
+                  )}
+                </div>
               ))
             ) : (
               <div className="text-center py-12 bg-white rounded-xl shadow-sm">
