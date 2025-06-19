@@ -51,7 +51,7 @@ export default function ManagerList() {
   // 찜한 매니저 삭제
   const handleRemoveFavorite = async (managerUuid: string) => {
     try {
-      await consumerApi.removeLikedManager(managerUuid);
+      await consumerApi.removePreferenceManager(managerUuid);
       setFavoriteManagers((prev) =>
         prev.filter((m) => m.managerUuid !== managerUuid),
       );
@@ -64,7 +64,7 @@ export default function ManagerList() {
   // 블랙리스트 매니저 삭제
   const handleRemoveBlacklist = async (managerUuid: string) => {
     try {
-      await consumerApi.removeLikedManager(managerUuid);
+      await consumerApi.removePreferenceManager(managerUuid);
       setBlacklistManagers((prev) =>
         prev.filter((m) => m.managerUuid !== managerUuid),
       );
