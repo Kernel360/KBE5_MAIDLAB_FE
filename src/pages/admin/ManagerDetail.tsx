@@ -13,7 +13,7 @@ import {
   Divider,
 } from '@mui/material';
 import { adminApi } from '../../apis/admin';
-import type { ManagerResponseDto } from '../../apis/admin';
+import type { Gender } from '@/constants';
 
 // API 응답 타입 확장
 interface ExtendedManagerResponseDto {
@@ -21,7 +21,7 @@ interface ExtendedManagerResponseDto {
   phoneNumber: string;
   name: string;
   birth: string;
-  gender: 'MALE' | 'FEMALE';
+  gender: Gender;
   averageRate: number;
   region: string[];
   isVerified: 'PENDING' | 'APPROVED' | 'REJECTED';
@@ -48,7 +48,8 @@ const ManagerDetail = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [managerData, setManagerData] = useState<ExtendedManagerResponseDto | null>(null);
+  const [managerData, setManagerData] =
+    useState<ExtendedManagerResponseDto | null>(null);
 
   useEffect(() => {
     const fetchManagerData = async () => {
@@ -57,7 +58,11 @@ const ManagerDetail = () => {
         const response = await adminApi.getManager(parseInt(id));
         setManagerData(response as unknown as ExtendedManagerResponseDto);
       } catch (err) {
-        setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
+        setError(
+          err instanceof Error
+            ? err.message
+            : '데이터를 불러오는데 실패했습니다.',
+        );
       } finally {
         setLoading(false);
       }
@@ -74,7 +79,9 @@ const ManagerDetail = () => {
       const response = await adminApi.getManager(parseInt(id));
       setManagerData(response as unknown as ExtendedManagerResponseDto);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '승인 처리에 실패했습니다.');
+      setError(
+        err instanceof Error ? err.message : '승인 처리에 실패했습니다.',
+      );
     }
   };
 
@@ -86,14 +93,21 @@ const ManagerDetail = () => {
       const response = await adminApi.getManager(parseInt(id));
       setManagerData(response as unknown as ExtendedManagerResponseDto);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '거절 처리에 실패했습니다.');
+      setError(
+        err instanceof Error ? err.message : '거절 처리에 실패했습니다.',
+      );
     }
   };
 
   if (loading) {
     return (
       <StyledContainer>
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="60vh"
+        >
           <CircularProgress />
         </Box>
       </StyledContainer>
@@ -126,7 +140,12 @@ const ManagerDetail = () => {
 
   return (
     <StyledContainer>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Typography variant="h5" component="h1">
           매니저 상세 정보
         </Typography>
@@ -142,7 +161,13 @@ const ManagerDetail = () => {
               기본 정보
             </Typography>
             <Divider sx={{ mb: 2 }} />
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+                gap: 2,
+              }}
+            >
               <Box>
                 <Typography variant="subtitle2" color="textSecondary">
                   이름
@@ -153,7 +178,9 @@ const ManagerDetail = () => {
                 <Typography variant="subtitle2" color="textSecondary">
                   전화번호
                 </Typography>
-                <Typography variant="body1">{managerData.phoneNumber}</Typography>
+                <Typography variant="body1">
+                  {managerData.phoneNumber}
+                </Typography>
               </Box>
               <Box>
                 <Typography variant="subtitle2" color="textSecondary">
@@ -164,15 +191,15 @@ const ManagerDetail = () => {
                     managerData.isVerified === 'PENDING'
                       ? '승인 대기'
                       : managerData.isVerified === 'APPROVED'
-                      ? '승인됨'
-                      : '거절됨'
+                        ? '승인됨'
+                        : '거절됨'
                   }
                   color={
                     managerData.isVerified === 'PENDING'
                       ? 'warning'
                       : managerData.isVerified === 'APPROVED'
-                      ? 'success'
-                      : 'error'
+                        ? 'success'
+                        : 'error'
                   }
                   size="small"
                 />
@@ -181,7 +208,9 @@ const ManagerDetail = () => {
                 <Typography variant="subtitle2" color="textSecondary">
                   평점
                 </Typography>
-                <Typography variant="body1">{managerData.averageRate.toFixed(1)}</Typography>
+                <Typography variant="body1">
+                  {managerData.averageRate.toFixed(1)}
+                </Typography>
               </Box>
               <Box sx={{ gridColumn: { xs: '1', sm: '1 / -1' } }}>
                 <Typography variant="subtitle2" color="textSecondary">
@@ -212,4 +241,4 @@ const ManagerDetail = () => {
   );
 };
 
-export default ManagerDetail; 
+export default ManagerDetail;

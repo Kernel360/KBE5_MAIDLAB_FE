@@ -37,11 +37,14 @@ export { default as ConsumerProfileSetup } from './consumer/ConsumerProfileSetup
 
 export { default as ConsumerProfileEdit } from './consumer/ProfileEdit';
 
-// export { default as ConsumerMyPage } from './consumer/MyPage';
-// export { default as ConsumerProfile } from './consumer/Profile';
-// export { default as ConsumerReservations } from './consumer/Reservations';
-// export { default as ReservationCreate } from './consumer/ReservationCreate';
-// export { default as LikedManagers } from './consumer/LikedManagers';
+export { default as ConsumerMyPage } from './consumer/MyPage';
+export { default as ConsumerProfile } from './consumer/Profile';
+
+// 소비자 리뷰 등록 페이지
+export { default as ConsumerReviewRegister } from './consumer/ConsumerReviewRegister';
+
+// 수요자의 좋아요, 블랙리스트 매니저 페이지
+export { default as ManagerList } from './consumer/ManagerList';
 
 /**
  * manager
@@ -61,6 +64,9 @@ export { default as ManagerReviewRegister } from './manager/ManagerReviewRegiste
 
 // export { default as ManagerReservations } from './manager/Reservations';
 // export { default as ManagerReviews } from './manager/Reviews';
+
+// 매니저 정산 페이지
+export { default as ManagerSettlements } from './manager/ManagerSettlements';
 
 /**
  * reservation
@@ -84,6 +90,7 @@ export { default as ManagerReservations } from './reservation/ManagerReservation
 // 예약 매칭 페이지
 export { default as ManagerMatching } from './matching/ManagerMatching';
 
+
 /**
  * board
  */
@@ -99,12 +106,16 @@ export { default as BoardDetail } from '@/pages/admin/BoardDetail';
 
 // 관리자 로그인 페이지
 export { default as AdminLogin } from '@/pages/admin/AdminLogin';
+
+// 관리자 어쩌구 페이지...
 export { default as AdminLayout } from '@/pages/admin/layout/AdminLayout';
 export { default as AdminUserList } from '@/pages/admin/UserList';
 export { default as AdminManagerDetail } from '@/pages/admin/ManagerDetail';
 export { default as AdminConsumerDetail } from '@/pages/admin/ConsumerDetail';
 export { default as AdminReservationList } from '@/pages/admin/ReservationList';
 export { default as AdminReservationDetail } from '@/pages/admin/ReservationDetail';
+export { default as AdminSettlementList } from '@/pages/admin/SettlementList';
+export { default as AdminSettlementDetail } from '@/pages/admin/SettlementDetail';
 export { default as AdminEvents } from '@/pages/admin/EventList';
 export { default as AdminEventCreate } from '@/pages/admin/EventCreate';
 export { default as AdminEventEdit } from '@/pages/admin/EventEdit';

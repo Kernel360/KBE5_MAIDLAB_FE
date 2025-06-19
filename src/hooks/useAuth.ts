@@ -11,11 +11,11 @@ import { tokenStorage, userStorage } from '@/utils/storage';
 import { ROUTES, SUCCESS_MESSAGES, ERROR_MESSAGES } from '@/constants';
 import { useToast } from './useToast';
 import type {
-  LoginRequestDto,
-  SignUpRequestDto,
-  SocialLoginRequestDto,
-  SocialSignUpRequestDto,
-} from '@/apis/auth';
+  LoginRequest,
+  SignUpRequest,
+  SocialLoginRequest,
+  SocialSignUpRequest,
+} from '@/types/auth';
 import type { UserType } from '@/types';
 
 // 인증 상태 타입
@@ -78,20 +78,19 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
 
 // 컨텍스트 타입
 interface AuthContextType extends AuthState {
-  login: (
-    data: LoginRequestDto,
-  ) => Promise<{ success: boolean; error?: string }>;
-  socialLogin: (data: SocialLoginRequestDto) => Promise<{
+  login: (data: LoginRequest) => Promise<{ success: boolean; error?: string }>;
+  socialLogin: (data: SocialLoginRequest) => Promise<{
     success: boolean;
     newUser?: boolean;
     error?: string;
     accessToken?: string;
+    profileCompleted?: boolean;
   }>;
   signUp: (
-    data: SignUpRequestDto,
+    data: SignUpRequest,
   ) => Promise<{ success: boolean; error?: string }>;
   socialSignUp: (
-    data: SocialSignUpRequestDto,
+    data: SocialSignUpRequest,
   ) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   resetError: () => void;
@@ -130,7 +129,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // 로그인 함수
   const login = useCallback(
-    async (data: LoginRequestDto) => {
+    async (data: LoginRequest) => {
       try {
         dispatch({ type: 'AUTH_START' });
 
@@ -146,7 +145,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         showToast(SUCCESS_MESSAGES.LOGIN, 'success');
 
-        navigate(ROUTES.HOME);
+        // 🔧 프로필 완성 여부에 따라 페이지 이동 결정
+        if (!response.profileCompleted) {
+          // 프로필이 없는 경우 프로필 설정 페이지로
+          showToast('프로필을 설정해주세요.', 'info');
+          const profileRoute =
+            data.userType === 'MANAGER'
+              ? '/manager/profile/setup' // 🔧 실제 라우트 경로 사용
+              : '/consumer/profile/setup'; // 🔧 소비자도 실제 경로로 수정
+          navigate(profileRoute);
+        } else {
+          // 프로필이 있는 경우 홈으로
+          navigate(ROUTES.HOME);
+        }
 
         return { success: true };
       } catch (error: any) {
@@ -162,35 +173,63 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // 소셜 로그인 함수
   const socialLogin = useCallback(
-    async (data: SocialLoginRequestDto) => {
+    async (data: SocialLoginRequest) => {
       try {
         dispatch({ type: 'AUTH_START' });
+        console.log('🔄 useAuth socialLogin 시작:', data);
 
         const response = await authApi.socialLogin(data);
 
+        console.log('📨 socialLogin API 응답:', response);
+        console.log('🔍 응답 분석:', {
+          newUser: response.newUser,
+          accessToken: response.accessToken ? 'Present' : 'Missing',
+          expirationTime: response.expirationTime,
+        });
+
         if (response.newUser) {
-          // 신규 사용자 - 추가 정보 입력 필요
+          localStorage.setItem('tempSocialToken', response.accessToken);
+          localStorage.setItem('tempUserType', data.userType);
+
           dispatch({ type: 'AUTH_LOGOUT' });
+
           return {
             success: true,
             newUser: true,
+            profileCompleted: response.profileCompleted,
             accessToken: response.accessToken,
           };
         }
 
-        // 기존 사용자 - 로그인 완료
-        tokenStorage.setAccessToken(response.accessToken);
-        userStorage.setUserType(data.userType);
+        // 🔧 기존 사용자는 프로필 완성 여부와 관계없이 정식 로그인 처리
+        if (!response.newUser) {
+          console.log('🔑 기존 사용자 정식 로그인 처리:', {
+            profileCompleted: response.profileCompleted,
+          });
 
-        dispatch({
-          type: 'AUTH_SUCCESS',
-          payload: { userType: data.userType as UserType },
-        });
+          // 정식 토큰으로 로그인 처리
+          tokenStorage.setAccessToken(response.accessToken);
+          userStorage.setUserType(data.userType);
 
-        showToast(SUCCESS_MESSAGES.LOGIN, 'success');
+          dispatch({
+            type: 'AUTH_SUCCESS',
+            payload: { userType: data.userType as UserType },
+          });
+
+          showToast(SUCCESS_MESSAGES.LOGIN, 'success');
+
+          // 🔧 프로필 완성 여부에 따라 추가 안내만 제공
+          if (!response.profileCompleted) {
+            setTimeout(() => {
+              showToast('프로필을 완성해주세요.', 'info');
+            }, 1000);
+          }
+        }
+
         return {
           success: true,
-          newUser: false,
+          newUser: response.newUser,
+          profileCompleted: response.profileCompleted,
           accessToken: response.accessToken,
         };
       } catch (error: any) {
@@ -202,12 +241,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         return { success: false, error: errorMessage };
       }
     },
-    [showToast, navigate],
+    [showToast],
   );
 
   // 회원가입 함수
   const signUp = useCallback(
-    async (data: SignUpRequestDto) => {
+    async (data: SignUpRequest) => {
       try {
         dispatch({ type: 'AUTH_START' });
 
@@ -246,38 +285,54 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // 소셜 회원가입 함수
   const socialSignUp = useCallback(
-    async (data: SocialSignUpRequestDto) => {
+    async (data: SocialSignUpRequest) => {
       try {
         dispatch({ type: 'AUTH_START' });
 
-        await authApi.socialSignUp(data);
+        // 임시 토큰을 localStorage에서 가져오기
+        const tempToken = localStorage.getItem('tempSocialToken');
+
+        if (!tempToken) {
+          throw new Error('인증 정보가 없습니다.');
+        }
+
+        await authApi.socialSignUp(data, tempToken);
+
+        // 🔧 회원가입 성공 후 로그아웃 상태로 유지
+        // SocialSignUp 페이지에서 토큰 정리와 홈 이동 처리
+        dispatch({ type: 'AUTH_LOGOUT' });
 
         showToast(SUCCESS_MESSAGES.SIGNUP, 'success');
-        dispatch({ type: 'AUTH_LOGOUT' });
 
         return { success: true };
       } catch (error: any) {
+        console.error('❌ socialSignUp 에러:', {
+          message: error.message,
+          response: error.response,
+        });
+
         const errorMessage = error.message || ERROR_MESSAGES.UNKNOWN;
         dispatch({ type: 'AUTH_FAILURE', payload: errorMessage });
         showToast(errorMessage, 'error');
         return { success: false, error: errorMessage };
       }
     },
-    [showToast],
+    [showToast, navigate],
   );
 
   // 로그아웃 함수
-  const logout = useCallback(() => {
-    authApi.logout().catch(() => {
-      // API 실패해도 로컬 정리는 진행
-    });
-
-    tokenStorage.clearTokens();
-    userStorage.clearUserData();
-
-    dispatch({ type: 'AUTH_LOGOUT' });
-    showToast(SUCCESS_MESSAGES.LOGOUT, 'success');
-    navigate(ROUTES.LOGIN);
+  const logout = useCallback(async () => {
+    try {
+      await authApi.logout();
+      tokenStorage.clearTokens();
+      userStorage.clearUserData();
+      dispatch({ type: 'AUTH_LOGOUT' });
+      showToast(SUCCESS_MESSAGES.LOGOUT, 'success');
+      navigate(ROUTES.LOGIN);
+    } catch (error: any) {
+      const errorMessage = error?.message || '로그아웃 중 오류가 발생했습니다.';
+      showToast(errorMessage, 'error');
+    }
   }, [showToast, navigate]);
 
   // 비밀번호 변경 함수

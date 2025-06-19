@@ -9,9 +9,6 @@ import {
   TableHead,
   TableRow,
   Typography,
-  TextField,
-  Button,
-  InputAdornment,
   IconButton,
   Tooltip,
   CircularProgress,
@@ -20,22 +17,15 @@ import {
   Tab,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import SearchIcon from '@mui/icons-material/Search';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useState, useEffect } from 'react';
 import { useAdmin } from '@/hooks';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ROUTES } from '@/constants';
-import type { ConsumerBoardResponseDto } from '@/apis/admin';
+import type { BoardResponse } from '@/types/board';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
-}));
-
-const SearchBox = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  gap: theme.spacing(2),
-  marginBottom: theme.spacing(3),
 }));
 
 const ActionButton = styled(IconButton)(({ theme }) => ({
@@ -53,14 +43,17 @@ const BOARD_TYPE_NAMES: Record<BoardType, string> = {
 } as const;
 
 // 게시판 타입별 칩 색상
-const BOARD_TYPE_COLORS: Record<BoardType, 'error' | 'primary' | 'info' | 'default'> = {
+const BOARD_TYPE_COLORS: Record<
+  BoardType,
+  'error' | 'primary' | 'info' | 'default'
+> = {
   REFUND: 'error',
   MANAGER: 'primary',
   SERVICE: 'info',
   ETC: 'default',
 } as const;
 
-interface BoardWithId extends ConsumerBoardResponseDto {
+interface BoardWithId extends BoardResponse {
   id: number;
 }
 
@@ -68,8 +61,18 @@ interface BoardWithId extends ConsumerBoardResponseDto {
 type TabType = 'consultation' | 'refund';
 
 const BoardList = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [currentTab, setCurrentTab] = useState<TabType>('consultation');
+  const location = useLocation();
+  const [currentTab, setCurrentTab] = useState<TabType>(() => {
+    const savedTab = localStorage.getItem('adminBoardTab');
+    if (savedTab !== null) {
+      localStorage.removeItem('adminBoardTab');
+      return savedTab as TabType;
+    }
+    return (
+      (location.state as { previousTab?: TabType })?.previousTab ??
+      'consultation'
+    );
+  });
   const [filteredBoards, setFilteredBoards] = useState<BoardWithId[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -79,7 +82,7 @@ const BoardList = () => {
   const fetchBoardsByTab = async (tab: TabType) => {
     setLoading(true);
     try {
-      let data: ConsumerBoardResponseDto[];
+      let data: BoardResponse[];
       if (tab === 'consultation') {
         data = await boardManagement.fetchConsultationBoards();
       } else if (tab === 'refund') {
@@ -98,18 +101,9 @@ const BoardList = () => {
     fetchBoardsByTab(currentTab);
   }, [currentTab]);
 
-  // 게시글 목록 필터링
-  useEffect(() => {
-    if (!filteredBoards) return;
-
-    const filtered = filteredBoards.filter((board) => {
-      return board.title.toLowerCase().includes(searchTerm.toLowerCase());
-    });
-    setFilteredBoards(filtered);
-  }, [searchTerm]);
-
   // 게시글 상세 페이지로 이동
   const handleViewDetail = (boardId: number) => {
+    localStorage.setItem('adminBoardTab', currentTab);
     navigate(`${ROUTES.ADMIN.BOARD_DETAIL.replace(':id', boardId.toString())}`);
   };
 
@@ -120,7 +114,12 @@ const BoardList = () => {
 
   return (
     <StyledContainer>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Typography variant="h5" component="h1">
           게시판 관리
         </Typography>
@@ -132,23 +131,6 @@ const BoardList = () => {
           <Tab label="환불 문의" value="refund" />
         </Tabs>
       </Box>
-
-      <SearchBox>
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder="게시글 검색..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-          }}
-        />
-      </SearchBox>
 
       <TableContainer component={Paper}>
         <Table>
@@ -187,7 +169,9 @@ const BoardList = () => {
                   </TableCell>
                   <TableCell align="center">
                     <Tooltip title="상세보기">
-                      <ActionButton onClick={() => handleViewDetail(board.boardId)}>
+                      <ActionButton
+                        onClick={() => handleViewDetail(board.boardId)}
+                      >
                         <VisibilityIcon />
                       </ActionButton>
                     </Tooltip>
@@ -208,4 +192,4 @@ const BoardList = () => {
   );
 };
 
-export default BoardList; 
+export default BoardList;

@@ -1,6 +1,6 @@
 import { tokenStorage, userStorage } from './storage';
 import { USER_TYPES } from '@/constants/user';
-import { env } from './env';
+import { generateGoogleOAuthUrl } from './googleOAuth';
 
 /**
  * 로그인 상태 확인
@@ -164,19 +164,13 @@ export const canAccessPage = (requiredUserType?: string): boolean => {
  * 소셜 로그인 URL 생성
  */
 export const getSocialLoginUrl = (
-  provider: 'KAKAO' | 'GOOGLE',
-  userType: string,
+  provider: string,
+  userType: 'CONSUMER' | 'MANAGER',
 ): string => {
-  const clientId =
-    provider === 'GOOGLE' ? env.GOOGLE_CLIENT_ID : env.KAKAO_CLIENT_ID;
-  const redirectUri =
-    provider === 'GOOGLE' ? env.GOOGLE_REDIRECT_URI : env.KAKAO_REDIRECT_URI;
-
-  if (!clientId) {
-    throw new Error(`${provider} client ID is not configured`);
+  if (provider === 'GOOGLE') {
+    return generateGoogleOAuthUrl(userType);
   }
-
-  return `${env.API_BASE_URL}/oauth2/authorization/${provider.toLowerCase()}?userType=${userType}&client_id=${clientId}&redirect_uri=${redirectUri}`;
+  throw new Error(`지원하지 않는 소셜 로그인 제공자입니다: ${provider}`);
 };
 
 /**

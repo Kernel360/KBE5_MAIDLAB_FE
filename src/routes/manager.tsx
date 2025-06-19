@@ -1,10 +1,16 @@
 import { Route } from 'react-router-dom';
 import { ROUTES } from '@/constants';
 import { ProtectedRoute } from '@/components/common';
-import ManagerProfileSetup from '@/pages/ManagerProfileSetup';
-import ManagerReservations from '@/pages/reservation/ManagerReservations';
-import ManagerReservationDetail from '@/pages/reservation/ManagerReservationDetail';
-import { ManagerMatching } from '@/pages/matching/ManagerMatching';
+
+import {
+  ManagerProfileSetup,
+  ManagerMyPage,
+  ManagerReservations,
+  ManagerReservationDetail,
+  ManagerReviewRegister,
+  ManagerMatching,
+  ManagerSettlements,
+} from '@/pages';
 
 export const ManagerRoutes = () => (
   <>
@@ -13,6 +19,14 @@ export const ManagerRoutes = () => (
       element={
         <ProtectedRoute requiredUserType="MANAGER">
           <ManagerProfileSetup />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path={ROUTES.MANAGER.MYPAGE}
+      element={
+        <ProtectedRoute requiredUserType="MANAGER">
+          <ManagerMyPage />
         </ProtectedRoute>
       }
     />
@@ -33,10 +47,26 @@ export const ManagerRoutes = () => (
       }
     />
     <Route
+      path={ROUTES.MANAGER.REVIEW_REGISTER}
+      element={
+        <ProtectedRoute requiredUserType="MANAGER">
+          <ManagerReviewRegister />
+        </ProtectedRoute>
+      }
+    />
+    <Route
       path={ROUTES.MANAGER.MATCHING}
       element={
         <ProtectedRoute requiredUserType="MANAGER">
           <ManagerMatching />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path={ROUTES.MANAGER.SETTLEMENTS}
+      element={
+        <ProtectedRoute requiredUserType="MANAGER">
+          <ManagerSettlements />
         </ProtectedRoute>
       }
     />

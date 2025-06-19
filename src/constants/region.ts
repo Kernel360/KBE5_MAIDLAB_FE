@@ -30,8 +30,8 @@ export const SEOUL_DISTRICTS = {
 export type SeoulDistrict =
   (typeof SEOUL_DISTRICTS)[keyof typeof SEOUL_DISTRICTS];
 
-// ===== 서울 지역 한글명 =====
-export const SEOUL_DISTRICT_LABELS = {
+// ✅ 타입 안전성 강화 - Record 타입 명시적 선언
+export const SEOUL_DISTRICT_LABELS: Record<SeoulDistrict, string> = {
   [SEOUL_DISTRICTS.GANGNAM]: '강남구',
   [SEOUL_DISTRICTS.GANGDONG]: '강동구',
   [SEOUL_DISTRICTS.GANGBUK]: '강북구',
@@ -59,8 +59,8 @@ export const SEOUL_DISTRICT_LABELS = {
   [SEOUL_DISTRICTS.JUNGNANG]: '중랑구',
 } as const;
 
-// ===== 서울 지역 DB ID 매핑 =====
-export const SEOUL_DISTRICT_IDS = {
+// ✅ 타입 안전성 강화 - Record 타입 명시적 선언
+export const SEOUL_DISTRICT_IDS: Record<SeoulDistrict, number> = {
   [SEOUL_DISTRICTS.GANGNAM]: 1, // 강남구
   [SEOUL_DISTRICTS.GANGDONG]: 2, // 강동구
   [SEOUL_DISTRICTS.GANGBUK]: 3, // 강북구
@@ -137,7 +137,7 @@ export const DISTRICT_GROUPS = {
       SEOUL_DISTRICTS.SEONGBUK,
     ],
   },
-  GANGSERVER_AREA: {
+  GANGSER_AREA: {
     name: '강서권',
     districts: [
       SEOUL_DISTRICTS.GANGSEO,

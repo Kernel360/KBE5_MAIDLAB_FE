@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import {
   Container,
@@ -10,7 +10,8 @@ import {
   CircularProgress,
   Divider,
 } from '@mui/material';
-import { reservationApi, type ReservationDetailResponseDto } from '../../apis/reservation';
+import { reservationApi } from '../../apis/reservation';
+import type { ReservationDetailResponse } from '@/types/reservation';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
@@ -27,7 +28,13 @@ const StyledButton = styled(Button)(({ theme }) => ({
   },
 }));
 
-const InfoItem = ({ label, value }: { label: string; value: string | number }) => (
+const InfoItem = ({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number;
+}) => (
   <Box mb={2}>
     <Typography variant="subtitle2" color="textSecondary" gutterBottom>
       {label}
@@ -36,7 +43,13 @@ const InfoItem = ({ label, value }: { label: string; value: string | number }) =
   </Box>
 );
 
-const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+const Section = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) => (
   <Box mb={4}>
     <Typography variant="h6" gutterBottom>
       {title}
@@ -49,9 +62,13 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
 const ReservationDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  const previousTab =
+    (location.state as { previousTab?: number })?.previousTab ?? 0;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [reservation, setReservation] = useState<ReservationDetailResponseDto | null>(null);
+  const [reservation, setReservation] =
+    useState<ReservationDetailResponse | null>(null);
 
   useEffect(() => {
     const fetchReservationDetail = async () => {
@@ -66,7 +83,11 @@ const ReservationDetail = () => {
         setReservation(data);
       } catch (err) {
         console.error('예약 상세 조회 에러:', err);
-        setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
+        setError(
+          err instanceof Error
+            ? err.message
+            : '데이터를 불러오는데 실패했습니다.',
+        );
       } finally {
         setLoading(false);
       }
@@ -75,17 +96,28 @@ const ReservationDetail = () => {
     fetchReservationDetail();
   }, [id]);
 
-  const formatPrice = (price: number) => {
+  const formatPrice = (price: string | number) => {
+    const numericPrice =
+      typeof price === 'string' ? parseInt(price, 10) : price;
     return new Intl.NumberFormat('ko-KR', {
       style: 'currency',
       currency: 'KRW',
-    }).format(price);
+    }).format(numericPrice);
+  };
+
+  const handleBack = () => {
+    navigate('/admin/reservations', { state: { previousTab } });
   };
 
   if (loading) {
     return (
       <StyledContainer>
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="60vh"
+        >
           <CircularProgress />
         </Box>
       </StyledContainer>
@@ -98,7 +130,7 @@ const ReservationDetail = () => {
         <Typography color="error" gutterBottom>
           {error}
         </Typography>
-        <StyledButton variant="contained" onClick={() => navigate(-1)}>
+        <StyledButton variant="contained" onClick={handleBack}>
           돌아가기
         </StyledButton>
       </StyledContainer>
@@ -109,7 +141,7 @@ const ReservationDetail = () => {
     return (
       <StyledContainer>
         <Typography>예약을 찾을 수 없습니다.</Typography>
-        <StyledButton variant="contained" onClick={() => navigate(-1)}>
+        <StyledButton variant="contained" onClick={handleBack}>
           돌아가기
         </StyledButton>
       </StyledContainer>
@@ -118,25 +150,40 @@ const ReservationDetail = () => {
 
   return (
     <StyledContainer>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Typography variant="h5" component="h1">
           예약 상세 정보
         </Typography>
-        <StyledButton variant="contained" onClick={() => navigate(-1)}>
+        <StyledButton variant="contained" onClick={handleBack}>
           목록으로
         </StyledButton>
       </Box>
 
       <StyledPaper>
         <Section title="서비스 정보">
-          <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} gap={3}>
+          <Box
+            display="flex"
+            flexDirection={{ xs: 'column', sm: 'row' }}
+            gap={3}
+          >
             <Box flex={1}>
               <InfoItem label="서비스 유형" value={reservation.serviceType} />
-              <InfoItem label="상세 서비스" value={reservation.serviceDetailType} />
+              <InfoItem
+                label="상세 서비스"
+                value={reservation.serviceDetailType}
+              />
               <InfoItem label="예약 날짜" value={reservation.reservationDate} />
               <InfoItem label="시작 시간" value={reservation.startTime} />
               <InfoItem label="종료 시간" value={reservation.endTime} />
-              <InfoItem label="금액" value={formatPrice(reservation.totalPrice)} />
+              <InfoItem
+                label="금액"
+                value={formatPrice(reservation.totalPrice)}
+              />
             </Box>
             <Box flex={1}>
               <InfoItem label="주소" value={reservation.address} />
@@ -149,22 +196,42 @@ const ReservationDetail = () => {
         </Section>
 
         <Section title="매니저 정보">
-          <Box display="flex" flexDirection={{ xs: 'column', sm: 'row' }} gap={3}>
+          <Box
+            display="flex"
+            flexDirection={{ xs: 'column', sm: 'row' }}
+            gap={3}
+          >
             <Box flex={1}>
-              <InfoItem label="매니저 이름" value={reservation.managerName || '-'} />
-              <InfoItem label="매니저 전화번호" value={reservation.managerPhoneNumber || '-'} />
-              <InfoItem 
-                label="평균 평점" 
-                value={reservation.managerAverageRate != null ? reservation.managerAverageRate.toFixed(1) : '-'} 
+              <InfoItem
+                label="매니저 이름"
+                value={reservation.managerName || '-'}
+              />
+              <InfoItem
+                label="매니저 전화번호"
+                value={reservation.managerPhoneNumber || '-'}
+              />
+              <InfoItem
+                label="평균 평점"
+                value={
+                  reservation.managerAverageRate != null
+                    ? reservation.managerAverageRate.toFixed(1)
+                    : '-'
+                }
               />
             </Box>
             <Box flex={1}>
               <Box mb={2}>
-                <Typography variant="subtitle2" color="textSecondary" gutterBottom>
+                <Typography
+                  variant="subtitle2"
+                  color="textSecondary"
+                  gutterBottom
+                >
                   활동 지역
                 </Typography>
                 <Typography variant="body1">
-                  {Array.isArray(reservation.managerRegion) ? reservation.managerRegion.join(', ') : '-'}
+                  {Array.isArray(reservation.managerRegion)
+                    ? reservation.managerRegion.join(', ')
+                    : '-'}
                 </Typography>
               </Box>
             </Box>
@@ -173,7 +240,9 @@ const ReservationDetail = () => {
 
         {reservation.specialRequest && (
           <Section title="특별 요청사항">
-            <Typography variant="body1">{reservation.specialRequest}</Typography>
+            <Typography variant="body1">
+              {reservation.specialRequest}
+            </Typography>
           </Section>
         )}
       </StyledPaper>

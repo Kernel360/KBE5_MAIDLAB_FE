@@ -1,107 +1,105 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
+import { useBoard } from '@/hooks/domain/useBoard';
 import { ROUTES } from '@/constants/route';
-import { BOARD_TYPES,  BOARD_TYPE_LABELS } from '@/constants/board';
-import type { ConsumerBoardDetailResponseDto, ImageDto } from '@/apis/board';
-import BoardHeader from '@/components/board/BoardHeader';
-import AnswerSection from '@/components/board/AnswerSection';
+import { BOARD_TYPE_LABELS } from '@/constants/board';
+import type { BoardDetailResponse, ImageInfo } from '@/types/board';
+import AnswerSection from '@/components/features/board/AnswerSection';
+import { BottomNavigation, ManagerFooter } from '@/components/layout/BottomNavigation/BottomNavigation';
+import { useAuth } from '@/hooks';
 
-// 하드코딩된 게시글  데이터
-const MOCK_BOARD_DETAILS: ConsumerBoardDetailResponseDto[] = [
-  {
-    boardId: 1,
-    boardType: BOARD_TYPES.REFUND,
-    title: '환불 문의드립니다',
-    content: '서비스 이용 중 문제가 발생하여 환불을 요청드립니다.',
-    answered: true,
-    images: [
-      { imagePath: 'https://picsum.photos/400/300', name: 'image1.jpg' },
-      { imagePath: 'https://picsum.photos/400/301', name: 'image2.jpg' },
-    ],
-    answer: {
-      content: '안녕하세요. 환불 요청하신 내용 확인했습니다. 자세한 내용은 고객센터로 문의 부탁드립니다.',
-      // createdAt: '2024-03-15T14:30:00',
-    },
-    // createdAt: '2024-03-15T10:00:00',
-  },
-  {
-    boardId: 2,
-    boardType: BOARD_TYPES.MANAGER,
-    title: '매니저 추천 부탁드립니다',
-    content: '강남 지역에서 활동하시는 매니저님 추천 부탁드립니다.',
-    answered: false,
-    images: [],
-    // createdAt: '2024-03-14T15:20:00',
-  },
-//   {
-//     boardId: 3,
-//     boardType: BOARD_TYPES.SERVICE,
-//     title: '서비스 이용 방법 문의',
-//     content: '서비스 이용 방법에 대해 자세히 알고 싶습니다. 예약은 어떻게 하나요?',
-//     answered: true,
-//     images: [],
-//     answer: {
-//       content: '안녕하세요. 서비스 이용 방법에 대해 답변드립니다. 홈페이지의 예약하기 버튼을 통해 예약이 가능합니다. 자세한 내용은 이용가이드를 참고해주세요.',
-//     },
-//   },
-  {
-    boardId: 4,
-    boardType: BOARD_TYPES.ETC,
-    title: '기타 문의사항',
-    content: '서비스 이용 중 다른 궁금한 점이 있어 문의드립니다.',
-    answered: false,
-    images: [],
-  },
-];
+// 이미지 모달 컴포넌트
+const ImageModal = ({
+  image,
+  onClose,
+}: {
+  image: ImageInfo;
+  onClose: () => void;
+}) => {
+  return (
+    <div
+      className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <div className="relative max-w-4xl max-h-[90vh] w-full">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-white hover:text-gray-300 z-10"
+        >
+          ✕
+        </button>
+        <img
+          src={image.imagePath}
+          alt={image.name}
+          className="w-full h-full object-contain"
+          onClick={(e) => e.stopPropagation()}
+        />
+      </div>
+    </div>
+  );
+};
 
 export default function BoardDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { fetchBoardDetail, deleteBoard } = useBoard();
+  const { isAuthenticated, userType } = useAuth();
+  const [board, setBoard] = useState<BoardDetailResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [board, setBoard] = useState<ConsumerBoardDetailResponseDto | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<ImageInfo | null>(null);
+
+  // 날짜 포맷팅 함수
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    
+    return `${year}/${month}/${day} ${hours}:${minutes}`;
+  };
 
   useEffect(() => {
-    let isComponentMounted = true; // 컴포넌트 마운트 상태 추적
+    let isComponentMounted = true;
 
     const loadBoard = async () => {
       if (!id) return;
 
       try {
         setIsLoading(true);
-        // TODO: 서버 통신 구현 후 주석 해제
-        // const data = await boardApi.getBoardDetail(parseInt(id));
-        // setBoard(data);
+        const data = await fetchBoardDetail(parseInt(id));
 
-        // 하드코딩된 데이터 사용
-        setTimeout(() => {
-          if (!isComponentMounted) return; // 컴포넌트가 언마운트되었다면 실행하지 않음
+        if (!isComponentMounted) return;
 
-          const boardId = parseInt(id);
-          const mockData = MOCK_BOARD_DETAILS.find(b => b.boardId === boardId);
-          
-          if (mockData) {
-            setBoard(mockData);
-          } else {
-            showToast('게시글을 찾을 수 없습니다.', 'error');
-            // 토스트 메시지가 표시된 후 목록 페이지로 이동
-            setTimeout(() => {
-              if (isComponentMounted) { // 컴포넌트가 여전히 마운트된 상태일 때만 이동
-                navigate(ROUTES.BOARD.LIST);
-              }
-            }, 1000);
-          }
-          setIsLoading(false);
-        }, 500);
-      } catch (error: any) {
-        if (isComponentMounted) { // 컴포넌트가 마운트된 상태일 때만 에러 처리
-          showToast(error.message || '게시글을 불러오는데 실패했습니다.', 'error');
+        if (data) {
+          setBoard(data);
+        } else {
+          showToast('게시글을 찾을 수 없습니다.', 'error');
           setTimeout(() => {
-            if (isComponentMounted) { // 컴포넌트가 여전히 마운트된 상태일 때만 이동
+            if (isComponentMounted) {
               navigate(ROUTES.BOARD.LIST);
             }
           }, 1000);
+        }
+      } catch (error: any) {
+        if (isComponentMounted) {
+          showToast(
+            error.message || '게시글을 불러오는데 실패했습니다.',
+            'error',
+          );
+          setTimeout(() => {
+            if (isComponentMounted) {
+              navigate(ROUTES.BOARD.LIST);
+            }
+          }, 1000);
+        }
+      } finally {
+        if (isComponentMounted) {
           setIsLoading(false);
         }
       }
@@ -109,15 +107,39 @@ export default function BoardDetail() {
 
     loadBoard();
 
-    // 클린업 함수
     return () => {
       isComponentMounted = false;
     };
-  }, [id, navigate, showToast]);
+  }, [id, navigate, showToast, fetchBoardDetail]);
+
+  const handleDelete = async () => {
+    if (!id || !window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) return;
+
+    try {
+      setIsDeleting(true);
+      const result = await deleteBoard(parseInt(id));
+      if (result.success) {
+        showToast('게시글이 삭제되었습니다.', 'success');
+        navigate(ROUTES.BOARD.LIST);
+      }
+    } catch (error: any) {
+      showToast(error.message || '게시글 삭제에 실패했습니다.', 'error');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleBack = () => {
+    navigate(ROUTES.BOARD.LIST);
+  };
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
+      <div className="min-h-screen bg-gray-50 flex justify-center items-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
       </div>
     );
@@ -128,62 +150,123 @@ export default function BoardDetail() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <BoardHeader
-        title="문의 상세"
-        showCreateButton={false}
-        onBackClick={() => navigate(ROUTES.BOARD.LIST)}
-      />
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b bg-white">
+        <button
+          onClick={handleBack}
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+        >
+          <ArrowLeft className="w-6 h-6" />
+        </button>
+        <h1 className="text-lg font-bold">문의 상세</h1>
+        <div className="w-10" />
+      </div>
 
-      <div className="space-y-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-sm text-gray-500">
-                  {BOARD_TYPE_LABELS[board.boardType]}
-                </span>
-                {board.answered && (
-                  <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
-                    답변완료
+      {/* Content */}
+      <div className="px-4 py-6 pb-20">
+        <div className="max-w-md mx-auto space-y-6">
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="space-y-4">
+              {/* 게시글 타입과 답변 상태 */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-500">
+                    {BOARD_TYPE_LABELS[board.boardType]}
                   </span>
+                  <span className="text-xs text-gray-400">
+                    {formatDate(board.createdAt)}
+                  </span>
+                  {board.answered && (
+                    <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
+                      답변완료
+                    </span>
+                  )}
+                </div>
+                {board && (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        if (id) {
+                          navigate(`${ROUTES.BOARD.EDIT.replace(':id', id)}`);
+                        }
+                      }}
+                      className="px-4 py-2 text-sm text-blue-600 hover:text-blue-800 whitespace-nowrap"
+                      disabled={isDeleting}
+                    >
+                      수정
+                    </button>
+                    <button
+                      onClick={handleDelete}
+                      className="px-4 py-2 text-sm text-red-600 hover:text-red-800 whitespace-nowrap disabled:opacity-50"
+                      disabled={isDeleting}
+                    >
+                      {isDeleting ? '삭제 중...' : '삭제'}
+                    </button>
+                  </div>
                 )}
               </div>
-              <h1 className="text-2xl font-bold text-gray-900">{board.title}</h1>
+
+              {/* 제목 */}
+              <h1 className="text-2xl font-bold text-gray-900 break-words text-left">
+                {board.title}
+              </h1>
+
+              {/* 내용 */}
+              <p className="text-gray-700 whitespace-pre-wrap break-words text-left">
+                {board.content}
+              </p>
             </div>
-            {board && (
-              <button
-                onClick={() => {
-                  if (id) {
-                    navigate(`${ROUTES.BOARD.EDIT.replace(':id', id)}`);
-                  }
-                }}
-                className="px-4 py-2 text-sm text-blue-600 hover:text-blue-800"
-              >
-                수정
-              </button>
-            )}
           </div>
-          <p className="text-gray-700 whitespace-pre-wrap">{board.content}</p>
+
+          {/* 이미지 갤러리 */}
+          {board.images && board.images.length > 0 && (
+            <div className="bg-white rounded-lg shadow p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                첨부 이미지
+              </h3>
+              <div className="grid grid-cols-3 gap-4">
+                {board.images.map((image: ImageInfo, index: number) => (
+                  <div
+                    key={index}
+                    className="aspect-square relative group cursor-pointer"
+                    onClick={() => setSelectedImage(image)}
+                  >
+                    <img
+                      src={image.imagePath}
+                      alt={image.name}
+                      className="w-full h-full object-cover rounded-lg transition-transform duration-200 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity duration-200 rounded-lg" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 답변 섹션 */}
+          <AnswerSection answer={board.answer?.content} />
+
+          {/* 이미지 모달 */}
+          {selectedImage && (
+            <ImageModal
+              image={selectedImage}
+              onClose={() => setSelectedImage(null)}
+            />
+          )}
         </div>
-
-        {/* 이미지 갤러리 */}
-        {board.images && board.images.length > 0 && (
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            {board.images.map((image: ImageDto, index: number) => (
-              <img
-                key={index}
-                src={image.imagePath}
-                alt={image.name}
-                className="w-full h-48 object-cover rounded-lg"
-              />
-            ))}
-          </div>
-        )}
-
-        {/* 답변 섹션 */}
-        <AnswerSection answer={board.answer?.content} />
       </div>
+
+      {/* Footer */}
+      {userType === 'MANAGER' ? (
+        <ManagerFooter />
+      ) : (
+        <BottomNavigation
+          activeTab="consultation"
+          onTabClick={handleNavigation}
+          isAuthenticated={isAuthenticated}
+        />
+      )}
     </div>
   );
-} 
+}

@@ -1,13 +1,18 @@
 import { Route } from 'react-router-dom';
 import { ROUTES } from '@/constants';
 import { ProtectedRoute } from '@/components/common';
-import ConsumerProfileSetup from '@/pages/ConsumerProfileSetup';
-import ConsumerMyPage from '@/pages/consumer/MyPage';
-import ConsumerProfile from '@/pages/consumer/Profile';
-import ConsumerReservations from '@/pages/reservation/ConsumerReservations';
-import ConsumerReservationCreate from '@/pages/reservation/ConsumerReservationCreate';
-import ConsumerReservationDetail from '@/pages/reservation/ConsumerReservationDetail';
-import ManagerList from '@/pages/consumer/ManagerList';
+import {
+  ConsumerProfileSetup,
+  ConsumerMyPage,
+  ConsumerProfile,
+  ConsumerProfileEdit,
+  ConsumerReservations,
+  ConsumerReservationCreate,
+  ConsumerReservationDetail,
+  ConsumerReviewRegister,
+  ManagerList,
+} from '@/pages';
+
 
 export const ConsumerRoutes = () => (
   <>
@@ -36,6 +41,14 @@ export const ConsumerRoutes = () => (
       }
     />
     <Route
+      path={ROUTES.CONSUMER.PROFILE_EDIT}
+      element={
+        <ProtectedRoute requiredUserType="CONSUMER">
+          <ConsumerProfileEdit />
+        </ProtectedRoute>
+      }
+    />
+    <Route
       path={ROUTES.CONSUMER.RESERVATIONS}
       element={
         <ProtectedRoute requiredUserType="CONSUMER">
@@ -60,7 +73,23 @@ export const ConsumerRoutes = () => (
       }
     />
     <Route
+      path={ROUTES.CONSUMER.REVIEW_REGISTER}
+      element={
+        <ProtectedRoute requiredUserType="CONSUMER">
+          <ConsumerReviewRegister />
+        </ProtectedRoute>
+      }
+    />
+    <Route
       path={ROUTES.CONSUMER.LIKED_MANAGERS}
+      element={
+        <ProtectedRoute requiredUserType="CONSUMER">
+          <ManagerList />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path={ROUTES.CONSUMER.BLACKLIST}
       element={
         <ProtectedRoute requiredUserType="CONSUMER">
           <ManagerList />

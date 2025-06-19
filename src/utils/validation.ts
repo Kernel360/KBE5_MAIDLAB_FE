@@ -2,6 +2,7 @@ import {
   VALIDATION_PATTERNS,
   LENGTH_LIMITS,
   NUMBER_LIMITS,
+  validateBirthDate as validateBirth,
 } from '@/constants/validation';
 
 /**
@@ -54,13 +55,7 @@ export const validateDate = (date: string): boolean => {
  * 생년월일 유효성 검사 (18세 이상 80세 이하)
  */
 export const validateBirthDate = (birthDate: string): boolean => {
-  if (!validateDate(birthDate)) return false;
-
-  const birth = new Date(birthDate);
-  const today = new Date();
-  const age = today.getFullYear() - birth.getFullYear();
-
-  return age >= NUMBER_LIMITS.AGE.MIN && age <= NUMBER_LIMITS.AGE.MAX;
+  return validateBirth(birthDate).isValid;
 };
 
 /**

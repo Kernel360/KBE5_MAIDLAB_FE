@@ -7,7 +7,6 @@ import {
   Button,
   CircularProgress,
   Chip,
-  IconButton,
   Divider,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
@@ -16,7 +15,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAdmin } from '@/hooks';
 import { ROUTES } from '@/constants';
-import type { ConsumerBoardDetailResponseDto } from '@/apis/admin';
+import type { BoardDetailResponse } from '@/types/board';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
@@ -40,7 +39,10 @@ const BOARD_TYPE_NAMES: Record<string, string> = {
 } as const;
 
 // 게시판 타입별 칩 색상
-const BOARD_TYPE_COLORS: Record<string, 'error' | 'primary' | 'info' | 'default'> = {
+const BOARD_TYPE_COLORS: Record<
+  string,
+  'error' | 'primary' | 'info' | 'default'
+> = {
   REFUND: 'error',
   MANAGER: 'primary',
   SERVICE: 'info',
@@ -51,7 +53,7 @@ const BoardEdit = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { boardManagement } = useAdmin();
-  const [board, setBoard] = useState<ConsumerBoardDetailResponseDto | null>(null);
+  const [board, setBoard] = useState<BoardDetailResponse | null>(null);
   const [answer, setAnswer] = useState('');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -106,7 +108,12 @@ const BoardEdit = () => {
   if (loading) {
     return (
       <StyledContainer>
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="60vh"
+        >
           <CircularProgress />
         </Box>
       </StyledContainer>
@@ -125,7 +132,12 @@ const BoardEdit = () => {
 
   return (
     <StyledContainer>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Button startIcon={<ArrowBackIcon />} onClick={handleCancel}>
           돌아가기
         </Button>
@@ -177,7 +189,11 @@ const BoardEdit = () => {
               onClick={handleSubmit}
               disabled={!answer.trim() || submitting}
             >
-              {submitting ? <CircularProgress size={24} color="inherit" /> : '저장'}
+              {submitting ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                '저장'
+              )}
             </Button>
             <Button
               variant="outlined"
@@ -194,4 +210,4 @@ const BoardEdit = () => {
   );
 };
 
-export default BoardEdit; 
+export default BoardEdit;

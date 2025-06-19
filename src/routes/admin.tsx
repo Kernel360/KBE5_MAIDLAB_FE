@@ -1,6 +1,6 @@
 import { Route } from 'react-router-dom';
 import { ROUTES } from '@/constants';
-import { ProtectedRoute } from '@/components/common';
+import { AdminProtectedRoute } from '@/components/common';
 import {
   AdminLogin,
   AdminLayout,
@@ -9,6 +9,8 @@ import {
   AdminConsumerDetail,
   AdminReservationList,
   AdminReservationDetail,
+  AdminSettlementList,
+  AdminSettlementDetail,
   AdminEvents,
   AdminEventCreate,
   AdminBoards,
@@ -16,6 +18,7 @@ import {
   AdminBoardEdit,
   AdminEventEdit,
   AdminEventDetail,
+  Dashboard,
 } from '@/pages';
 
 export const AdminRoutes = () => (
@@ -24,9 +27,9 @@ export const AdminRoutes = () => (
     <Route
       path={ROUTES.ADMIN.DASHBOARD}
       element={
-        <ProtectedRoute requiredUserType="ADMIN">
+        <AdminProtectedRoute>
           <AdminLayout />
-        </ProtectedRoute>
+        </AdminProtectedRoute>
       }
     >
       <Route path="users" element={<AdminUserList />} />
@@ -34,6 +37,11 @@ export const AdminRoutes = () => (
       <Route path="users/consumer/:id" element={<AdminConsumerDetail />} />
       <Route path="reservations" element={<AdminReservationList />} />
       <Route path="reservations/:id" element={<AdminReservationDetail />} />
+      <Route path="settlements" element={<AdminSettlementList />} />
+      <Route
+        path="settlements/:settlementId"
+        element={<AdminSettlementDetail />}
+      />
       <Route path="events" element={<AdminEvents />} />
       <Route path="events/create" element={<AdminEventCreate />} />
       <Route path="events/:id/edit" element={<AdminEventEdit />} />
@@ -41,7 +49,7 @@ export const AdminRoutes = () => (
       <Route path="boards" element={<AdminBoards />} />
       <Route path="boards/:id" element={<AdminBoardDetail />} />
       <Route path="boards/:id/edit" element={<AdminBoardEdit />} />
-      <Route index element={<AdminUserList />} />
+      <Route index element={<Dashboard />} />
     </Route>
   </>
 );

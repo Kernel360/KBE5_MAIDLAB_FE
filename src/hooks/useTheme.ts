@@ -1,7 +1,5 @@
-// src/hooks/useTheme.ts - 라이트모드 전용 테마 훅
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { setLocalStorage, getLocalStorage } from '@/utils/storage';
+import { setLocalStorage } from '@/utils/storage';
 
 // 테마 타입 (라이트모드만)
 export type Theme = 'light';
