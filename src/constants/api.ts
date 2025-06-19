@@ -85,7 +85,7 @@ export const API_ENDPOINTS = {
     LIKES: '/api/consumers/likes',
     BLACKLIST: '/api/consumers/blacklists',
     PREFERENCE: (uuid: string) => `/api/consumers/preference/${uuid}`,
-    REMOVE_LIKE: (uuid: string) => `/api/consumers/likes/${uuid}`,
+    REMOVE_PREFERENCE_MANAGER: (uuid: string) => `/api/consumers/preference/${uuid}`,
   },
   RESERVATION: {
     CREATE: '/api/reservations/register',

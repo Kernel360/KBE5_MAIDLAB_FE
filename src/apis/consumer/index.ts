@@ -61,10 +61,10 @@ export const consumerApi = {
   /**
    * 찜한 매니저 제거
    */
-  removeLikedManager: async (managerUuid: string): Promise<void> => {
+  removePreferenceManager: async (managerUuid: string): Promise<void> => {
     return apiCall<void>(
       'delete',
-      API_ENDPOINTS.CONSUMER.REMOVE_LIKE(managerUuid),
+      API_ENDPOINTS.CONSUMER.REMOVE_PREFERENCE_MANAGER(managerUuid),
     );
   },
 
