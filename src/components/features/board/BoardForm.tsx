@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
 import { useBoard } from '@/hooks/domain/useBoard';
 import { ROUTES } from '@/constants/route';
@@ -7,7 +8,6 @@ import { BOARD_TYPES } from '@/constants/board';
 import { uploadToS3 } from '@/utils/s3';
 import type { BoardType } from '@/constants/board';
 import type { ImageInfo, BoardCreateRequest } from '@/types/board';
-import BoardHeader from '@/components/features/board/BoardHeader';
 import BoardTypeSelector from '@/components/features/board/BoardTypeSelector';
 import ImageUploader from '@/components/features/board/ImageUploader';
 
@@ -113,7 +113,6 @@ export default function BoardForm({
       if (mode === 'create') {
         const result = await createBoard(boardData);
         if (result.success) {
-          showToast('게시글이 등록되었습니다.', 'success');
           if (onSuccess) {
             onSuccess();
           } else {
@@ -123,7 +122,6 @@ export default function BoardForm({
       } else if (mode === 'edit' && boardId) {
         const result = await updateBoard(boardId, boardData);
         if (result.success) {
-          showToast('게시글이 수정되었습니다.', 'success');
           if (onSuccess) {
             onSuccess();
           } else {
@@ -143,128 +141,132 @@ export default function BoardForm({
     }
   };
 
+  const handleBack = () => {
+    if (mode === 'create') {
+      navigate(ROUTES.BOARD.LIST);
+    } else if (mode === 'edit' && boardId) {
+      navigate(`/board/${boardId}`);
+    }
+  };
+
   if (isLoading) {
     return (
-      <div className="max-w-4xl mx-auto p-4">
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
-        </div>
+      <div className="min-h-screen bg-gray-50 flex justify-center items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <BoardHeader
-        title={`문의 ${mode === 'create' ? '작성' : '수정'}`}
-        showCreateButton={false}
-        onBackClick={() => {
-          if (mode === 'create') {
-            navigate(ROUTES.BOARD.LIST);
-          } else if (mode === 'edit' && boardId) {
-            navigate(`/board/${boardId}`);
-          }
-        }}
-      />
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b bg-white">
+        <button
+          onClick={handleBack}
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+        >
+          <ArrowLeft className="w-6 h-6" />
+        </button>
+        <h1 className="text-lg font-bold">{`문의 ${mode === 'create' ? '작성' : '수정'}`}</h1>
+        <div className="w-10" />
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="text-left">
-          <BoardTypeSelector
-            selectedType={boardType}
-            onTypeChange={setBoardType}
-          />
-        </div>
+      {/* Content */}
+      <div className="px-4 py-6">
+        <div className="max-w-md mx-auto">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="text-left">
+              <BoardTypeSelector
+                selectedType={boardType}
+                onTypeChange={setBoardType}
+              />
+            </div>
 
-        <div className="text-left">
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2 text-left">
-            제목 <span className="text-gray-500 text-xs">(최대 30자)</span>
-          </label>
-          <input
-            type="text"
-            id="title"
-            value={title}
-            onChange={(e) => {
-              if (e.target.value.length <= 30) {
-                setTitle(e.target.value);
-              }
-            }}
-            maxLength={30}
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-left"
-            placeholder="제목을 입력해주세요 (최대 30자)"
-          />
-          <div className="mt-1 text-right text-sm text-gray-500">
-            {title.length}/30
-          </div>
-        </div>
+            <div className="text-left">
+              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2 text-left">
+                제목 <span className="text-gray-500 text-xs">(최대 30자)</span>
+              </label>
+              <input
+                type="text"
+                id="title"
+                value={title}
+                onChange={(e) => {
+                  if (e.target.value.length <= 30) {
+                    setTitle(e.target.value);
+                  }
+                }}
+                maxLength={30}
+                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-left"
+                placeholder="제목을 입력해주세요 (최대 30자)"
+              />
+              <div className="mt-1 text-right text-sm text-gray-500">
+                {title.length}/30
+              </div>
+            </div>
 
-        <div className="text-left">
-          <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2 text-left">
-            내용 <span className="text-gray-500 text-xs">(최대 2000자)</span>
-          </label>
-          <textarea
-            id="content"
-            value={content}
-            onChange={(e) => {
-              if (e.target.value.length <= 2000) {
-                setContent(e.target.value);
-              }
-            }}
-            maxLength={2000}
-            rows={6}
-            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-left"
-            placeholder="문의 내용을 입력해주세요 (최대 2000자)"
-          />
-          <div className="mt-1 text-right text-sm text-gray-500">
-            {content.length}/2000
-          </div>
-        </div>
+            <div className="text-left">
+              <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2 text-left">
+                내용 <span className="text-gray-500 text-xs">(최대 2000자)</span>
+              </label>
+              <textarea
+                id="content"
+                value={content}
+                onChange={(e) => {
+                  if (e.target.value.length <= 2000) {
+                    setContent(e.target.value);
+                  }
+                }}
+                maxLength={2000}
+                rows={6}
+                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-left"
+                placeholder="문의 내용을 입력해주세요 (최대 2000자)"
+              />
+              <div className="mt-1 text-right text-sm text-gray-500">
+                {content.length}/2000
+              </div>
+            </div>
 
-        <div className="text-left">
-          <ImageUploader
-            images={images}
-            previewUrls={previewUrls}
-            onImagesChange={setImages}
-            onPreviewUrlsChange={setPreviewUrls}
-            existingImages={existingImages}
-            onExistingImagesChange={setExistingImages}
-            disabled={isUploading}
-          />
-        </div>
+            <div className="text-left">
+              <ImageUploader
+                images={images}
+                previewUrls={previewUrls}
+                onImagesChange={setImages}
+                onPreviewUrlsChange={setPreviewUrls}
+                existingImages={existingImages}
+                onExistingImagesChange={setExistingImages}
+              />
+            </div>
 
-        <div className="flex justify-end space-x-4">
-          <button
-            type="button"
-            onClick={() => {
-              if (mode === 'create') {
-                navigate(ROUTES.BOARD.LIST);
-              } else if (mode === 'edit' && boardId) {
-                navigate(`/board/${boardId}`);
-              }
-            }}
-            className="px-4 py-2 text-[#FF6B00] hover:bg-[#FFF5EE] rounded-lg"
-            disabled={isSubmitting || isUploading}
-          >
-            취소
-          </button>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-[#FF6B00] text-white rounded-lg hover:bg-[#FF8533] disabled:bg-[#FFB380]"
-            disabled={isSubmitting || isUploading}
-          >
-            {isSubmitting ? (
-              <span className="flex items-center">
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                {isUploading ? '이미지 업로드 중...' : '저장 중...'}
-              </span>
-            ) : (
-              '저장하기'
-            )}
-          </button>
+            <div className="flex justify-end space-x-4">
+              <button
+                type="button"
+                onClick={handleBack}
+                className="px-4 py-2 text-[#FF6B00] hover:bg-[#FFF5EE] rounded-lg"
+                disabled={isSubmitting || isUploading}
+              >
+                취소
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-[#FF6B00] text-white rounded-lg hover:bg-[#FF8533] disabled:bg-[#FFB380]"
+                disabled={isSubmitting || isUploading}
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    {isUploading ? '이미지 업로드 중...' : '저장 중...'}
+                  </span>
+                ) : (
+                  '저장하기'
+                )}
+              </button>
+            </div>
+          </form>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
