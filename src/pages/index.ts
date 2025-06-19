@@ -20,11 +20,14 @@ export { default as BoardDetail } from '@/pages/admin/BoardDetail';
 // 소비자 페이지
 export { default as ConsumerProfileSetup } from './consumer/ConsumerProfileSetup';
 export { default as ConsumerProfileEdit } from './consumer/ProfileEdit';
-// export { default as ConsumerMyPage } from './consumer/MyPage';
-// export { default as ConsumerProfile } from './consumer/Profile';
-// export { default as ConsumerReservations } from './consumer/Reservations';
-// export { default as ReservationCreate } from './consumer/ReservationCreate';
-// export { default as LikedManagers } from './consumer/LikedManagers';
+export { default as ConsumerMyPage } from './consumer/MyPage';
+export { default as ConsumerProfile } from './consumer/Profile';
+
+// 소비자 리뷰 등록 페이지
+export { default as ConsumerReviewRegister } from './consumer/ConsumerReviewRegister';
+
+// 수요자의 좋아요, 블랙리스트 매니저 페이지
+export { default as ManagerList } from './consumer/ManagerList';
 
 // 매니저 프로필 설정 페이지
 export { default as ManagerProfileSetup } from './manager/ManagerProfileSetup';
@@ -32,14 +35,12 @@ export { default as ManagerProfileSetup } from './manager/ManagerProfileSetup';
 // 매니저 마이 페이지
 export { default as ManagerMyPage } from './manager/ManagerMyPage';
 
-// 매니저 프로필 조회 페이지
-// export { default as ManagerProfile } from './manager/ManagerProfile';
 
 // 매니저 리뷰 등록 페이지
 export { default as ManagerReviewRegister } from './manager/ManagerReviewRegister';
 
-// export { default as ManagerReservations } from './manager/Reservations';
-// export { default as ManagerReviews } from './manager/Reviews';
+// 매니저 정산 페이지
+export { default as ManagerSettlements } from './manager/ManagerSettlements';
 
 // 수요자 예약 생성 페이지
 export { default as ConsumerReservationCreate } from './reservation/ConsumerReservationCreate';
