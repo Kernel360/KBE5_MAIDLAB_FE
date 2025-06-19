@@ -283,10 +283,9 @@ export const adminApi = {
     boardId: number,
     data: AdminAnswerRequest,
   ): Promise<string> => {
-    const queryString = buildQueryString({ boardId });
     return apiCall<string>(
       'post',
-      `${API_ENDPOINTS.ADMIN.BOARD.UPDATE_ANSWER}${queryString}`,
+      API_ENDPOINTS.ADMIN.BOARD.UPDATE_ANSWER(boardId),
       data,
     );
   },
@@ -295,12 +294,12 @@ export const adminApi = {
    * 답변 수정
    */
   updateAnswer: async (
-    answerId: number,
+    boardId: number,
     data: AdminAnswerRequest,
   ): Promise<string> => {
     return apiCall<string>(
       'patch',
-      API_ENDPOINTS.ADMIN.BOARD.UPDATE_ANSWER(answerId),
+      API_ENDPOINTS.ADMIN.BOARD.UPDATE_ANSWER(boardId),
       data,
     );
   },
