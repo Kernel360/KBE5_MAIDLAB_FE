@@ -159,3 +159,39 @@ export interface PointHistoryResponse {
   expiringPoints: number;
   history: PointHistory[];
 }
+
+/**
+ * 마이페이지 등에서 메뉴 버튼(아이템) 컴포넌트의 props 타입
+ */
+export interface MenuItemProps {
+  icon: React.ReactNode;
+  title: string;
+  onClick: () => void;
+}
+
+/**
+ * 도우미 선호도(찜/블랙리스트/선택없음) 타입
+ */
+export type PreferenceType = 'LIKE' | 'BLACKLIST' | 'NONE';
+
+/**
+ * 리뷰 등록 폼의 상태 타입
+ */
+export interface ReviewFormData {
+  rating: number;
+  comment: string;
+  preference: PreferenceType;
+}
+
+/**
+ * 소비자 프로필/프로필 수정 등에서 사용하는 사용자 정보 타입
+  */
+export interface ProfileData {
+  name: string;
+  phoneNumber: string;
+  birth: string;
+  gender: 'MALE' | 'FEMALE';
+  address: string;
+  detailAddress: string;
+  profileImage: string | undefined;
+}

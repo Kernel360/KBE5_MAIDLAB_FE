@@ -4,16 +4,7 @@ import { useReservation } from '@/hooks/domain/useReservation';
 import { ROUTES } from '@/constants';
 import { LENGTH_LIMITS } from '@/constants/validation';
 import type { ReviewRegisterRequest } from '@/types/reservation';
-
-// 선호도 타입 정의
-type PreferenceType = 'LIKE' | 'BLACKLIST' | 'NONE';
-
-// 리뷰 폼 데이터 타입 정의
-interface ReviewFormData {
-  rating: number;
-  comment: string;
-  preference: PreferenceType;
-}
+import type { PreferenceType, ReviewFormData } from '@/types/consumer';
 
 // 별점 컴포넌트
 const RatingStars: React.FC<{
