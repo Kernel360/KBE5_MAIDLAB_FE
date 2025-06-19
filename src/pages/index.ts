@@ -95,11 +95,20 @@ export { default as ManagerMatching } from './matching/ManagerMatching';
  * board
  */
 
-// 게시판 페이지 (나중에 구현)
-// export { default as Board } from './Board';
-// export { default as BoardCreate } from './BoardCreate';
-export { default as BoardDetail } from '@/pages/admin/BoardDetail';
+// 작성한 게시글 전체 조회
+export { default as BoardList } from './board/BoardList';
 
+// 게시글 작성
+export { default as BoardCreate } from './board/BoardCreate';
+
+// 게시글 상세 조회
+export { default as BoardDetail } from './board/BoardDetail';
+
+// 게시글 수정
+export { default as BoardEdit } from './board/BoardEdit';
+
+
+// 어드민용 게시판 상세
 /**
  * admin
  */
