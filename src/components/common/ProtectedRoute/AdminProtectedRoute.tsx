@@ -7,7 +7,7 @@ interface AdminProtectedRouteProps {
   children: React.ReactNode;
 }
 
-const AdminProtectedRoute: React.FC<AdminProtectedRouteProps> = ({
+export const AdminProtectedRoute: React.FC<AdminProtectedRouteProps> = ({
   children,
 }) => {
   const { isAuthenticated } = useAdminAuth();
@@ -18,5 +18,3 @@ const AdminProtectedRoute: React.FC<AdminProtectedRouteProps> = ({
 
   return <>{children}</>;
 };
-
-export default AdminProtectedRoute;

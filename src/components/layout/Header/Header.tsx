@@ -2,7 +2,7 @@ import React from 'react';
 import { Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { APP_INFO, ROUTES } from '@/constants';
-import { useAuth } from '@/hooks';
+import { useAuth, useToast } from '@/hooks';
 
 interface HeaderProps {
   showNotification?: boolean;
@@ -13,12 +13,12 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({
   showNotification = false,
-  onNotificationClick,
   title = APP_INFO.NAME,
   onLogoClick,
 }) => {
   const navigate = useNavigate();
   const { logout, isAuthenticated } = useAuth();
+  const { showToast } = useToast();
 
   const handleLogoClick = () => {
     if (onLogoClick) {
@@ -26,6 +26,10 @@ export const Header: React.FC<HeaderProps> = ({
     } else {
       navigate(ROUTES.HOME);
     }
+  };
+
+  const handleNotificationClick = () => {
+    showToast('알람 기능을 준비 중입니다.', 'info');
   };
 
   return (
@@ -45,7 +49,7 @@ export const Header: React.FC<HeaderProps> = ({
         {/* 알림 버튼 */}
         {showNotification && (
           <button
-            onClick={onNotificationClick}
+            onClick={handleNotificationClick}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors relative"
           >
             <Bell className="w-6 h-6 text-gray-600" />
