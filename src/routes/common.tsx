@@ -1,11 +1,13 @@
 import { Route } from 'react-router-dom';
 import { ROUTES } from '@/constants';
-import Home from '@/pages/Home';
-import Login from '@/pages/Login';
-import SignUp from '@/pages/SignUp';
-import SocialSignUp from '@/pages/SocialSignUp';
-import GoogleCallback from '@/pages/GoogleCallback';
-import NotFound from '@/pages/NotFound';
+import {
+  Home,
+  Login,
+  SignUp,
+  SocialSignUp,
+  GoogleCallback,
+  NotFound,
+} from '@/pages';
 
 export const CommonRoutes = () => (
   <>
