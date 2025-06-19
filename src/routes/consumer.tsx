@@ -1,15 +1,18 @@
 import { Route } from 'react-router-dom';
 import { ROUTES } from '@/constants';
 import { ProtectedRoute } from '@/components/common';
-import ConsumerProfileSetup from '@/pages/consumer/ConsumerProfileSetup';
-import ConsumerMyPage from '@/pages/consumer/MyPage';
-import ConsumerProfile from '@/pages/consumer/Profile';
-import ConsumerProfileEdit from '@/pages/consumer/ProfileEdit';
-import ConsumerReservations from '@/pages/reservation/ConsumerReservations';
-import ConsumerReservationCreate from '@/pages/reservation/ConsumerReservationCreate';
-import ConsumerReservationDetail from '@/pages/reservation/ConsumerReservationDetail';
-import ConsumerReviewRegister from '@/pages/consumer/ReviewRegister';
-import ManagerList from '@/pages/consumer/ManagerList';
+import {
+  ConsumerProfileSetup,
+  ConsumerMyPage,
+  ConsumerProfile,
+  ConsumerProfileEdit,
+  ConsumerReservations,
+  ConsumerReservationCreate,
+  ConsumerReservationDetail,
+  ConsumerReviewRegister,
+  ManagerList,
+} from '@/pages';
+
 
 export const ConsumerRoutes = () => (
   <>

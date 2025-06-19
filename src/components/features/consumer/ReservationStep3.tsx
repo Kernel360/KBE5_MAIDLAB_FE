@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { ReservationFormData } from '@/types/reservation';
 import { useReservation } from '@/hooks/domain/useReservation';
-import { useMatching } from '@/hooks/domain/useMatching';
 import {
   SERVICE_DETAIL_TYPES,
   HOUSING_TYPES,
