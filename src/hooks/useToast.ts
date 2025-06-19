@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useRef,
+} from 'react';
 import type { ReactNode } from 'react';
 
 interface Toast {
@@ -27,6 +33,7 @@ interface ToastProviderProps {
 
 export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const recentToastsRef = useRef<Map<string, number>>(new Map());
 
   const showToast = useCallback(
     (
@@ -34,31 +41,57 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
       type: Toast['type'] = 'info',
       duration: number = 3000,
     ) => {
+      const now = Date.now();
+      const toastKey = `${message}_${type}`;
+
+      const hasActiveToast = toasts.some(
+        (toast) => toast.message === message && toast.type === type,
+      );
+
+      const lastShownTime = recentToastsRef.current.get(toastKey);
+      const isRecentlyShown = lastShownTime && now - lastShownTime < 5000; // 5초
+
+      if (hasActiveToast || isRecentlyShown) {
+        return ''; // 중복 방지
+      }
+
+      // 토스트 표시 시간 기록
+      recentToastsRef.current.set(toastKey, now);
+
       const id = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       const toast: Toast = { id, message, type, duration };
-
-      console.log('🍞 토스트 추가:', toast); // 디버깅 로그
 
       setToasts((prev) => [...prev, toast]);
 
       // 자동 제거
       setTimeout(() => {
         setToasts((prev) => prev.filter((t) => t.id !== id));
+
+        // 토스트 제거 후 일정 시간이 지나면 최근 기록도 정리
+        setTimeout(() => {
+          const currentTime = Date.now();
+          const entries = Array.from(recentToastsRef.current.entries());
+          entries.forEach(([key, time]) => {
+            if (currentTime - time > 10000) {
+              // 10초 후 기록 제거
+              recentToastsRef.current.delete(key);
+            }
+          });
+        }, 2000);
       }, duration);
 
       return id;
     },
-    [],
+    [toasts],
   );
 
   const removeToast = useCallback((id: string) => {
-    console.log('🗑️ 토스트 제거:', id); // 디버깅 로그
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
   const clearToasts = useCallback(() => {
-    console.log('🧹 모든 토스트 제거'); // 디버깅 로그
     setToasts([]);
+    recentToastsRef.current.clear(); // 최근 기록도 초기화
   }, []);
 
   const value: ToastContextType = {
