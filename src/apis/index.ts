@@ -4,9 +4,7 @@ import { API_CODE_MESSAGES, API_ENDPOINTS } from '@/constants/api';
 import { USER_TYPES } from '@/constants/user';
 
 // 환경변수 검증
-const BASE_URL = 
-// import.meta.env.VITE_API_BASE_URL;
-'http://localhost:8080'
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 if (!BASE_URL) {
   throw new Error('VITE_API_BASE_URL 환경변수가 설정되지 않았습니다.');
 }
