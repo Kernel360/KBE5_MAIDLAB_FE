@@ -289,7 +289,8 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
             />
           
             <button
-              onClick={() => navigate('/google-map')}
+              // onClick={() => navigate('/google-map')}
+              onClick={() => alert("서비스 준비중입니다.")}
               className="p-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
               type="button"
             >
