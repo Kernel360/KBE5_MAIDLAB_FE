@@ -1,5 +1,5 @@
 import type { BaseUser } from './user';
-import type { Gender } from '@/constants/user';
+import type { Gender, PreferenceType} from '@/constants/user';
 
 /**
  * 소비자 프로필 생성 요청
@@ -160,19 +160,6 @@ export interface PointHistoryResponse {
   history: PointHistory[];
 }
 
-/**
- * 마이페이지 등에서 메뉴 버튼(아이템) 컴포넌트의 props 타입
- */
-export interface MenuItemProps {
-  icon: React.ReactNode;
-  title: string;
-  onClick: () => void;
-}
-
-/**
- * 도우미 선호도(찜/블랙리스트/선택없음) 타입
- */
-export type PreferenceType = 'LIKE' | 'BLACKLIST' | 'NONE';
 
 /**
  * 리뷰 등록 폼의 상태 타입
@@ -190,7 +177,7 @@ export interface ProfileData {
   name: string;
   phoneNumber: string;
   birth: string;
-  gender: 'MALE' | 'FEMALE';
+  gender: Gender;
   address: string;
   detailAddress: string;
   profileImage: string | undefined;

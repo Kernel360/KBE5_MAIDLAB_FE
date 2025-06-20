@@ -43,3 +43,10 @@ export const SOCIAL_TYPE_LABELS = {
   [SOCIAL_TYPES.KAKAO]: '카카오',
   [SOCIAL_TYPES.GOOGLE]: '구글',
 } as const;
+
+
+/**
+ * 도우미 선호도(찜/블랙리스트/선택없음) 타입
+ */
+export type PreferenceType = 'LIKE' | 'BLACKLIST';
+

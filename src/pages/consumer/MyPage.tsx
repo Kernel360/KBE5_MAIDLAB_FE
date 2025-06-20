@@ -14,8 +14,14 @@ import {
 } from 'lucide-react';
 import { useConsumer } from '@/hooks/domain/useConsumer';
 import { useToast } from '@/hooks/useToast';
-import type { ConsumerMyPageResponse, MenuItemProps } from '@/types/consumer';
+import type { ConsumerMyPageResponse } from '@/types/consumer';
 import { ROUTES } from '@/constants';
+
+interface MenuItemProps {
+  icon: React.ReactNode;
+  title: string;
+  onClick: () => void;
+}
 
 const MenuItem: React.FC<MenuItemProps> = ({ icon, title, onClick }) => (
   <button
