@@ -12,6 +12,7 @@ import {
   ConsumerReviewRegister,
   ManagerList,
 } from '@/pages';
+import GoogleMap from '@/pages/reservation/GoogleMap';
 
 
 export const ConsumerRoutes = () => (
@@ -94,6 +95,12 @@ export const ConsumerRoutes = () => (
         <ProtectedRoute requiredUserType="CONSUMER">
           <ManagerList />
         </ProtectedRoute>
+      }
+    />
+    <Route
+      path={'/google-map'}
+      element={
+          <GoogleMap />
       }
     />
   </>

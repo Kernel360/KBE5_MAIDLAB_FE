@@ -5,6 +5,7 @@ import { useMatching } from '@/hooks/domain/useMatching';
 import { format, addDays } from 'date-fns';
 import { HOUSING_TYPES, SERVICE_OPTIONS, ROOM_SIZES } from '@/constants/service';
 import ReservationHeader from './ReservationHeader';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface Props {
   initialData: Partial<ReservationFormData>;
@@ -13,6 +14,8 @@ interface Props {
 }
 
 const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [form, setForm] = useState<ReservationFormData>({
     serviceType: initialData.serviceType || 'HOUSEKEEPING',
     serviceDetailType: initialData.serviceDetailType || '대청소',
@@ -37,6 +40,20 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
   const [basePrice] = useState(50000); // 기본 가격 5만원
   const [totalPrice, setTotalPrice] = useState(basePrice);
   const { fetchAvailableManagers } = useMatching();
+  const [mapLatLng, setMapLatLng] = useState<{ lat: number; lng: number } | null>(null);
+
+  // 구글맵에서 전달된 주소 자동 반영
+  useEffect(() => {
+    if (location.state && (location.state as any).address) {
+      const { address, lat, lng } = location.state as any;
+      setForm(prev => ({ ...prev, address }));
+      setMapLatLng(lat && lng ? { lat, lng } : null);
+      // history.replaceState로 state 초기화(뒤로가기 시 중복 방지)
+      if (window.history.replaceState) {
+        window.history.replaceState({}, document.title);
+      }
+    }
+  }, [location.state]);
 
   // 시작 시간이 변경되면 3시간 후로 종료 시간 자동 설정 (다음날로 넘어갈 수 있도록)
   useEffect(() => {
@@ -71,11 +88,6 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
     if (!form.chooseManager) {
       handleManagerSelect();
     }
-  };
-
-  const handleAddressSearch = () => {
-    // TODO: 주소 검색 API 연동
-    alert('주소 검색 기능은 추후 구현 예정입니다.');
   };
 
   const handleManagerSelect = async () => {
@@ -275,11 +287,13 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
               onChange={(e) => setForm(prev => ({ ...prev, address: e.target.value }))}
               ref={addressRef}
             />
+          
             <button
-              onClick={handleAddressSearch}
-              className="p-3 bg-gray-100 rounded-lg"
+              onClick={() => navigate('/google-map')}
+              className="p-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+              type="button"
             >
-              🔍
+              현재 위치에서 찾기
             </button>
           </div>
           <input
