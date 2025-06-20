@@ -14,7 +14,7 @@ export const matchingApi = {
     data: MatchingRequest,
   ): Promise<AvailableManagerResponse[]> => {
     return apiCall<AvailableManagerResponse[]>(
-      'get',
+      'post',
       API_ENDPOINTS.MATCHING.MANAGERS,
       data,
     );
