@@ -21,6 +21,9 @@ export interface MatchingRequest {
 export interface AvailableManagerResponse {
   uuid: string;
   name: string;
+  averageRate: number;
+  introduceText: string;
+  profileImage : string; 
 }
 
 /**

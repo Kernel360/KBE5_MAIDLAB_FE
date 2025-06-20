@@ -94,9 +94,6 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
       if (Array.isArray(result)) {
         setManagerList(result.map(manager => ({
           ...manager,
-          rating: (Math.random() * 1.5 + 3.5).toFixed(1), // 임시 평점 (3.5-5.0)
-          experience: Math.floor(Math.random() * 7) + 3, // 임시 경력 (3-10년)
-          tags: ['청소', '요리', '세심함'].sort(() => Math.random() - 0.5).slice(0, 2), // 임시 태그
         })));
         setShowManagerModal(true);
       } else {
@@ -461,51 +458,46 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
         {/* 매니저 선택 모달 */}
         {showManagerModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[80vh] overflow-y-auto">
-              <h3 className="text-lg font-semibold mb-4">매니저 선택</h3>
-              <div className="space-y-4">
+            <div className="relative bg-white rounded-2xl p-6 w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl animate-fade-in">
+              {/* 닫기 버튼 */}
+              <button
+                onClick={() => setShowManagerModal(false)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold focus:outline-none"
+                aria-label="닫기"
+              >
+                ×
+              </button>
+              <h3 className="text-xl font-bold mb-6 text-center">매니저 선택</h3>
+              <div className="space-y-5">
                 {managerList.map((manager) => (
                   <div
                     key={manager.uuid}
-                    className={`p-4 border rounded-lg ${
-                      form.managerUuId === manager.uuid ? 'border-orange-500' : 'border-gray-200'
+                    className={`group p-4 border-2 rounded-xl transition-all duration-200 cursor-pointer flex items-center gap-4 shadow-sm hover:shadow-lg hover:border-orange-400 ${
+                      form.managerUuId === manager.uuid ? 'border-orange-500 bg-orange-50' : 'border-gray-200 bg-white'
                     }`}
+                    onClick={() => {
+                      setForm(prev => ({ ...prev, managerUuId: manager.uuid }));
+                      setShowManagerModal(false);
+                    }}
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-gray-200 rounded-full" />
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-medium">{manager.name}</h4>
-                          <span className="text-orange-500">★ {manager.rating}</span>
-                        </div>
-                        <p className="text-sm text-gray-600">가사 도우미 경력 {manager.experience}년</p>
-                        <div className="flex gap-1 mt-1">
-                          {manager.tags.map((tag: string) => (
-                            <span key={tag} className="text-xs px-2 py-1 bg-gray-100 rounded-full">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
+                    <img
+                      src={manager.profileImage || '/default-profile.png'}
+                      alt={manager.name}
+                      className="w-16 h-16 rounded-full object-cover border-2 border-gray-200 group-hover:border-orange-400"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-semibold text-lg truncate">{manager.name}</span>
+                        <span className="text-orange-500 font-bold text-sm">★ {manager.averageRate}</span>
                       </div>
+                      <div className="text-gray-600 text-sm truncate">{manager.introduceText}</div>
                     </div>
-                    <button
-                      onClick={() => {
-                        setForm(prev => ({ ...prev, managerUuId: manager.uuid }));
-                        setShowManagerModal(false);
-                      }}
-                      className="mt-2 w-full py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
-                    >
-                      선택하기
-                    </button>
+                    {form.managerUuId === manager.uuid && (
+                      <span className="ml-2 px-2 py-1 bg-orange-500 text-white text-xs rounded-full">선택됨</span>
+                    )}
                   </div>
                 ))}
               </div>
-              <button
-                onClick={() => setShowManagerModal(false)}
-                className="mt-4 w-full py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-              >
-                닫기
-              </button>
             </div>
           </div>
         )}
