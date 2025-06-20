@@ -155,6 +155,40 @@ const BoardDetail = () => {
     setIsEditing(false);
   };
 
+  // 날짜 포맷팅 함수
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  // 작성자 정보 구분 함수
+  const getAuthorInfo = () => {
+    if (board?.consumerName) {
+      return {
+        name: board.consumerName,
+        type: '사용자',
+        color: 'primary' as const,
+      };
+    } else if (board?.managerName) {
+      return {
+        name: board.managerName,
+        type: '매니저',
+        color: 'secondary' as const,
+      };
+    }
+    return {
+      name: '익명',
+      type: '',
+      color: 'default' as const,
+    };
+  };
+
   if (loading) {
     return (
       <StyledContainer>
@@ -203,10 +237,37 @@ const BoardDetail = () => {
           />
         </Box>
 
-        {/* 제목 */}
-        <Typography variant="h5" component="h1" gutterBottom>
-          {board.title}
-        </Typography>
+        {/* 제목과 작성자/시간 */}
+        <Box mb={2}>
+          <Typography variant="h5" component="h1" gutterBottom>
+            {board.title}
+          </Typography>
+          <Box display="flex" gap={2} alignItems="center">
+            <Box display="flex" alignItems="center" gap={1}>
+              <Typography variant="body2" color="text.secondary">
+                작성자:
+              </Typography>
+              <Typography variant="body2" fontWeight="medium">
+                {getAuthorInfo().name}
+              </Typography>
+              {getAuthorInfo().type && (
+                <Chip
+                  label={getAuthorInfo().type}
+                  color={getAuthorInfo().color}
+                  size="small"
+                  variant="outlined"
+                  sx={{ height: '20px', fontSize: '0.7rem' }}
+                />
+              )}
+            </Box>
+            <Typography variant="body2" color="text.secondary">
+              •
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {board.createdAt ? formatDate(board.createdAt) : '날짜 정보 없음'}
+            </Typography>
+          </Box>
+        </Box>
 
         <StyledDivider />
 

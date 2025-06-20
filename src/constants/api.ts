@@ -107,9 +107,9 @@ export const API_ENDPOINTS = {
   EVENT: {
     LIST: '/api/events',
     DETAIL: (id: number) => `/api/event/${id}`,
-    CREATE: '/api/event',
-    UPDATE: (id: number) => `/api/event/${id}`,
-    DELETE: (id: number) => `/api/event/${id}`,
+    CREATE: '/api/admin/event',
+    UPDATE: (id: number) => `/api/admin/event/${id}`,
+    DELETE: (id: number) => `/api/admin/event/${id}`,
   },
   BOARD: {
     LIST: '/api/board',
