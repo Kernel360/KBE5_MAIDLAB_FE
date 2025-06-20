@@ -1,4 +1,3 @@
-// hooks/useValidation.ts
 import { useCallback } from 'react';
 import type {
   ValidatorKey,
@@ -35,7 +34,6 @@ import {
 import { VALIDATION_MESSAGES } from '@/constants';
 
 export const useValidation = () => {
-  // 기본 검증자 맵 (boolean 반환하는 유틸함수들을 string | null로 변환)
   const validators = {
     phone: (value: string) =>
       validatePhone(value) ? null : VALIDATION_MESSAGES.PHONE.INVALID,
@@ -46,7 +44,6 @@ export const useValidation = () => {
     name: (value: string) =>
       validateName(value) ? null : VALIDATION_MESSAGES.NAME.INVALID,
     birth: (value: string) => {
-      // validateBirthDate는 이미 boolean을 반환하므로 직접 사용
       return validateBirthDate(value)
         ? null
         : VALIDATION_MESSAGES.BIRTH.INVALID_DATE;
@@ -262,7 +259,6 @@ export const useValidation = () => {
     createCustomValidator,
     isValidatorKey,
 
-    // 원시 검증 함수들 (utils에서 그대로 export)
     utils: {
       validatePhone,
       validateEmail,
