@@ -1,170 +1,118 @@
+// hooks/useValidation.ts
 import { useCallback } from 'react';
+import type {
+  ValidatorKey,
+  ValidatorFunction,
+  ValidationRule,
+  FormValidationResult,
+  FormValidationRules,
+} from '@/types/hooks/validation';
 import {
   validatePhone,
   validateEmail,
   validatePassword,
   validateName,
+  validateBirthDate,
   validateReservationTime,
   validateRequired,
-} from '@/utils';
+  validatePasswordMatch,
+  validateTime,
+  validateDate,
+  validateRating,
+  validatePrice,
+  validateTitleLength,
+  validateContentLength,
+  validateRoomSize,
+  validateImageFile,
+  validateDocumentFile,
+  validateUrl,
+  isNumericOnly,
+  isKoreanOnly,
+  isEnglishOnly,
+  validateFileSize,
+  validateFileType,
+} from '@/utils/validation';
 import { VALIDATION_MESSAGES } from '@/constants';
 
-export type ValidatorKey =
-  | 'phone'
-  | 'email'
-  | 'password'
-  | 'name'
-  | 'required'
-  | 'birth';
-
-export type ValidatorFunction = (value: any) => string | null;
-
-export type ValidationRule = ValidatorKey | ValidatorFunction;
-
 export const useValidation = () => {
-  // 생년월일 검증 함수
-  const validateBirth = useCallback((birthStr: string): string | null => {
-    // 1. 필수 값 체크
-    if (!validateRequired(birthStr)) {
-      return VALIDATION_MESSAGES.BIRTH.REQUIRED;
-    }
-
-    // 2. 포맷 검사 (YYYY-MM-DD)
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(birthStr)) {
-      return VALIDATION_MESSAGES.BIRTH.INVALID_FORMAT;
-    }
-
-    const [yearStr, monthStr, dayStr] = birthStr.split('-');
-    const year = parseInt(yearStr);
-    const month = parseInt(monthStr);
-    const day = parseInt(dayStr);
-
-    // 3. 기본 범위 검사
-    if (year < 1900 || year > new Date().getFullYear()) {
-      return VALIDATION_MESSAGES.BIRTH.INVALID_YEAR;
-    }
-
-    if (month < 1 || month > 12) {
-      return VALIDATION_MESSAGES.BIRTH.INVALID_MONTH;
-    }
-
-    if (day < 1 || day > 31) {
-      return VALIDATION_MESSAGES.BIRTH.INVALID_DAY;
-    }
-
-    // 4. 실제 날짜 존재 여부 검사
-    const date = new Date(year, month - 1, day);
-    if (
-      date.getFullYear() !== year ||
-      date.getMonth() !== month - 1 ||
-      date.getDate() !== day
-    ) {
-      return VALIDATION_MESSAGES.BIRTH.INVALID_DATE;
-    }
-
-    // 5. 미래 날짜 검사
-    if (date > new Date()) {
-      return VALIDATION_MESSAGES.BIRTH.FUTURE_DATE;
-    }
-
-    // 6. 나이 제한 검사 (14세 이상, 100세 이하)
-    const today = new Date();
-    const age = today.getFullYear() - year;
-    const monthDiff = today.getMonth() - (month - 1);
-    const dayDiff = today.getDate() - day;
-
-    const actualAge =
-      monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? age - 1 : age;
-
-    if (actualAge < 14) {
-      return VALIDATION_MESSAGES.BIRTH.TOO_YOUNG;
-    }
-
-    if (actualAge > 100) {
-      return VALIDATION_MESSAGES.BIRTH.TOO_OLD;
-    }
-
-    return null;
-  }, []);
-
-  // 필드별 유효성 검사 함수들
+  // 기본 검증자 맵 (boolean 반환하는 유틸함수들을 string | null로 변환)
   const validators = {
-    phone: useCallback((value: string): string | null => {
-      if (!validateRequired(value)) return VALIDATION_MESSAGES.PHONE.REQUIRED;
-      if (!validatePhone(value)) return VALIDATION_MESSAGES.PHONE.INVALID;
-      return null;
-    }, []),
-
-    email: useCallback((value: string): string | null => {
-      if (!validateRequired(value)) return VALIDATION_MESSAGES.EMAIL.REQUIRED;
-      if (!validateEmail(value)) return VALIDATION_MESSAGES.EMAIL.INVALID;
-      return null;
-    }, []),
-
-    password: useCallback((value: string): string | null => {
-      if (!validateRequired(value))
-        return VALIDATION_MESSAGES.PASSWORD.REQUIRED;
-      if (!validatePassword(value)) return VALIDATION_MESSAGES.PASSWORD.INVALID;
-      return null;
-    }, []),
-
-    name: useCallback((value: string): string | null => {
-      if (!validateRequired(value)) return VALIDATION_MESSAGES.NAME.REQUIRED;
-      if (!validateName(value)) return VALIDATION_MESSAGES.NAME.INVALID;
-      return null;
-    }, []),
-
-    birth: validateBirth,
-
-    required: useCallback((value: any): string | null => {
-      return validateRequired(value) ? null : VALIDATION_MESSAGES.REQUIRED;
-    }, []),
+    phone: (value: string) =>
+      validatePhone(value) ? null : VALIDATION_MESSAGES.PHONE.INVALID,
+    email: (value: string) =>
+      validateEmail(value) ? null : VALIDATION_MESSAGES.EMAIL.INVALID,
+    password: (value: string) =>
+      validatePassword(value) ? null : VALIDATION_MESSAGES.PASSWORD.INVALID,
+    name: (value: string) =>
+      validateName(value) ? null : VALIDATION_MESSAGES.NAME.INVALID,
+    birth: (value: string) => {
+      // validateBirthDate는 이미 boolean을 반환하므로 직접 사용
+      return validateBirthDate(value)
+        ? null
+        : VALIDATION_MESSAGES.BIRTH.INVALID_DATE;
+    },
+    required: (value: any) =>
+      validateRequired(value) ? null : VALIDATION_MESSAGES.REQUIRED,
+    time: (value: string) =>
+      validateTime(value) ? null : VALIDATION_MESSAGES.TIME.INVALID,
+    date: (value: string) =>
+      validateDate(value) ? null : VALIDATION_MESSAGES.DATE.INVALID,
+    rating: (value: number) =>
+      validateRating(value) ? null : VALIDATION_MESSAGES.RATING.INVALID,
+    price: (value: number) =>
+      validatePrice(value) ? null : VALIDATION_MESSAGES.PRICE.INVALID,
+    title: (value: string) =>
+      validateTitleLength(value) ? null : VALIDATION_MESSAGES.TITLE.LENGTH,
+    content: (value: string) =>
+      validateContentLength(value) ? null : VALIDATION_MESSAGES.CONTENT.LENGTH,
+    roomSize: (value: number) =>
+      validateRoomSize(value) ? null : '평수는 10-300평 사이로 입력해주세요.',
   } as const;
 
-  // 예약 시간 검증 함수 (별도 분리)
-  const reservationTimeValidator = useCallback(
-    (startTime: string, endTime: string): string | null => {
-      const result = validateReservationTime(startTime, endTime);
-      return result.isValid ? null : result.error || null;
+  // 타입 가드
+  const isValidatorKey = (key: unknown): key is ValidatorKey =>
+    typeof key === 'string' && key in validators;
+
+  // 단일 필드 검증
+  const validateField = useCallback(
+    <T>(value: T, rule: ValidationRule): string | null => {
+      if (typeof rule === 'string' && isValidatorKey(rule)) {
+        return validators[rule](value as any);
+      }
+      if (typeof rule === 'function') {
+        return rule(value);
+      }
+      return null;
     },
     [],
   );
 
-  // 단일 필드 검증
-  const validateField = useCallback(
-    (value: any, rule: ValidationRule): string | null => {
-      if (typeof rule === 'string') {
-        // rule이 ValidatorKey 타입인 경우
-        const validator = validators[rule as keyof typeof validators];
-        if (validator) {
-          return validator(value);
-        }
-      } else if (typeof rule === 'function') {
-        // rule이 함수인 경우
-        return rule(value);
-      }
-
-      return null;
-    },
-    [validators],
-  );
-
-  // 폼 전체 유효성 검사
+  // 폼 전체 검증
   const validateForm = useCallback(
     <T extends Record<string, any>>(
       formData: T,
-      rules: Partial<Record<keyof T, ValidationRule>>,
-    ): { isValid: boolean; errors: Partial<Record<keyof T, string>> } => {
+      rules: FormValidationRules<T>,
+    ): FormValidationResult<T> => {
       const errors: Partial<Record<keyof T, string>> = {};
 
       Object.entries(rules).forEach(([field, rule]) => {
         if (!rule) return;
 
-        const value = formData[field as keyof T];
-        const error = validateField(value, rule);
+        const fieldKey = field as keyof T;
+        const fieldValue = formData[fieldKey];
 
-        if (error) {
-          errors[field as keyof T] = error;
+        // 배열 규칙 지원 (여러 검증 규칙)
+        if (Array.isArray(rule)) {
+          for (const singleRule of rule) {
+            const error = validateField(fieldValue, singleRule);
+            if (error) {
+              errors[fieldKey] = error;
+              break; // 첫 번째 에러에서 중단
+            }
+          }
+        } else {
+          const error = validateField(fieldValue, rule);
+          if (error) errors[fieldKey] = error;
         }
       });
 
@@ -176,12 +124,13 @@ export const useValidation = () => {
     [validateField],
   );
 
-  // 예약 시간 전용 검증 (2개 파라미터)
+  // 예약 시간 검증 (utils의 validateReservationTime 직접 사용)
   const validateReservationTimes = useCallback(
     (startTime: string, endTime: string): string | null => {
-      return reservationTimeValidator(startTime, endTime);
+      const result = validateReservationTime(startTime, endTime);
+      return result.isValid ? null : result.error || null;
     },
-    [reservationTimeValidator],
+    [],
   );
 
   // 비밀번호 확인 검증
@@ -190,22 +139,154 @@ export const useValidation = () => {
       if (!validateRequired(confirmPassword)) {
         return '비밀번호 확인을 입력해주세요.';
       }
-      if (password !== confirmPassword) {
-        return VALIDATION_MESSAGES.PASSWORD.MISMATCH;
+      return validatePasswordMatch(password, confirmPassword)
+        ? null
+        : VALIDATION_MESSAGES.PASSWORD.MISMATCH;
+    },
+    [],
+  );
+
+  // 파일 검증 (utils의 validateImageFile, validateDocumentFile 직접 사용)
+  const validateImage = useCallback((file: File): string | null => {
+    const result = validateImageFile(file);
+    return result.isValid ? null : result.error || null;
+  }, []);
+
+  const validateDocument = useCallback((file: File): string | null => {
+    const result = validateDocumentFile(file);
+    return result.isValid ? null : result.error || null;
+  }, []);
+
+  // 커스텀 파일 검증
+  const validateFile = useCallback(
+    (file: File, maxSize: number, allowedTypes: string[]): string | null => {
+      if (!validateFileType(file, allowedTypes)) {
+        return `허용된 파일 형식: ${allowedTypes.join(', ')}`;
+      }
+      if (!validateFileSize(file, maxSize)) {
+        return `파일 크기는 ${Math.round(maxSize / 1024 / 1024)}MB 이하여야 합니다.`;
       }
       return null;
     },
     [],
   );
 
+  // URL 검증
+  const validateUrlField = useCallback((url: string): string | null => {
+    return validateUrl(url) ? null : '올바른 URL 형식이 아닙니다.';
+  }, []);
+
+  // 문자 타입 검증들
+  const validateNumericOnly = useCallback((value: string): string | null => {
+    return isNumericOnly(value) ? null : '숫자만 입력 가능합니다.';
+  }, []);
+
+  const validateKoreanOnly = useCallback((value: string): string | null => {
+    return isKoreanOnly(value) ? null : '한글만 입력 가능합니다.';
+  }, []);
+
+  const validateEnglishOnly = useCallback((value: string): string | null => {
+    return isEnglishOnly(value) ? null : '영문만 입력 가능합니다.';
+  }, []);
+
+  // 에러 처리 유틸리티들
+  const formatValidationErrors = useCallback(
+    <T>(errors: Partial<Record<keyof T, string>>): string[] => {
+      return Object.values(errors).filter(Boolean) as string[];
+    },
+    [],
+  );
+
+  const getFirstError = useCallback(
+    <T>(errors: Partial<Record<keyof T, string>>): string | null => {
+      const errorList = formatValidationErrors(errors);
+      return errorList.length > 0 ? errorList[0] : null;
+    },
+    [formatValidationErrors],
+  );
+
+  const getFieldError = useCallback(
+    <T>(
+      errors: Partial<Record<keyof T, string>>,
+      field: keyof T,
+    ): string | null => {
+      return errors[field] || null;
+    },
+    [],
+  );
+
+  const hasErrors = useCallback(
+    <T>(errors: Partial<Record<keyof T, string>>): boolean => {
+      return Object.keys(errors).length > 0;
+    },
+    [],
+  );
+
+  // 커스텀 검증자 생성기
+  const createCustomValidator = useCallback(
+    (
+      validatorFn: (value: any) => boolean,
+      errorMessage: string,
+    ): ValidatorFunction => {
+      return (value: any) => (validatorFn(value) ? null : errorMessage);
+    },
+    [],
+  );
+
   return {
+    // 기본 검증자들
     validators,
+
+    // 핵심 검증 메서드
     validateField,
     validateForm,
+
+    // 특수 검증 메서드
     validateReservationTimes,
     validatePasswordConfirm,
-    validateBirth, // 생년월일 검증 직접 접근용
-    // 직접 접근용 (reservationTime은 별도 함수 사용)
-    reservationTimeValidator,
+    validateImage,
+    validateDocument,
+    validateFile,
+    validateUrlField,
+    validateNumericOnly,
+    validateKoreanOnly,
+    validateEnglishOnly,
+
+    // 검증 결과 처리
+    formatValidationErrors,
+    getFirstError,
+    getFieldError,
+    hasErrors,
+
+    // 유틸리티
+    createCustomValidator,
+    isValidatorKey,
+
+    // 원시 검증 함수들 (utils에서 그대로 export)
+    utils: {
+      validatePhone,
+      validateEmail,
+      validatePassword,
+      validateName,
+      validateBirthDate,
+      validateRequired,
+      validatePasswordMatch,
+      validateTime,
+      validateDate,
+      validateRating,
+      validatePrice,
+      validateTitleLength,
+      validateContentLength,
+      validateRoomSize,
+      validateReservationTime,
+      validateImageFile,
+      validateDocumentFile,
+      validateUrl,
+      validateFileSize,
+      validateFileType,
+      isNumericOnly,
+      isKoreanOnly,
+      isEnglishOnly,
+    },
   };
 };
