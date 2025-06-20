@@ -3,16 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, User } from 'lucide-react';
 import { useConsumer } from '@/hooks/domain/useConsumer';
 import { ROUTES } from '@/constants';
-
-interface ProfileData {
-  name: string;
-  phoneNumber: string;
-  birth: string;
-  gender: 'MALE' | 'FEMALE';
-  address: string;
-  detailAddress: string;
-  profileImage: string | undefined;
-}
+import type { ProfileData } from '@/types/consumer';
 
 const DEFAULT_PROFILE_IMAGE = '/default-profile.png';
 

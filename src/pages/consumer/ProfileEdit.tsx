@@ -4,20 +4,10 @@ import { ArrowLeft, Upload, User, Eye, EyeOff, Lock } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
 import { useConsumer } from '@/hooks/domain/useConsumer';
 import { useAuth } from '@/hooks/useAuth';
-import type { ConsumerProfileUpdateRequest } from '@/types/consumer';
+import type { ConsumerProfileUpdateRequest, ProfileData } from '@/types/consumer';
 import { ROUTES } from '@/constants';
 import { uploadToS3 } from '@/utils/s3';
 import { validatePassword } from '@/utils/validation';
-
-interface ProfileData {
-  name: string;
-  phoneNumber: string;
-  birth: string;
-  gender: 'MALE' | 'FEMALE';
-  address: string;
-  detailAddress: string;
-  profileImage: string | undefined;
-}
 
 const DEFAULT_PROFILE_IMAGE = '/default-profile.png';
 
