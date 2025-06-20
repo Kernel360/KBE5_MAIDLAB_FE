@@ -173,7 +173,7 @@ const EventCreate = () => {
       const result = await createEvent({
         title: formData.title,
         mainImageUrl: "https://d1llec2m3tvk5i.cloudfront.net/" + mainImageUrl,
-        imageUrl: "https://d1llec2m3tvk5i.cloudfront.net/" + imageUrl,
+        imageUrl: imageUrl ? "https://d1llec2m3tvk5i.cloudfront.net/" + imageUrl : "",
         content: formData.content,
       });
 

@@ -49,6 +49,8 @@ export interface BoardResponse {
   boardType: BoardType;
   createdAt: string;
   updatedAt: string;
+  managerName?: string;
+  consumerName?: string;
 }
 
 /**
@@ -64,6 +66,8 @@ export interface BoardDetailResponse {
   answer?: Answer;
   createdAt: string;
   updatedAt: string;
+  managerName?: string;
+  consumerName?: string;
 }
 
 /**
