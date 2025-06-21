@@ -2,12 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { ReservationListResponse } from '@/types/reservation';
 import { useReservation } from '@/hooks/domain/useReservation';
-import { formatDateTime } from '@/utils';
+import { useMatching } from '@/hooks/domain/useMatching';
+import { formatDateTime, formatPrice } from '@/utils';
 import { SUCCESS_MESSAGES } from '@/constants/message';
 import { useReservationStatus } from '@/hooks/useReservationStatus';
+import { SERVICE_TYPE_LABELS, SERVICE_TYPES } from '@/constants/service';
+import { RESERVATION_STATUS, RESERVATION_STATUS_LABELS } from '@/constants/status';
 import { ManagerReservationCard } from '@/components/features/reservation/ManagerReservationCard';
 import ReservationHeader from '@/components/features/consumer/ReservationHeader';
 import {ManagerFooter} from '@/components/layout/BottomNavigation/BottomNavigation';
+import { useToast } from '@/hooks/useToast';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -129,221 +133,273 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   );
 };
 
-const ManagerReservations: React.FC = () => {
+const FILTERS = [
+  { label: '예정', value: 'MATCHED' },
+  { label: '오늘', value: 'TODAY' },
+  { label: '완료', value: 'COMPLETED' },
+];
+
+const PAGE_SIZE = 10;
+
+const ManagerReservationsAndMatching: React.FC = () => {
   const navigate = useNavigate();
-  const { fetchReservations, checkIn, checkOut, reservations } = useReservation();
-  const {
-    loading: reservationStatusLoading,
-    setLoading: setReservationStatusLoading,
-    activeTab,
-    setActiveTab: setReservationStatusActiveTab,
-    filterReservationsByTab,
-    getStatusBadgeStyle,
-  } = useReservationStatus();
+  const { showToast } = useToast();
+  const { fetchReservations, checkIn, checkOut, respondToReservation, reservations } = useReservation();
+  const { fetchMatchings, matchings } = useMatching();
+  const [tab, setTab] = useState<'schedule' | 'request'>('schedule');
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('MATCHED');
+  const [filterOpen, setFilterOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [checkInOutModal, setCheckInOutModal] = useState<{
-    isOpen: boolean;
-    isCheckIn: boolean;
-    reservationId: number | null;
-    reservationInfo: {
-      serviceType: string;
-      detailServiceType: string;
-      time: string;
-    };
-  }>({
-    isOpen: false,
-    isCheckIn: true,
-    reservationId: null,
-    reservationInfo: {
-      serviceType: '',
-      detailServiceType: '',
-      time: '',
-    },
-  });
-  const [confirmModal, setConfirmModal] = useState<{
-    isOpen: boolean;
-    isCheckIn: boolean;
-  }>({
-    isOpen: false,
-    isCheckIn: true,
-  });
+  const [modal, setModal] = useState<{ type: 'success' | 'fail' | null, info?: any }>({ type: null });
 
   useEffect(() => {
-    const getReservations = async () => {
-      try {
-        setReservationStatusLoading(true);
-        await fetchReservations();
-      } catch (error) {
-        console.error('예약 목록 조회 실패:', error);
-      } finally {
-        setReservationStatusLoading(false);
-      }
-    };
+    setLoading(true);
+    Promise.all([fetchReservations(), fetchMatchings()]).finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    getReservations();
-  }, [fetchReservations, setReservationStatusLoading]);
+  // 예약 일정 필터링
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const filteredReservations = reservations.filter((r) => {
+    if (filter === 'MATCHED') return r.status === 'MATCHED' && r.reservationDate !== todayStr;
+    if (filter === 'TODAY') return r.status === 'MATCHED' && r.reservationDate === todayStr;
+    if (filter === 'COMPLETED') return r.status === 'COMPLETED';
+    return true;
+  });
+  const totalPages = Math.ceil(filteredReservations.length / PAGE_SIZE);
+  const paginatedReservations = filteredReservations.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
-  const handleCheckInOutClick = (
-    reservation: ReservationListResponse,
-    isCheckIn: boolean
-  ) => {
-    setCheckInOutModal({
-      isOpen: true,
-      isCheckIn,
-      reservationId: reservation.reservationId,
-      reservationInfo: {
-        serviceType: reservation.serviceType,
-        detailServiceType: reservation.detailServiceType,
-        time: `${formatDateTime(reservation.reservationDate)} ${reservation.startTime} ~ ${reservation.endTime}`,
-      },
-    });
-  };
-
-  const handleCheckInOut = async () => {
-    if (!checkInOutModal.reservationId) return;
-
-    const currentTime = new Date().toISOString();
-    try {
-      if (checkInOutModal.isCheckIn) {
-        await checkIn(checkInOutModal.reservationId, { checkTime: currentTime });
-      } else {
-        await checkOut(checkInOutModal.reservationId, { checkTime: currentTime });
-      }
-      setCheckInOutModal((prev) => ({ ...prev, isOpen: false }));
-      setConfirmModal({
-        isOpen: true,
-        isCheckIn: checkInOutModal.isCheckIn,
-      });
-      await fetchReservations();
-    } catch (error) {
-      console.error('체크인/아웃 처리 실패:', error);
-    }
-  };
-
-  const handleConfirmModalClose = () => {
-    setConfirmModal((prev) => ({ ...prev, isOpen: false }));
-    if (!checkInOutModal.isCheckIn && checkInOutModal.reservationId) {
-      // 체크아웃 후에만 리뷰 작성 페이지로 이동
-      navigate(`/managers/reservations/${checkInOutModal.reservationId}/review`);
-    }
-  };
-
-  const filteredReservations = filterReservationsByTab(reservations);
-
-  // 페이징 처리
-  const totalPages = Math.ceil(filteredReservations.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedReservations = filteredReservations.slice(
-    startIndex,
-    startIndex + ITEMS_PER_PAGE
-  );
-
-
-  if (reservationStatusLoading) {
+  // 예약 일정 카드 UI (이미지와 동일하게)
+  const renderReservationCard = (reservation: any) => {
+    const statusLabel =
+      reservation.status === 'MATCHED' && reservation.reservationDate === todayStr
+        ? '오늘'
+        : reservation.status === 'MATCHED'
+        ? '예정'
+        : '완료';
+    const statusColor =
+      statusLabel === '예정'
+        ? 'bg-green-500'
+        : statusLabel === '오늘'
+        ? 'bg-orange-500'
+        : statusLabel === '완료'
+        ? 'bg-gray-400'
+        : 'bg-gray-200';
     return (
-      <div className="min-h-screen bg-gray-50 flex justify-center items-center">
-        <p className="text-gray-500">로딩 중...</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <ReservationHeader title="예약 목록" onBack={() => navigate(-1)} />
-      <div className="flex-1 max-w-3xl mx-auto p-4 pt-16 pb-20">
-        <h1 className="text-2xl font-bold mb-6">예약 일정</h1>
-
-        {/* 탭 */}
-        <div className="flex space-x-4 mb-6">
-
-          <button
-            onClick={() => setReservationStatusActiveTab('scheduled')}
-            className={`px-4 py-2 rounded-lg ${
-              activeTab === 'scheduled'
-                ? 'bg-orange-500 text-white'
-                : 'bg-white text-gray-500'
-            }`}
-          >
-            예정
-          </button>
-          <button
-            onClick={() => setReservationStatusActiveTab('today')}
-            className={`px-4 py-2 rounded-lg ${
-              activeTab === 'today'
-                ? 'bg-orange-500 text-white'
-                : 'bg-white text-gray-500'
-            }`}
-          >
-            오늘
-          </button>
-          <button
-            onClick={() => setReservationStatusActiveTab('completed')}
-            className={`px-4 py-2 rounded-lg ${
-              activeTab === 'completed'
-                ? 'bg-orange-500 text-white'
-                : 'bg-white text-gray-500'
-            }`}
-          >
-            완료
-          </button>
+      <div key={reservation.reservationId} className="rounded-2xl border border-gray-200 bg-white px-6 py-5 mb-5 shadow-sm">
+        <div className="flex justify-between items-start mb-2">
+          <div className="font-extrabold text-lg text-[#4B2E13]">
+            {SERVICE_TYPE_LABELS[reservation.serviceType as keyof typeof SERVICE_TYPES]} &gt; {reservation.detailServiceType}
+          </div>
+          <span className={`px-4 py-1 text-sm rounded-full text-white font-bold ${statusColor}`}>{statusLabel}</span>
         </div>
-
-        {/* 예약 목록 */}
-        <div className="space-y-4">
-          {filteredReservations.length === 0 ? (
-            <div className="bg-white rounded-lg shadow p-6 text-center text-gray-500">
-              예약이 없습니다.
-            </div>
-          ) : (
-            paginatedReservations.map((reservation) => (
-              <ManagerReservationCard
-                key={reservation.reservationId}
-                reservation={reservation}
-                getStatusBadgeStyle={(status) => getStatusBadgeStyle(status, reservation.reservationDate)}
-                onDetailClick={() => navigate(`/manager/reservations/${reservation.reservationId}`)}
-                onCheckIn={() => handleCheckInOutClick(reservation, true)}
-                onCheckOut={() => handleCheckInOutClick(reservation, false)}
-              />
-            ))
+        <div className="grid grid-cols-3 gap-x-4 gap-y-1 mb-2">
+          <div className="text-sm text-gray-400 col-span-1">날짜</div>
+          <div className="text-sm text-gray-400 col-span-1">시간</div>
+          <div className="text-sm text-gray-400 col-span-1">금액</div>
+          <div className="text-base text-[#4B2E13] font-semibold col-span-1">{formatDateTime(reservation.reservationDate)}</div>
+          <div className="text-base text-[#4B2E13] font-semibold col-span-1">{reservation.startTime} ~ {reservation.endTime}</div>
+          <div className="text-base font-bold text-orange-500 col-span-1">{formatPrice(reservation.totalPrice)}원</div>
+        </div>
+        <div className="flex gap-2 mt-2">
+          <button
+            onClick={() => navigate(`/manager/reservations/${reservation.reservationId}`)}
+            className="flex-1 py-2 border-2 border-orange-400 text-orange-500 rounded-full font-bold hover:bg-orange-50 transition"
+          >
+            상세보기
+          </button>
+          {statusLabel === '예정' && (
+            <button
+              onClick={() => showToast('아직 가능한 기능이 아니고, 관리자와 상담요청을 통해 취소문의를 해주세요.', 'info')}
+              className="flex-1 py-2 border-2 border-red-400 text-red-500 rounded-full font-bold hover:bg-red-50 transition"
+            >
+              예약취소
+            </button>
+          )}
+          {statusLabel === '완료' && (
+            <button className="flex-1 py-2 border-2 border-green-400 text-green-600 rounded-full font-bold hover:bg-green-50 transition">서비스 완료</button>
+          )}
+          {statusLabel === '오늘' && (
+            <button className="flex-1 py-2 border-2 border-orange-400 text-orange-500 rounded-full font-bold hover:bg-orange-50 transition">체크인</button>
           )}
         </div>
-
-        {/* 페이지네이션 */}
-        {totalPages > 1 && (
-          <div className="flex justify-center mt-6 space-x-2">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`px-3 py-1 rounded ${
-                  currentPage === page
-                    ? 'bg-orange-500 text-white'
-                    : 'bg-white text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                {page}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
-      <ManagerFooter />
+    );
+  };
 
-      {/* 모달 */}
-      <CheckInOutModal
-        isOpen={checkInOutModal.isOpen}
-        onClose={() => setCheckInOutModal((prev) => ({ ...prev, isOpen: false }))}
-        onConfirm={handleCheckInOut}
-        isCheckIn={checkInOutModal.isCheckIn}
-        reservationInfo={checkInOutModal.reservationInfo}
-      />
-      <ConfirmModal
-        isOpen={confirmModal.isOpen}
-        onClose={handleConfirmModalClose}
-        isCheckIn={confirmModal.isCheckIn}
-      />
+  // 예약 요청 카드 UI (이미지와 동일하게)
+  const renderMatchingCard = (matching: any) => {
+    const info = {
+      service: `${matching.detailServiceType} > ${matching.serviceType}`,
+      customer: matching.customerName || '고객',
+      time: `${matching.startTime} ~ ${matching.endTime}`,
+    };
+    return (
+      <div key={matching.reservationId} className="rounded-2xl border border-gray-200 bg-white px-6 py-5 mb-5 shadow-sm">
+        <div className="font-extrabold text-lg text-[#4B2E13] mb-2">{matching.detailServiceType} &gt; {matching.serviceType}</div>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-1 mb-2">
+          <div className="text-sm text-gray-400">날짜/시간</div>
+          <div className="text-base text-[#4B2E13] font-semibold">{formatDateTime(matching.reservationDate)} {matching.startTime} ~ {matching.endTime}</div>
+          <div className="text-sm text-gray-400">위치</div>
+          <div className="text-base text-[#4B2E13] font-semibold">{matching.address} {matching.addressDetail}</div>
+          <div className="text-sm text-gray-400">방크기</div>
+          <div className="text-base text-[#4B2E13] font-semibold">{matching.roomSize}평</div>
+          <div className="text-sm text-gray-400">반려동물</div>
+          <div className="text-base text-[#4B2E13] font-semibold">{matching.pet}</div>
+          <div className="text-sm text-gray-400">금액</div>
+          <div className="text-base font-bold text-orange-500">{formatPrice(matching.totalPrice)}원</div>
+        </div>
+        <div className="flex gap-2 mt-2">
+          <button
+            onClick={async () => {
+              const result = await respondToReservation(matching.reservationId, { status: true });
+              if (result.success) setModal({ type: 'success', info });
+            }}
+            className="flex-1 py-2 border-2 border-orange-400 text-orange-500 rounded-full font-bold hover:bg-orange-50 transition"
+          >
+            수락
+          </button>
+          <button
+            onClick={async () => {
+              const result = await respondToReservation(matching.reservationId, { status: false });
+              if (result.success) setModal({ type: 'fail' });
+            }}
+            className="flex-1 py-2 border-2 border-red-400 text-red-500 rounded-full font-bold hover:bg-red-50 transition"
+          >
+            거절
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // 필터 드롭다운 UI
+  const filterDropdown = (
+    <div className="relative inline-block text-left">
+      <button
+        onClick={() => setFilterOpen((v) => !v)}
+        className="flex items-center gap-1 px-4 py-2 border border-gray-300 rounded-full font-semibold text-gray-700 bg-white hover:bg-gray-100"
+      >
+        {FILTERS.find((f) => f.value === filter)?.label}
+        <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+      </button>
+      {filterOpen && (
+        <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+          {FILTERS.map((f) => (
+            <button
+              key={f.value}
+              onClick={() => { setFilter(f.value); setFilterOpen(false); setCurrentPage(1); }}
+              className={`block w-full px-4 py-2 text-left text-gray-700 hover:bg-orange-50 ${filter === f.value ? 'font-bold text-orange-500' : ''}`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  // 페이징 네비게이션
+  const pagination = (
+    <div className="flex justify-center items-center gap-2 mt-6">
+      <button
+        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+        disabled={currentPage === 1}
+        className="px-3 py-1 rounded bg-gray-100 text-gray-500 disabled:opacity-50"
+      >
+        이전
+      </button>
+      <span className="font-semibold text-gray-700">{currentPage} / {totalPages || 1}</span>
+      <button
+        onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+        disabled={currentPage === totalPages || totalPages === 0}
+        className="px-3 py-1 rounded bg-gray-100 text-gray-500 disabled:opacity-50"
+      >
+        다음
+      </button>
+    </div>
+  );
+
+  // 모달 UI
+  const now = new Date();
+  return (
+    <div className="max-w-md mx-auto bg-[#F7F7F7] min-h-screen p-0">
+      {/* 탭 헤더 */}
+      <div className="flex items-center justify-between border-b border-gray-200 bg-white px-6 pt-6 pb-2">
+        <div className="flex gap-8">
+          <button
+            className={`text-lg font-bold pb-2 border-b-2 ${tab === 'schedule' ? 'border-orange-500 text-orange-500' : 'border-transparent text-gray-400'}`}
+            onClick={() => setTab('schedule')}
+          >
+            예약 일정
+          </button>
+          <button
+            className={`text-lg font-bold pb-2 border-b-2 ${tab === 'request' ? 'border-orange-500 text-orange-500' : 'border-transparent text-gray-400'}`}
+            onClick={() => setTab('request')}
+          >
+            예약 요청
+          </button>
+        </div>
+        {tab === 'schedule' && filterDropdown}
+      </div>
+      {/* 예약 일정 탭 */}
+      {tab === 'schedule' && (
+        <div className="px-2 pt-4">
+          {loading ? (
+            <div className="text-center py-8 text-gray-400">로딩중...</div>
+          ) : paginatedReservations.length === 0 ? (
+            <div className="text-center py-8 text-gray-400">예약 일정이 없습니다.</div>
+          ) : (
+            paginatedReservations.map(renderReservationCard)
+          )}
+          {pagination}
+        </div>
+      )}
+      {/* 예약 요청 탭 */}
+      {tab === 'request' && (
+        <div className="px-2 pt-4">
+          {loading ? (
+            <div className="text-center py-8 text-gray-400">로딩중...</div>
+          ) : matchings.length === 0 ? (
+            <div className="text-center py-8 text-gray-400">예약 요청이 없습니다.</div>
+          ) : (
+            matchings.map(renderMatchingCard)
+          )}
+        </div>
+      )}
+      {/* 승인/거절 모달 */}
+      {modal.type === 'success' && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl w-[340px] flex flex-col items-center">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+              <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+            </div>
+            <div className="text-xl font-bold text-[#4B2E13] mb-2">예약 승인되었습니다</div>
+            <div className="text-gray-500 mb-4">서비스를 시작하시겠습니까?</div>
+            <div className="bg-gray-50 rounded-lg p-4 w-full text-left mb-4">
+              <div className="flex justify-between mb-1"><span className="text-gray-400">서비스</span><span>{modal.info?.service}</span></div>
+              <div className="flex justify-between mb-1"><span className="text-gray-400">고객</span><span>{modal.info?.customer}</span></div>
+              <div className="flex justify-between mb-1"><span className="text-gray-400">시간</span><span>{modal.info?.time}</span></div>
+              <div className="flex justify-between"><span className="text-gray-400">현재 시간</span><span>{now.getHours()}:{now.getMinutes().toString().padStart(2, '0')}</span></div>
+            </div>
+            <button onClick={() => window.location.reload()} className="w-full py-2 bg-orange-500 text-white rounded-lg font-bold">확인</button>
+          </div>
+        </div>
+      )}
+      {modal.type === 'fail' && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl w-[340px] flex flex-col items-center">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+              <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </div>
+            <div className="text-xl font-bold text-[#4B2E13] mb-2">예약 승인 거절되었습니다</div>
+            <button onClick={() => window.location.reload()} className="w-full py-2 bg-orange-500 text-white rounded-lg font-bold mt-4">확인</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default ManagerReservations;
+export default ManagerReservationsAndMatching;

@@ -64,8 +64,8 @@ export const useReservationStatus = () => {
   };
 
   return {
-    loading,
-    setLoading,
+    // loading,
+    // setLoading,
     activeTab,
     setActiveTab,
     filterReservationsByTab,
