@@ -14,18 +14,7 @@ import { useEvent } from '@/hooks';
 import { ROUTES } from '@/constants';
 import { useFileUpload } from '@/hooks';
 import type { EventDetailResponse } from '@/types/event';
-
-interface UploadResult {
-  originalName: string;
-  storedKey: string;
-  size: number;
-  type: string;
-}
-
-interface PresignedUrlResponse {
-  url: string;
-  key: string;
-}
+import type { UploadResult, PresignedUrlResponse } from '@/types/admin';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),

@@ -1,45 +1,73 @@
 import { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
-import SearchIcon from '@mui/icons-material/Search';
-import type { 
-  ConsumerListResponseDto, 
-  PageConsumerListResponseDto, 
-  PageManagerListResponseDto, 
-  ManagerResponseDto,
-  ManagerListResponseDto 
-} from '../../apis/admin';
-import { adminApi } from '../../apis/admin';
-import { MANAGER_VERIFICATION_LABELS, MANAGER_VERIFICATION_STATUS, type ManagerVerificationStatus } from '../../constants/status';
-import { Box, Container, Typography, Tabs, Tab, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Button, TextField, InputAdornment, Chip, CircularProgress, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
+// API 및 기존 타입 import
+import type { 
+  ConsumerListResponse, 
+  ManagerListResponse, 
+  ManagerListItem, 
+  AdminManagerDetail
+} from '@/types/admin';
+import { adminApi } from '../../apis/admin';
+import { MANAGER_VERIFICATION_LABELS, MANAGER_VERIFICATION_STATUS, type ManagerVerificationStatus } from '../../constants/status';
+
+// 새로 분리한 파일들 import
+import { 
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_PAGE_NUMBER,
+  LOCAL_STORAGE_KEYS,
+  TABLE_COLUMNS,
+  STATUS_FILTER_OPTIONS,
+  USER_TYPES,
+  TAB_INDICES
+} from '../../constants/admin';
+
+import type { 
+  TabPanelProps,
+  ManagerStatusFilter,
+  UserType,
+  LocationState
+} from '../../types/userList';
+
+import {
+  getLocalStorage,
+  setLocalStorage,
+  removeLocalStorage
+} from '@/utils/storage';
+
+// MUI 컴포넌트들
+import { 
+  Box, 
+  Container, 
+  Typography, 
+  Tabs, 
+  Tab, 
+  Paper, 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableContainer, 
+  TableHead, 
+  TablePagination, 
+  TableRow, 
+  Button, 
+  Chip, 
+  CircularProgress, 
+  Select, 
+  MenuItem, 
+  FormControl, 
+  InputLabel 
+} from '@mui/material';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
-}));
-
-const SearchBox = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  gap: theme.spacing(2),
-  marginBottom: theme.spacing(3),
 }));
 
 const FilterBox = styled(Box)(({ theme }) => ({
   display: 'flex',
   gap: theme.spacing(2),
   marginBottom: theme.spacing(3),
-}));
-
-const SearchButton = styled(Button)(({ theme }) => ({
-  backgroundColor: '#FF7F50',
-  '&:hover': {
-    backgroundColor: '#FF6347',
-  },
 }));
 
 function TabPanel(props: TabPanelProps) {
@@ -58,67 +86,73 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-type ManagerStatusFilter = ManagerVerificationStatus | 'ALL';
-
 const UserList = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // 상수를 사용한 초기화
   const [tabValue, setTabValue] = useState(() => {
-    const savedTab = localStorage.getItem('adminUserTab');
+    const savedTab = getLocalStorage<number>(LOCAL_STORAGE_KEYS.ADMIN_USER_TAB);
     if (savedTab !== null) {
-      localStorage.removeItem('adminUserTab');
-      return parseInt(savedTab, 10);
+      removeLocalStorage(LOCAL_STORAGE_KEYS.ADMIN_USER_TAB);
+      return savedTab;
     }
-    return (location.state as { previousTab?: number })?.previousTab ?? 0;
+    return (location.state as LocationState)?.previousTab ?? TAB_INDICES.CONSUMER;
   });
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  
+  const [page, setPage] = useState(DEFAULT_PAGE_NUMBER);
+  const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_PAGE_SIZE);
   const [loading, setLoading] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<ManagerStatusFilter>(() => {
-    const savedStatus = localStorage.getItem('adminManagerStatus');
-    return (savedStatus as ManagerStatusFilter) || 'ALL';
+    const savedStatus = getLocalStorage<ManagerStatusFilter>(LOCAL_STORAGE_KEYS.ADMIN_MANAGER_STATUS);
+    return savedStatus || 'ALL';
   });
-  const [consumerData, setConsumerData] = useState<PageConsumerListResponseDto>({
+  
+  const [consumerData, setConsumerData] = useState<ConsumerListResponse>({
     content: [],
     totalElements: 0,
     totalPages: 0,
-    size: 10,
-    number: 0,
+    size: DEFAULT_PAGE_SIZE,
+    number: DEFAULT_PAGE_NUMBER,
+    numberOfElements: 0,
     first: true,
     last: false,
     empty: true,
   });
-  const [managerData, setManagerData] = useState<PageManagerListResponseDto>({
+  
+  const [managerData, setManagerData] = useState<ManagerListResponse>({
     content: [],
     totalElements: 0,
     totalPages: 0,
-    size: 10,
-    number: 0,
+    size: DEFAULT_PAGE_SIZE,
+    number: DEFAULT_PAGE_NUMBER,
+    numberOfElements: 0,
     first: true,
     last: false,
     empty: true,
   });
-  const [managerDetails, setManagerDetails] = useState<Record<number, ManagerResponseDto>>({});
+  
+  const [managerDetails, setManagerDetails] = useState<Record<number, AdminManagerDetail>>({});
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
-    setPage(0);
+    setPage(DEFAULT_PAGE_NUMBER);
   };
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+    setPage(DEFAULT_PAGE_NUMBER);
   };
 
   const handleStatusChange = (event: any) => {
     const newStatus = event.target.value as ManagerStatusFilter;
     setSelectedStatus(newStatus);
-    localStorage.setItem('adminManagerStatus', newStatus);
-    setPage(0);
+    setLocalStorage(LOCAL_STORAGE_KEYS.ADMIN_MANAGER_STATUS, newStatus);
+    setPage(DEFAULT_PAGE_NUMBER);
   };
 
   const fetchConsumers = async () => {
@@ -141,7 +175,7 @@ const UserList = () => {
       setLoading(true);
       let response;
       
-      if (selectedStatus === 'ALL') {
+      if (selectedStatus === STATUS_FILTER_OPTIONS.ALL) {
         response = await adminApi.getManagers({ 
           page, 
           size: rowsPerPage,
@@ -157,9 +191,8 @@ const UserList = () => {
         setManagerData(response);
       }
 
-      // 각 매니저의 상세 정보를 가져옵니다
       const detailsPromises = response.content
-        .map(async (manager: ManagerListResponseDto) => {
+        .map(async (manager: ManagerListItem) => {
           try {
             const details = await adminApi.getManager(manager.id);
             return { id: manager.id, details };
@@ -170,12 +203,12 @@ const UserList = () => {
         });
 
       const details = await Promise.all(detailsPromises);
-      const detailsMap = details.reduce((acc: Record<number, ManagerResponseDto>, curr: { id: number; details: ManagerResponseDto } | null) => {
+      const detailsMap = details.reduce((acc: Record<number, AdminManagerDetail>, curr: { id: number; details: AdminManagerDetail } | null) => {
         if (curr) {
           acc[curr.id] = curr.details;
         }
         return acc;
-      }, {} as Record<number, ManagerResponseDto>);
+      }, {} as Record<number, AdminManagerDetail>);
       
       setManagerDetails(detailsMap);
     } catch (error) {
@@ -186,16 +219,16 @@ const UserList = () => {
   };
 
   useEffect(() => {
-    if (tabValue === 0) {
+    if (tabValue === TAB_INDICES.CONSUMER) {
       fetchConsumers();
     } else {
       fetchManagers();
     }
   }, [tabValue, page, rowsPerPage, selectedStatus]);
 
-  const handleDetailView = (type: 'consumer' | 'manager', id: number) => {
-    localStorage.setItem('adminUserTab', tabValue.toString());
-    localStorage.setItem('adminManagerStatus', selectedStatus);
+  const handleDetailView = (type: UserType, id: number) => {
+    setLocalStorage(LOCAL_STORAGE_KEYS.ADMIN_USER_TAB, tabValue);
+    setLocalStorage(LOCAL_STORAGE_KEYS.ADMIN_MANAGER_STATUS, selectedStatus);
     navigate(`/admin/users/${type}/${id}`);
   };
 
@@ -203,7 +236,7 @@ const UserList = () => {
     if (loading) {
       return (
         <TableRow>
-          <TableCell colSpan={4} align="center">
+          <TableCell colSpan={TABLE_COLUMNS.CONSUMER} align="center">
             <CircularProgress />
           </TableCell>
         </TableRow>
@@ -219,7 +252,7 @@ const UserList = () => {
           <Button
             variant="outlined"
             size="small"
-            onClick={() => handleDetailView('consumer', consumer.id)}
+            onClick={() => handleDetailView(USER_TYPES.CONSUMER, consumer.id)}
           >
             상세보기
           </Button>
@@ -232,7 +265,7 @@ const UserList = () => {
     if (loading) {
       return (
         <TableRow>
-          <TableCell colSpan={4} align="center">
+          <TableCell colSpan={TABLE_COLUMNS.MANAGER} align="center">
             <CircularProgress />
           </TableCell>
         </TableRow>
@@ -259,7 +292,7 @@ const UserList = () => {
             <Button
               variant="outlined"
               size="small"
-              onClick={() => handleDetailView('manager', manager.id)}
+              onClick={() => handleDetailView(USER_TYPES.MANAGER, manager.id)}
             >
               상세보기
             </Button>
@@ -282,7 +315,7 @@ const UserList = () => {
         </Tabs>
       </Box>
 
-      <TabPanel value={tabValue} index={0}>
+      <TabPanel value={tabValue} index={TAB_INDICES.CONSUMER}>
         <TableContainer component={Paper}>
           <Table>
             <TableHead>
@@ -310,7 +343,7 @@ const UserList = () => {
         />
       </TabPanel>
 
-      <TabPanel value={tabValue} index={1}>
+      <TabPanel value={tabValue} index={TAB_INDICES.MANAGER}>
         <FilterBox>
           <FormControl sx={{ minWidth: 200 }}>
             <InputLabel>상태</InputLabel>
@@ -319,7 +352,7 @@ const UserList = () => {
               onChange={handleStatusChange}
               label="상태"
             >
-              <MenuItem value="ALL">전체</MenuItem>
+              <MenuItem value={STATUS_FILTER_OPTIONS.ALL}>전체</MenuItem>
               {Object.entries(MANAGER_VERIFICATION_STATUS).map(([key, value]) => (
                 <MenuItem key={value} value={value}>
                   {MANAGER_VERIFICATION_LABELS[value as ManagerVerificationStatus]}
@@ -359,4 +392,4 @@ const UserList = () => {
   );
 };
 
-export default UserList; 
+export default UserList;
