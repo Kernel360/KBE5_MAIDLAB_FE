@@ -85,7 +85,7 @@ export const API_ENDPOINTS = {
     LIKES: '/api/consumers/likes',
     BLACKLIST: '/api/consumers/blacklists',
     PREFERENCE: (uuid: string) => `/api/consumers/preference/${uuid}`,
-    REMOVE_LIKE: (uuid: string) => `/api/consumers/likes/${uuid}`,
+    REMOVE_PREFERENCE_MANAGER: (uuid: string) => `/api/consumers/preference/${uuid}`,
   },
   RESERVATION: {
     CREATE: '/api/reservations/register',
@@ -107,9 +107,9 @@ export const API_ENDPOINTS = {
   EVENT: {
     LIST: '/api/events',
     DETAIL: (id: number) => `/api/event/${id}`,
-    CREATE: '/api/event',
-    UPDATE: (id: number) => `/api/event/${id}`,
-    DELETE: (id: number) => `/api/event/${id}`,
+    CREATE: '/api/admin/event',
+    UPDATE: (id: number) => `/api/admin/event/${id}`,
+    DELETE: (id: number) => `/api/admin/event/${id}`,
   },
   BOARD: {
     LIST: '/api/board',

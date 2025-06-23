@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { ReservationFormData } from '@/types/reservation';
 import { useReservation } from '@/hooks/domain/useReservation';
+import { useNavigate } from 'react-router-dom';
 import {
   SERVICE_DETAIL_TYPES,
   HOUSING_TYPES,
@@ -8,6 +9,7 @@ import {
   SERVICE_OPTIONS,
   PET_TYPES,
 } from '@/constants/service';
+import {ROUTES} from '@/constants'
 import ReservationHeader from './ReservationHeader';
 
 interface Props {
@@ -32,6 +34,7 @@ const getPetDisplay = (pet: string) => {
 const ReservationStep3: React.FC<Props> = ({ data, onBack, onSubmit }) => {
   const [expectedPrice, setExpectedPrice] = useState(0);
   const { createReservation } = useReservation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const calculatePrice = async () => {
@@ -86,6 +89,7 @@ const ReservationStep3: React.FC<Props> = ({ data, onBack, onSubmit }) => {
       if (result.success) {
         alert('예약이 완료되었습니다.');
         onSubmit();
+        navigate(ROUTES.HOME);
       } else {
         alert('예약 요청 실패: ' + (result.error || '오류'));
       }

@@ -138,6 +138,8 @@ const BoardList = () => {
             <TableRow>
               <TableCell>유형</TableCell>
               <TableCell>제목</TableCell>
+              <TableCell>작성자</TableCell>
+              <TableCell></TableCell>
               <TableCell>답변 상태</TableCell>
               <TableCell align="center">작업</TableCell>
             </TableRow>
@@ -145,7 +147,7 @@ const BoardList = () => {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={4} align="center">
+                <TableCell colSpan={6} align="center">
                   <CircularProgress />
                 </TableCell>
               </TableRow>
@@ -160,6 +162,15 @@ const BoardList = () => {
                     />
                   </TableCell>
                   <TableCell>{board.title}</TableCell>
+                  <TableCell>
+                    {currentTab === 'consultation' 
+                      ? (board.managerName || '익명')
+                      : (board.consumerName || '익명')
+                    }
+                  </TableCell>
+                  <TableCell>
+                    {board.createdAt.split('T')[0] + ' ' + board.createdAt.split('T')[1].split('.')[0]}
+                  </TableCell>
                   <TableCell>
                     <Chip
                       label={board.answered ? '답변 완료' : '답변 대기'}
@@ -180,7 +191,7 @@ const BoardList = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={4} align="center">
+                <TableCell colSpan={6} align="center">
                   게시글이 없습니다.
                 </TableCell>
               </TableRow>

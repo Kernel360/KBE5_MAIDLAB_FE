@@ -1,10 +1,12 @@
 import { Route } from 'react-router-dom';
 import { ROUTES } from '@/constants';
 import { ProtectedRoute } from '@/components/common';
-import BoardList from '@/pages/board/BoardList';
-import BoardCreate from '@/pages/board/BoardCreate';
-import BoardDetail from '@/pages/board/BoardDetail';
-import BoardEdit from '@/pages/board/BoardEdit';
+import {
+  BoardList,
+  BoardCreate,
+  BoardDetail,
+  BoardEdit
+} from '@/pages';
 
 export const BoardRoutes = () => (
   <>

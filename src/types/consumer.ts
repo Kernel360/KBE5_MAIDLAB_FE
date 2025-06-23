@@ -1,5 +1,5 @@
 import type { BaseUser } from './user';
-import type { Gender } from '@/constants/user';
+import type { Gender, PreferenceType} from '@/constants/user';
 
 /**
  * 소비자 프로필 생성 요청
@@ -158,4 +158,27 @@ export interface PointHistoryResponse {
   totalUsed: number;
   expiringPoints: number;
   history: PointHistory[];
+}
+
+
+/**
+ * 리뷰 등록 폼의 상태 타입
+ */
+export interface ReviewFormData {
+  rating: number;
+  comment: string;
+  preference: PreferenceType;
+}
+
+/**
+ * 소비자 프로필/프로필 수정 등에서 사용하는 사용자 정보 타입
+  */
+export interface ProfileData {
+  name: string;
+  phoneNumber: string;
+  birth: string;
+  gender: Gender;
+  address: string;
+  detailAddress: string;
+  profileImage: string | undefined;
 }

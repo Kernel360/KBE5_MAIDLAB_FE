@@ -179,6 +179,21 @@
   .responsive-grid {
     @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4;
   }
+
+  /* ManagerList custom styles */
+  .region-tag {
+    @apply px-2.5 py-1 bg-gray-50 text-slate-600 text-xs font-medium rounded-xl border border-slate-200 transition-colors duration-200;
+  }
+  .region-tag:hover {
+    @apply bg-slate-100 border-slate-300;
+  }
+  
+  .expand-btn {
+    @apply px-2.5 py-1 text-slate-500 text-xs font-medium bg-transparent border border-slate-200 rounded-xl transition-colors duration-200 inline-flex items-center gap-1;
+  }
+  .expand-btn:hover {
+    @apply bg-slate-50 border-slate-300 text-slate-700;
+  }
 }
 
 /* 유틸리티 및 애니메이션 */

@@ -5,6 +5,7 @@ import { useMatching } from '@/hooks/domain/useMatching';
 import { format, addDays } from 'date-fns';
 import { HOUSING_TYPES, SERVICE_OPTIONS, ROOM_SIZES } from '@/constants/service';
 import ReservationHeader from './ReservationHeader';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface Props {
   initialData: Partial<ReservationFormData>;
@@ -13,6 +14,8 @@ interface Props {
 }
 
 const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [form, setForm] = useState<ReservationFormData>({
     serviceType: initialData.serviceType || 'HOUSEKEEPING',
     serviceDetailType: initialData.serviceDetailType || '대청소',
@@ -37,6 +40,20 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
   const [basePrice] = useState(50000); // 기본 가격 5만원
   const [totalPrice, setTotalPrice] = useState(basePrice);
   const { fetchAvailableManagers } = useMatching();
+  const [mapLatLng, setMapLatLng] = useState<{ lat: number; lng: number } | null>(null);
+
+  // 구글맵에서 전달된 주소 자동 반영
+  useEffect(() => {
+    if (location.state && (location.state as any).address) {
+      const { address, lat, lng } = location.state as any;
+      setForm(prev => ({ ...prev, address }));
+      setMapLatLng(lat && lng ? { lat, lng } : null);
+      // history.replaceState로 state 초기화(뒤로가기 시 중복 방지)
+      if (window.history.replaceState) {
+        window.history.replaceState({}, document.title);
+      }
+    }
+  }, [location.state]);
 
   // 시작 시간이 변경되면 3시간 후로 종료 시간 자동 설정 (다음날로 넘어갈 수 있도록)
   useEffect(() => {
@@ -73,11 +90,6 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
     }
   };
 
-  const handleAddressSearch = () => {
-    // TODO: 주소 검색 API 연동
-    alert('주소 검색 기능은 추후 구현 예정입니다.');
-  };
-
   const handleManagerSelect = async () => {
     try {
       const startDateTime = `${form.reservationDate}T${form.startTime}`;
@@ -94,9 +106,6 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
       if (Array.isArray(result)) {
         setManagerList(result.map(manager => ({
           ...manager,
-          rating: (Math.random() * 1.5 + 3.5).toFixed(1), // 임시 평점 (3.5-5.0)
-          experience: Math.floor(Math.random() * 7) + 3, // 임시 경력 (3-10년)
-          tags: ['청소', '요리', '세심함'].sort(() => Math.random() - 0.5).slice(0, 2), // 임시 태그
         })));
         setShowManagerModal(true);
       } else {
@@ -278,11 +287,14 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
               onChange={(e) => setForm(prev => ({ ...prev, address: e.target.value }))}
               ref={addressRef}
             />
+          
             <button
-              onClick={handleAddressSearch}
-              className="p-3 bg-gray-100 rounded-lg"
+              // onClick={() => navigate('/google-map')}
+              onClick={() => alert("서비스 준비중입니다.")}
+              className="p-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+              type="button"
             >
-              🔍
+              현재 위치에서 찾기
             </button>
           </div>
           <input
@@ -461,51 +473,46 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
         {/* 매니저 선택 모달 */}
         {showManagerModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[80vh] overflow-y-auto">
-              <h3 className="text-lg font-semibold mb-4">매니저 선택</h3>
-              <div className="space-y-4">
+            <div className="relative bg-white rounded-2xl p-6 w-full max-w-md max-h-[80vh] overflow-y-auto shadow-2xl animate-fade-in">
+              {/* 닫기 버튼 */}
+              <button
+                onClick={() => setShowManagerModal(false)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold focus:outline-none"
+                aria-label="닫기"
+              >
+                ×
+              </button>
+              <h3 className="text-xl font-bold mb-6 text-center">매니저 선택</h3>
+              <div className="space-y-5">
                 {managerList.map((manager) => (
                   <div
                     key={manager.uuid}
-                    className={`p-4 border rounded-lg ${
-                      form.managerUuId === manager.uuid ? 'border-orange-500' : 'border-gray-200'
+                    className={`group p-4 border-2 rounded-xl transition-all duration-200 cursor-pointer flex items-center gap-4 shadow-sm hover:shadow-lg hover:border-orange-400 ${
+                      form.managerUuId === manager.uuid ? 'border-orange-500 bg-orange-50' : 'border-gray-200 bg-white'
                     }`}
+                    onClick={() => {
+                      setForm(prev => ({ ...prev, managerUuId: manager.uuid }));
+                      setShowManagerModal(false);
+                    }}
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-gray-200 rounded-full" />
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-medium">{manager.name}</h4>
-                          <span className="text-orange-500">★ {manager.rating}</span>
-                        </div>
-                        <p className="text-sm text-gray-600">가사 도우미 경력 {manager.experience}년</p>
-                        <div className="flex gap-1 mt-1">
-                          {manager.tags.map((tag: string) => (
-                            <span key={tag} className="text-xs px-2 py-1 bg-gray-100 rounded-full">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
+                    <img
+                      src={manager.profileImage || '/default-profile.png'}
+                      alt={manager.name}
+                      className="w-16 h-16 rounded-full object-cover border-2 border-gray-200 group-hover:border-orange-400"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-semibold text-lg truncate">{manager.name}</span>
+                        <span className="text-orange-500 font-bold text-sm">★ {manager.averageRate}</span>
                       </div>
+                      <div className="text-gray-600 text-sm truncate">{manager.introduceText}</div>
                     </div>
-                    <button
-                      onClick={() => {
-                        setForm(prev => ({ ...prev, managerUuId: manager.uuid }));
-                        setShowManagerModal(false);
-                      }}
-                      className="mt-2 w-full py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
-                    >
-                      선택하기
-                    </button>
+                    {form.managerUuId === manager.uuid && (
+                      <span className="ml-2 px-2 py-1 bg-orange-500 text-white text-xs rounded-full">선택됨</span>
+                    )}
                   </div>
                 ))}
               </div>
-              <button
-                onClick={() => setShowManagerModal(false)}
-                className="mt-4 w-full py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-              >
-                닫기
-              </button>
             </div>
           </div>
         )}
