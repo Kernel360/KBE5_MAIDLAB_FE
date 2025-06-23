@@ -9,7 +9,7 @@ import { useReservationStatus } from '@/hooks/useReservationStatus';
 import { SERVICE_TYPE_LABELS, SERVICE_TYPES } from '@/constants/service';
 import { RESERVATION_STATUS} from '@/constants/status';
 import { ManagerReservationCard } from '@/components/features/reservation/ManagerReservationCard';
-// import ReservationHeader from '@/components/features/consumer/ReservationHeader';
+import ReservationHeader from '@/components/features/consumer/ReservationHeader';
 import {ManagerFooter} from '@/components/layout/BottomNavigation/BottomNavigation';
 import { useToast } from '@/hooks/useToast';
 
@@ -254,13 +254,8 @@ const ManagerReservationsAndMatching: React.FC = () => {
   };
   
   const handleCancelReservation = async (reservationId: number) => {
-    const result = await cancelReservation(reservationId);
-    if (result.success) {
-      showToast('예약이 성공적으로 취소되었습니다.', 'success');
-      fetchReservations(true);
-    } else {
-      showToast('예약 취소에 실패했습니다.', 'error');
-    }
+    // TODO : 예약 취소 기능
+    showToast('서비스 준비중입니다. 예약 취소를 원하실 경우 관리자에게 직접 문의해 주세요.', 'info');
   };
 
   // 예약 일정 카드 UI (ManagerReservationCard 활용)
@@ -348,34 +343,16 @@ const ManagerReservationsAndMatching: React.FC = () => {
     </div>
   );
 
-  // 페이징 네비게이션
-  const pagination = (
-    <div className="flex justify-center items-center gap-2 mt-6">
-      <button
-        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-        disabled={currentPage === 1}
-        className="px-3 py-1 rounded bg-gray-100 text-gray-500 disabled:opacity-50"
-      >
-        이전
-      </button>
-      <span className="font-semibold text-gray-700">{currentPage} / {totalPages || 1}</span>
-      <button
-        onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-        disabled={currentPage === totalPages || totalPages === 0}
-        className="px-3 py-1 rounded bg-gray-100 text-gray-500 disabled:opacity-50"
-      >
-        다음
-      </button>
-    </div>
-  );
-
   // 모달 UI
   const now = new Date();
   return (
-    <div className="max-w-md mx-auto bg-[#F7F7F7] min-h-screen p-0 pb-20">
-      {/* <ReservationHeader title="예약 관리" onBack={() => navigate(-1)} /> */}
+    <div className="max-w-md mx-auto bg-[#F7F7F7] min-h-screen p-0 pb-20 relative">
+      {/* ReservationHeader를 absolute로 올리고, 탭 헤더에 pt-16 추가 */}
+      <div className="absolute top-0 left-0 w-full z-20">
+        <ReservationHeader title="예약 관리" onBack={() => navigate(-1)} />
+      </div>
       {/* 탭 헤더 */}
-      <div className="flex items-center justify-between border-b border-gray-200 bg-white px-6 pt-6 pb-2">
+      <div className="flex items-center justify-between border-b border-gray-200 bg-white px-6 pt-16 pb-2 sticky top-0 z-10">
         <div className="flex gap-8">
           <button
             className={`text-lg font-bold pb-2 border-b-2 ${tab === 'schedule' ? 'border-orange-500 text-orange-500' : 'border-transparent text-gray-400'}`}
@@ -402,7 +379,24 @@ const ManagerReservationsAndMatching: React.FC = () => {
           ) : (
             paginatedReservations.map(renderReservationCard)
           )}
-          {pagination}
+          {/* ConsumerReservations.tsx와 동일한 페이지네이션 UI */}
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-6 space-x-2">
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`px-3 py-1 rounded ${
+                    currentPage === i + 1
+                      ? 'bg-orange-500 text-white'
+                      : 'bg-white text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
       {/* 예약 요청 탭 */}
