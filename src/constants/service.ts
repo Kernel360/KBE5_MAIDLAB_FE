@@ -16,18 +16,20 @@ export interface MoneyAmount {
   formatted: string; // "150,000원" 형태
 }
 
-// ===== 서비스 타입 상수 =====
+// ===== 서비스 타입 상수 (이미지 표 기준) =====
 export const SERVICE_TYPES = {
-  HOUSEKEEPING: 'HOUSEKEEPING',
-  CARE: 'CARE',
+  GENERAL_CLEANING: 'GENERAL_CLEANING',
+  BABYSITTER: 'BABYSITTER',
+  PET_CARE: 'PET_CARE',
 } as const;
 
 export type ServiceType = (typeof SERVICE_TYPES)[keyof typeof SERVICE_TYPES];
 
-// ===== 서비스 타입 한글명 =====
+// ===== 서비스 타입 한글명 (이미지 표 기준) =====
 export const SERVICE_TYPE_LABELS: Record<ServiceType, string> = {
-  [SERVICE_TYPES.HOUSEKEEPING]: '가사도우미',
-  [SERVICE_TYPES.CARE]: '돌봄서비스',
+  [SERVICE_TYPES.GENERAL_CLEANING]: '일반청소',
+  [SERVICE_TYPES.BABYSITTER]: '베이비시터',
+  [SERVICE_TYPES.PET_CARE]: '반려동물 케어',
 } as const;
 
 // ===== 주거 타입 상수 =====
@@ -85,57 +87,92 @@ export const WEEKDAY_SHORT_LABELS: Record<Weekday, string> = {
   [WEEKDAYS.SUNDAY]: '일',
 } as const;
 
-// ===== 서비스 상세 타입 인터페이스 =====
+// ===== 서비스 상세 타입 인터페이스 (이미지 표 기준) =====
 export interface ServiceDetailType {
   id: number;
   name: string;
   type: ServiceType;
-  basePrice: number; // ✅ 단순한 숫자값으로 저장
+  basePrice?: number; // 금액이 없는 경우 undefined (추가 예정/산책 등)
   description?: string;
-  duration?: number; // 기본 소요 시간 (분)
+  options?: string[];
 }
 
-// ===== 서비스 상세 타입 정의 =====
+// ===== 서비스 상세 타입 정의 (이미지 표 기준) =====
 export const SERVICE_DETAIL_TYPES: Record<string, ServiceDetailType> = {
-  대청소: {
+  // 일반청소
+  생활청소: {
     id: 1,
-    name: '대청소',
-    type: SERVICE_TYPES.HOUSEKEEPING,
-    basePrice: 50000,
-    description: '집 전체를 깨끗하게 청소해드립니다',
-    duration: 240, // 4시간
+    name: '생활청소',
+    type: SERVICE_TYPES.GENERAL_CLEANING,
+    basePrice: 34800, // 2시간(변동요금)
+    description:
+      '생활공간 먼지 제거 및 바닥 청소, 물건 정리정돈, 주방/욕실/베란다/현관/분리수거 등',
+    options: [
+      '생활공간 먼지 제거 및 바닥 청소',
+      '물건 제자리 정리정돈',
+      '주방 청소 (설거지, 싱크대, 가스레인지 및 인덕션, 후드 청소)',
+      '욕실 청소 (욕조, 변기, 세면대, 거울, 바닥 청소)',
+      '베란다 청소 (물청소는 미포함)',
+      '현관 앞 신발 정리정돈',
+      '분류된 재활용품 및 일반 쓰레기, 음식물 쓰레기 배출',
+    ],
   },
   부분청소: {
     id: 2,
     name: '부분청소',
-    type: SERVICE_TYPES.HOUSEKEEPING,
-    basePrice: 30000,
-    description: '필요한 부분만 선택적으로 청소해드립니다',
-    duration: 120, // 2시간
+    type: SERVICE_TYPES.GENERAL_CLEANING,
+    description: '에어컨/세탁기/냉장고/욕실 등 부분 청소',
+    options: [
+      '에어컨 청소',
+      '세탁기 청소',
+      '냉장고 청소',
+      '욕실 청소 (욕조, 변기, 세면대, 거울, 바닥 청소)',
+    ],
   },
-  기타청소: {
+  // 베이비시터
+  영유아돌봄: {
     id: 3,
-    name: '기타청소',
-    type: SERVICE_TYPES.HOUSEKEEPING,
-    basePrice: 20000,
-    description: '특별한 청소 요청사항을 처리해드립니다',
-    duration: 90, // 1.5시간
+    name: '영유아 돌봄',
+    type: SERVICE_TYPES.BABYSITTER,
+    description: '수유, 이유식 먹이기, 기저귀 갈기, 재우기, 목욕시키기, 놀이 활동, 간단한 세탁 등',
+    options: [
+      '아이의 건강 관리, 위생 돌봄, 수면, 위생 관리 등',
+      '기저귀 및 이유식 챙기기, 간단한 식사 준비, 목욕 등',
+    ],
   },
-  아이돌봄: {
+  유아교육: {
     id: 4,
-    name: '아이돌봄',
-    type: SERVICE_TYPES.CARE,
-    basePrice: 50000,
-    description: '아이들을 안전하고 즐겁게 돌봐드립니다',
-    duration: 240, // 4시간
+    name: '유아 교육',
+    type: SERVICE_TYPES.BABYSITTER,
+    description: '학습 보조, 독서 지도, 놀이 활동 등',
+    options: [
+      '아이의 학업/공부 도와주기',
+      '놀이 활동, 독서 지도 등',
+    ],
   },
-  어르신돌봄: {
+  // 반려동물 케어
+  기본돌봄: {
     id: 5,
-    name: '어르신돌봄',
-    type: SERVICE_TYPES.CARE,
-    basePrice: 30000,
-    description: '어르신들을 정성스럽게 돌봐드립니다',
-    duration: 180, // 3시간
+    name: '기본 돌봄',
+    type: SERVICE_TYPES.PET_CARE,
+    description: '기본 돌봄(배식/산책/배변 정리/응급처치 등)',
+    options: [
+      '배식/급수',
+      '배변 정리',
+      '응급처치',
+      '운동/놀이',
+    ],
+  },
+  산책: {
+    id: 6,
+    name: '산책',
+    type: SERVICE_TYPES.PET_CARE,
+    description: '반려동물 산책 서비스',
+    options: [
+      '기본 산책',
+      '리드줄 착용',
+      '배변 정리',
+    ],
   },
 } as const;
 
@@ -186,6 +223,18 @@ export const ROOM_SIZES: RoomSizeOption[] = [
   { id: 40, label: '40평대', priceMultiplier: 1.6 },
   { id: 50, label: '50평 이상', priceMultiplier: 2.0 },
 ] as const;
+
+// ===== 생활청소 평수별 요금/시간 기준표 (이미지 표 기준) =====
+export const ROOM_SIZES_LIFE_CLEANING = [
+  { range: '8평 이하', baseTime: 3.5, unitPrice: 15000, estimatedPrice: 52500},
+  { range: '9~10평', baseTime: 3.5, unitPrice: 15600, estimatedPrice: 54600 },
+  { range: '11~15평', baseTime: 4, unitPrice: 15750, estimatedPrice: 63000 },
+  { range: '16~20평', baseTime: 4, unitPrice: 16000, estimatedPrice: 64000 },
+  { range: '21~25평', baseTime: 4.5, unitPrice: 16500, estimatedPrice: 74250 },
+  { range: '26~30평', baseTime: 4.5, unitPrice: 16800, estimatedPrice: 75600 },
+  { range: '31~34평', baseTime: 4.5, unitPrice: 17000, estimatedPrice: 76500 },
+  { range: '35평 이상', baseTime: 4.5, unitPrice: 17150, estimatedPrice: 78000 },
+];
 
 // ===== 수수료 관련 상수 =====
 export const FEE_CONFIG = {

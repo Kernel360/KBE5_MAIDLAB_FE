@@ -4,87 +4,82 @@ import ReservationHeader from './ReservationHeader';
 import { BottomNavigation } from '@/components/layout/BottomNavigation/BottomNavigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import { SERVICE_DETAIL_TYPES } from '@/constants/service';
+
 interface Props {
   onNext: (data: { serviceType: string; serviceDetailType: string }) => void;
+  onBack?: () => void;
 }
 
-const ReservationStep1: React.FC<Props> = ({ onNext }) => {
-  const [selected, setSelected] = useState<'대청소' | '부분청소' | '기타 청소'>('대청소');
+const TABS = [
+  { key: '생활청소', label: '생활 청소' },
+  { key: '부분청소', label: '부분 청소' },
+];
+
+const ReservationStep1: React.FC<Props> = ({ onNext, onBack }) => {
+  const [selectedTab, setSelectedTab] = useState<'생활청소' | '부분청소'>('생활청소');
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const handleSelect = (type: '대청소' | '부분청소' | '기타 청소') => {
-    if (type !== '대청소') {
-      alert('서비스 준비중입니다.');
-      return;
-    }
-    setSelected(type);
-  };
+
+  const detail = SERVICE_DETAIL_TYPES[selectedTab];
 
   const handleNext = () => {
-    onNext({ serviceType: 'HOUSEKEEPING', serviceDetailType: selected });
+    if (selectedTab === '부분청소') {
+      window.alert('서비스 준비중입니다.');
+      return;
+    }
+    onNext({ serviceType: 'GENERAL_CLEANING', serviceDetailType: selectedTab });
   };
 
   return (
-    <>
-      <ReservationHeader title="예약하기" onBack={() => window.history.back()} />
-      <div className="pt-16 p-4 space-y-6 text-gray-800">
-        <h2 className="text-lg font-bold border-b pb-2">가사 서비스를 선택하셨네요!</h2>
-        <p className="text-sm">하위 옵션을 선택해 주세요.</p>
-
-        <div className="flex space-x-2">
-          {['대청소', '부분청소', '기타 청소'].map((type) => (
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="absolute top-0 left-0 w-full z-20">
+        <ReservationHeader title="일반 청소를 선택하셨네요!" onBack={onBack || (() => window.history.back())} />
+      </div>
+      <div className="flex-1 flex flex-col items-center pt-20 px-4">
+        <h2 className="text-lg font-bold mb-2 mt-2">하위 옵션을 선택해 주세요.</h2>
+        <div className="w-full max-w-md flex gap-2 mt-4 mb-6">
+          {TABS.map((tab) => (
             <button
-              key={type}
-              onClick={() => handleSelect(type as any)}
-              className={`flex-1 border rounded px-4 py-2 font-medium text-center ${
-                selected === type
-                  ? 'border-orange-500 text-orange-500 bg-orange-50'
-                  : 'border-gray-300'
-              }`}
-              disabled={type !== '대청소'}
-              style={type !== '대청소' ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+              key={tab.key}
+              className={`flex-1 py-2 rounded-lg font-semibold border transition text-base ${selectedTab === tab.key ? 'bg-orange-50 border-orange-500 text-orange-500' : 'bg-white border-gray-200 text-gray-500'}`}
+              onClick={() => setSelectedTab(tab.key as '생활청소' | '부분청소')}
             >
-              {type}
+              {tab.label}
             </button>
           ))}
         </div>
-
-        <ul className="text-sm space-y-1 text-gray-600">
-          <li className="before:content-['\2713'] before:text-blue-500 before:mr-2">
-            소파 등 가구 먼지제거
-          </li>
-          <li className="before:content-['\2713'] before:text-blue-500 before:mr-2">
-            바닥청소(물걸레 포함)
-          </li>
-          <li className="before:content-['\2713'] before:text-blue-500 before:mr-2">
-            창문, 곰팡이 정리정돈
-          </li>
-          <li className="before:content-['\2713'] before:text-blue-500 before:mr-2">
-            설치지 및 주변정리
-          </li>
-          <li className="before:content-['\2713'] before:text-blue-500 before:mr-2">
-            일반/음식물/재활용 배출
-          </li>
-          <li className="before:content-['\2713'] before:text-blue-500 before:mr-2">
-            분류별 세탁물 세탁 (1회 한정 서비스)
-          </li>
-        </ul>
-
-        <div className="flex justify-end">
+        <div className="w-full max-w-md card mt-2 mb-6">
+          <ul className="text-sm space-y-2 text-gray-700">
+            {detail.options?.map((opt, idx) => (
+              <li key={idx} className="flex items-start gap-2">
+                <span className="text-blue-500 mt-0.5">✔</span>
+                <span>{opt}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="flex justify-between w-full max-w-md mt-4">
+          <button
+            onClick={onBack || (() => window.history.back())}
+            className="btn btn-secondary w-1/3"
+          >
+            이전
+          </button>
           <button
             onClick={handleNext}
-            className="bg-orange-500 text-white px-4 py-2 rounded"
+            className="btn btn-primary w-1/2"
           >
             다음
           </button>
         </div>
-        <BottomNavigation
+      </div>
+      <BottomNavigation
         activeTab="reservation"
         onTabClick={navigate}
         isAuthenticated={isAuthenticated}
       />
-      </div>
-    </>
+    </div>
   );
 };
 

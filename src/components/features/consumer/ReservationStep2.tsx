@@ -271,6 +271,7 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
 
   return (
     <>
+    
       <ReservationHeader title="예약 정보 입력" onBack={onBack} />
       <div className="pt-16 p-4 space-y-6">
 
