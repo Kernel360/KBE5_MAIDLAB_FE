@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { RESERVATION_STATUS } from '@/constants/status';
+import { RESERVATION_STATUS, RESERVATION_STATUS_COLORS } from '@/constants/status';
 import type { ReservationListResponse } from '@/types/reservation';
 
 export type ReservationTab = 'scheduled' | 'today' | 'completed';
 
 export const useReservationStatus = () => {
-  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<ReservationTab>('scheduled');
 
   const filterReservationsByTab = (
@@ -41,14 +40,20 @@ export const useReservationStatus = () => {
 
   const getStatusBadgeStyle = (status: string, reservationDate: string) => {
     const today = new Date().toISOString().split('T')[0];
-
     if (status === RESERVATION_STATUS.COMPLETED) {
-      return 'bg-gray-100 text-gray-600';
+      return 'bg-gray-200 text-gray-600 border border-gray-300';
     }
-    if (reservationDate === today) {
-      return 'bg-blue-100 text-blue-600';
+    if (status === RESERVATION_STATUS.WORKING) {
+      return 'bg-green-100 text-green-700 border border-green-300';
     }
-    return 'bg-orange-100 text-orange-600';
+    if (status === RESERVATION_STATUS.MATCHED) {
+      if (reservationDate === today) {
+        return 'bg-blue-100 text-blue-700 border border-blue-300';
+      }
+      return 'bg-orange-100 text-orange-700 border border-orange-300';
+    }
+    const color = RESERVATION_STATUS_COLORS[status as keyof typeof RESERVATION_STATUS_COLORS] || '#ccc';
+    return `bg-[${color}] text-white`;
   };
 
   const isCheckInAvailable = (reservation: ReservationListResponse) => {
@@ -64,8 +69,6 @@ export const useReservationStatus = () => {
   };
 
   return {
-    loading,
-    setLoading,
     activeTab,
     setActiveTab,
     filterReservationsByTab,

@@ -54,14 +54,14 @@ export const ManagerRoutes = () => (
         </ProtectedRoute>
       }
     />
-    <Route
+    {/* <Route
       path={ROUTES.MANAGER.MATCHING}
       element={
         <ProtectedRoute requiredUserType="MANAGER">
           <ManagerMatching />
         </ProtectedRoute>
       }
-    />
+    /> */}
     <Route
       path={ROUTES.MANAGER.SETTLEMENTS}
       element={
