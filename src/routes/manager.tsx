@@ -10,7 +10,9 @@ import {
   ManagerReviewRegister,
   ManagerMatching,
   ManagerSettlements,
+  ManagerProfile,
 } from '@/pages';
+import ManagerProfileEdit from '@/pages/manager/ManagerProfileEdit';
 
 export const ManagerRoutes = () => (
   <>
@@ -27,6 +29,22 @@ export const ManagerRoutes = () => (
       element={
         <ProtectedRoute requiredUserType="MANAGER">
           <ManagerMyPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path={ROUTES.MANAGER.PROFILE}
+      element={
+        <ProtectedRoute requiredUserType="MANAGER">
+          <ManagerProfile />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path={ROUTES.MANAGER.PROFILE_EDIT}
+      element={
+        <ProtectedRoute requiredUserType="MANAGER">
+          <ManagerProfileEdit />
         </ProtectedRoute>
       }
     />
