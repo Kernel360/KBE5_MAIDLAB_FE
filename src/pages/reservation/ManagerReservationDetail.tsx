@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useReservation } from '@/hooks/domain/useReservation';
-import { useReservationStatus } from '@/hooks/useReservationStatus';
+import { useReservationStatus } from '@/hooks/domain/useReservationStatus';
 import { formatDateTime, formatPrice } from '@/utils';
 import { RESERVATION_STATUS_LABELS } from '@/constants/status';
 import { SERVICE_TYPE_LABELS } from '@/constants/service';
 import type { ReservationDetailResponse } from '@/types/reservation';
 import ReservationHeader from '@/components/features/consumer/ReservationHeader';
-import {ManagerFooter} from '@/components/layout/BottomNavigation/BottomNavigation';
+import { ManagerFooter } from '@/components/layout/BottomNavigation/BottomNavigation';
 
 const ManagerReservationDetail: React.FC = () => {
   const navigate = useNavigate();

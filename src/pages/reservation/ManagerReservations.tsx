@@ -5,11 +5,13 @@ import { useReservation } from '@/hooks/domain/useReservation';
 import { useMatching } from '@/hooks/domain/useMatching';
 import { formatDateTime, formatPrice } from '@/utils';
 import { SUCCESS_MESSAGES } from '@/constants/message';
-import { useReservationStatus } from '@/hooks/useReservationStatus';
+import { useReservationStatus } from '@/hooks/domain/useReservationStatus';
 import { SERVICE_TYPE_LABELS, SERVICE_TYPES } from '@/constants/service';
 import { RESERVATION_STATUS} from '@/constants/status';
 import { ManagerReservationCard } from '@/components/features/reservation/ManagerReservationCard';
 import ReservationHeader from '@/components/features/consumer/ReservationHeader';
+
+const ITEMS_PER_PAGE = 10;
 import {ManagerFooter} from '@/components/layout/BottomNavigation/BottomNavigation';
 import { useToast } from '@/hooks/useToast';
 
@@ -65,7 +67,10 @@ const CheckInOutModal: React.FC<CheckInOutModalProps> = ({
             서비스를 {isCheckIn ? '시작' : '종료'}하시겠습니까?
           </h3>
           <div className="bg-gray-50 p-4 rounded-lg mb-4">
-            <p className="font-medium">{reservationInfo.serviceType} → {reservationInfo.detailServiceType}</p>
+            <p className="font-medium">
+              {reservationInfo.serviceType} →{' '}
+              {reservationInfo.detailServiceType}
+            </p>
             <p className="text-gray-600 text-sm mt-1">{reservationInfo.time}</p>
           </div>
           <div className="flex justify-center gap-3">
@@ -89,10 +94,10 @@ const CheckInOutModal: React.FC<CheckInOutModalProps> = ({
 };
 
 const ConfirmModal: React.FC<ConfirmModalProps> = ({
-                                                     isOpen,
-                                                     onClose,
-                                                     isCheckIn,
-                                                   }) => {
+  isOpen,
+  onClose,
+  isCheckIn,
+}) => {
   if (!isOpen) return null;
 
   return (
@@ -117,7 +122,9 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
             </div>
           </div>
           <h3 className="text-lg font-medium mb-4">
-            {isCheckIn ? SUCCESS_MESSAGES.CHECKIN_SUCCESS : SUCCESS_MESSAGES.CHECKOUT_SUCCESS}
+            {isCheckIn
+              ? SUCCESS_MESSAGES.CHECKIN_SUCCESS
+              : SUCCESS_MESSAGES.CHECKOUT_SUCCESS}
           </h3>
           <button
             onClick={onClose}

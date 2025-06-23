@@ -10,6 +10,7 @@ export { useForm } from './useForm';
 
 // 데이터 관리 훅
 export { useReservation } from './domain/useReservation';
+export { useReservationStatus } from './domain/useReservationStatus';
 export { useManager } from './domain/useManager';
 export { useMatching } from './domain/useMatching';
 export { useBoard } from './domain/useBoard';
