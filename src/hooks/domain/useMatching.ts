@@ -62,7 +62,6 @@ export const useMatching = () => {
       try {
         setLoading(true);
         const data = await matchingApi.getMatching(page, size);
-        console.log("--------------------------------------data:",data);
         setMatchings(data);
         return data;
       } catch (error: any) {

@@ -7,13 +7,11 @@ import { formatDateTime, formatPrice } from '@/utils';
 import { SUCCESS_MESSAGES } from '@/constants/message';
 import { useReservationStatus } from '@/hooks/useReservationStatus';
 import { SERVICE_TYPE_LABELS, SERVICE_TYPES } from '@/constants/service';
-import { RESERVATION_STATUS, RESERVATION_STATUS_LABELS } from '@/constants/status';
+import { RESERVATION_STATUS} from '@/constants/status';
 import { ManagerReservationCard } from '@/components/features/reservation/ManagerReservationCard';
-import ReservationHeader from '@/components/features/consumer/ReservationHeader';
+// import ReservationHeader from '@/components/features/consumer/ReservationHeader';
 import {ManagerFooter} from '@/components/layout/BottomNavigation/BottomNavigation';
 import { useToast } from '@/hooks/useToast';
-
-const ITEMS_PER_PAGE = 10;
 
 interface CheckInOutModalProps {
   isOpen: boolean;
@@ -136,6 +134,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 const FILTERS = [
   { label: '예정', value: 'MATCHED' },
   { label: '오늘', value: 'TODAY' },
+  { label: '진행중', value: 'WORKING' },
   { label: '완료', value: 'COMPLETED' },
 ];
 
@@ -144,14 +143,39 @@ const PAGE_SIZE = 10;
 const ManagerReservationsAndMatching: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const { fetchReservations, checkIn, checkOut, respondToReservation, reservations } = useReservation();
+  const {
+    fetchReservations,
+    checkIn,
+    checkOut,
+    respondToReservation,
+    cancelReservation,
+    reservations,
+  } = useReservation();
   const { fetchMatchings, matchings } = useMatching();
+  const {
+    getStatusBadgeStyle,
+  } = useReservationStatus();
   const [tab, setTab] = useState<'schedule' | 'request'>('schedule');
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('MATCHED');
+  const [filter, setFilter] = useState<'MATCHED' | 'TODAY' | 'WORKING' | 'COMPLETED'>('MATCHED');
   const [filterOpen, setFilterOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [modal, setModal] = useState<{ type: 'success' | 'fail' | null, info?: any }>({ type: null });
+  const [checkInOutModal, setCheckInOutModal] = useState<{
+    isOpen: boolean;
+    isCheckIn: boolean;
+    reservationId: number | null;
+    reservationInfo: { serviceType: string; detailServiceType: string; time: string };
+  }>({
+    isOpen: false,
+    isCheckIn: true,
+    reservationId: null,
+    reservationInfo: { serviceType: '', detailServiceType: '', time: '' },
+  });
+  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; isCheckIn: boolean }>({
+    isOpen: false,
+    isCheckIn: true,
+  });
 
   useEffect(() => {
     setLoading(true);
@@ -159,74 +183,98 @@ const ManagerReservationsAndMatching: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 예약 일정 필터링
+  // 날짜만 추출하는 함수 (T, 공백 등 모두 대응)
+  const getDateOnly = (dateStr: string) => {
+    if (!dateStr) return '';
+    return dateStr.split('T')[0].split(' ')[0];
+  };
+
+  // 예약 일정 필터링 (상수 및 훅 사용)
   const todayStr = new Date().toISOString().slice(0, 10);
-  const filteredReservations = reservations.filter((r) => {
-    if (filter === 'MATCHED') return r.status === 'MATCHED' && r.reservationDate !== todayStr;
-    if (filter === 'TODAY') return r.status === 'MATCHED' && r.reservationDate === todayStr;
-    if (filter === 'COMPLETED') return r.status === 'COMPLETED';
-    return true;
-  });
+  let filteredReservations: ReservationListResponse[] = [];
+  if (filter === 'MATCHED') {
+    filteredReservations = reservations.filter(r => {
+      const dateOnly = getDateOnly(r.reservationDate);
+      return (
+        (r.status === RESERVATION_STATUS.MATCHED && dateOnly > todayStr) ||
+        (dateOnly === todayStr && ([RESERVATION_STATUS.MATCHED] as string[]).includes(r.status))
+      );
+    });
+  } else if (filter === 'TODAY') {
+    filteredReservations = reservations
+      .filter(r =>
+        ([RESERVATION_STATUS.MATCHED, RESERVATION_STATUS.WORKING, RESERVATION_STATUS.COMPLETED] as string[]).includes(r.status) &&
+        (getDateOnly(r.reservationDate) === todayStr)
+      )
+      .sort((a, b) => {
+        // WORKING → MATCHED → COMPLETED 순서로 정렬
+        const order = {
+          [RESERVATION_STATUS.MATCHED]: 0,
+          [RESERVATION_STATUS.WORKING]: 1,
+          [RESERVATION_STATUS.COMPLETED]: 2,
+        };
+        return (order[a.status as keyof typeof order] ?? 99) - (order[b.status as keyof typeof order] ?? 99);
+      });
+  } else if (filter === 'WORKING') {
+    filteredReservations = reservations.filter(r => r.status === RESERVATION_STATUS.WORKING);
+  } else if (filter === 'COMPLETED') {
+    filteredReservations = reservations.filter(r => r.status === RESERVATION_STATUS.COMPLETED);
+  }
   const totalPages = Math.ceil(filteredReservations.length / PAGE_SIZE);
   const paginatedReservations = filteredReservations.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
-  // 예약 일정 카드 UI (이미지와 동일하게)
-  const renderReservationCard = (reservation: any) => {
-    const statusLabel =
-      reservation.status === 'MATCHED' && reservation.reservationDate === todayStr
-        ? '오늘'
-        : reservation.status === 'MATCHED'
-        ? '예정'
-        : '완료';
-    const statusColor =
-      statusLabel === '예정'
-        ? 'bg-green-500'
-        : statusLabel === '오늘'
-        ? 'bg-orange-500'
-        : statusLabel === '완료'
-        ? 'bg-gray-400'
-        : 'bg-gray-200';
-    return (
-      <div key={reservation.reservationId} className="rounded-2xl border border-gray-200 bg-white px-6 py-5 mb-5 shadow-sm">
-        <div className="flex justify-between items-start mb-2">
-          <div className="font-extrabold text-lg text-[#4B2E13]">
-            {SERVICE_TYPE_LABELS[reservation.serviceType as keyof typeof SERVICE_TYPES]} &gt; {reservation.detailServiceType}
-          </div>
-          <span className={`px-4 py-1 text-sm rounded-full text-white font-bold ${statusColor}`}>{statusLabel}</span>
-        </div>
-        <div className="grid grid-cols-3 gap-x-4 gap-y-1 mb-2">
-          <div className="text-sm text-gray-400 col-span-1">날짜</div>
-          <div className="text-sm text-gray-400 col-span-1">시간</div>
-          <div className="text-sm text-gray-400 col-span-1">금액</div>
-          <div className="text-base text-[#4B2E13] font-semibold col-span-1">{formatDateTime(reservation.reservationDate)}</div>
-          <div className="text-base text-[#4B2E13] font-semibold col-span-1">{reservation.startTime} ~ {reservation.endTime}</div>
-          <div className="text-base font-bold text-orange-500 col-span-1">{formatPrice(reservation.totalPrice)}원</div>
-        </div>
-        <div className="flex gap-2 mt-2">
-          <button
-            onClick={() => navigate(`/manager/reservations/${reservation.reservationId}`)}
-            className="flex-1 py-2 border-2 border-orange-400 text-orange-500 rounded-full font-bold hover:bg-orange-50 transition"
-          >
-            상세보기
-          </button>
-          {statusLabel === '예정' && (
-            <button
-              onClick={() => showToast('아직 가능한 기능이 아니고, 관리자와 상담요청을 통해 취소문의를 해주세요.', 'info')}
-              className="flex-1 py-2 border-2 border-red-400 text-red-500 rounded-full font-bold hover:bg-red-50 transition"
-            >
-              예약취소
-            </button>
-          )}
-          {statusLabel === '완료' && (
-            <button className="flex-1 py-2 border-2 border-green-400 text-green-600 rounded-full font-bold hover:bg-green-50 transition">서비스 완료</button>
-          )}
-          {statusLabel === '오늘' && (
-            <button className="flex-1 py-2 border-2 border-orange-400 text-orange-500 rounded-full font-bold hover:bg-orange-50 transition">체크인</button>
-          )}
-        </div>
-      </div>
-    );
+  const handleCheckInOutClick = (reservation: ReservationListResponse, isCheckIn: boolean) => {
+    setCheckInOutModal({
+      isOpen: true,
+      isCheckIn,
+      reservationId: reservation.reservationId,
+      reservationInfo: {
+        serviceType: SERVICE_TYPE_LABELS[reservation.serviceType as keyof typeof SERVICE_TYPES] ?? reservation.serviceType,
+        detailServiceType: reservation.detailServiceType,
+        time: `${formatDateTime(reservation.reservationDate)} ${reservation.startTime} ~ ${reservation.endTime}`,
+      },
+    });
   };
+
+  const handleModalConfirm = async () => {
+    if (!checkInOutModal.reservationId) return;
+    try {
+      const action = checkInOutModal.isCheckIn ? checkIn : checkOut;
+      await action(checkInOutModal.reservationId, { checkTime: new Date().toISOString() });
+      setCheckInOutModal({ ...checkInOutModal, isOpen: false });
+      setConfirmModal({ isOpen: true, isCheckIn: checkInOutModal.isCheckIn });
+      fetchReservations(true); // 데이터 새로고침
+    } catch (error) {
+      showToast('작업 처리 중 오류가 발생했습니다.', 'error');
+    }
+  };
+
+  const handleConfirmModalClose = () => {
+    setConfirmModal({ isOpen: false, isCheckIn: true });
+  };
+  
+  const handleCancelReservation = async (reservationId: number) => {
+    const result = await cancelReservation(reservationId);
+    if (result.success) {
+      showToast('예약이 성공적으로 취소되었습니다.', 'success');
+      fetchReservations(true);
+    } else {
+      showToast('예약 취소에 실패했습니다.', 'error');
+    }
+  };
+
+  // 예약 일정 카드 UI (ManagerReservationCard 활용)
+  const renderReservationCard = (reservation: any) => (
+    <ManagerReservationCard
+      key={reservation.reservationId}
+      reservation={reservation}
+      getStatusBadgeStyle={getStatusBadgeStyle}
+      onDetailClick={() => navigate(`/manager/reservations/${reservation.reservationId}`)}
+      onCheckIn={() => handleCheckInOutClick(reservation, true)}
+      onCheckOut={() => handleCheckInOutClick(reservation, false)}
+      onCancel={() => handleCancelReservation(reservation.reservationId)}
+    />
+  );
 
   // 예약 요청 카드 UI (이미지와 동일하게)
   const renderMatchingCard = (matching: any) => {
@@ -248,7 +296,7 @@ const ManagerReservationsAndMatching: React.FC = () => {
           <div className="text-sm text-gray-400">반려동물</div>
           <div className="text-base text-[#4B2E13] font-semibold">{matching.pet}</div>
           <div className="text-sm text-gray-400">금액</div>
-          <div className="text-base font-bold text-orange-500">{formatPrice(matching.totalPrice)}원</div>
+          <div className="text-base font-bold text-orange-500">{formatPrice(matching.totalPrice)}</div>
         </div>
         <div className="flex gap-2 mt-2">
           <button
@@ -289,7 +337,7 @@ const ManagerReservationsAndMatching: React.FC = () => {
           {FILTERS.map((f) => (
             <button
               key={f.value}
-              onClick={() => { setFilter(f.value); setFilterOpen(false); setCurrentPage(1); }}
+              onClick={() => { setFilter(f.value as 'MATCHED' | 'TODAY' | 'WORKING' | 'COMPLETED'); setFilterOpen(false); setCurrentPage(1); }}
               className={`block w-full px-4 py-2 text-left text-gray-700 hover:bg-orange-50 ${filter === f.value ? 'font-bold text-orange-500' : ''}`}
             >
               {f.label}
@@ -324,7 +372,8 @@ const ManagerReservationsAndMatching: React.FC = () => {
   // 모달 UI
   const now = new Date();
   return (
-    <div className="max-w-md mx-auto bg-[#F7F7F7] min-h-screen p-0">
+    <div className="max-w-md mx-auto bg-[#F7F7F7] min-h-screen p-0 pb-20">
+      {/* <ReservationHeader title="예약 관리" onBack={() => navigate(-1)} /> */}
       {/* 탭 헤더 */}
       <div className="flex items-center justify-between border-b border-gray-200 bg-white px-6 pt-6 pb-2">
         <div className="flex gap-8">
@@ -398,6 +447,19 @@ const ManagerReservationsAndMatching: React.FC = () => {
           </div>
         </div>
       )}
+      <CheckInOutModal
+        isOpen={checkInOutModal.isOpen}
+        onClose={() => setCheckInOutModal({ ...checkInOutModal, isOpen: false })}
+        onConfirm={handleModalConfirm}
+        isCheckIn={checkInOutModal.isCheckIn}
+        reservationInfo={checkInOutModal.reservationInfo}
+      />
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={handleConfirmModalClose}
+        isCheckIn={confirmModal.isCheckIn}
+      />
+      <ManagerFooter />
     </div>
   );
 };

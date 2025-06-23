@@ -42,7 +42,6 @@ export const useReservation = () => {
         setError(null);
 
         const data = await reservationApi.getAllReservations();
-        console.log("--------------------------------------data:",data);
         setReservations(data);
         lastUpdateRef.current = now;
         return data;
