@@ -45,4 +45,4 @@ export type {
   ValidatorKey,
   ValidatorFunction,
   ValidationRule,
-} from './useValidation';
+} from '@/types/hooks/validation';
