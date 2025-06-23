@@ -15,6 +15,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAdmin } from '@/hooks';
 import { ROUTES } from '@/constants';
+import { BOARD_TYPE_NAMES, BOARD_TYPE_COLORS } from '@/constants/admin';
 import type { BoardDetailResponse } from '@/types/board';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
@@ -29,25 +30,6 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
 const StyledDivider = styled(Divider)(({ theme }) => ({
   margin: theme.spacing(3, 0),
 }));
-
-// 게시판 타입별 한글 이름
-const BOARD_TYPE_NAMES: Record<string, string> = {
-  REFUND: '환불 문의',
-  MANAGER: '매니저 문의',
-  SERVICE: '서비스 문의',
-  ETC: '기타 문의',
-} as const;
-
-// 게시판 타입별 칩 색상
-const BOARD_TYPE_COLORS: Record<
-  string,
-  'error' | 'primary' | 'info' | 'default'
-> = {
-  REFUND: 'error',
-  MANAGER: 'primary',
-  SERVICE: 'info',
-  ETC: 'default',
-} as const;
 
 const BoardEdit = () => {
   const { id } = useParams<{ id: string }>();

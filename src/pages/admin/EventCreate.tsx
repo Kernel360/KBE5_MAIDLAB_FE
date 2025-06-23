@@ -13,18 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEvent } from '@/hooks';
 import { ROUTES } from '@/constants';
 import { useFileUpload } from '@/hooks';
-
-interface UploadResult {
-  originalName: string;
-  storedKey: string;
-  size: number;
-  type: string;
-}
-
-interface PresignedUrlResponse {
-  url: string;
-  key: string;
-}
+import type { UploadResult, PresignedUrlResponse  } from '@/types/admin' 
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),

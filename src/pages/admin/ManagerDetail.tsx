@@ -13,20 +13,8 @@ import {
   Divider,
 } from '@mui/material';
 import { adminApi } from '../../apis/admin';
-import type { Gender } from '@/constants';
-
-// API 응답 타입 확장
-interface ExtendedManagerResponseDto {
-  uuid: string;
-  phoneNumber: string;
-  name: string;
-  birth: string;
-  gender: Gender;
-  averageRate: number;
-  region: string[];
-  isVerified: 'PENDING' | 'APPROVED' | 'REJECTED';
-  isDeleted: boolean;
-}
+import type { ManagerDetail } from '@/types';
+import type { AdminManagerDetail } from '@/types/admin'
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
@@ -49,14 +37,14 @@ const ManagerDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [managerData, setManagerData] =
-    useState<ExtendedManagerResponseDto | null>(null);
+    useState<AdminManagerDetail | null>(null);
 
   useEffect(() => {
     const fetchManagerData = async () => {
       try {
         if (!id) return;
         const response = await adminApi.getManager(parseInt(id));
-        setManagerData(response as unknown as ExtendedManagerResponseDto);
+        setManagerData(response as unknown as AdminManagerDetail);
       } catch (err) {
         setError(
           err instanceof Error
@@ -77,7 +65,7 @@ const ManagerDetail = () => {
       await adminApi.approveManager(parseInt(id));
       // 데이터 새로고침
       const response = await adminApi.getManager(parseInt(id));
-      setManagerData(response as unknown as ExtendedManagerResponseDto);
+      setManagerData(response as unknown as AdminManagerDetail);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : '승인 처리에 실패했습니다.',
@@ -91,7 +79,7 @@ const ManagerDetail = () => {
       await adminApi.rejectManager(parseInt(id));
       // 데이터 새로고침
       const response = await adminApi.getManager(parseInt(id));
-      setManagerData(response as unknown as ExtendedManagerResponseDto);
+      setManagerData(response as unknown as AdminManagerDetail);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : '거절 처리에 실패했습니다.',
