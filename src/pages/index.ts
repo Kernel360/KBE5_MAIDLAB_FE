@@ -57,7 +57,10 @@ export { default as ManagerProfileSetup } from './manager/ManagerProfileSetup';
 export { default as ManagerMyPage } from './manager/ManagerMyPage';
 
 // 매니저 프로필 조회 페이지
-// export { default as ManagerProfile } from './manager/ManagerProfile';
+export { default as ManagerProfile } from './manager/ManagerProfile';
+
+// 매니저 프로필 수정 페이지
+export { default as ManagerProfileDdit } from './manager/ManagerProfile';
 
 // 매니저 리뷰 등록 페이지
 export { default as ManagerReviewRegister } from './manager/ManagerReviewRegister';
@@ -89,7 +92,6 @@ export { default as ManagerReservations } from './reservation/ManagerReservation
 
 // 예약 매칭 페이지
 export { default as ManagerMatching } from './matching/ManagerMatching';
-
 
 /**
  * board
