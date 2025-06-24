@@ -48,7 +48,7 @@ const EventCreate = () => {
 
   // S3 presigned URL 요청 함수
   const getPresignedUrls = async (filenames: string[]): Promise<PresignedUrlResponse[]> => {
-    const response = await fetch('http://localhost:8080/api/files/presigned-urls', {
+    const response = await fetch('https://api-maidlab.duckdns.org/api/files/presigned-urls', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -369,7 +369,85 @@ export const useAdmin = () => {
       },
       [showToast],
     ),
+
+
+    
+
+
+
+
   };
+
+//대시보드용 조회 함수들
+  const dashboard = {
+
+    getManagerCount: useCallback(
+      async () => {
+        try {
+          const result = await adminApi.getManagerCount();
+          return { success: true, data: result };
+        } catch (error: any) {
+          return { success: false, error: error.message };
+        }
+      },
+      [],
+    ),
+    getNewManagerCount: useCallback(
+      async () => {
+        try {
+          const result = await adminApi.getNewManagerCount();
+          return { success: true, data: result };
+        } catch (error: any) {
+          return { success: false, error: error.message };
+        }
+      },
+      [],
+    ),
+    getConsumerCount: useCallback(
+      async () => {
+        try {
+          const result = await adminApi.getConsumerCount();
+          return { success: true, data: result };
+        } catch (error: any) {
+          return { success: false, error: error.message };
+        }
+      },
+      [],
+    ),
+    getTodayReservationCount: useCallback(
+      async () => {
+        try {
+          const result = await adminApi.getTodayReservationCount();
+          return { success: true, data: result };
+        } catch (error: any) {
+          return { success: false, error: error.message };
+        }
+      },
+      [],
+    ),
+    getEventCount: useCallback(
+      async () => {
+        try {
+          const result = await adminApi.getEventCount();
+          return { success: true, data: result };
+        } catch (error: any) {
+          return { success: false, error: error.message };
+        }
+      },
+      [],
+    ),
+    getBoardWithoutAnswerCount: useCallback(
+      async () => {
+        try {
+          const result = await adminApi.getBoardWithoutAnswerCount();
+          return { success: true, data: result };
+        } catch (error: any) {
+          return { success: false, error: error.message };
+        }
+      },
+      [],
+    )
+  }
 
   return {
     loading,
@@ -378,5 +456,6 @@ export const useAdmin = () => {
     reservationManagement,
     matchingManagement,
     boardManagement,
+    dashboard,
   };
 };

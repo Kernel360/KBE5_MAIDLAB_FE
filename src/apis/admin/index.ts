@@ -335,4 +335,45 @@ export const adminApi = {
       API_ENDPOINTS.ADMIN.RESERVATION.SETTLEMENT_REJECT(settlementId),
     );
   },
+  //대시보드용 조회 api들
+  getManagerCount: async (): Promise<string> => {
+    return apiCall<string>(
+      'get',
+      `${API_ENDPOINTS.ADMIN.MANAGER.GETCOUNT}`,
+    )
+  },
+  getNewManagerCount: async (): Promise<string> => {
+    return apiCall<string>(
+      'get',
+      `${API_ENDPOINTS.ADMIN.MANAGER.NEWMANAGERCOUNT}`,
+    )
+  },
+  
+  getConsumerCount: async (): Promise<string> => {
+    return apiCall<string>(
+      'get',
+      `${API_ENDPOINTS.ADMIN.CONSUMER.GETCOUNT}`,
+    )
+  },  
+  getTodayReservationCount: async (): Promise<string> => {
+    return apiCall<string>(
+      'get',
+      `${API_ENDPOINTS.ADMIN.RESERVATION.GETTODAYCOUNT}`,
+    )
+  },
+  getEventCount: async (): Promise<string> => {
+    return apiCall<string>(
+      'get',
+      `${API_ENDPOINTS.EVENT.GETCOUNT}`,
+    )
+  },
+  getBoardWithoutAnswerCount: async (): Promise<string> => {
+    return apiCall<string>(
+      'get',
+      `${API_ENDPOINTS.ADMIN.BOARD.GETWITHOUTANSWERCOUNT}`,
+    )
+  }
+
+
+
 };

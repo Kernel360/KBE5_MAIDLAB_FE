@@ -10,8 +10,9 @@ import {
   CircularProgress,
   Divider,
 } from '@mui/material';
-import { reservationApi } from '../../apis/reservation';
+import { adminApi } from '@/apis'; 
 import type { ReservationDetailResponse } from '@/types/reservation';
+import { formatDateTime } from '@/utils'
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
@@ -74,9 +75,7 @@ const ReservationDetail = () => {
     const fetchReservationDetail = async () => {
       try {
         if (!id) return;
-        console.log('예약 상세 조회 시작:', id);
-        const data = await reservationApi.getReservationDetail(parseInt(id));
-        console.log('예약 상세 응답:', data);
+        const data = await adminApi.getReservation(parseInt(id));
         if (!data) {
           throw new Error('데이터가 없습니다.');
         }
@@ -177,9 +176,9 @@ const ReservationDetail = () => {
                 label="상세 서비스"
                 value={reservation.serviceDetailType}
               />
-              <InfoItem label="예약 날짜" value={reservation.reservationDate} />
-              <InfoItem label="시작 시간" value={reservation.startTime} />
-              <InfoItem label="종료 시간" value={reservation.endTime} />
+              <InfoItem label="예약 날짜" value={formatDateTime(reservation.reservationDate)} />
+              <InfoItem label="시작 시간" value={formatDateTime(reservation.startTime)} />
+              <InfoItem label="종료 시간" value={formatDateTime(reservation.endTime)} />
               <InfoItem
                 label="금액"
                 value={formatPrice(reservation.totalPrice)}
