@@ -125,4 +125,5 @@ export const reservationApi = {
       `${API_ENDPOINTS.RESERVATION.SETTLEMENTS}${queryString}`,
     );
   },
+
 };
