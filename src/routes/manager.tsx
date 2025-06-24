@@ -4,12 +4,14 @@ import { ProtectedRoute } from '@/components/common';
 
 import {
   ManagerProfileSetup,
+  ManagerProfileEdit,
   ManagerMyPage,
+  ManagerReviews,
   ManagerReservations,
   ManagerReservationDetail,
   ManagerReviewRegister,
-  ManagerMatching,
   ManagerSettlements,
+  ManagerProfile,
 } from '@/pages';
 
 export const ManagerRoutes = () => (
@@ -27,6 +29,30 @@ export const ManagerRoutes = () => (
       element={
         <ProtectedRoute requiredUserType="MANAGER">
           <ManagerMyPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path={ROUTES.MANAGER.PROFILE}
+      element={
+        <ProtectedRoute requiredUserType="MANAGER">
+          <ManagerProfile />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path={ROUTES.MANAGER.PROFILE_EDIT}
+      element={
+        <ProtectedRoute requiredUserType="MANAGER">
+          <ManagerProfileEdit />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path={ROUTES.MANAGER.REVIEWS}
+      element={
+        <ProtectedRoute requiredUserType="MANAGER">
+          <ManagerReviews />
         </ProtectedRoute>
       }
     />
@@ -54,14 +80,6 @@ export const ManagerRoutes = () => (
         </ProtectedRoute>
       }
     />
-    {/* <Route
-      path={ROUTES.MANAGER.MATCHING}
-      element={
-        <ProtectedRoute requiredUserType="MANAGER">
-          <ManagerMatching />
-        </ProtectedRoute>
-      }
-    /> */}
     <Route
       path={ROUTES.MANAGER.SETTLEMENTS}
       element={

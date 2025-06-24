@@ -7,7 +7,15 @@ import React, {
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authApi } from '@/apis/auth';
-import { tokenStorage, userStorage } from '@/utils/storage';
+import {
+  isAuthenticated as checkAuth,
+  getUserType as getStoredUserType,
+  isConsumer,
+  isManager,
+  canAccessPage,
+  login as authLogin,
+  logout as authLogout,
+} from '@/utils/auth';
 import { ROUTES, SUCCESS_MESSAGES, ERROR_MESSAGES } from '@/constants';
 import { useToast } from './useToast';
 import type {
@@ -98,10 +106,54 @@ interface AuthContextType extends AuthState {
     password: string,
   ) => Promise<{ success: boolean; error?: string }>;
   withdraw: () => Promise<{ success: boolean; error?: string }>;
+  canAccessPage: (requiredUserType?: string) => boolean;
+  isConsumer: () => boolean;
+  isManager: () => boolean;
 }
 
 // 컨텍스트 생성
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// 🔧 소셜 로그인 로직 분리
+const useSocialLogin = (showToast: (message: string, type: string) => void) => {
+  const handleNewUser = useCallback((response: any, userType: UserType) => {
+    // 임시 토큰 저장 (소셜 회원가입용)
+    localStorage.setItem('tempSocialToken', response.accessToken);
+    localStorage.setItem('tempUserType', userType);
+
+    return {
+      success: true,
+      newUser: true,
+      profileCompleted: response.profileCompleted,
+      accessToken: response.accessToken,
+    };
+  }, []);
+
+  const handleExistingUser = useCallback(
+    (response: any, userType: UserType) => {
+      // 🔧 utils/auth.ts의 login 함수 활용
+      authLogin(response.accessToken, userType);
+      showToast(SUCCESS_MESSAGES.LOGIN, 'success');
+
+      // 프로필 완성도에 따른 추가 안내
+      if (!response.profileCompleted) {
+        setTimeout(() => {
+          showToast('프로필을 완성해주세요.', 'info');
+        }, 1000);
+      }
+
+      return {
+        success: true,
+        newUser: false,
+        profileCompleted: response.profileCompleted,
+        accessToken: response.accessToken,
+      };
+    },
+    [showToast],
+  );
+
+  return { handleNewUser, handleExistingUser };
+};
 
 // Provider 컴포넌트
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -110,22 +162,44 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [state, dispatch] = useReducer(authReducer, initialState);
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const showToastForSocialLogin = (message: string, type: string) => {
+    showToast(message, type as any);
+  };
+  const { handleNewUser, handleExistingUser } = useSocialLogin(
+    showToastForSocialLogin,
+  );
 
-  // 초기 인증 상태 확인
+  // 🔧 초기 인증 상태 확인 - utils/auth.ts 활용
   useEffect(() => {
-    const token = tokenStorage.getAccessToken();
-    const userType = userStorage.getUserType() as UserType;
-    const userInfo = userStorage.getUserInfo();
+    const isAuth = checkAuth();
+    const userType = getStoredUserType() as UserType;
 
-    if (token && userType) {
+    if (isAuth && userType) {
       dispatch({
         type: 'AUTH_SUCCESS',
-        payload: { userType, userInfo },
+        payload: { userType },
       });
     } else {
       dispatch({ type: 'AUTH_LOGOUT' });
     }
   }, []);
+
+  // 프로필 설정 페이지 이동 로직
+  const navigateToProfileSetup = useCallback(
+    (userType: UserType, profileCompleted: boolean) => {
+      if (!profileCompleted) {
+        showToast('프로필을 설정해주세요.', 'info');
+        const profileRoute =
+          userType === 'MANAGER'
+            ? '/manager/profile/setup'
+            : '/consumer/profile/setup';
+        navigate(profileRoute);
+      } else {
+        navigate(ROUTES.HOME);
+      }
+    },
+    [navigate, showToast],
+  );
 
   // 로그인 함수
   const login = useCallback(
@@ -135,8 +209,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         const response = await authApi.login(data);
 
-        tokenStorage.setAccessToken(response.accessToken);
-        userStorage.setUserType(data.userType);
+        authLogin(response.accessToken, data.userType);
 
         dispatch({
           type: 'AUTH_SUCCESS',
@@ -144,20 +217,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         });
 
         showToast(SUCCESS_MESSAGES.LOGIN, 'success');
-
-        // 🔧 프로필 완성 여부에 따라 페이지 이동 결정
-        if (!response.profileCompleted) {
-          // 프로필이 없는 경우 프로필 설정 페이지로
-          showToast('프로필을 설정해주세요.', 'info');
-          const profileRoute =
-            data.userType === 'MANAGER'
-              ? '/manager/profile/setup' // 🔧 실제 라우트 경로 사용
-              : '/consumer/profile/setup'; // 🔧 소비자도 실제 경로로 수정
-          navigate(profileRoute);
-        } else {
-          // 프로필이 있는 경우 홈으로
-          navigate(ROUTES.HOME);
-        }
+        navigateToProfileSetup(
+          data.userType as UserType,
+          response.profileCompleted || false,
+        );
 
         return { success: true };
       } catch (error: any) {
@@ -168,7 +231,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         return { success: false, error: errorMessage };
       }
     },
-    [showToast, navigate],
+    [showToast, navigateToProfileSetup],
   );
 
   // 소셜 로그인 함수
@@ -176,64 +239,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     async (data: SocialLoginRequest) => {
       try {
         dispatch({ type: 'AUTH_START' });
-        console.log('🔄 useAuth socialLogin 시작:', data);
-
         const response = await authApi.socialLogin(data);
 
-        console.log('📨 socialLogin API 응답:', response);
-        console.log('🔍 응답 분석:', {
-          newUser: response.newUser,
-          accessToken: response.accessToken ? 'Present' : 'Missing',
-          expirationTime: response.expirationTime,
-        });
-
         if (response.newUser) {
-          localStorage.setItem('tempSocialToken', response.accessToken);
-          localStorage.setItem('tempUserType', data.userType);
-
           dispatch({ type: 'AUTH_LOGOUT' });
-
-          return {
-            success: true,
-            newUser: true,
-            profileCompleted: response.profileCompleted,
-            accessToken: response.accessToken,
-          };
-        }
-
-        // 🔧 기존 사용자는 프로필 완성 여부와 관계없이 정식 로그인 처리
-        if (!response.newUser) {
-          console.log('🔑 기존 사용자 정식 로그인 처리:', {
-            profileCompleted: response.profileCompleted,
-          });
-
-          // 정식 토큰으로 로그인 처리
-          tokenStorage.setAccessToken(response.accessToken);
-          userStorage.setUserType(data.userType);
-
+          return handleNewUser(response, data.userType as UserType);
+        } else {
           dispatch({
             type: 'AUTH_SUCCESS',
             payload: { userType: data.userType as UserType },
           });
-
-          showToast(SUCCESS_MESSAGES.LOGIN, 'success');
-
-          // 🔧 프로필 완성 여부에 따라 추가 안내만 제공
-          if (!response.profileCompleted) {
-            setTimeout(() => {
-              showToast('프로필을 완성해주세요.', 'info');
-            }, 1000);
-          }
+          return handleExistingUser(response, data.userType as UserType);
         }
-
-        return {
-          success: true,
-          newUser: response.newUser,
-          profileCompleted: response.profileCompleted,
-          accessToken: response.accessToken,
-        };
       } catch (error: any) {
-        console.error('❌ useAuth socialLogin 에러:', error);
         const errorMessage =
           error.message || ERROR_MESSAGES.INVALID_CREDENTIALS;
         dispatch({ type: 'AUTH_FAILURE', payload: errorMessage });
@@ -241,7 +259,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         return { success: false, error: errorMessage };
       }
     },
-    [showToast],
+    [handleNewUser, handleExistingUser, showToast],
   );
 
   // 회원가입 함수
@@ -250,20 +268,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         dispatch({ type: 'AUTH_START' });
 
-        // 회원가입
         await authApi.signUp(data);
 
         // 자동 로그인
-        const loginData = {
+        const loginResponse = await authApi.login({
           userType: data.userType,
           phoneNumber: data.phoneNumber,
           password: data.password,
-        };
-        const loginResponse = await authApi.login(loginData);
+        });
 
-        // 로그인 상태로 변경
-        tokenStorage.setAccessToken(loginResponse.accessToken);
-        userStorage.setUserType(data.userType);
+        authLogin(loginResponse.accessToken, data.userType);
 
         dispatch({
           type: 'AUTH_SUCCESS',
@@ -271,7 +285,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         });
 
         showToast(SUCCESS_MESSAGES.SIGNUP, 'success');
-
         return { success: true };
       } catch (error: any) {
         const errorMessage = error.message || ERROR_MESSAGES.UNKNOWN;
@@ -289,46 +302,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         dispatch({ type: 'AUTH_START' });
 
-        // 임시 토큰을 localStorage에서 가져오기
         const tempToken = localStorage.getItem('tempSocialToken');
-
         if (!tempToken) {
           throw new Error('인증 정보가 없습니다.');
         }
 
         await authApi.socialSignUp(data, tempToken);
-
-        // 🔧 회원가입 성공 후 로그아웃 상태로 유지
-        // SocialSignUp 페이지에서 토큰 정리와 홈 이동 처리
         dispatch({ type: 'AUTH_LOGOUT' });
-
         showToast(SUCCESS_MESSAGES.SIGNUP, 'success');
 
         return { success: true };
       } catch (error: any) {
-        console.error('❌ socialSignUp 에러:', {
-          message: error.message,
-          response: error.response,
-        });
-
         const errorMessage = error.message || ERROR_MESSAGES.UNKNOWN;
         dispatch({ type: 'AUTH_FAILURE', payload: errorMessage });
         showToast(errorMessage, 'error');
         return { success: false, error: errorMessage };
       }
     },
-    [showToast, navigate],
+    [showToast],
   );
 
   // 로그아웃 함수
   const logout = useCallback(async () => {
     try {
       await authApi.logout();
-      tokenStorage.clearTokens();
-      userStorage.clearUserData();
+      authLogout();
       dispatch({ type: 'AUTH_LOGOUT' });
       showToast(SUCCESS_MESSAGES.LOGOUT, 'success');
-      navigate(ROUTES.LOGIN);
+      navigate(ROUTES.HOME);
     } catch (error: any) {
       const errorMessage = error?.message || '로그아웃 중 오류가 발생했습니다.';
       showToast(errorMessage, 'error');
@@ -355,14 +356,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const withdraw = useCallback(async () => {
     try {
       await authApi.withdraw();
-
-      tokenStorage.clearTokens();
-      userStorage.clearUserData();
-
+      authLogout();
       dispatch({ type: 'AUTH_LOGOUT' });
       showToast(SUCCESS_MESSAGES.ACCOUNT_DELETED, 'success');
       navigate(ROUTES.LOGIN);
-
       return { success: true };
     } catch (error: any) {
       const errorMessage = error.message || ERROR_MESSAGES.UNKNOWN;
@@ -386,6 +383,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     resetError,
     changePassword,
     withdraw,
+    canAccessPage,
+    isConsumer,
+    isManager,
   };
 
   return React.createElement(AuthContext.Provider, { value }, children);

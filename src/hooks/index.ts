@@ -1,4 +1,3 @@
-// 인증 관련 훅
 export { useAuth, AuthProvider } from './useAuth';
 export { useAdminAuth } from './useAdminAuth';
 
@@ -7,6 +6,10 @@ export { useTheme, ThemeProvider } from './useTheme';
 
 // 폼 관련 훅
 export { useForm } from './useForm';
+
+// 🔧 새로 추가된 공통 훅들
+export { useApiCall } from './useApiCall';
+export { useReservationCache } from './useReservationCache';
 
 // 데이터 관리 훅
 export { useReservation } from './domain/useReservation';
@@ -34,9 +37,12 @@ export { useGeolocation } from './useGeolocation';
 export { useFileUpload } from './useFileUpload';
 export { useValidation } from './useValidation';
 
-// 타입 정의 (useValidation에서 export된 타입들만)
+// 🔧 중복 파일 정리 - domain 폴더의 useReservationStatus만 사용
+export { useReservationStatus } from './domain/useReservationStatus';
+
+// 타입 정의
 export type {
   ValidatorKey,
   ValidatorFunction,
   ValidationRule,
-} from './useValidation';
+} from '@/types/hooks/validation';

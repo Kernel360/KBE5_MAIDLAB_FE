@@ -36,7 +36,7 @@ export const ServiceGrid: React.FC<ServiceGridProps> = ({ onServiceClick }) => {
 
   return (
     <section className="mb-8">
-      <h2 className="text-lg font-bold text-gray-900 mb-4">서비스</h2>
+      <h2 className="text-lg font-bold text-gray-900 mb-4 pl-">서비스</h2>
       <div className="grid grid-cols-4 gap-4">
         {services.map(({ id, icon: Icon, label, color }) => (
           <button

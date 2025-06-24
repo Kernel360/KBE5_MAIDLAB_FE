@@ -89,11 +89,11 @@ const ManagerMyPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
+      <div className="flex items-center justify-between p-4 border-b bg-white">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate(ROUTES.HOME)}
           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
         >
           <ArrowLeft className="w-6 h-6" />
@@ -104,82 +104,84 @@ const ManagerMyPage: React.FC = () => {
 
       {/* Content */}
       <div className="px-4 py-6">
-        <div className="max-w-md mx-auto space-y-6">
-          {/* Profile Section */}
-          <div className="text-center mb-8">
-            <div className="relative inline-block mb-4">
-              <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden mx-auto">
-                {profileData?.profileImage ? (
-                  <img
-                    src={profileData.profileImage}
-                    alt="프로필"
-                    className="w-full h-full object-cover"
-                  />
+        <div className="max-w-md mx-auto">
+          <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+            {/* Profile Section */}
+            <div className="text-center mb-8">
+              <div className="relative inline-block mb-4">
+                <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden mx-auto">
+                  {profileData?.profileImage ? (
+                    <img
+                      src={profileData.profileImage}
+                      alt="프로필"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-12 h-12 text-gray-400" />
+                  )}
+                </div>
+              </div>
+
+              <h2 className="text-xl font-bold text-gray-900 mb-2">
+                {profileData?.name || '김 매니저'}
+              </h2>
+
+              <div className="flex items-center justify-center gap-2 mb-6">
+                <span className="text-gray-600">매니저</span>
+                {profileData?.isVerified ? (
+                  <span className="px-2 py-1 bg-green-100 text-green-600 text-xs rounded-full">
+                    승인완료
+                  </span>
                 ) : (
-                  <User className="w-12 h-12 text-gray-400" />
+                  <span className="px-2 py-1 bg-orange-100 text-orange-600 text-xs rounded-full">
+                    승인대기
+                  </span>
                 )}
               </div>
+
+              <button
+                onClick={handleProfile}
+                className="w-full py-3 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors"
+              >
+                프로필 보기
+              </button>
             </div>
 
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
-              {profileData?.name || '김 매니저'}
-            </h2>
-
-            <div className="flex items-center justify-center gap-2 mb-6">
-              <span className="text-gray-600">매니저</span>
-              {profileData?.isVerified ? (
-                <span className="px-2 py-1 bg-green-100 text-green-600 text-xs rounded-full">
-                  승인완료
-                </span>
-              ) : (
-                <span className="px-2 py-1 bg-orange-100 text-orange-600 text-xs rounded-full">
-                  승인대기
-                </span>
-              )}
-            </div>
-
-            <button
-              onClick={handleProfile}
-              className="w-full py-3 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors"
-            >
-              프로필 보기
-            </button>
-          </div>
-
-          {/* Menu Items */}
-          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-            <MenuItem
-              icon={<FileText className="w-5 h-5" />}
-              title="정산계좌 관리"
-              onClick={handlePaymentAccount}
-            />
-            <div className="border-t border-gray-200">
+            {/* Menu Items */}
+            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
               <MenuItem
                 icon={<FileText className="w-5 h-5" />}
-                title="정산 내역"
-                onClick={handleSettlementHistory}
+                title="정산계좌 관리"
+                onClick={handlePaymentAccount}
               />
-            </div>
-            <div className="border-t border-gray-200">
-              <MenuItem
-                icon={<MessageCircle className="w-5 h-5" />}
-                title="리뷰 확인하기"
-                onClick={handleReviews}
-              />
-            </div>
-            <div className="border-t border-gray-200">
-              <MenuItem
-                icon={<Share2 className="w-5 h-5" />}
-                title="진구 조대하기"
-                onClick={handleInviteFriend}
-              />
-            </div>
-            <div className="border-t border-gray-200">
-              <MenuItem
-                icon={<Settings className="w-5 h-5" />}
-                title="설정"
-                onClick={handleSettings}
-              />
+              <div className="border-t border-gray-200">
+                <MenuItem
+                  icon={<FileText className="w-5 h-5" />}
+                  title="정산 내역"
+                  onClick={handleSettlementHistory}
+                />
+              </div>
+              <div className="border-t border-gray-200">
+                <MenuItem
+                  icon={<MessageCircle className="w-5 h-5" />}
+                  title="리뷰 확인하기"
+                  onClick={handleReviews}
+                />
+              </div>
+              <div className="border-t border-gray-200">
+                <MenuItem
+                  icon={<Share2 className="w-5 h-5" />}
+                  title="친구 조대하기"
+                  onClick={handleInviteFriend}
+                />
+              </div>
+              <div className="border-t border-gray-200">
+                <MenuItem
+                  icon={<Settings className="w-5 h-5" />}
+                  title="설정"
+                  onClick={handleSettings}
+                />
+              </div>
             </div>
           </div>
         </div>

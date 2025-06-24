@@ -104,3 +104,7 @@ export interface BoardStats {
   unansweredBoards: number;
   boardsByType: Record<BoardType, number>;
 }
+
+export interface BoardWithId extends BoardResponse {
+  boardId: number;
+}

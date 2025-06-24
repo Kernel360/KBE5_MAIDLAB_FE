@@ -9,7 +9,7 @@ export default function BoardTypeSelector({ selectedType, onTypeChange }: BoardT
   return (
     <div className="mb-6">
       <label className="block text-sm font-medium text-gray-700 mb-2">문의 유형</label>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         {Object.entries(BOARD_TYPE_LABELS).map(([type, label]) => (
           <button
             key={type}

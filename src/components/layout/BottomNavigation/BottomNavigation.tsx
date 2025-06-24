@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Home,
-  FileText,
-  MessageSquare,
-  User,
-  Calendar,
-  AlertTriangle,
-} from 'lucide-react';
+import { Home, FileText, MessageSquare, User, Calendar } from 'lucide-react';
 import { ROUTES } from '@/constants';
 import { useNavigate } from 'react-router-dom';
 
@@ -91,12 +84,6 @@ export const ManagerFooter: React.FC = () => {
       label: '일정',
       path: '/manager/reservations',
     }, // 매니저 일정
-    {
-      id: 'request',
-      icon: AlertTriangle,
-      label: '요청',
-      path: '/manager/matching',
-    }, // 매니저 예약요청
     { id: 'consultation', icon: MessageSquare, label: '상담', path: '/board' }, // 매니저 상담(공통 게시판)
     { id: 'profile', icon: User, label: '프로필', path: '/manager/mypage' }, // 매니저 마이페이지
   ];

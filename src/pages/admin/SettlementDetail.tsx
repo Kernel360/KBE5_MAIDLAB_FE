@@ -3,15 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAdmin } from '@/hooks/domain/useAdmin';
 import { Button, Card, Skeleton, Typography } from '@mui/material';
 import { formatNumber } from '@/utils';
-
-interface SettlementDetail {
-  settlementId: number;
-  serviceType: 'HOUSEKEEPING';
-  serviceDetailType: string;
-  status: 'PENDING' | 'APPROVED' | 'REJECTED';
-  platformFee: number;
-  amount: number;
-}
+import type { SettlementDetail } from '@/types/admin';
 
 const SettlementDetail = () => {
   const { settlementId } = useParams<{ settlementId: string }>();
@@ -24,7 +16,7 @@ const SettlementDetail = () => {
       if (!settlementId) return;
       const data = await reservationManagement.fetchSettlementDetail(Number(settlementId));
       if (data) {
-        setSettlement(data);
+        setSettlement(data.data);
       }
     };
 

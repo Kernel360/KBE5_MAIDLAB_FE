@@ -23,16 +23,12 @@ import { type ReservationListResponse } from '@/types/reservation';
 import { type MatchingResponse } from '@/types/matching';
 import { adminApi } from '../../apis/admin';
 import MatchingChangeDialog from '../../components/features/admin/MatchingChangeDialog';
+import type { TabPanelProps } from '@/types/userList';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
 }));
 
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
 
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
@@ -296,6 +292,7 @@ const ReservationList = () => {
                       <Button
                         variant="outlined"
                         size="small"
+                        disabled={matching.matchingStatus.toLowerCase() === 'pending'}
                         onClick={() => handleOpenDialog(matching)}
                       >
                         매니저 변경

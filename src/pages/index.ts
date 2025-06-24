@@ -57,13 +57,18 @@ export { default as ManagerProfileSetup } from './manager/ManagerProfileSetup';
 export { default as ManagerMyPage } from './manager/ManagerMyPage';
 
 // 매니저 프로필 조회 페이지
-// export { default as ManagerProfile } from './manager/ManagerProfile';
+export { default as ManagerProfile } from './manager/ManagerProfile';
+
+// 매니저 프로필 수정 페이지
+export { default as ManagerProfileEdit } from './manager/ManagerProfileEdit';
 
 // 매니저 리뷰 등록 페이지
 export { default as ManagerReviewRegister } from './manager/ManagerReviewRegister';
 
 // export { default as ManagerReservations } from './manager/Reservations';
-// export { default as ManagerReviews } from './manager/Reviews';
+
+// 매니저 리뷰 조회 페이지
+export { default as ManagerReviews } from './manager/ManagerReviews';
 
 // 매니저 정산 페이지
 export { default as ManagerSettlements } from './manager/ManagerSettlements';
@@ -90,7 +95,6 @@ export { default as ManagerReservations } from './reservation/ManagerReservation
 // 예약 매칭 페이지
 export { default as ManagerMatching } from './matching/ManagerMatching';
 
-
 /**
  * board
  */
@@ -106,7 +110,6 @@ export { default as BoardDetail } from './board/BoardDetail';
 
 // 게시글 수정
 export { default as BoardEdit } from './board/BoardEdit';
-
 
 // 어드민용 게시판 상세
 /**

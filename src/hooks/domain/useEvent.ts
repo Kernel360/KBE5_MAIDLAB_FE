@@ -10,15 +10,20 @@ import type {
 export const useEvent = () => {
   const [events, setEvents] = useState<EventListItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [hasNetworkError, setHasNetworkError] = useState(false);
   const { showToast } = useToast();
 
   // 이벤트 목록 조회
   const fetchEvents = useCallback(async () => {
+    if (hasNetworkError) return;
+
     try {
       setLoading(true);
       const data = await eventApi.getAllEvents();
       setEvents(data.eventList || []);
+      setHasNetworkError(false);
     } catch (error: any) {
+      setHasNetworkError(true);
       showToast(
         error.message || '이벤트 목록을 불러오는데 실패했습니다.',
         'error',
