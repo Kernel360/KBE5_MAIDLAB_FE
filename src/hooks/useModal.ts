@@ -1,4 +1,3 @@
-// useModal.ts - 수정버전 (usePagination 코드 제거)
 import { useState, useCallback } from 'react';
 
 interface ModalState {

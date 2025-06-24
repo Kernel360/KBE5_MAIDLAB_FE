@@ -171,7 +171,7 @@ const ManagerMyPage: React.FC = () => {
               <div className="border-t border-gray-200">
                 <MenuItem
                   icon={<Share2 className="w-5 h-5" />}
-                  title="진구 조대하기"
+                  title="친구 조대하기"
                   onClick={handleInviteFriend}
                 />
               </div>
