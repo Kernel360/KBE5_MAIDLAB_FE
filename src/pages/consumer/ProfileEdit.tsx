@@ -99,11 +99,14 @@ const ProfileEdit: React.FC = () => {
     return !errors.address && !errors.detailAddress && formData.address.trim() !== '' && formData.detailAddress.trim() !== '';
   };
 
-
-  
-
-  
-  
+  // 생년월일 자동 하이픈 처리
+  const handleBirthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/[^0-9]/g, '');
+    if (value.length > 8) value = value.slice(0, 8);
+    if (value.length > 4) value = value.slice(0, 4) + '-' + value.slice(4);
+    if (value.length > 7) value = value.slice(0, 7) + '-' + value.slice(7);
+    setFormData((prev) => ({ ...prev, birth: value }));
+  };
 
   // 3. In handleSubmit, upload the image to S3 if a new file is selected, then send the API request
   const handleSubmit = async (e: React.FormEvent) => {
@@ -296,9 +299,9 @@ const ProfileEdit: React.FC = () => {
                 <input
                   type="text"
                   value={formData.birth}
-                  onChange={e => handleInputChange('birth', e.target.value)}
+                  onChange={handleBirthChange}
                   placeholder="YYYY-MM-DD"
-                  className="w-full p-3 border rounded-lg text-gray-900 border-gray-300"
+                  className="w-full p-3 border rounded-lg text-center text-gray-900 border-gray-300"
                   maxLength={10}
                   inputMode="numeric"
                   autoComplete="bday"
