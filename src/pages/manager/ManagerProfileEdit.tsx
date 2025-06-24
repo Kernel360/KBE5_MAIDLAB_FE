@@ -116,13 +116,9 @@ const ManagerProfileEdit: React.FC = () => {
 
   useEffect(() => {
     setIsValid(validate());
-    // eslint-disable-next-line
   }, [profile?.name, profile?.gender, profile?.birth]);
 
   const handleSubmit = async () => {
-    console.log('저장 버튼 클릭!');
-    console.log('저장 직전 profile:', profile);
-    console.log('저장 직전 profileImage:', profile?.profileImage);
     if (!profile) return;
 
     console.log(profile.profileImage);
@@ -274,7 +270,7 @@ const ManagerProfileEdit: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b bg-white">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate(ROUTES.MANAGER.PROFILE)}
           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
         >
           <ArrowLeft className="w-6 h-6" />
