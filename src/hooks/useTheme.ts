@@ -1,75 +1,154 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { setLocalStorage } from '@/utils/storage';
+import { setLocalStorage, getLocalStorage } from '@/utils/storage';
+import { STORAGE_KEYS } from '@/constants/storage';
+import { DEFAULT_THEME, SUPPORTED_THEMES } from '@/constants/theme';
+import {
+  resolveTheme,
+  createSystemThemeListener,
+  sanitizeTheme,
+} from '@/utils/theme';
+import type { ThemeContextType, ThemeProviderProps } from '@/types/hooks/theme';
 
-// 테마 타입 (라이트모드만)
-export type Theme = 'light';
-
-// 테마 컨텍스트 타입
-interface ThemeContextType {
-  theme: Theme;
-  actualTheme: 'light';
-  setTheme: (theme: Theme) => void;
-  toggleTheme: () => void; // 기존 호환성을 위해 유지하지만 동작하지 않음
-}
-
-// 컨텍스트 생성
+// ===== 테마 컨텍스트 생성 =====
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-// Provider 컴포넌트
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
+// ===== DOM에 테마 적용 =====
+const applyThemeToDOM = (): void => {
+  const root = document.documentElement;
+
+  // 현재는 라이트모드만 지원하므로 고정값
+  root.className = 'light';
+  root.setAttribute('data-theme', 'light');
+
+  // 메타 태그 업데이트 (PWA 지원)
+  const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+  if (metaThemeColor) {
+    metaThemeColor.setAttribute('content', '#ffffff');
+  }
+};
+
+// ===== 테마 프로바이더 =====
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   children,
+  defaultTheme = DEFAULT_THEME,
+  storageKey = STORAGE_KEYS.THEME || 'theme',
 }) => {
-  // 항상 라이트 테마로 고정
-  const [theme] = useState<Theme>('light');
-  const [actualTheme] = useState<'light'>('light');
+  // 초기 테마 설정
+  const [theme, setThemeState] = useState(() => {
+    if (typeof window === 'undefined') return defaultTheme;
 
-  // 테마 설정 함수 (라이트모드로 고정)
-  const setTheme = (newTheme: Theme) => {
-    // 라이트 테마만 허용
-    if (newTheme === 'light') {
-      setLocalStorage('theme', 'light');
+    const savedTheme = getLocalStorage<string>(storageKey);
+    return sanitizeTheme(savedTheme) || defaultTheme;
+  });
+
+  const resolvedTheme = resolveTheme(theme); // 현재는 항상 'light'
+
+  // 테마 설정 함수
+  const setTheme = (newTheme: typeof theme) => {
+    // 지원되는 테마인지 확인
+    if (!SUPPORTED_THEMES.includes(newTheme)) {
+      console.warn(`지원되지 않는 테마입니다: ${newTheme}`);
+      return;
     }
+
+    setThemeState(newTheme);
+    setLocalStorage(storageKey, newTheme);
   };
 
-  // 테마 토글 함수 (동작하지 않음 - 기존 호환성을 위해 유지)
-  const toggleTheme = () => {
-    // 라이트모드 고정이므로 아무것도 하지 않음
-    console.log('테마는 라이트모드로 고정되어 있습니다.');
-  };
-
-  // DOM에 라이트 테마 클래스 적용
+  // 시스템 테마 변경 감지 (system 모드일 때만)
   useEffect(() => {
-    const root = document.documentElement;
+    if (theme !== 'system') return;
 
-    // 다크모드 클래스 제거 및 라이트모드 클래스 적용
-    root.classList.remove('dark');
-    root.classList.add('light');
+    const unsubscribe = createSystemThemeListener(() => {
+      // 시스템 테마가 변경되어도 현재는 라이트모드 유지
+      // 향후 다크모드 지원시 여기서 실제 테마 변경 처리
+    });
 
-    // data-theme 속성 설정
-    root.setAttribute('data-theme', 'light');
+    return unsubscribe;
+  }, [theme]);
 
-    // 메타 태그 업데이트 (라이트모드 색상)
-    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (metaThemeColor) {
-      metaThemeColor.setAttribute('content', '#ffffff');
-    }
-  }, []);
+  // DOM에 테마 적용
+  useEffect(() => {
+    applyThemeToDOM();
+  }, [resolvedTheme]);
 
+  // localStorage 변경 감지 (다른 탭에서 테마 변경시 동기화)
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === storageKey && e.newValue) {
+        try {
+          // localStorage에서 저장된 형태에 따라 파싱
+          const parsedValue = JSON.parse(e.newValue);
+          const newTheme = sanitizeTheme(parsedValue.value || parsedValue);
+
+          if (newTheme !== theme) {
+            setThemeState(newTheme);
+          }
+        } catch (error) {
+          // JSON 파싱 실패시 무시
+          console.warn('테마 값 파싱에 실패했습니다:', e.newValue);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [theme, storageKey]);
+
+  const toggleTheme = () => {
+    setTheme(theme === 'light' ? 'system' : 'light');
+  };
+
+  const resetTheme = () => {
+    setTheme(defaultTheme);
+  };
+
+  // 컨텍스트 값
   const value: ThemeContextType = {
     theme,
-    actualTheme,
+    resolvedTheme,
     setTheme,
+    isSystemMode: theme === 'system',
     toggleTheme,
+    resetTheme,
+    isSupported: true,
   };
 
   return React.createElement(ThemeContext.Provider, { value }, children);
 };
 
-// 훅 함수
+// ===== 테마 훅 =====
 export const useTheme = (): ThemeContextType => {
   const context = useContext(ThemeContext);
+
   if (context === undefined) {
     throw new Error('useTheme must be used within a ThemeProvider');
   }
+
   return context;
+};
+
+// ===== 편의 훅들 =====
+export const useIsSystemMode = (): boolean => {
+  const { isSystemMode } = useTheme();
+  return isSystemMode;
+};
+
+export const useThemeSetter = () => {
+  const { setTheme } = useTheme();
+  return setTheme;
+};
+
+// ===== 테마 토글 훅 =====
+export const useThemeToggle = () => {
+  const { theme, setTheme } = useTheme();
+
+  const toggleTheme = () => {
+    // 현재 라이트모드만 지원: light ↔ system 토글
+    setTheme(theme === 'light' ? 'system' : 'light');
+  };
+
+  return toggleTheme;
 };
