@@ -36,7 +36,7 @@ const ManagerProfile: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b bg-white">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate(ROUTES.MANAGER.MYPAGE)}
           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
         >
           <ArrowLeft className="w-6 h-6" />
@@ -74,7 +74,7 @@ const ManagerProfile: React.FC = () => {
                 type="text"
                 value={profile.name}
                 disabled
-                className="w-full p-3 border text-center border-gray-300 rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50"
+                className="w-full p-3 text-center rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50"
               />
             </div>
 
@@ -87,10 +87,10 @@ const ManagerProfile: React.FC = () => {
                 <button
                   type="button"
                   disabled
-                  className={`flex-1 py-2 rounded-lg border text-center font-medium transition-all ${
+                  className={`flex-1 py-2 rounded-lg text-center font-medium transition-all ${
                     profile.gender === GENDER.MALE
-                      ? 'border-orange-500 bg-orange-50 text-orange-600'
-                      : 'border-gray-200 text-gray-400'
+                      ? 'bg-orange-50 text-orange-600'
+                      : 'text-gray-400'
                   }`}
                 >
                   {GENDER_LABELS[GENDER.MALE]}
@@ -98,10 +98,10 @@ const ManagerProfile: React.FC = () => {
                 <button
                   type="button"
                   disabled
-                  className={`flex-1 py-2 rounded-lg border text-center font-medium transition-all ${
+                  className={`flex-1 py-2 rounded-lg text-center font-medium transition-all ${
                     profile.gender === GENDER.FEMALE
-                      ? 'border-orange-500 bg-orange-50 text-orange-600'
-                      : 'border-gray-200 text-gray-400'
+                      ? 'bg-orange-50 text-orange-600'
+                      : 'text-gray-400'
                   }`}
                 >
                   {GENDER_LABELS[GENDER.FEMALE]}
@@ -118,7 +118,7 @@ const ManagerProfile: React.FC = () => {
                 type="text"
                 value={profile.birth}
                 disabled
-                className="w-full p-3 border text-center border-gray-300 rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50"
+                className="w-full p-3 text-center rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50"
               />
             </div>
 
@@ -133,10 +133,10 @@ const ManagerProfile: React.FC = () => {
                     key={service}
                     type="button"
                     disabled
-                    className={`w-full h-12 flex items-center justify-center rounded-lg border font-medium text-sm transition-all ${
+                    className={`w-full h-12 flex items-center justify-center rounded-lg  font-medium text-sm transition-all ${
                       profile.services.includes(service)
-                        ? 'border-orange-500 bg-orange-50 text-orange-600'
-                        : 'border-gray-200 text-gray-400'
+                        ? 'bg-orange-50 text-orange-600'
+                        : 'text-gray-400'
                     }`}
                   >
                     {SERVICE_TYPE_LABELS[service as ServiceType]}
@@ -156,7 +156,7 @@ const ManagerProfile: React.FC = () => {
                     key={region.region}
                     type="button"
                     disabled
-                    className="px-4 py-2 rounded-lg border border-orange-500 bg-orange-50 text-orange-600 font-medium text-sm"
+                    className="px-4 py-2 rounded-lg bg-orange-50 text-orange-600 font-medium text-sm"
                   >
                     {SEOUL_DISTRICT_LABELS[region.region as SeoulDistrict] ||
                       region.region}
@@ -176,7 +176,7 @@ const ManagerProfile: React.FC = () => {
                     <select
                       value={slot.day}
                       disabled
-                      className="w-28 p-2 border text-center border-gray-300 rounded text-gray-900 bg-gray-50 disabled:bg-gray-50 appearance-none"
+                      className="w-28 p-2  text-center rounded text-gray-900 bg-gray-50 disabled:bg-gray-50 appearance-none"
                     >
                       {Object.entries(WEEKDAY_LABELS).map(([key, label]) => (
                         <option key={key} value={key}>
@@ -188,14 +188,14 @@ const ManagerProfile: React.FC = () => {
                       type="text"
                       value={slot.startTime}
                       disabled
-                      className="w-24 p-2 border text-center border-gray-300 rounded text-gray-900 bg-gray-50 disabled:bg-gray-50"
+                      className="w-24 p-2  text-center rounded text-gray-900 bg-gray-50 disabled:bg-gray-50"
                     />
                     <span className="mx-1">~</span>
                     <input
                       type="text"
                       value={slot.endTime}
                       disabled
-                      className="w-24 p-2 border text-center border-gray-300 rounded text-gray-900 bg-gray-50 disabled:bg-gray-50"
+                      className="w-24 p-2  text-center rounded text-gray-900 bg-gray-50 disabled:bg-gray-50"
                     />
                   </div>
                 ))}
@@ -210,7 +210,7 @@ const ManagerProfile: React.FC = () => {
               <textarea
                 value={profile.introduceText || ''}
                 disabled
-                className="w-full p-3 border text-center border-gray-300 rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50 resize-none min-h-[48px]"
+                className="w-full p-3  text-center rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50 resize-none min-h-[48px]"
                 rows={3}
               />
             </div>
