@@ -15,6 +15,9 @@ export interface ConsumerProfileCreateRequest {
  */
 export interface ConsumerProfileUpdateRequest {
   profileImage?: string;
+  name?: string;
+  gender?: Gender
+  birth?: string
   address?: string;
   detailAddress?: string;
 }
@@ -24,7 +27,6 @@ export interface ConsumerProfileUpdateRequest {
  */
 export interface ConsumerProfileResponse {
   profileImage?: string;
-  phoneNumber: string;
   name: string;
   birth: string;
   gender: Gender;
@@ -175,7 +177,6 @@ export interface ReviewFormData {
   */
 export interface ProfileData {
   name: string;
-  phoneNumber: string;
   birth: string;
   gender: Gender;
   address: string;

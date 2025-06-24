@@ -4,7 +4,6 @@ import {
   Header,
   BottomNavigation,
   ServiceGrid,
-  PromotionBanner,
   HeroSection,
 } from '@/components';
 import { ROUTES } from '@/constants';
@@ -122,13 +121,6 @@ const ConsumerMain: React.FC = () => {
             loading={eventsLoading}
           />
           <ServiceGrid onServiceClick={handleServiceClick} />
-
-          <PromotionBanner
-            title="회원가입 혜택"
-            subtitle="지금 가입하고 포인트 받기"
-            discount="1000P"
-            onClick={() => navigate(ROUTES.SIGNUP)}
-          />
 
           <div className="recent-reservation-card">
             <div className="flex justify-between items-start mb-2">

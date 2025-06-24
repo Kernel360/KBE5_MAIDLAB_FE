@@ -6,6 +6,7 @@ import type {
   ConsumerProfileResponse,
   LikedManagerResponse,
   BlackListedManagerResponse,
+  ConsumerProfileCreateRequest,
 } from '@/types/consumer';
 
 export const useConsumer = () => {
@@ -48,6 +49,25 @@ export const useConsumer = () => {
         return { success: true };
       } catch (error: any) {
         showToast(error.message || '프로필 수정에 실패했습니다.', 'error');
+        return { success: false, error: error.message };
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchProfile, showToast],
+  );
+
+  // 프로필 생성
+  const createProfile = useCallback(
+    async (data: ConsumerProfileCreateRequest) => {
+      try {
+        setLoading(true);
+        await consumerApi.createProfile(data);
+        await fetchProfile();
+        showToast('프로필이 등록되었습니다.', 'success');
+        return { success: true };
+      } catch (error: any) {
+        showToast(error.message || '프로필 등록에 실패했습니다.', 'error');
         return { success: false, error: error.message };
       } finally {
         setLoading(false);
@@ -143,7 +163,7 @@ export const useConsumer = () => {
   const removeLikedManager = useCallback(
     async (managerUuid: string) => {
       try {
-        await consumerApi.removeLikedManager(managerUuid);
+        await consumerApi.removePreferenceManager(managerUuid);
 
         // 로컬 상태에서 제거
         setLikedManagers((prev) =>
@@ -194,6 +214,7 @@ export const useConsumer = () => {
     loading,
     fetchProfile,
     updateProfile,
+    createProfile,
     fetchMypage,
     fetchLikedManagers,
     fetchBlacklistedManagers,

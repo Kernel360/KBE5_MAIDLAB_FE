@@ -11,7 +11,6 @@ const Profile: React.FC = () => {
   const { profile, fetchProfile, loading } = useConsumer();
   const [formData, setFormData] = useState<ProfileData>({
     name: '',
-    phoneNumber: '',
     birth: '',
     gender: 'MALE',
     address: '',
@@ -31,7 +30,6 @@ const Profile: React.FC = () => {
     if (profile) {
       setFormData({
         name: profile.name || '',
-        phoneNumber: profile.phoneNumber || '',
         birth: profile.birth || '',
         gender: profile.gender || 'MALE',
         address: profile.address || '',
@@ -58,14 +56,14 @@ const Profile: React.FC = () => {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
-      </div>
+          </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
+      <div className="flex items-center justify-between p-4 border-b bg-white">
         <button
           onClick={() => navigate(ROUTES.CONSUMER.MYPAGE)}
           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -77,117 +75,110 @@ const Profile: React.FC = () => {
       </div>
 
       <div className="px-4 py-6">
-        <div className="max-w-md mx-auto space-y-6">
-          {/* 프로필 이미지 */}
-          <div className="text-center">
-            <div className="relative inline-block">
-              <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
-                {formData.profileImage ? (
-                  <img
-                    src={imageError ? DEFAULT_PROFILE_IMAGE : formData.profileImage}
-                    alt="프로필"
-                    className="w-full h-full object-cover"
-                    onError={handleImageError}
-                  />
-                ) : (
-                  <User className="w-16 h-16 text-gray-400" />
-                )}
+        <div className="max-w-md mx-auto">
+          <div className="bg-white rounded-xl shadow-sm p-6 space-y-8">
+            {/* 프로필 이미지 */}
+            <div className="flex flex-col items-center mb-4">
+              <div className="relative mb-2">
+                <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+                  {formData.profileImage ? (
+                    <img
+                      src={imageError ? DEFAULT_PROFILE_IMAGE : formData.profileImage}
+                      alt="프로필"
+                      className="w-full h-full object-cover"
+                      onError={handleImageError}
+                    />
+                  ) : (
+                    <User className="w-12 h-12 text-gray-400" />
+                  )}
+                </div>
               </div>
             </div>
-            <p className="text-sm text-gray-500 mt-3">
-              프로필 사진
-            </p>
-          </div>
 
-          {/* 프로필 정보 */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-bold text-gray-900 text-center">
-              프로필 정보
-            </h3>
+            {/* 이름 */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">
+                이름
+              </label>
+              <input
+                type="text"
+                value={formData.name}
+                disabled
+                className="w-full p-3 text-center rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50"
+              />
+            </div>
 
-            <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  휴대폰 번호
-                </label>
-                <input
-                  type="tel"
-                  value={formData.phoneNumber}
+            {/* 성별 */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">
+                성별
+              </label>
+              <div className="flex gap-2">
+                <button
+                  type="button"
                   disabled
-                  className="w-full p-3 bg-white border border-gray-300 rounded-lg text-gray-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  이름
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
+                  className={`flex-1 py-2 rounded-lg text-center font-medium transition-all ${formData.gender === 'MALE' ? 'bg-orange-50 text-orange-600' : 'text-gray-400'}`}
+                >
+                  남성
+                </button>
+                <button
+                  type="button"
                   disabled
-                  className="w-full p-3 bg-white border border-gray-300 rounded-lg text-gray-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  성별
-                </label>
-                <input
-                  type="text"
-                  value={formData.gender === 'MALE' ? '남성' : '여성'}
-                  disabled
-                  className="w-full p-3 bg-white border border-gray-300 rounded-lg text-gray-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  생년월일
-                </label>
-                <input
-                  type="text"
-                  value={formData.birth}
-                  disabled
-                  className="w-full p-3 bg-white border border-gray-300 rounded-lg text-gray-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  주소 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.address}
-                  disabled
-                  className="w-full p-3 bg-white border border-gray-300 rounded-lg text-gray-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  상세 주소 <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.detailAddress}
-                  disabled
-                  className="w-full p-3 bg-white border border-gray-300 rounded-lg text-gray-500"
-                />
+                  className={`flex-1 py-2 rounded-lg text-center font-medium transition-all ${formData.gender === 'FEMALE' ? 'bg-orange-50 text-orange-600' : 'text-gray-400'}`}
+                >
+                  여성
+                </button>
               </div>
             </div>
-          </div>
 
-          {/* 완료 버튼 */}
-          <div className="pt-6">
-            <button
-              onClick={() => navigate(ROUTES.CONSUMER.PROFILE_EDIT)}
-              className="w-full py-4 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors"
-            >
-              수정하기
-            </button>
+            {/* 생년월일 */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">
+                생년월일
+              </label>
+              <input
+                type="text"
+                value={formData.birth}
+                disabled
+                className="w-full p-3 text-center rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50"
+              />
+            </div>
+
+            {/* 주소 */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">
+                주소 <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={formData.address}
+                disabled
+                className="w-full p-3 text-center rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50"
+              />
+            </div>
+
+            {/* 상세 주소 */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">
+                상세 주소 <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={formData.detailAddress}
+                disabled
+                className="w-full p-3 text-center rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50"
+              />
+            </div>
+
+            {/* 완료 버튼 */}
+            <div className="pt-6">
+              <button
+                onClick={() => navigate(ROUTES.CONSUMER.PROFILE_EDIT)}
+                className="w-full py-4 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors"
+              >
+                수정하기
+              </button>
+            </div>
           </div>
         </div>
       </div>

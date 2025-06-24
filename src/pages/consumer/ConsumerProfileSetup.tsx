@@ -19,7 +19,7 @@ import type {
 const ConsumerProfileSetup: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const { updateProfile, loading } = useConsumer();
+  const { createProfile, loading } = useConsumer();
   const { validateForm } = useValidation();
 
   const [formData, setFormData] = useState<ConsumerProfileFormData>({
@@ -106,9 +106,9 @@ const ConsumerProfileSetup: React.FC = () => {
         detailAddress: formData.detailAddress,
       };
 
-      const result = await updateProfile(profileData);
+      const result = await createProfile(profileData);
 
-      if (result.success) {
+      if (result?.success !== false) {
         showToast(SUCCESS_MESSAGES.PROFILE_CREATED, 'success');
         setTimeout(() => {
           navigate(ROUTES.HOME, { replace: true });

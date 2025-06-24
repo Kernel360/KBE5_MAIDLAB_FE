@@ -43,8 +43,11 @@ export { default as ConsumerProfile } from './consumer/Profile';
 // 소비자 리뷰 등록 페이지
 export { default as ConsumerReviewRegister } from './consumer/ConsumerReviewRegister';
 
-// 수요자의 좋아요, 블랙리스트 매니저 페이지
-export { default as ManagerList } from './consumer/ManagerList';
+// 수요자의 찜한 매니저 조회
+export { default as LikedManagerList } from './consumer/LikedManagerList';
+
+// 수요자의 블랙리스트 매니저 조회
+export { default as BlackListManagerList } from './consumer/BlackListManagerList';
 
 /**
  * manager
