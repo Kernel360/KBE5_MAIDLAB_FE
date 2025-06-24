@@ -36,7 +36,7 @@ const ManagerReservationDetail: React.FC = () => {
           fetchReservationDetail(parseInt(id)),
           fetchReservations(),
         ]);
-        setReservation(detailData);
+        setReservation(detailData ?? null);
       } catch (error) {
         console.error('예약 정보 조회 실패:', error);
       } finally {
@@ -61,7 +61,7 @@ const ManagerReservationDetail: React.FC = () => {
       setShowModal(false);
       // 상태 업데이트를 위해 상세 정보 다시 조회
       const detailData = await fetchReservationDetail(parseInt(id));
-      setReservation(detailData);
+      setReservation(detailData ?? null);
     } catch (error) {
       console.error('체크인/아웃 실패:', error);
     }
