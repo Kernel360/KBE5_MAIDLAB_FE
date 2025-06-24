@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useReservation } from '@/hooks/domain/useReservation';
-import { useReservationStatus } from '@/hooks/useReservationStatus';
+import { useReservationStatus } from '@/hooks/domain/useReservationStatus';
 import { formatDateTime, formatPrice } from '@/utils';
 import { RESERVATION_STATUS_LABELS } from '@/constants/status';
 import { SERVICE_TYPE_LABELS } from '@/constants/service';
 import type { ReservationDetailResponse } from '@/types/reservation';
 import ReservationHeader from '@/components/features/consumer/ReservationHeader';
-import {ManagerFooter} from '@/components/layout/BottomNavigation/BottomNavigation';
+import { ManagerFooter } from '@/components/layout/BottomNavigation/BottomNavigation';
 
 const ManagerReservationDetail: React.FC = () => {
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ const ManagerReservationDetail: React.FC = () => {
           fetchReservationDetail(parseInt(id)),
           fetchReservations(),
         ]);
-        setReservation(detailData);
+        setReservation(detailData ?? null);
       } catch (error) {
         console.error('예약 정보 조회 실패:', error);
       } finally {
@@ -61,7 +61,7 @@ const ManagerReservationDetail: React.FC = () => {
       setShowModal(false);
       // 상태 업데이트를 위해 상세 정보 다시 조회
       const detailData = await fetchReservationDetail(parseInt(id));
-      setReservation(detailData);
+      setReservation(detailData ?? null);
     } catch (error) {
       console.error('체크인/아웃 실패:', error);
     }

@@ -8,26 +8,16 @@ import {
   HeroSection,
 } from '@/components';
 import { ROUTES } from '@/constants';
-import { useAuth, useEvent } from '@/hooks';
-import { ManagerFooter } from '@/components/layout/BottomNavigation/BottomNavigation';
-import ConsumerMain from '@/pages/consumer/ConsumerMain';
+import { useEvent } from '@/hooks';
 
-const Home: React.FC = () => {
+const GuestHome: React.FC = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, userType, isLoading } = useAuth();
   const { activeEvents, loading: eventsLoading } = useEvent();
 
-  React.useEffect(() => {
-    console.log('[Home] isAuthenticated:', isAuthenticated, 'userType:', userType);
-  }, [isAuthenticated, userType]);
-
+  // 비로그인 상태에서는 서비스 클릭시 로그인 페이지로
   const handleServiceClick = (serviceType: string) => {
-    if (!isAuthenticated) {
-      navigate(ROUTES.LOGIN);
-      return;
-    }
-    navigate(ROUTES.CONSUMER.RESERVATION_CREATE, {
-      state: { serviceType },
+    navigate(ROUTES.LOGIN, {
+      state: { redirectTo: ROUTES.CONSUMER.RESERVATION_CREATE, serviceType },
     });
   };
 
@@ -39,18 +29,9 @@ const Home: React.FC = () => {
     navigate(`${ROUTES.EVENTS}/${eventId}`);
   };
 
-  // TODO: 알림 클릭 핸들러 (나중에 알림 페이지 연결)
   const handleNotificationClick = () => {
-    console.log('알림 클릭');
+    navigate(ROUTES.LOGIN);
   };
-
-  if (isLoading) {
-    return <div className="min-h-screen flex items-center justify-center">로딩 중...</div>;
-  }
-
-  if (isAuthenticated && userType === 'CONSUMER') {
-    return <ConsumerMain />;
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -78,17 +59,14 @@ const Home: React.FC = () => {
         </div>
       </main>
 
-      {userType === 'MANAGER' ? (
-        <ManagerFooter />
-      ) : (
-        <BottomNavigation
-          activeTab="home"
-          onTabClick={handleNavigation}
-          isAuthenticated={isAuthenticated}
-        />
-      )}
+      {/* 비로그인 상태이므로 isAuthenticated=false */}
+      <BottomNavigation
+        activeTab="home"
+        onTabClick={handleNavigation}
+        isAuthenticated={false}
+      />
     </div>
   );
 };
 
-export default Home;
+export default GuestHome;

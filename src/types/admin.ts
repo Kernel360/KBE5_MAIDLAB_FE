@@ -159,3 +159,18 @@ export interface AdminStats {
   totalReservations: number;
   totalRevenue: number;
 }
+export type BoardType = 'REFUND' | 'MANAGER' | 'SERVICE' | 'ETC';
+
+export type TabType = 'consultation' | 'refund';
+
+export interface UploadResult {
+  originalName: string;
+  storedKey: string;
+  size: number;
+  type: string;
+}
+
+export interface PresignedUrlResponse {
+  url: string;
+  key: string;
+}

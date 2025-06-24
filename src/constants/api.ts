@@ -85,7 +85,7 @@ export const API_ENDPOINTS = {
     LIKES: '/api/consumers/likes',
     BLACKLIST: '/api/consumers/blacklists',
     PREFERENCE: (uuid: string) => `/api/consumers/preference/${uuid}`,
-    REMOVE_PREFERENCE_MANAGER: (uuid: string) => `/api/consumers/preference/${uuid}`,
+    REMOVE_LIKE: (uuid: string) => `/api/consumers/likes/${uuid}`,
   },
   RESERVATION: {
     CREATE: '/api/reservations/register',
@@ -111,6 +111,7 @@ export const API_ENDPOINTS = {
     CREATE: '/api/admin/event',
     UPDATE: (id: number) => `/api/admin/event/${id}`,
     DELETE: (id: number) => `/api/admin/event/${id}`,
+    GETCOUNT: `/api/eventcount`,
   },
   BOARD: {
     LIST: '/api/board',
@@ -134,10 +135,13 @@ export const API_ENDPOINTS = {
       APPROVE: (id: number) => `/api/admin/manager/${id}/approve`,
       REJECT: (id: number) => `/api/admin/manager/${id}/reject`,
       STATUS: '/api/admin/manager/status',
+      GETCOUNT: '/api/admin/manager/managercount',
+      NEWMANAGERCOUNT: '/api/admin/manager/newmanagercount'
     },
     CONSUMER: {
       LIST: '/api/admin/consumer',
       DETAIL: (id: number) => `/api/admin/consumer/${id}`,
+      GETCOUNT: '/api/admin/consumer/consumercount'
     },
     RESERVATION: {
       LIST: '/api/admin/reservations',
@@ -150,6 +154,7 @@ export const API_ENDPOINTS = {
         `/api/admin/reservations/settlement/${id}/approve`,
       SETTLEMENT_REJECT: (id: number) =>
         `/api/admin/reservations/settlement/${id}/reject`,
+      GETTODAYCOUNT: '/api/admin/reservations/todayreservation',
     },
     MATCHING: {
       LIST: '/api/admin/matching',
@@ -162,6 +167,7 @@ export const API_ENDPOINTS = {
       CONSULTATION: '/api/admin/board/consultation',
       REFUND: '/api/admin/board/refund',
       UPDATE_ANSWER: (id: number) => `/api/admin/board/answer/${id}`,
+      GETWITHOUTANSWERCOUNT: '/api/admin/board/boardcount'
     },
   },
 } as const;

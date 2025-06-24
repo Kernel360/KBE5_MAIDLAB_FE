@@ -6,16 +6,14 @@ import {
   Typography,
   Divider,
 } from '@mui/material';
+import { useAdmin } from '@/hooks';
+import { useEffect, useState } from 'react';
 
-const mockStats = [
-  { label: '전체 회원 수', value: 1234 },
-  { label: '매니저 수', value: 56 },
-  { label: '소비자 수', value: 1178 },
-  { label: '오늘 예약', value: 23 },
-  { label: '이번달 정산', value: '₩1,200,000' },
-  { label: '진행중 이벤트', value: 2 },
-  { label: '미답변 문의', value: 4 },
-];
+
+
+
+
+
 
 const recentActivities = [
   {
@@ -29,10 +27,34 @@ const recentActivities = [
 ];
 
 const Dashboard = () => {
+  const { dashboard } = useAdmin();
+  const [stats, setStats] = useState<any[]>([]);
+  
+  useEffect(() => {
+    const fetchStats = async () => {
+      const ManagerCount = (await dashboard.getManagerCount()).data ?? 0;
+      const NewManagerCount = (await dashboard.getNewManagerCount()).data ?? 0;
+      const ConsumerCount = (await dashboard.getConsumerCount()).data ?? 0;
+      const TodayReservation = (await dashboard.getTodayReservationCount()).data ?? 0;
+      const EventCount = (await dashboard.getEventCount()).data ?? 0;
+      const BoardWithoutAnswerCount = (await dashboard.getBoardWithoutAnswerCount()).data ?? 0;
+      setStats([
+        { label: '전체 회원 수', value: Number(ManagerCount) + Number(ConsumerCount) },
+        { label: '현재 활동중인 매니저 수', value: ManagerCount },
+        { label: '승인 대기중인 매니저 수', value: NewManagerCount },
+        { label: '소비자 수', value: ConsumerCount },
+        { label: '오늘 예약', value: TodayReservation },
+        { label: '진행중 이벤트', value: EventCount },
+        { label: '미답변 문의', value: BoardWithoutAnswerCount },
+      ]);
+    };
+  
+    fetchStats();
+  }, []);
   return (
     <Box>
       <Grid container spacing={3}>
-        {mockStats.map((stat) => (
+        {stats.map((stat) => (
           <Grid item xs={12} sm={6} md={3} key={stat.label}>
             <Card>
               <CardContent>

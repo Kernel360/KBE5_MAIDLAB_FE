@@ -160,6 +160,33 @@ export const useConsumer = () => {
     [showToast],
   );
 
+  // 매니저 찜하기
+  const likeManager = useCallback(
+    async (managerUuid: string) => {
+      return setManagerPreference(managerUuid, true);
+    },
+    [setManagerPreference],
+  );
+
+  // 매니저 블랙리스트 추가
+  const blacklistManager = useCallback(
+    async (managerUuid: string) => {
+      return setManagerPreference(managerUuid, false);
+    },
+    [setManagerPreference],
+  );
+
+  // 소비자 프로필 포맷팅 함수 (이름 마스킹 예시)
+  const formatProfileData = useCallback((profile: ConsumerProfileResponse) => {
+    return {
+      ...profile,
+      maskedName: profile.name
+        ? profile.name[0] + '*'.repeat(profile.name.length - 1)
+        : '',
+      formattedName: profile.name,
+    };
+  }, []);
+
   return {
     profile,
     likedManagers,
@@ -172,5 +199,8 @@ export const useConsumer = () => {
     fetchBlacklistedManagers,
     setManagerPreference,
     removeLikedManager,
+    likeManager,
+    blacklistManager,
+    formatProfileData,
   };
 };

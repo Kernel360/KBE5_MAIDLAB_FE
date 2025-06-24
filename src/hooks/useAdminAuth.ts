@@ -59,7 +59,7 @@ export const useAdminAuth = () => {
   }, [showToast]);
 
   // 토큰 갱신
-  const refreshToken = useCallback(async () => {
+  const adminRefreshToken = useCallback(async () => {
     try {
       const response = await adminApi.refreshToken();
       tokenStorage.setAccessToken(response.accessToken);
@@ -76,6 +76,6 @@ export const useAdminAuth = () => {
     isAuthenticated,
     login,
     logout,
-    refreshToken,
+    adminRefreshToken,
   };
 };
