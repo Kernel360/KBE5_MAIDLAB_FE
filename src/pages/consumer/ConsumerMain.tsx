@@ -17,6 +17,7 @@ const ConsumerMain: React.FC = () => {
   const { isAuthenticated, userType } = useAuth();
   const { profile, fetchProfile } = useUser();
   const { activeEvents, loading: eventsLoading } = useEvent();
+
   const [recentReservation, setRecentReservation] = useState<null | {
     reservationId: number;
     serviceType: string;
@@ -25,21 +26,23 @@ const ConsumerMain: React.FC = () => {
     addressDetail: string;
   }>(null);
 
+  // 프로필 호출
   useEffect(() => {
     fetchProfile();
-    // 최근 예약 정보 불러오기
+  }, []);
+
+  // 최근 예약 정보 조회
+  useEffect(() => {
     (async () => {
       try {
         const reservations = await reservationApi.getAllReservations();
         if (reservations && reservations.length > 0) {
-          // 최신 예약 추출 (가장 최근 예약일 기준 정렬)
           const sorted = [...reservations].sort((a, b) => {
             const dateA = new Date(a.reservationDate.replace(' ', 'T'));
             const dateB = new Date(b.reservationDate.replace(' ', 'T'));
             return dateB.getTime() - dateA.getTime();
           });
           const latest = sorted[0];
-          // 상세 정보 조회 (주소, 상세주소)
           const detail = await reservationApi.getReservationDetail(latest.reservationId);
           setRecentReservation({
             reservationId: latest.reservationId,
@@ -51,15 +54,13 @@ const ConsumerMain: React.FC = () => {
         } else {
           setRecentReservation(null);
         }
-      } catch (e) {
+      } catch {
         setRecentReservation(null);
       }
     })();
-  }, [fetchProfile]);
+  }, []);
 
-  // 날짜 포맷 함수
   const formatDateTime = (dateStr: string) => {
-    // dateStr: '2025-08-15 10:30' 또는 '2025-08-15T10:30:00' 등
     if (!dateStr) return '';
     let [date, time] = dateStr.split(' ');
     if (!time && dateStr.includes('T')) [date, time] = dateStr.split('T');
@@ -91,7 +92,6 @@ const ConsumerMain: React.FC = () => {
     navigate(`${ROUTES.EVENTS}/${eventId}`);
   };
 
-  // TODO: 알림 클릭 핸들러 (나중에 알림 페이지 연결)
   const handleNotificationClick = () => {
     console.log('알림 클릭');
   };
@@ -105,18 +105,17 @@ const ConsumerMain: React.FC = () => {
 
       <main className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto">
-          {/* 사용자 이름 환영 인사 */}
           {profile?.name ? (
-            <div className="mb-6 flex flex-col items-center justify-center text-gray-900">
+            <div className="mb-6 flex flex-col items-center text-gray-900">
               <div className="font-bold text-xl">안녕하세요, {profile.name}님!</div>
               <div className="text-base mt-1">오늘도 좋은 하루 보내세요.</div>
             </div>
           ) : (
-            <div className="mb-6 flex flex-col items-center justify-center text-gray-900">
+            <div className="mb-6 flex flex-col items-center text-gray-900">
               <div className="font-bold text-xl">환영합니다!</div>
             </div>
           )}
-          {/* 이벤트 버튼/영역 */}
+
           <HeroSection
             onEventClick={handleEventClick}
             events={activeEvents}
@@ -130,22 +129,20 @@ const ConsumerMain: React.FC = () => {
             discount="1000P"
             onClick={() => navigate(ROUTES.SIGNUP)}
           />
-          {/* 최근 예약 정보 */}
+
           <div className="recent-reservation-card">
-            <div className="flex flex-row justify-between items-start mb-2">
+            <div className="flex justify-between items-start mb-2">
               <h2 className="text-lg font-bold text-gray-900">최근 예약</h2>
               <button
                 className="text-sm text-orange-500 font-medium hover:underline ml-4"
-                onClick={() => {
-                  navigate(ROUTES.CONSUMER.RESERVATIONS);
-                }}
+                onClick={() => navigate(ROUTES.CONSUMER.RESERVATIONS)}
               >
                 더보기
               </button>
             </div>
             <hr className="border-t border-gray-200 mb-2" />
             <div
-              className="flex flex-row justify-between items-start cursor-pointer hover:bg-orange-50 rounded-lg transition-colors duration-150"
+              className="flex justify-between items-start cursor-pointer hover:bg-orange-50 rounded-lg transition-colors duration-150"
               role="button"
               tabIndex={0}
               onClick={() => {
@@ -154,10 +151,8 @@ const ConsumerMain: React.FC = () => {
                 }
               }}
               onKeyDown={e => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  if (recentReservation) {
-                    navigate(`/consumer/reservations/${recentReservation.reservationId}`);
-                  }
+                if ((e.key === 'Enter' || e.key === ' ') && recentReservation) {
+                  navigate(`/consumer/reservations/${recentReservation.reservationId}`);
                 }
               }}
             >
@@ -174,15 +169,20 @@ const ConsumerMain: React.FC = () => {
                     </div>
                     <div>
                       <span className="recent-reservation-label">주소: </span>
-                      <span className="recent-reservation-value">{recentReservation.address} {recentReservation.addressDetail}</span>
+                      <span className="recent-reservation-value">
+                        {recentReservation.address} {recentReservation.addressDetail}
+                      </span>
                     </div>
                   </>
                 ) : (
                   <div className="recent-reservation-label">최근 예약이 없습니다.</div>
                 )}
               </div>
-              {/* 오른쪽 상단 상태값 하드코딩 */}
-              <div className="ml-4 text-xs font-bold bg-orange-100 text-orange-500 px-3 py-1 rounded-full whitespace-nowrap border border-orange-200">진행중</div>
+              {recentReservation && (
+                <div className="ml-4 text-xs font-bold bg-orange-100 text-orange-500 px-3 py-1 rounded-full whitespace-nowrap border border-orange-200">
+                  진행중
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -201,4 +201,4 @@ const ConsumerMain: React.FC = () => {
   );
 };
 
-export default ConsumerMain; 
+export default ConsumerMain;
