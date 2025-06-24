@@ -292,6 +292,7 @@ const ReservationList = () => {
                       <Button
                         variant="outlined"
                         size="small"
+                        disabled={matching.matchingStatus.toLowerCase() === 'pending'}
                         onClick={() => handleOpenDialog(matching)}
                       >
                         매니저 변경

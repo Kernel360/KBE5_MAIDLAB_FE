@@ -22,7 +22,9 @@ import { useState, useEffect } from 'react';
 import { useAdmin } from '@/hooks';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ROUTES } from '@/constants';
-import type { BoardResponse } from '@/types/board';
+import { BOARD_TYPE_NAMES, BOARD_TYPE_COLORS } from '@/constants/admin';
+import type { BoardResponse, BoardWithId } from '@/types/board';
+import type { TabType } from '@/types/admin';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
@@ -32,33 +34,7 @@ const ActionButton = styled(IconButton)(({ theme }) => ({
   color: theme.palette.primary.main,
 }));
 
-type BoardType = 'REFUND' | 'MANAGER' | 'SERVICE' | 'ETC';
 
-// 게시판 타입별 한글 이름
-const BOARD_TYPE_NAMES: Record<BoardType, string> = {
-  REFUND: '환불 문의',
-  MANAGER: '매니저 문의',
-  SERVICE: '서비스 문의',
-  ETC: '기타 문의',
-} as const;
-
-// 게시판 타입별 칩 색상
-const BOARD_TYPE_COLORS: Record<
-  BoardType,
-  'error' | 'primary' | 'info' | 'default'
-> = {
-  REFUND: 'error',
-  MANAGER: 'primary',
-  SERVICE: 'info',
-  ETC: 'default',
-} as const;
-
-interface BoardWithId extends BoardResponse {
-  id: number;
-}
-
-// 탭 인덱스 타입
-type TabType = 'consultation' | 'refund';
 
 const BoardList = () => {
   const location = useLocation();
