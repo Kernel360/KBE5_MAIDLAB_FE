@@ -126,10 +126,4 @@ export const reservationApi = {
     );
   },
 
-  /**
-   * 최신 예약 1건 조회
-   */
-  getLatestReservation: async (): Promise<ReservationListResponse | null> => {
-    return apiCall<ReservationListResponse>('get', API_ENDPOINTS.RESERVATION.LASTEST);
-  },
 };
