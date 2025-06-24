@@ -44,7 +44,7 @@ const ConsumerReservationCreate: React.FC = () => {
     setFormData((prev) => ({ ...prev, ...data }));
     setStep(3);
   };
-  const handleBackToStep1 = () => setStep(1);
+  const handleBackToStep2 = () => setStep(2);
 
   // step3: 완료
   const handleCompleteReservation = () => {
@@ -65,14 +65,14 @@ const ConsumerReservationCreate: React.FC = () => {
       {step === 2 && (
         <ReservationStep2
           initialData={formData}
-          onBack={handleBackToStep1}
+          onBack={handleBackToStep0}
           onSubmit={handleSubmitFromStep2}
         />
       )}
       {step === 3 && (
         <ReservationStep3
           data={formData as ReservationFormData}
-          onBack={handleBackToStep1}
+          onBack={handleBackToStep2}
           onSubmit={handleCompleteReservation}
         />
       )}

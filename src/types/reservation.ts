@@ -10,12 +10,12 @@ export interface ReservationCreateRequest {
   addressDetail: string;
   managerUuId: string;
   housingType: string;
-  roomSize: number;
+  lifeCleaningRoomIdx?: number;
   housingInformation: string;
   reservationDate: string;
   startTime: string;
   endTime: string;
-  serviceAdd: string;
+  serviceOptions?: { id: string; count?: number }[];
   pet: string;
   specialRequest: string;
   totalPrice: number;
@@ -134,16 +134,25 @@ export interface ReservationFormData {
   address: string;
   addressDetail: string;
   housingType: HousingType;
-  roomSize: number;
-  housingInformation: string;
   reservationDate: string;
   startTime: string;
   endTime: string;
-  serviceAdd: string;
   pet: PetType;
-  specialRequest: string;
   managerUuId?: string;
   chooseManager: boolean; // 직접 선택 여부
+  // 생활청소 평수 인덱스
+  lifeCleaningRoomIdx?: number;
+  // 추가 서비스 옵션 (id, count)
+  serviceOptions?: { id: string; count?: number }[];
+  housingInformation: string;
+  specialRequest: string;
+  managerInfo?: {
+    uuid: string;
+    name: string;
+    profileImage?: string;
+    averageRate?: number;
+    introduceText?: string;
+  };
 }
 
 /**

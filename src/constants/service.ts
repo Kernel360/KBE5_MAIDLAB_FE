@@ -185,29 +185,37 @@ export interface ServiceOption {
   description?: string;
 }
 
-export const SERVICE_OPTIONS: ServiceOption[] = [
+export const SERVICE_OPTIONS = [
   {
-    id: 'cooking',
-    label: '요리',
-    price: 10000,
-    timeAdd: 60,
-    description: '간단한 요리를 준비해드립니다',
+    id: 'WINDOW_CLEANING',
+    label: '창문 유리/커튼 및 블라인드 청소',
+    timeAdd: 90, // 1.5시간 = 90분
+    priceAdd: 27900
   },
   {
-    id: 'ironing',
+    id: 'FAN_CLEANING',
+    label: '선풍기 청소',
+    timeAdd: 20, // 20분
+    priceAdd: 7800,
+    countable: true // 개수 선택 가능
+  },
+  {
+    id: 'SHOES_CLEANING',
+    label: '운동화 세탁',
+    timeAdd: 30, // 0.5시간 = 30분
+    priceAdd: 8600,
+    countable: true // 개수 선택 가능
+  },
+  {
+    id: 'IRONING',
     label: '다림질',
-    price: 10000,
-    timeAdd: 60,
-    description: '의류 다림질을 해드립니다',
-  },
-  {
-    id: 'cleaning_tools',
-    label: '청소 도구 준비',
-    price: 20000,
-    timeAdd: 0,
-    description: '전문 청소 도구를 준비해드립니다',
-  },
-] as const;
+    timeAdd: 60, // 1시간 = 60분
+    priceAdd: 15600
+  }
+];
+
+// 개수 선택 가능한 옵션의 최대 개수
+export const MAX_COUNTABLE_ITEMS = 5;
 
 // ===== 평수 옵션 =====
 export interface RoomSizeOption {

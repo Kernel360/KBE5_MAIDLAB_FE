@@ -103,26 +103,18 @@ export const useReservation = () => {
           addressDetail: reservationData.addressDetail,
           managerUuId: reservationData.managerUuId,
           housingType: reservationData.housingType,
-          roomSize: reservationData.roomSize,
+          lifeCleaningRoomIdx: reservationData.lifeCleaningRoomIdx,
           housingInformation: reservationData.housingInformation,
-          reservationDate: toISODateTime(
-            reservationData.reservationDate,
-            reservationData.startTime,
-          ),
-          startTime: toISODateTime(
-            reservationData.reservationDate,
-            reservationData.startTime,
-          ),
-          endTime: toISODateTime(
-            reservationData.reservationDate,
-            reservationData.endTime,
-          ),
-          serviceAdd: reservationData.serviceAdd,
+          reservationDate: toISODateTime(reservationData.reservationDate, reservationData.startTime),
+          startTime: toISODateTime(reservationData.reservationDate, reservationData.startTime),
+          endTime: toISODateTime(reservationData.reservationDate, reservationData.endTime),
+          serviceOptions: reservationData.serviceOptions,
           pet: reservationData.pet,
           specialRequest: reservationData.specialRequest,
           totalPrice: reservationData.totalPrice,
         };
-
+        console.log("----------");
+        console.log("request data:",formattedData);
         const result = await reservationApi.create(formattedData);
         await fetchReservations(true); // 강제 새로고침
         showToast('예약이 완료되었습니다.', 'success');
