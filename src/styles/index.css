@@ -194,6 +194,22 @@
   .expand-btn:hover {
     @apply bg-slate-50 border-slate-300 text-slate-700;
   }
+
+  /* 최근 예약 카드 스타일 */
+  .recent-reservation-card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-6 flex flex-col gap-2;
+    border-top-width: 4px;
+    border-top-color: #FF6B00;
+  }
+  .recent-reservation-title {
+    @apply text-base font-bold text-gray-900 mb-2;
+  }
+  .recent-reservation-label {
+    @apply text-sm text-gray-500;
+  }
+  .recent-reservation-value {
+    @apply text-sm text-gray-900 font-medium;
+  }
 }
 
 /* 유틸리티 및 애니메이션 */

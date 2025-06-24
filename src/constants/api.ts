@@ -98,6 +98,7 @@ export const API_ENDPOINTS = {
     CHECKOUT: (id: number) => `/api/reservations/${id}/checkout`,
     REVIEW: (id: number) => `/api/reservations/${id}/review`,
     SETTLEMENTS: '/api/reservations/settlements/weekly-details',
+    LASTEST: '/api/reservations/lastest',
   },
   MATCHING: {
     MANAGERS: '/api/matching/matchmanager',

@@ -10,11 +10,16 @@ import {
 import { ROUTES } from '@/constants';
 import { useAuth, useEvent } from '@/hooks';
 import { ManagerFooter } from '@/components/layout/BottomNavigation/BottomNavigation';
+import ConsumerMain from '@/pages/consumer/ConsumerMain';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, userType } = useAuth();
+  const { isAuthenticated, userType, isLoading } = useAuth();
   const { activeEvents, loading: eventsLoading } = useEvent();
+
+  React.useEffect(() => {
+    console.log('[Home] isAuthenticated:', isAuthenticated, 'userType:', userType);
+  }, [isAuthenticated, userType]);
 
   const handleServiceClick = (serviceType: string) => {
     if (!isAuthenticated) {
@@ -38,6 +43,14 @@ const Home: React.FC = () => {
   const handleNotificationClick = () => {
     console.log('알림 클릭');
   };
+
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center">로딩 중...</div>;
+  }
+
+  if (isAuthenticated && userType === 'CONSUMER') {
+    return <ConsumerMain />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
