@@ -55,10 +55,11 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
 
   const [showManagerModal, setShowManagerModal] = useState(false);
   const [managerList, setManagerList] = useState<any[]>([]);
-  const [basePrice] = useState(50000); // 기본 가격 5만원
-  const [totalPrice, setTotalPrice] = useState(basePrice);
+
   const { fetchAvailableManagers } = useMatching();
   const [mapLatLng, setMapLatLng] = useState<{ lat: number; lng: number } | null>(null);
+
+  // const { fetchProfile } = useConsumer();
 
   // 구글맵에서 전달된 주소 자동 반영
   useEffect(() => {
@@ -393,7 +394,7 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
               <h3 className="text-xl font-bold text-orange-600">예약 날짜 및 시간</h3>
             </div>
             <div className="text-gray-500 text-sm mb-4">원하는 예약 날짜와 시작 시간을 선택하세요.</div>
-            <div className="flex flex-col md:flex-row gap-4 items-center">
+            <div className="mt-14 flex flex-col md:flex-row gap-4 items-center">
               <div className="flex-1 w-full">
                 <label className="block text-gray-700 font-medium mb-1">날짜 선택</label>
                 <DatePicker
@@ -402,7 +403,7 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
                   minDate={tomorrow}
                   dateFormat="yyyy-MM-dd"
                   locale={ko}
-                  className="w-full p-3 border-2 border-orange-200 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition text-center text-lg font-semibold bg-white"
+                  className="w-full h-12 p-3 border-2 border-orange-200 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition text-center text-lg font-semibold bg-white"
                   calendarClassName="!border-orange-200 !rounded-xl !shadow-lg"
                   dayClassName={date =>
                     format(date, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')
@@ -417,7 +418,7 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
                 <div className="relative">
                   <ClockIcon className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-orange-400" />
                   <select
-                    className="w-full p-3 pl-10 border-2 border-orange-200 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition bg-white text-center text-lg font-semibold appearance-none"
+                    className="w-full h-12 py-2 px-3 pl-10 border-2 border-orange-200 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition bg-white text-center text-lg font-semibold appearance-none"
                     value={form.startTime}
                     onChange={e => setForm(prev => ({ ...prev, startTime: e.target.value }))}
                   >
@@ -439,17 +440,25 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
                 </div>
               </div>
             </div>
-            <div className="mt-4 flex flex-col items-center justify-center">
-              <div className="text-gray-700 text-base font-semibold">
-                선택한 날짜: <span className="text-orange-600 font-bold">{format(selectedDate, 'yyyy-MM-dd')}</span>
+            <div className="mt-14 pt-10 flex flex-col items-center justify-center border-t border-orange-100">
+              <div className="flex flex-row items-center justify-center gap-8 w-full max-w-xl mx-auto">
+                <div className="flex flex-col items-center flex-1">
+                  <CalendarDaysIcon className="w-6 h-6 text-orange-400 mb-1" />
+                  <span className="text-xs text-gray-500">선택한 날짜</span>
+                  <span className="text-base font-bold text-orange-600 mt-1">{format(selectedDate, 'yyyy-MM-dd')}</span>
+                </div>
+                <div className="flex flex-col items-center flex-1">
+                  <ClockIcon className="w-6 h-6 text-orange-400 mb-1" />
+                  <span className="text-xs text-gray-500">시작 시간</span>
+                  <span className="text-base font-bold text-orange-600 mt-1">{form.startTime || '선택 전'}</span>
+                </div>
+                <div className="flex flex-col items-center flex-1">
+                  <ClockIcon className="w-6 h-6 text-orange-400 mb-1" />
+                  <span className="text-xs text-gray-500">예상 종료</span>
+                  <span className="text-base font-bold text-orange-600 mt-1">{getExpectedEndTime()}</span>
+                </div>
               </div>
-              <div className="text-gray-700 text-base font-semibold mt-1">
-                시작 시간: <span className="text-orange-600 font-bold">{form.startTime || '선택 전'}</span>
-              </div>
-              <div className="text-orange-500 text-base font-bold mt-1">
-                예상 종료 시간: {getExpectedEndTime()}
-              </div>
-              <div className="text-gray-400 text-sm mt-1">(종료 시간은 서비스/옵션에 따라 자동 계산됩니다)</div>
+              <div className="mt-10 text-gray-400 text-sm mt-3 text-center">(종료 시간은 서비스/옵션에 따라 자동 계산됩니다)</div>
             </div>
           </div>
         </div>
@@ -499,10 +508,11 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
                     </label>
                   </div>
                   <div className="text-orange-500 font-medium">
-                    +{service.priceAdd.toLocaleString()}원
+                    +{(service.countable && selectedServices.includes(service.id))
+                      ? (service.priceAdd * (optionCounts[service.id] || 1)).toLocaleString()
+                      : service.priceAdd.toLocaleString()}원
                   </div>
                 </div>
-                
                 {service.countable && selectedServices.includes(service.id) && (
                   <div className="mt-3 flex items-center gap-2 pl-7">
                     <button
@@ -695,37 +705,53 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
         {/* 반려동물 모달 */}
         {petModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-            <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md flex flex-col animate-fade-in">
-              <div className="text-xl font-bold mb-2 text-center">애완동물 추가</div>
-              <div className="text-gray-600 text-center mb-4">강아지나 고양이에 알레르기가 있는 도우미를 피할 수 있도록 알려주세요.</div>
-              <div className="flex gap-6 justify-center mb-4">
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" checked={petType.dog} onChange={e => setPetType(pt => ({ ...pt, dog: e.target.checked }))} />
-                  <span>개</span>
+            <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md flex flex-col items-center animate-fade-in relative">
+              <button
+                onClick={() => setPetModal(false)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold focus:outline-none"
+                aria-label="닫기"
+              >
+                ×
+              </button>
+              <div className="flex flex-col items-center mb-6">
+                <span className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-orange-100 mb-2">
+                  <svg className="w-8 h-8 text-orange-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
+                </span>
+                <div className="text-2xl font-bold text-orange-600 mb-1">반려동물 정보</div>
+                <div className="text-gray-500 text-center text-base">강아지, 고양이 등 반려동물이 있다면 알려주세요.<br/>알레르기 있는 도우미를 피할 수 있습니다.</div>
+              </div>
+              <div className="flex gap-8 mb-6">
+                <label className="flex flex-col items-center cursor-pointer">
+                  <input type="checkbox" checked={petType.dog} onChange={e => setPetType(pt => ({ ...pt, dog: e.target.checked }))} className="hidden peer" />
+                  <span className="w-12 h-12 rounded-full flex items-center justify-center bg-gray-100 peer-checked:bg-orange-500 transition-colors">
+                    <svg className="w-7 h-7 text-gray-400 peer-checked:text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
+                  </span>
+                  <span className="mt-2 text-sm font-medium text-gray-700 peer-checked:text-orange-500">강아지</span>
                 </label>
-                <label className="flex items-center gap-2">
-                  <input type="checkbox" checked={petType.cat} onChange={e => setPetType(pt => ({ ...pt, cat: e.target.checked }))} />
-                  <span>고양이</span>
+                <label className="flex flex-col items-center cursor-pointer">
+                  <input type="checkbox" checked={petType.cat} onChange={e => setPetType(pt => ({ ...pt, cat: e.target.checked }))} className="hidden peer" />
+                  <span className="w-12 h-12 rounded-full flex items-center justify-center bg-gray-100 peer-checked:bg-orange-500 transition-colors">
+                    <svg className="w-7 h-7 text-gray-400 peer-checked:text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
+                  </span>
+                  <span className="mt-2 text-sm font-medium text-gray-700 peer-checked:text-orange-500">고양이</span>
                 </label>
               </div>
-              <div className="mb-4">
-                <input
-                  type="text"
-                  className="w-full p-3 border border-gray-300 rounded-lg"
-                  placeholder="기타 (예: 토끼, 햄스터 등)"
-                  value={petType.etc}
-                  onChange={e => setPetType(pt => ({ ...pt, etc: e.target.value }))}
-                />
-              </div>
+              <input
+                type="text"
+                className="w-full p-3 border border-gray-300 rounded-lg mb-4"
+                placeholder="기타 (예: 토끼, 햄스터 등)"
+                value={petType.etc}
+                onChange={e => setPetType(pt => ({ ...pt, etc: e.target.value }))}
+              />
               <button
                 onClick={handlePetSave}
-                className="w-full py-3 bg-green-100 text-green-600 rounded-lg font-bold text-lg hover:opacity-80"
+                className="w-full py-3 bg-orange-500 text-white rounded-lg font-bold text-lg hover:bg-orange-600 mb-2"
               >
                 저장
               </button>
               <button
                 onClick={() => setPetModal(false)}
-                className="w-full mt-2 py-2 bg-gray-100 text-gray-700 rounded-lg hover:opacity-80"
+                className="w-full py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
               >
                 닫기
               </button>
