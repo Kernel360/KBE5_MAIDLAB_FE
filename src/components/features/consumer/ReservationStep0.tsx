@@ -3,28 +3,10 @@ import ReservationHeader from './ReservationHeader';
 import { BottomNavigation } from '@/components/layout/BottomNavigation/BottomNavigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-
+import {SERVICE_LIST} from '@/constants/service'
 interface Props {
   onNext: (serviceType: string) => void;
 }
-
-const SERVICE_LIST = [
-  {
-    key: 'GENERAL_CLEANING',
-    label: '일반청소',
-    emoji: '🏡',
-  },
-  {
-    key: 'BABYSITTER',
-    label: '베이비시터',
-    emoji: '🤱',
-  },
-  {
-    key: 'PET_CARE',
-    label: '반려동물 케어',
-    emoji: '🐕',
-  },
-];
 
 const ReservationStep0: React.FC<Props> = ({ onNext }) => {
   const { isAuthenticated } = useAuth();
@@ -48,11 +30,11 @@ const ReservationStep0: React.FC<Props> = ({ onNext }) => {
         <div className="w-full max-w-md flex flex-col gap-6 mt-8">
           {SERVICE_LIST.map((item) => (
             <button
-              key={item.key}
+              key={item.id}
               className="flex items-center gap-4 card shadow hover:shadow-md transition cursor-pointer py-5 px-6 text-lg font-semibold text-gray-800 bg-white border border-gray-200 rounded-2xl focus:ring-2 focus:ring-orange-400"
-              onClick={() => handleSelect(item.key)}
+              onClick={() => handleSelect(item.id)}
             >
-              <span className="text-4xl">{item.emoji}</span>
+              <span className="text-4xl">{item.icon}</span>
               <span>{item.label}</span>
             </button>
           ))}

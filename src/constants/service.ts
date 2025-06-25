@@ -185,6 +185,24 @@ export interface ServiceOption {
   description?: string;
 }
 
+export const SERVICE_LIST = [
+  {
+    id: SERVICE_TYPES.GENERAL_CLEANING,
+    label: SERVICE_TYPE_LABELS[SERVICE_TYPES.GENERAL_CLEANING],
+    icon: '🏠',
+  },
+  {
+    id: SERVICE_TYPES.BABYSITTER,
+    label: SERVICE_TYPE_LABELS[SERVICE_TYPES.BABYSITTER],
+    icon: '👩‍🍼',
+  },
+  {
+    id: SERVICE_TYPES.PET_CARE,
+    label: SERVICE_TYPE_LABELS[SERVICE_TYPES.PET_CARE],
+    icon: '🦮',
+  }
+];
+
 export const SERVICE_OPTIONS = [
   {
     id: 'WINDOW_CLEANING',

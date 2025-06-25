@@ -10,8 +10,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
-  SERVICE_TYPES,
-  SERVICE_TYPE_LABELS,
+  SERVICE_LIST,
   SEOUL_DISTRICT_LABELS,
   WEEKDAYS,
   WEEKDAY_LABELS,
@@ -53,19 +52,6 @@ const ManagerProfileSetup: React.FC = () => {
     documents: [],
   });
   const [errors, setErrors] = useState<ManagerProfileErrors>({});
-
-  const serviceOptions = [
-    {
-      id: SERVICE_TYPES.HOUSEKEEPING,
-      label: SERVICE_TYPE_LABELS[SERVICE_TYPES.HOUSEKEEPING],
-      icon: '🏠',
-    },
-    {
-      id: SERVICE_TYPES.CARE,
-      label: SERVICE_TYPE_LABELS[SERVICE_TYPES.CARE],
-      icon: '👥',
-    },
-  ];
 
   // 서울 25개 구
   const regionOptions = [
@@ -456,7 +442,7 @@ const ManagerProfileSetup: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              {serviceOptions.map((service) => (
+              {SERVICE_LIST.map((service) => (
                 <button
                   key={service.id}
                   onClick={() => handleServiceToggle(service.id)}
