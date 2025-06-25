@@ -13,7 +13,6 @@ import {
   Divider,
 } from '@mui/material';
 import { adminApi } from '../../apis/admin';
-import type { ManagerDetail } from '@/types';
 import type { AdminManagerDetail } from '@/types/admin'
 
 const StyledContainer = styled(Container)(({ theme }) => ({

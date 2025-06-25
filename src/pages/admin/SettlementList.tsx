@@ -23,6 +23,7 @@ import dayjs from 'dayjs';
 import { useAdmin } from '@/hooks';
 import type { AdminSettlement } from '@/types/admin';
 import { useNavigate } from 'react-router-dom';
+import { formatDate } from '@/utils';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
@@ -153,9 +154,9 @@ const SettlementList = () => {
                 <TableCell>서비스 유형</TableCell>
                 <TableCell>상세 서비스</TableCell>
                 <TableCell>상태</TableCell>
-                <TableCell align="right">금액</TableCell>
+                <TableCell>금액</TableCell>
                 <TableCell>생성일</TableCell>
-                <TableCell align="center">상세</TableCell>
+                <TableCell>상세</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -171,17 +172,17 @@ const SettlementList = () => {
                       size="small"
                     />
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell>
                     {formatPrice(settlement.amount)}
                   </TableCell>
-                  <TableCell>{settlement.createdAt}</TableCell>
-                  <TableCell align="center">
+                  <TableCell>{formatDate(settlement.createdAt)}</TableCell>
+                  <TableCell>
                     <Button
                       variant="contained"
                       size="small"
                       onClick={() => handleViewDetail(settlement.settlementId)}
                     >
-                      상세보기
+                    상세보기
                     </Button>
                   </TableCell>
                 </TableRow>

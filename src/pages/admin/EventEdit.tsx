@@ -56,7 +56,7 @@ const EventEdit = () => {
     filenames: string[],
   ): Promise<PresignedUrlResponse[]> => {
     const response = await fetch(
-      'http://localhost:8080/api/files/presigned-urls',
+      'https://api-maidlab.duckdns.org/api/files/presigned-urls',
       {
         method: 'POST',
         headers: {

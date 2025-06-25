@@ -8,12 +8,8 @@ import {
 } from '@mui/material';
 import { useAdmin } from '@/hooks';
 import { useEffect, useState } from 'react';
-
-
-
-
-
-
+import { ROUTES } from '@/constants';
+import { useNavigate } from 'react-router-dom';
 
 const recentActivities = [
   {
@@ -29,6 +25,11 @@ const recentActivities = [
 const Dashboard = () => {
   const { dashboard } = useAdmin();
   const [stats, setStats] = useState<any[]>([]);
+  const navigate = useNavigate();
+
+  const handleStatClick = (path: string) => {
+    navigate(path);
+  };
   
   useEffect(() => {
     const fetchStats = async () => {
@@ -39,13 +40,41 @@ const Dashboard = () => {
       const EventCount = (await dashboard.getEventCount()).data ?? 0;
       const BoardWithoutAnswerCount = (await dashboard.getBoardWithoutAnswerCount()).data ?? 0;
       setStats([
-        { label: '전체 회원 수', value: Number(ManagerCount) + Number(ConsumerCount) },
-        { label: '현재 활동중인 매니저 수', value: ManagerCount },
-        { label: '승인 대기중인 매니저 수', value: NewManagerCount },
-        { label: '소비자 수', value: ConsumerCount },
-        { label: '오늘 예약', value: TodayReservation },
-        { label: '진행중 이벤트', value: EventCount },
-        { label: '미답변 문의', value: BoardWithoutAnswerCount },
+        { 
+          label: '전체 회원 수', 
+          value: Number(ManagerCount) + Number(ConsumerCount),
+          path: ROUTES.ADMIN.USERS
+        },
+        { 
+          label: '현재 활동중인 매니저 수', 
+          value: ManagerCount,
+          path: ROUTES.ADMIN.USERS
+        },
+        { 
+          label: '승인 대기중인 매니저 수', 
+          value: NewManagerCount,
+          path: ROUTES.ADMIN.USERS
+        },
+        { 
+          label: '소비자 수', 
+          value: ConsumerCount,
+          path: ROUTES.ADMIN.USERS
+        },
+        { 
+          label: '오늘 예약', 
+          value: TodayReservation,
+          path: ROUTES.ADMIN.RESERVATIONS
+        },
+        { 
+          label: '진행중 이벤트', 
+          value: EventCount,
+          path: ROUTES.ADMIN.EVENTS
+        },
+        { 
+          label: '미답변 문의', 
+          value: BoardWithoutAnswerCount,
+          path: ROUTES.ADMIN.BOARDS
+        },
       ]);
     };
   
@@ -56,7 +85,8 @@ const Dashboard = () => {
       <Grid container spacing={3}>
         {stats.map((stat) => (
           <Grid item xs={12} sm={6} md={3} key={stat.label}>
-            <Card>
+            <Card
+            onClick={() => handleStatClick(stat.path)}>
               <CardContent>
                 <Typography variant="subtitle2" color="text.secondary">
                   {stat.label}
