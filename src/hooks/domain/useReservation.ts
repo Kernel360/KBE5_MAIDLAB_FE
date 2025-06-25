@@ -91,38 +91,30 @@ export const useReservation = () => {
         throw new Error('서비스 종류가 선택되지 않았습니다.');
       }
 
-      const formattedData: ReservationCreateRequest = {
-        serviceDetailTypeId: reservationData.serviceDetailTypeId,
-        address: reservationData.address,
-        addressDetail: reservationData.addressDetail,
-        managerUuId: reservationData.managerUuId,
-        housingType: reservationData.housingType,
-        roomSize: reservationData.roomSize,
-        housingInformation: reservationData.housingInformation,
-        reservationDate: toISODateTime(
-          reservationData.reservationDate,
-          reservationData.startTime,
-        ),
-        startTime: toISODateTime(
-          reservationData.reservationDate,
-          reservationData.startTime,
-        ),
-        endTime: toISODateTime(
-          reservationData.reservationDate,
-          reservationData.endTime,
-        ),
-        serviceAdd: reservationData.serviceAdd,
-        pet: reservationData.pet,
-        specialRequest: reservationData.specialRequest,
-        totalPrice: reservationData.totalPrice,
-      };
-
-      const result = await callApi(() => reservationApi.create(formattedData), {
-        successMessage: '예약이 완료되었습니다.',
-        errorMessage: '예약에 실패했습니다.',
-      });
-
-      if (result.success) {
+        const formattedData: ReservationCreateRequest = {
+          serviceDetailTypeId: reservationData.serviceDetailTypeId,
+          address: reservationData.address,
+          addressDetail: reservationData.addressDetail,
+          managerUuId: reservationData.managerUuId,
+          housingType: reservationData.housingType,
+          lifeCleaningRoomIdx: reservationData.lifeCleaningRoomIdx,
+          housingInformation: reservationData.housingInformation,
+          reservationDate: toISODateTime(reservationData.reservationDate, reservationData.startTime),
+          startTime: toISODateTime(reservationData.reservationDate, reservationData.startTime),
+          endTime: toISODateTime(reservationData.reservationDate, reservationData.endTime),
+          serviceOptions: reservationData.serviceOptions,
+          pet: reservationData.pet,
+          specialRequest: reservationData.specialRequest,
+          totalPrice: reservationData.totalPrice,
+        };
+        console.log("----------");
+        console.log("request data:",formattedData);
+        const result = await callApi(() => reservationApi.create(formattedData), {
+          successMessage: '예약이 완료되었습니다.',
+          errorMessage: '예약에 실패했습니다.',
+        });
+  
+        if (result.success) {
         await fetchReservations(true); // 강제 새로고침
       }
 

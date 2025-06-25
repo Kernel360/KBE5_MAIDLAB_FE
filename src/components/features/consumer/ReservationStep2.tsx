@@ -1,11 +1,15 @@
 // src/components/features/consumer/ReservationStep2.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import type { ReservationFormData } from '@/types/reservation';
 import { useMatching } from '@/hooks/domain/useMatching';
 import { format, addDays } from 'date-fns';
-import { HOUSING_TYPES, SERVICE_OPTIONS, ROOM_SIZES } from '@/constants/service';
+import { HOUSING_TYPES, SERVICE_OPTIONS, ROOM_SIZES, SERVICE_TYPES, ROOM_SIZES_LIFE_CLEANING, MAX_COUNTABLE_ITEMS } from '@/constants/service';
 import ReservationHeader from './ReservationHeader';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { CalendarDaysIcon, ClockIcon } from '@heroicons/react/24/outline';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { ko } from 'date-fns/locale';
 
 interface Props {
   initialData: Partial<ReservationFormData>;
@@ -13,28 +17,42 @@ interface Props {
   onSubmit: (form: ReservationFormData) => void;
 }
 
+// 서비스 옵션 카운트 타입
+interface ServiceOptionCounts {
+  [key: string]: number;
+}
+
 const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [form, setForm] = useState<ReservationFormData>({
-    serviceType: initialData.serviceType || 'HOUSEKEEPING',
-    serviceDetailType: initialData.serviceDetailType || '대청소',
+    serviceType: initialData.serviceType || 'GENERAL_CLEANING',
+    serviceDetailType: initialData.serviceDetailType || '생활청소',
     address: initialData.address || '',
     addressDetail: initialData.addressDetail || '',
     housingType: initialData.housingType || 'APT',
-    roomSize: initialData.roomSize || 10,
-    housingInformation: initialData.housingInformation || '',
-    reservationDate: initialData.reservationDate || format(new Date(), 'yyyy-MM-dd'),
-    startTime: initialData.startTime || '08:00',
-    endTime: initialData.endTime || '11:00',
-    serviceAdd: initialData.serviceAdd || '',
+    reservationDate: initialData.reservationDate || '',
+    startTime: initialData.startTime || '09:00',
+    endTime: initialData.endTime || '',
     pet: initialData.pet || 'NONE',
-    specialRequest: initialData.specialRequest || '',
-    chooseManager: initialData.chooseManager || false,
     managerUuId: initialData.managerUuId || '',
+    chooseManager: initialData.chooseManager || false,
+    lifeCleaningRoomIdx: initialData.lifeCleaningRoomIdx || 0,
+    serviceOptions: initialData.serviceOptions || [],
+    housingInformation: initialData.housingInformation || '',
+    specialRequest: initialData.specialRequest || '',
+    managerInfo: initialData.managerInfo || undefined,
   });
 
+  // 생활청소 평수 구간 선택 상태
+  const [selectedRoomIdx, setSelectedRoomIdx] = useState<number>(0);
+  
+  // 서비스 옵션 선택 상태
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  
+  // 개수 선택 가능한 옵션의 카운트
+  const [optionCounts, setOptionCounts] = useState<ServiceOptionCounts>({});
+
   const [showManagerModal, setShowManagerModal] = useState(false);
   const [managerList, setManagerList] = useState<any[]>([]);
   const [basePrice] = useState(50000); // 기본 가격 5만원
@@ -55,33 +73,77 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
     }
   }, [location.state]);
 
-  // 시작 시간이 변경되면 3시간 후로 종료 시간 자동 설정 (다음날로 넘어갈 수 있도록)
-  useEffect(() => {
-    if (form.startTime) {
-      const [hours, minutes] = form.startTime.split(':').map(Number);
-      let totalMinutes = hours * 60 + minutes + 180; // 기본 3시간
-      // 선택된 서비스에 따른 추가 시간 계산
-      const additionalMinutes = selectedServices.reduce((acc, serviceId) => {
-        const service = SERVICE_OPTIONS.find(s => s.id === serviceId);
-        return acc + (service?.timeAdd || 0);
-      }, 0);
-      totalMinutes += additionalMinutes;
-      // 24시간 이상이면 다음날로 넘어감
-      let endHours = Math.floor(totalMinutes / 60) % 24;
-      let endMinutes = totalMinutes % 60;
-      const endTime = `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
-      setForm(prev => ({ ...prev, endTime }));
-    }
-  }, [form.startTime, selectedServices]);
+  // 생활청소 시간/요금 정보 계산
+  const getLifeCleaningInfo = () => {
+    if (form.serviceDetailType !== '생활청소') return null;
+    return ROOM_SIZES_LIFE_CLEANING[selectedRoomIdx];
+  };
 
-  // 서비스 선택에 따른 가격 계산
+  // 총 시간 및 가격 계산
+  const calculateTotalTimeAndPrice = () => {
+    const baseInfo = getLifeCleaningInfo();
+    if (!baseInfo) return { totalTime: 0, totalPrice: 0 };
+
+    let additionalTime = 0;
+    let additionalPrice = 0;
+
+    selectedServices.forEach(serviceId => {
+      const service = SERVICE_OPTIONS.find(opt => opt.id === serviceId);
+      if (service) {
+        const count = service.countable ? (optionCounts[serviceId] || 1) : 1;
+        additionalTime += service.timeAdd * count;
+        additionalPrice += service.priceAdd * count;
+      }
+    });
+
+    const totalTime = baseInfo.baseTime * 60 + additionalTime; // 분 단위로 변환
+    const totalPrice = baseInfo.estimatedPrice + additionalPrice;
+
+    return { totalTime, totalPrice };
+  };
+
+  // 서비스 옵션 토글
+  const handleServiceToggle = (serviceId: string) => {
+    setSelectedServices(prev => {
+      if (prev.includes(serviceId)) {
+        setOptionCounts(counts => {
+          const newCounts = { ...counts };
+          delete newCounts[serviceId];
+          return newCounts;
+        });
+        return prev.filter(id => id !== serviceId);
+      }
+      return [...prev, serviceId];
+    });
+  };
+
+  // 옵션 개수 변경
+  const handleCountChange = (serviceId: string, count: number) => {
+    if (count >= 1 && count <= MAX_COUNTABLE_ITEMS) {
+      setOptionCounts(prev => ({
+        ...prev,
+        [serviceId]: count
+      }));
+    }
+  };
+
+  // 예약 정보에 시간 자동 반영
   useEffect(() => {
-    const additionalPrice = selectedServices.reduce((acc, serviceId) => {
-      const service = SERVICE_OPTIONS.find(s => s.id === serviceId);
-      return acc + (service?.price || 0);
-    }, 0);
-    setTotalPrice(basePrice + additionalPrice);
-  }, [selectedServices, basePrice]);
+    const { totalTime } = calculateTotalTimeAndPrice();
+    const startHour = parseInt(form.startTime.split(':')[0]);
+    const startMinute = parseInt(form.startTime.split(':')[1]);
+    
+    const endTime = new Date();
+    endTime.setHours(startHour);
+    endTime.setMinutes(startMinute + totalTime);
+    
+    const endTimeString = `${String(endTime.getHours()).padStart(2, '0')}:${String(endTime.getMinutes()).padStart(2, '0')}`;
+    
+    setForm(prev => ({
+      ...prev,
+      endTime: endTimeString
+    }));
+  }, [form.startTime, selectedServices, optionCounts, selectedRoomIdx]);
 
   const handleManagerToggle = () => {
     setForm(prev => ({ ...prev, chooseManager: !prev.chooseManager }));
@@ -139,7 +201,7 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
         return;
       }
     }
-
+    
     // 3. 예약 시간 체크
     const now = new Date();
     const reservationDate = new Date(form.reservationDate);
@@ -148,8 +210,8 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
       return;
     }
 
-
     let managerUuId = form.managerUuId;
+    let selectManager = null;
     if (!form.chooseManager) {
       try {
         const startDateTime = `${form.reservationDate}T${form.startTime}`;
@@ -162,7 +224,8 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
         };
         const managers = await fetchAvailableManagers(request);
         if (Array.isArray(managers) && managers.length > 0) {
-          managerUuId = managers[0].uuid;
+          selectManager = managers[0];
+          managerUuId = selectManager.uuid;
         } else {
           alert('해당 시간에 가능한 매니저가 없습니다.');
           return;
@@ -171,30 +234,33 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
         alert('매니저 자동 배정 중 오류가 발생했습니다.');
         return;
       }
+    } else{
+      selectManager=managerList.find((manager) => manager.uuid === managerUuId)
     }
 
-    // petType 상태를 기반으로 string으로 변환 (이미 form.pet에 반영됨)
+    // 최신 옵션 정보 반영
+    const serviceOptions = selectedServices.map(id => ({
+      id,
+      count: SERVICE_OPTIONS.find(opt => opt.id === id && opt.countable) ? (optionCounts[id] || 1) : undefined
+    }));
+    
     const formData: ReservationFormData = {
       ...form,
-      serviceAdd: selectedServices.join(','),
-      specialRequest: '',
+      lifeCleaningRoomIdx: selectedRoomIdx,
+      serviceOptions,
       managerUuId,
+      managerInfo : selectManager
+      ? {
+          uuid: selectManager.uuid,
+          name: selectManager.name,
+          profileImage: selectManager.profileImage,
+          averageRate: selectManager.averageRate,
+          introduceText: selectManager.introduceText,
+        }
+      : undefined,
       pet: form.pet as any,
     };
     onSubmit(formData);
-  };
-
-  // 서비스 추가 안내 모달 상태
-  const [serviceModal, setServiceModal] = useState<{open: boolean, type: string | null}>({open: false, type: null});
-
-  const handleServiceToggle = (serviceId: string) => {
-    setServiceModal({open: true, type: serviceId});
-    setSelectedServices(prev => {
-      if (prev.includes(serviceId)) {
-        return prev.filter(id => id !== serviceId);
-      }
-      return [...prev, serviceId];
-    });
   };
 
   // 반려동물 모달 상태
@@ -203,54 +269,6 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
   // 반려동물 토글 시 모달 오픈
   const handlePetToggle = () => {
     setPetModal(true);
-  };
-
-  // 서비스 안내 모달 내용
-  const getServiceModalContent = (type: string | null) => {
-    if (type === 'cooking') {
-      return {
-        title: '요구사항 추가',
-        subtitle: '요리',
-        desc: (
-          <>
-            <div>요리 서비스는 기본 예약 시간에 1시간이 추가됩니다.</div>
-          </>
-        ),
-        actions: [
-          { label: '확인', color: 'green', onClick: () => setServiceModal({ open: false, type: null }) },
-        ],
-      };
-    }
-    if (type === 'ironing') {
-      return {
-        title: '요구사항 추가',
-        subtitle: '다림질',
-        desc: (
-          <>
-            <div>다림질 서비스는 기본 예약 시간에 1시간이 추가됩니다.</div>
-          </>
-        ),
-        actions: [
-          { label: '확인', color: 'green', onClick: () => setServiceModal({ open: false, type: null }) },
-        ],
-      };
-    }
-    if (type === 'cleaning_tools') {
-      return {
-        title: '요구사항 추가',
-        subtitle: '청소도구 준비',
-        desc: (
-          <>
-            <div>청소도구 준비 서비스는 20,000원이 추가됩니다.</div>
-            <div>청소도구가 없는 경우에만 선택해주세요.</div>
-          </>
-        ),
-        actions: [
-          { label: '확인', color: 'green', onClick: () => setServiceModal({ open: false, type: null }) },
-        ],
-      };
-    }
-    return null;
   };
 
   // 반려동물 모달 내용
@@ -269,8 +287,44 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
   const addressRef = React.useRef<HTMLInputElement>(null);
   const addressDetailRef = React.useRef<HTMLInputElement>(null);
 
+  // 날짜 및 시간 선택 개선
+  const today = new Date();
+  const tomorrow = addDays(today, 1);
+
+  // 날짜를 Date 객체로 관리
+  const [selectedDate, setSelectedDate] = useState<Date>(tomorrow);
+
+  useEffect(() => {
+    // 날짜가 비어있으면 tomorrow로, 시간이 비어있으면 09:00으로 자동 설정
+    setForm(prev => ({
+      ...prev,
+      reservationDate: format(selectedDate, 'yyyy-MM-dd'),
+      startTime: prev.startTime || '09:00',
+    }));
+    // eslint-disable-next-line
+  }, [selectedDate]);
+
+  // 종료 시간 계산 함수
+  const getExpectedEndTime = () => {
+    const [startHour, startMinute] = (form.startTime || '09:00').split(':').map(Number);
+    const totalMinutes = startHour * 60 + startMinute + calculateTotalTimeAndPrice().totalTime;
+    const endHour = Math.floor(totalMinutes / 60) % 24;
+    const endMinute = totalMinutes % 60;
+    return `${String(endHour).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}`;
+  };
+
+  // 시간 선택 버튼 그리드 생성
+  const timeOptions: string[] = [];
+  for (let i = 0; i < 32; i++) {
+    const hour = 6 + Math.floor(i / 2);
+    const minute = i % 2 === 0 ? '00' : '30';
+    if (hour > 21) break;
+    timeOptions.push(`${String(hour).padStart(2, '0')}:${minute}`);
+  }
+
   return (
     <>
+    
       <ReservationHeader title="예약 정보 입력" onBack={onBack} />
       <div className="pt-16 p-4 space-y-6">
 
@@ -305,119 +359,171 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
             onChange={(e) => setForm(prev => ({ ...prev, addressDetail: e.target.value }))}
             ref={addressDetailRef}
           />
-        </div>
-
-        {/* 주택 정보 */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">주택 정보</h3>
-
-          {/* 주택 유형 */}
-          <div className="flex gap-2">
-            {Object.entries(HOUSING_TYPES).map(([key, label]) => (
-              <button
-                key={key}
-                onClick={() => setForm(prev => ({ ...prev, housingType: key as any }))}
-                className={`flex-1 py-2 px-4 rounded-full border ${
-                  form.housingType === key
-                    ? 'bg-orange-500 text-white border-orange-500'
-                    : 'bg-white text-gray-700 border-gray-300'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-
-          {/* 평수 */}
-          <div className="flex gap-2">
-            {ROOM_SIZES.map(size => (
-              <button
-                key={size.id}
-                onClick={() => setForm(prev => ({ ...prev, roomSize: size.id }))}
-                className={`flex-1 py-2 px-4 rounded-full border ${
-                  form.roomSize === size.id
-                    ? 'bg-orange-500 text-white border-orange-500'
-                    : 'bg-white text-gray-700 border-gray-300'
-                }`}
-              >
-                {size.label}
-              </button>
-            ))}
-          </div>
-
-          {/* 주택 상세 정보 */}
           <input
             type="text"
-            className="w-full p-3 border border-gray-300 rounded-lg"
-            placeholder="현관 비밀번호, 방 갯수 등등"
+            className="w-full p-3 border border-gray-300 rounded-lg mt-2"
+            placeholder="현관 비밀번호 등, 출입을 위한 특이사항을 입력해주세요.(선택)"
             value={form.housingInformation}
             onChange={(e) => setForm(prev => ({ ...prev, housingInformation: e.target.value }))}
           />
         </div>
 
-        {/* 날짜 및 시간 */}
+        {/* 주택 정보 */}
         <div className="space-y-4">
-          <h3 className="text-lg font-medium">날짜 및 시간</h3>
-          <p className="text-sm text-gray-500">서비스를 원하는 날짜와 시간을 선택해주세요</p>
-          <div className="grid grid-cols-3 gap-2">
-            <input
-              type="date"
-              className="p-3 border border-gray-300 rounded-lg"
-              value={form.reservationDate}
-              min={format(addDays(new Date(), 1), 'yyyy-MM-dd')}
-              onChange={(e) => setForm(prev => ({ ...prev, reservationDate: e.target.value }))}
-            />
-            <select
-              className="p-3 border border-gray-300 rounded-lg"
-              value={form.startTime}
-              onChange={(e) => setForm(prev => ({ ...prev, startTime: e.target.value }))}
-            >
-              {Array.from({ length: 32 }).map((_, i) => {
-                const hour = 6 + Math.floor(i / 2); // 6시부터 시작
-                const minute = i % 2 === 0 ? '00' : '30';
-                const time = `${String(hour).padStart(2, '0')}:${minute}`;
-                if (hour >= 6 && hour <= 21) {
-                  return (
-                    <option key={time} value={time}>
-                      {time}
-                    </option>
-                  );
-                }
-                return null;
-              })}
-            </select>
-
-            <select
-              className="p-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-400"
-              value={form.endTime}
-              disabled
-            >
-              <option>{form.endTime}</option>
-            </select>
+          <h3 className="text-lg font-medium">주택 유형</h3>
+          <div className="grid grid-cols-4 gap-2">
+            {Object.entries(HOUSING_TYPES).map(([key, label]) => (
+              <button
+                key={key}
+                onClick={() => setForm(prev => ({ ...prev, housingType: key as any }))}
+                className={`flex items-center justify-center py-3 rounded-lg border-2 shadow-sm transition-all text-base font-semibold
+                  ${form.housingType === key ? 'bg-orange-500 text-white border-orange-500 scale-105' : 'bg-white text-gray-700 border-gray-200 hover:border-orange-300'}`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* 서비스 추가 */}
+        {/* 날짜 및 시간 */}
         <div className="space-y-4">
-          <h3 className="text-lg font-medium">서비스 추가</h3>
-          <div className="flex flex-wrap gap-2">
+          <div className="rounded-2xl shadow-lg bg-white p-6 border border-orange-100">
+            <div className="flex items-center gap-3 mb-2">
+              <CalendarDaysIcon className="w-7 h-7 text-orange-500" />
+              <h3 className="text-xl font-bold text-orange-600">예약 날짜 및 시간</h3>
+            </div>
+            <div className="text-gray-500 text-sm mb-4">원하는 예약 날짜와 시작 시간을 선택하세요.</div>
+            <div className="flex flex-col md:flex-row gap-4 items-center">
+              <div className="flex-1 w-full">
+                <label className="block text-gray-700 font-medium mb-1">날짜 선택</label>
+                <DatePicker
+                  selected={selectedDate}
+                  onChange={date => setSelectedDate(date as Date)}
+                  minDate={tomorrow}
+                  dateFormat="yyyy-MM-dd"
+                  locale={ko}
+                  className="w-full p-3 border-2 border-orange-200 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition text-center text-lg font-semibold bg-white"
+                  calendarClassName="!border-orange-200 !rounded-xl !shadow-lg"
+                  dayClassName={date =>
+                    format(date, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd')
+                      ? '!bg-orange-500 !text-white !rounded-full'
+                      : ''
+                  }
+                  showPopperArrow={false}
+                />
+              </div>
+              <div className="flex-1 w-full">
+                <label className="block text-gray-700 font-medium mb-1">시작 시간</label>
+                <div className="relative">
+                  <ClockIcon className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-orange-400" />
+                  <select
+                    className="w-full p-3 pl-10 border-2 border-orange-200 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 transition bg-white text-center text-lg font-semibold appearance-none"
+                    value={form.startTime}
+                    onChange={e => setForm(prev => ({ ...prev, startTime: e.target.value }))}
+                  >
+                    <option value="">시간 선택</option>
+                    {Array.from({ length: 33 }).map((_, i) => {
+                      const hour = 6 + Math.floor(i / 2);
+                      const minute = i % 2 === 0 ? '00' : '30';
+                      const time = `${String(hour).padStart(2, '0')}:${minute}`;
+                      if (hour >= 6 && hour <= 21) {
+                        return (
+                          <option key={time} value={time}>
+                            {time}
+                          </option>
+                        );
+                      }
+                      return null;
+                    })}
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 flex flex-col items-center justify-center">
+              <div className="text-gray-700 text-base font-semibold">
+                선택한 날짜: <span className="text-orange-600 font-bold">{format(selectedDate, 'yyyy-MM-dd')}</span>
+              </div>
+              <div className="text-gray-700 text-base font-semibold mt-1">
+                시작 시간: <span className="text-orange-600 font-bold">{form.startTime || '선택 전'}</span>
+              </div>
+              <div className="text-orange-500 text-base font-bold mt-1">
+                예상 종료 시간: {getExpectedEndTime()}
+              </div>
+              <div className="text-gray-400 text-sm mt-1">(종료 시간은 서비스/옵션에 따라 자동 계산됩니다)</div>
+            </div>
+          </div>
+        </div>
+
+        {/* 생활청소 평수/요금 섹션 */}
+        {form.serviceDetailType === '생활청소' && (
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium">평수 선택</h3>
+            <div className="grid grid-cols-2 gap-2">
+              {ROOM_SIZES_LIFE_CLEANING.map((item, idx) => (
+                <button
+                  key={item.range}
+                  onClick={() => setSelectedRoomIdx(idx)}
+                  className={`p-3 rounded-lg border-2 transition-all ${
+                    selectedRoomIdx === idx
+                      ? 'border-orange-500 bg-orange-50 text-orange-700'
+                      : 'border-gray-200 hover:border-orange-200'
+                  }`}
+                >
+                  <div className="font-medium">{item.range}</div>
+                  <div className="text-sm text-gray-600">
+                    {item.baseTime}시간 / {item.estimatedPrice.toLocaleString()}원
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 서비스 옵션 섹션 */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">추가 서비스 선택</h3>
+          <div className="space-y-2">
             {SERVICE_OPTIONS.map(service => (
-              <button
-                key={service.id}
-                onClick={() => handleServiceToggle(service.id)}
-                className={`py-2 px-4 rounded-full border ${
-                  selectedServices.includes(service.id)
-                    ? 'bg-orange-500 text-white border-orange-500'
-                    : 'bg-white text-gray-700 border-gray-300'
-                }`}
-              >
-                {service.label}
-                {service.timeAdd > 0 && (
-                  <span className="ml-1 text-sm">
-                    (+{service.timeAdd}분)
-                  </span>
+              <div key={service.id} className="p-4 border rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id={service.id}
+                      checked={selectedServices.includes(service.id)}
+                      onChange={() => handleServiceToggle(service.id)}
+                      className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                    />
+                    <label htmlFor={service.id} className="font-medium">
+                      {service.label}
+                    </label>
+                  </div>
+                  <div className="text-orange-500 font-medium">
+                    +{service.priceAdd.toLocaleString()}원
+                  </div>
+                </div>
+                
+                {service.countable && selectedServices.includes(service.id) && (
+                  <div className="mt-3 flex items-center gap-2 pl-7">
+                    <button
+                      onClick={() => handleCountChange(service.id, (optionCounts[service.id] || 1) - 1)}
+                      className="w-8 h-8 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      disabled={(optionCounts[service.id] || 1) <= 1}
+                    >
+                      -
+                    </button>
+                    <span className="w-8 text-center">{optionCounts[service.id] || 1}</span>
+                    <button
+                      onClick={() => handleCountChange(service.id, (optionCounts[service.id] || 1) + 1)}
+                      className="w-8 h-8 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      disabled={(optionCounts[service.id] || 1) >= MAX_COUNTABLE_ITEMS}
+                    >
+                      +
+                    </button>
+                    <span className="text-sm text-gray-500">개</span>
+                  </div>
                 )}
-              </button>
+              </div>
             ))}
           </div>
         </div>
@@ -440,6 +546,13 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
               />
             </button>
           </div>
+          <input
+            type="text"
+            className="w-full p-3 border border-gray-300 rounded-lg mt-2"
+            placeholder="매니저가 알아야 할 특이사항 (예: 집 구조, 주의사항 등)"
+            value={form.specialRequest}
+            onChange={e => setForm(prev => ({ ...prev, specialRequest: e.target.value }))}
+          />
         </div>
 
         {/* 매니저 선택 */}
@@ -491,7 +604,17 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
                       form.managerUuId === manager.uuid ? 'border-orange-500 bg-orange-50' : 'border-gray-200 bg-white'
                     }`}
                     onClick={() => {
-                      setForm(prev => ({ ...prev, managerUuId: manager.uuid }));
+                      setForm(prev => ({
+                        ...prev,
+                        managerUuId: manager.uuid,
+                        managerInfo: {
+                          uuid: manager.uuid,
+                          name: manager.name,
+                          profileImage: manager.profileImage,
+                          averageRate: manager.averageRate,
+                          introduceText: manager.introduceText,
+                        }
+                      }));
                       setShowManagerModal(false);
                     }}
                   >
@@ -517,13 +640,37 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
           </div>
         )}
 
-        {/* 가격 표시 */}
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <div className="flex justify-between items-center">
-            <span className="font-medium">총 금액</span>
-            <span className="text-xl font-bold text-orange-500">
-              {totalPrice.toLocaleString()}원
-            </span>
+        {/* 가격 표시 섹션 업데이트 */}
+        <div className="mt-6 p-4 bg-orange-50 rounded-lg border border-orange-100">
+          <div className="space-y-2">
+            <div className="flex justify-between items-center text-gray-600">
+              <span>기본 요금</span>
+              <span>{getLifeCleaningInfo()?.estimatedPrice.toLocaleString()}원</span>
+            </div>
+            {selectedServices.length > 0 && (
+              <div className="space-y-1">
+                {selectedServices.map(serviceId => {
+                  const service = SERVICE_OPTIONS.find(opt => opt.id === serviceId);
+                  if (!service) return null;
+                  const count = service.countable ? (optionCounts[serviceId] || 1) : 1;
+                  return (
+                    <div key={serviceId} className="flex justify-between items-center text-gray-600">
+                      <span>{service.label}{service.countable ? ` x${count}` : ''}</span>
+                      <span>+{(service.priceAdd * count).toLocaleString()}원</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            <div className="border-t border-orange-200 pt-2 flex justify-between items-center">
+              <span className="font-medium">총 금액</span>
+              <span className="text-xl font-bold text-orange-500">
+                {calculateTotalTimeAndPrice().totalPrice.toLocaleString()}원
+              </span>
+            </div>
+            <div className="text-sm text-gray-500 text-center mt-2">
+              예상 소요 시간: {Math.floor(calculateTotalTimeAndPrice().totalTime / 60)}시간 {calculateTotalTimeAndPrice().totalTime % 60}분
+            </div>
           </div>
         </div>
 
@@ -543,29 +690,7 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
           </button>
         </div>
 
-        {/* 서비스 안내 모달 */}
-        {serviceModal.open && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-            <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md flex flex-col items-center animate-fade-in">
-              <div className="text-xl font-bold mb-2">{getServiceModalContent(serviceModal.type)?.title}</div>
-              <div className="text-lg font-semibold mb-4">{getServiceModalContent(serviceModal.type)?.subtitle}</div>
-              <div className="text-gray-700 text-center mb-6 space-y-1">{getServiceModalContent(serviceModal.type)?.desc}</div>
-              <div className="flex gap-4 w-full">
-                {getServiceModalContent(serviceModal.type)?.actions.map((action, idx) => (
-                  <button
-                    key={idx}
-                    onClick={action.onClick}
-                    className={`flex-1 py-3 rounded-lg font-bold text-lg ${
-                      action.color === 'green' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-900'
-                    } hover:opacity-80`}
-                  >
-                    {action.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+       
 
         {/* 반려동물 모달 */}
         {petModal && (
