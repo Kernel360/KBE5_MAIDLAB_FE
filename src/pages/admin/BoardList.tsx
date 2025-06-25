@@ -9,15 +9,12 @@ import {
   TableHead,
   TableRow,
   Typography,
-  IconButton,
-  Tooltip,
   CircularProgress,
   Chip,
   Tabs,
   Tab,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useState, useEffect } from 'react';
 import { useAdmin } from '@/hooks';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -30,11 +27,15 @@ const StyledContainer = styled(Container)(({ theme }) => ({
   marginTop: theme.spacing(4),
 }));
 
-const ActionButton = styled(IconButton)(({ theme }) => ({
-  color: theme.palette.primary.main,
+const ClickableTableRow = styled(TableRow)(({ theme }) => ({
+  cursor: 'pointer',
+  '&:hover': {
+    backgroundColor: theme.palette.action.hover,
+  },
+  transition: theme.transitions.create(['background-color'], {
+    duration: theme.transitions.duration.short,
+  }),
 }));
-
-
 
 const BoardList = () => {
   const location = useLocation();
@@ -115,21 +116,23 @@ const BoardList = () => {
               <TableCell>유형</TableCell>
               <TableCell>제목</TableCell>
               <TableCell>작성자</TableCell>
-              <TableCell></TableCell>
+              <TableCell>작성일</TableCell>
               <TableCell>답변 상태</TableCell>
-              <TableCell align="center">작업</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={6} align="center">
+                <TableCell colSpan={5} align="center">
                   <CircularProgress />
                 </TableCell>
               </TableRow>
             ) : filteredBoards.length > 0 ? (
               filteredBoards.map((board, index) => (
-                <TableRow key={index}>
+                <ClickableTableRow 
+                  key={index}
+                  onClick={() => handleViewDetail(board.boardId)}
+                >
                   <TableCell>
                     <Chip
                       label={BOARD_TYPE_NAMES[board.boardType]}
@@ -154,20 +157,11 @@ const BoardList = () => {
                       size="small"
                     />
                   </TableCell>
-                  <TableCell align="center">
-                    <Tooltip title="상세보기">
-                      <ActionButton
-                        onClick={() => handleViewDetail(board.boardId)}
-                      >
-                        <VisibilityIcon />
-                      </ActionButton>
-                    </Tooltip>
-                  </TableCell>
-                </TableRow>
+                </ClickableTableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} align="center">
+                <TableCell colSpan={5} align="center">
                   게시글이 없습니다.
                 </TableCell>
               </TableRow>
