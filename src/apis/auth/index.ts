@@ -70,8 +70,22 @@ export const authApi = {
   /**
    * 토큰 갱신
    */
-  refreshToken: async (): Promise<LoginResponse> => {
-    return apiCall<LoginResponse>('post', API_ENDPOINTS.AUTH.REFRESH);
+  refreshToken: async (refreshToken?: string): Promise<LoginResponse> => {
+    // refreshToken이 있으면 헤더에 포함, 없으면 쿠키 자동 전송
+    const config = refreshToken
+      ? {
+          headers: {
+            Authorization: `Bearer ${refreshToken}`,
+          },
+        }
+      : undefined;
+
+    return apiCall<LoginResponse>(
+      'post',
+      API_ENDPOINTS.AUTH.REFRESH,
+      undefined,
+      config,
+    );
   },
 
   /**
