@@ -26,6 +26,20 @@ import type {
 } from '@/types/auth';
 import type { UserType } from '@/types';
 
+// 🆕 전역 로그아웃 핸들러 타입 정의
+type GlobalLogoutHandler = (() => void) | null;
+
+// 🆕 전역 로그아웃 핸들러 관리
+let globalLogoutHandler: GlobalLogoutHandler = null;
+
+export const setGlobalLogoutHandler = (handler: GlobalLogoutHandler) => {
+  globalLogoutHandler = handler;
+};
+
+export const getGlobalLogoutHandler = (): GlobalLogoutHandler => {
+  return globalLogoutHandler;
+};
+
 // 인증 상태 타입
 interface AuthState {
   isAuthenticated: boolean;
@@ -168,6 +182,51 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const { handleNewUser, handleExistingUser } = useSocialLogin(
     showToastForSocialLogin,
   );
+
+  // 🆕 전역 로그아웃 핸들러 등록
+  useEffect(() => {
+    const globalLogout = () => {
+      console.log('🚨 전역 로그아웃 핸들러 실행됨');
+
+      try {
+        // 1. 로컬 상태 정리
+        authLogout();
+        dispatch({ type: 'AUTH_LOGOUT' });
+
+        // 2. 즉시 홈으로 이동 (replace 사용)
+        console.log('🔄 홈으로 리다이렉트 중...');
+        navigate(ROUTES.HOME, { replace: true });
+
+        // 🆕 3. 추가 안전장치: 0.5초 후에도 여전히 보호된 페이지에 있으면 강제 리다이렉트
+        setTimeout(() => {
+          const currentPath = window.location.pathname;
+          const protectedPaths = ['/consumer', '/manager', '/admin'];
+          const isOnProtectedPage = protectedPaths.some((path) =>
+            currentPath.startsWith(path),
+          );
+
+          if (isOnProtectedPage) {
+            console.log('🚨 여전히 보호된 페이지에 있음 - 강제 리다이렉트');
+            window.location.replace(ROUTES.HOME);
+          }
+        }, 500);
+      } catch (error) {
+        console.error('🚨 전역 로그아웃 핸들러 실행 중 오류:', error);
+
+        // 오류 발생 시 강제 리다이렉트
+        window.location.replace(ROUTES.HOME);
+      }
+    };
+
+    console.log('📝 전역 로그아웃 핸들러 등록됨');
+    setGlobalLogoutHandler(globalLogout);
+
+    // cleanup 함수
+    return () => {
+      console.log('🗑️ 전역 로그아웃 핸들러 해제됨');
+      setGlobalLogoutHandler(null);
+    };
+  }, [navigate, dispatch]);
 
   // 🔧 초기 인증 상태 확인 - utils/auth.ts 활용
   useEffect(() => {
@@ -329,17 +388,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     [showToast],
   );
 
-  // 로그아웃 함수
+  // 🆕 로그아웃 함수 수정 - API 호출 실패해도 로컬 로그아웃 진행
   const logout = useCallback(async () => {
     try {
+      // API 호출 시도
       await authApi.logout();
+    } catch (error: any) {
+      // API 호출 실패해도 로컬 로그아웃은 진행
+      console.warn(
+        '로그아웃 API 호출 실패, 로컬 로그아웃 진행:',
+        error.message,
+      );
+    } finally {
+      // 항상 로컬 로그아웃 처리
       authLogout();
       dispatch({ type: 'AUTH_LOGOUT' });
       showToast(SUCCESS_MESSAGES.LOGOUT, 'success');
       navigate(ROUTES.HOME);
-    } catch (error: any) {
-      const errorMessage = error?.message || '로그아웃 중 오류가 발생했습니다.';
-      showToast(errorMessage, 'error');
     }
   }, [showToast, navigate]);
 
