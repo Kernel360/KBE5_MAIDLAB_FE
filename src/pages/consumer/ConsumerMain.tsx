@@ -10,6 +10,8 @@ import { ROUTES } from '@/constants';
 import { useAuth, useUser, useEvent } from '@/hooks';
 import { ManagerFooter } from '@/components/layout/BottomNavigation/BottomNavigation';
 import { reservationApi } from '@/apis/reservation';
+import { RESERVATION_STATUS_LABELS } from '@/constants/status';
+import { SERVICE_TYPE_LABELS } from '@/constants/service';
 
 const ConsumerMain: React.FC = () => {
   const navigate = useNavigate();
@@ -23,6 +25,7 @@ const ConsumerMain: React.FC = () => {
     reservationDate: string;
     address: string;
     addressDetail: string;
+    status: string;
   }>(null);
 
   // 프로필 호출
@@ -36,19 +39,37 @@ const ConsumerMain: React.FC = () => {
       try {
         const reservations = await reservationApi.getAllReservations();
         if (reservations && reservations.length > 0) {
-          const sorted = [...reservations].sort((a, b) => {
-            const dateA = new Date(a.reservationDate.replace(' ', 'T'));
-            const dateB = new Date(b.reservationDate.replace(' ', 'T'));
-            return dateB.getTime() - dateA.getTime();
+          const today = new Date();
+          // 예약일 기준으로 오늘 또는 미래 예약만 필터링
+          const upcoming = reservations.filter(r => {
+            const date = new Date(r.reservationDate.replace(' ', 'T'));
+            // 시/분까지 비교하려면 date >= today
+            return date >= new Date(today.getFullYear(), today.getMonth(), today.getDate());
           });
-          const latest = sorted[0];
-          const detail = await reservationApi.getReservationDetail(latest.reservationId);
+          let target;
+          if (upcoming.length > 0) {
+            // 가까운 미래 예약 중 가장 빠른 것
+            target = upcoming.sort((a, b) => {
+              const dateA = new Date(a.reservationDate.replace(' ', 'T'));
+              const dateB = new Date(b.reservationDate.replace(' ', 'T'));
+              return dateA.getTime() - dateB.getTime();
+            })[0];
+          } else {
+            // 과거 예약 중 가장 최근 것
+            target = reservations.sort((a, b) => {
+              const dateA = new Date(a.reservationDate.replace(' ', 'T'));
+              const dateB = new Date(b.reservationDate.replace(' ', 'T'));
+              return dateB.getTime() - dateA.getTime();
+            })[0];
+          }
+          const detail = await reservationApi.getReservationDetail(target.reservationId);
           setRecentReservation({
-            reservationId: latest.reservationId,
-            serviceType: latest.serviceType,
-            reservationDate: latest.reservationDate,
+            reservationId: target.reservationId,
+            serviceType: target.serviceType,
+            reservationDate: target.reservationDate,
             address: detail.address,
             addressDetail: detail.addressDetail,
+            status: target.status,
           });
         } else {
           setRecentReservation(null);
@@ -153,7 +174,7 @@ const ConsumerMain: React.FC = () => {
                   <>
                     <div>
                       <span className="recent-reservation-label">서비스 종류: </span>
-                      <span className="recent-reservation-value">{recentReservation.serviceType}</span>
+                      <span className="recent-reservation-value">{SERVICE_TYPE_LABELS[recentReservation.serviceType as keyof typeof SERVICE_TYPE_LABELS] || recentReservation.serviceType}</span>
                     </div>
                     <div>
                       <span className="recent-reservation-label">예약 일시: </span>
@@ -171,8 +192,14 @@ const ConsumerMain: React.FC = () => {
                 )}
               </div>
               {recentReservation && (
-                <div className="ml-4 text-xs font-bold bg-orange-100 text-orange-500 px-3 py-1 rounded-full whitespace-nowrap border border-orange-200">
-                  진행중
+                <div className={`ml-4 text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap border ${
+                  recentReservation.status === 'COMPLETED'
+                    ? 'bg-gray-100 text-gray-500 border-gray-200'
+                    : recentReservation.status === 'CANCELED'
+                    ? 'bg-red-100 text-red-500 border-red-200'
+                    : 'bg-orange-100 text-orange-500 border-orange-200'
+                }`}>
+                  {RESERVATION_STATUS_LABELS[recentReservation.status as keyof typeof RESERVATION_STATUS_LABELS] || recentReservation.status}
                 </div>
               )}
             </div>

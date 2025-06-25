@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
 import { useBoard } from '@/hooks/domain/useBoard';
 import { ROUTES } from '@/constants/route';
@@ -177,9 +177,13 @@ export default function BoardDetail() {
                   <span className="text-xs text-gray-400">
                     {formatDate(board.createdAt)}
                   </span>
-                  {board.answered && (
+                  {board.answered ? (
                     <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
                       답변완료
+                    </span>
+                  ) : (
+                    <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">
+                      답변대기
                     </span>
                   )}
                 </div>
@@ -191,17 +195,19 @@ export default function BoardDetail() {
                           navigate(`${ROUTES.BOARD.EDIT.replace(':id', id)}`);
                         }
                       }}
-                      className="px-4 py-2 text-sm text-blue-600 hover:text-blue-800 whitespace-nowrap"
+                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-orange-600 hover:bg-orange-50 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-transparent"
                       disabled={isDeleting}
                     >
+                      <Edit className="w-4 h-4 mr-1.5" />
                       수정
                     </button>
                     <button
                       onClick={handleDelete}
-                      className="px-4 py-2 text-sm text-red-600 hover:text-red-800 whitespace-nowrap disabled:opacity-50"
+                      className="w-10 h-10 hover:bg-gray-100 rounded-full flex items-center justify-center transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={isDeleting}
+                      title="삭제"
                     >
-                      {isDeleting ? '삭제 중...' : '삭제'}
+                      <Trash2 className="w-4 h-4 text-gray-400" />
                     </button>
                   </div>
                 )}
