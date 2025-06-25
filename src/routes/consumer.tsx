@@ -10,7 +10,8 @@ import {
   ConsumerReservationCreate,
   ConsumerReservationDetail,
   ConsumerReviewRegister,
-  ManagerList,
+  LikedManagerList,
+  BlackListManagerList,
 } from '@/pages';
 import GoogleMap from '@/pages/reservation/GoogleMap';
 
@@ -85,7 +86,7 @@ export const ConsumerRoutes = () => (
       path={ROUTES.CONSUMER.LIKED_MANAGERS}
       element={
         <ProtectedRoute requiredUserType="CONSUMER">
-          <ManagerList />
+          <LikedManagerList />
         </ProtectedRoute>
       }
     />
@@ -93,7 +94,7 @@ export const ConsumerRoutes = () => (
       path={ROUTES.CONSUMER.BLACKLIST}
       element={
         <ProtectedRoute requiredUserType="CONSUMER">
-          <ManagerList />
+          <BlackListManagerList />
         </ProtectedRoute>
       }
     />

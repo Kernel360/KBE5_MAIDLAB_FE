@@ -5,17 +5,20 @@ import {
   User,
   Settings,
   ChevronRight,
-  CreditCard,
   Ticket,
   Coins,
   Heart,
   Ban,
   Users,
+  Lock,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { useConsumer } from '@/hooks/domain/useConsumer';
 import { useToast } from '@/hooks/useToast';
 import type { ConsumerMyPageResponse } from '@/types/consumer';
 import { ROUTES } from '@/constants';
+import { useAuth } from '@/hooks/useAuth';
 
 interface MenuItemProps {
   icon: React.ReactNode;
@@ -40,7 +43,20 @@ const MyPage: React.FC = () => {
   const navigate = useNavigate();
   const { fetchMypage, loading } = useConsumer();
   const { showToast } = useToast();
+  const { changePassword } = useAuth();
   const [userInfo, setUserInfo] = useState<ConsumerMyPageResponse | null>(null);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    newPassword: '',
+    confirmPassword: '',
+    showPassword: false,
+    showConfirmPassword: false
+  });
+  const [passwordErrors, setPasswordErrors] = useState({
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [changingPassword, setChangingPassword] = useState(false);
 
   useEffect(() => {
     const loadUserInfo = async () => {
@@ -58,10 +74,6 @@ const MyPage: React.FC = () => {
 
   const handleProfileEdit = () => {
     navigate(ROUTES.CONSUMER.PROFILE);
-  };
-
-  const handlePaymentMethods = () => {
-    showToast('결제수단 관리 기능은 준비 중입니다.', 'info');
   };
 
   const handlePromotions = () => {
@@ -86,6 +98,58 @@ const MyPage: React.FC = () => {
 
   const handleSettings = () => {
     showToast('설정 기능은 준비 중입니다.', 'info');
+  };
+
+  const handlePasswordChange = (field: string, value: string) => {
+    setPasswordData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    if (field === 'newPassword' && passwordErrors.newPassword) {
+      setPasswordErrors(prev => ({ ...prev, newPassword: '' }));
+    }
+    if (field === 'confirmPassword' && passwordErrors.confirmPassword) {
+      setPasswordErrors(prev => ({ ...prev, confirmPassword: '' }));
+    }
+  };
+
+  const validatePasswordForm = (): boolean => {
+    const newErrors = { newPassword: '', confirmPassword: '' };
+    if (!passwordData.newPassword.trim()) {
+      newErrors.newPassword = '새 비밀번호를 입력해주세요.';
+    } else if (passwordData.newPassword.length < 8 || passwordData.newPassword.length > 20) {
+      newErrors.newPassword = '8~20자 영문, 숫자를 입력해주세요.';
+    }
+    if (!passwordData.confirmPassword.trim()) {
+      newErrors.confirmPassword = '비밀번호 확인을 입력해주세요.';
+    } else if (passwordData.newPassword !== passwordData.confirmPassword) {
+      newErrors.confirmPassword = '비밀번호가 일치하지 않습니다.';
+    }
+    setPasswordErrors(newErrors);
+    return !newErrors.newPassword && !newErrors.confirmPassword;
+  };
+
+  const handlePasswordSubmit = async () => {
+    if (!validatePasswordForm()) return;
+    setChangingPassword(true);
+    try {
+      const result = await changePassword(passwordData.newPassword);
+      if (result.success) {
+        setShowPasswordModal(false);
+        setPasswordData({
+          newPassword: '',
+          confirmPassword: '',
+          showPassword: false,
+          showConfirmPassword: false
+        });
+        setPasswordErrors({ newPassword: '', confirmPassword: '' });
+        showToast('비밀번호가 변경되었습니다.', 'success');
+      }
+    } catch (error) {
+      showToast('비밀번호 변경에 실패했습니다.', 'error');
+    } finally {
+      setChangingPassword(false);
+    }
   };
 
   if (loading) {
@@ -144,7 +208,7 @@ const MyPage: React.FC = () => {
 
             <button
               onClick={handleProfileEdit}
-              className="w-full py-3 bg-[#FF6B00] text-white rounded-lg font-medium hover:bg-[#FF8533] transition-colors"
+              className="w-full py-3 bg-[#FF6B00] text-white rounded-lg font-medium hover:bg-[#FF8533] transition-colors mb-2"
             >
               프로필 조회
             </button>
@@ -152,11 +216,6 @@ const MyPage: React.FC = () => {
 
           {/* Menu Items */}
           <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-            <MenuItem
-              icon={<CreditCard className="w-5 h-5" />}
-              title="결제수단 관리"
-              onClick={handlePaymentMethods}
-            />
             <div className="border-t border-gray-200">
               <MenuItem
                 icon={<Ticket className="w-5 h-5" />}
@@ -194,6 +253,13 @@ const MyPage: React.FC = () => {
             </div>
             <div className="border-t border-gray-200">
               <MenuItem
+                icon={<Lock className="w-5 h-5" />}
+                title="비밀번호 변경"
+                onClick={() => setShowPasswordModal(true)}
+              />
+            </div>
+            <div className="border-t border-gray-200">
+              <MenuItem
                 icon={<Settings className="w-5 h-5" />}
                 title="설정"
                 onClick={handleSettings}
@@ -202,6 +268,92 @@ const MyPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* 비밀번호 변경 모달 */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900">비밀번호 변경</h3>
+              <button
+                onClick={() => setShowPasswordModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  새 비밀번호
+                </label>
+                <div className="relative">
+                  <input
+                    type={passwordData.showPassword ? 'text' : 'password'}
+                    value={passwordData.newPassword}
+                    onChange={(e) => handlePasswordChange('newPassword', e.target.value)}
+                    placeholder="새 비밀번호를 입력하세요"
+                    className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                      passwordErrors.newPassword ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setPasswordData(prev => ({ ...prev, showPassword: !prev.showPassword }))}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
+                  >
+                    {passwordData.showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+                {passwordErrors.newPassword && (
+                  <p className="text-red-500 text-sm mt-1">{passwordErrors.newPassword}</p>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  비밀번호 확인
+                </label>
+                <div className="relative">
+                  <input
+                    type={passwordData.showConfirmPassword ? 'text' : 'password'}
+                    value={passwordData.confirmPassword}
+                    onChange={(e) => handlePasswordChange('confirmPassword', e.target.value)}
+                    placeholder="비밀번호를 한 번 더 입력하세요"
+                    className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                      passwordErrors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setPasswordData(prev => ({ ...prev, showConfirmPassword: !prev.showConfirmPassword }))}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
+                  >
+                    {passwordData.showConfirmPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+                {passwordErrors.confirmPassword && (
+                  <p className="text-red-500 text-sm mt-1">{passwordErrors.confirmPassword}</p>
+                )}
+              </div>
+              <button
+                onClick={handlePasswordSubmit}
+                disabled={changingPassword}
+                className={`w-full py-3 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors mt-4`}
+              >
+                {changingPassword ? '변경 중...' : '비밀번호 변경'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
