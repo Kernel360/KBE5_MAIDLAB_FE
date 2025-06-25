@@ -14,7 +14,17 @@ import {
   BlackListManagerList,
 } from '@/pages';
 import GoogleMap from '@/pages/reservation/GoogleMap';
-
+import { Status, Wrapper } from '@googlemaps/react-wrapper';
+const render = (status: Status) => {
+  switch (status) {
+    case Status.LOADING:
+      return <>로딩중...</>;
+    case Status.FAILURE:
+      return <>에러 발생</>;
+    case Status.SUCCESS:
+      return <GoogleMap />;
+  }
+};
 
 export const ConsumerRoutes = () => (
   <>
@@ -62,7 +72,12 @@ export const ConsumerRoutes = () => (
       path={ROUTES.CONSUMER.RESERVATION_CREATE}
       element={
         <ProtectedRoute requiredUserType="CONSUMER">
-          <ConsumerReservationCreate />
+          <Wrapper
+            apiKey={import.meta.env.VITE_GOOGLEMAP_API_KEY}
+            render={render}
+          >
+            <ConsumerReservationCreate />
+          </Wrapper>
         </ProtectedRoute>
       }
     />
@@ -98,11 +113,6 @@ export const ConsumerRoutes = () => (
         </ProtectedRoute>
       }
     />
-    <Route
-      path={'/google-map'}
-      element={
-          <GoogleMap />
-      }
-    />
+    <Route path={'/google-map'} element={<GoogleMap />} />
   </>
 );
