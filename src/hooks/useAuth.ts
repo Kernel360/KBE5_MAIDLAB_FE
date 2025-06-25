@@ -308,11 +308,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         }
 
         await authApi.socialSignUp(data, tempToken);
+
+        localStorage.removeItem('tempSocialToken');
+        localStorage.removeItem('tempUserType');
+
         dispatch({ type: 'AUTH_LOGOUT' });
         showToast(SUCCESS_MESSAGES.SIGNUP, 'success');
 
         return { success: true };
       } catch (error: any) {
+        localStorage.removeItem('tempSocialToken');
+        localStorage.removeItem('tempUserType');
+
         const errorMessage = error.message || ERROR_MESSAGES.UNKNOWN;
         dispatch({ type: 'AUTH_FAILURE', payload: errorMessage });
         showToast(errorMessage, 'error');
