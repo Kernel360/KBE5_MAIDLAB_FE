@@ -196,9 +196,9 @@ const ProfileEdit: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
+      <div className="flex items-center justify-between p-4 border-b bg-white">
         <button
           onClick={() => navigate(ROUTES.CONSUMER.PROFILE)}
           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -210,45 +210,43 @@ const ProfileEdit: React.FC = () => {
       </div>
 
       <div className="px-4 py-6">
-        <div className="max-w-md mx-auto space-y-6">
-          {/* 프로필 이미지 */}
-          <div className="text-center">
-            <div className="relative inline-block">
-              <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
-                {previewImage || formData.profileImage ? (
-                  <img
-                    src={imageError ? DEFAULT_PROFILE_IMAGE : (previewImage || formData.profileImage)}
-                    alt="프로필"
-                    className="w-full h-full object-cover"
-                    onError={handleImageError}
-                  />
-                ) : (
-                  <User className="w-16 h-16 text-gray-400" />
-                )}
+        <div className="max-w-md mx-auto">
+          <div className="bg-white rounded-xl shadow-sm p-6 space-y-8">
+            {/* 프로필 이미지 */}
+            <div className="text-center mb-4">
+              <div className="relative inline-block">
+                <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+                  {previewImage || formData.profileImage ? (
+                    <img
+                      src={imageError ? DEFAULT_PROFILE_IMAGE : (previewImage || formData.profileImage)}
+                      alt="프로필"
+                      className="w-full h-full object-cover"
+                      onError={handleImageError}
+                    />
+                  ) : (
+                    <User className="w-16 h-16 text-gray-400" />
+                  )}
+                </div>
+                <button
+                  onClick={handleImageUpload}
+                  disabled={uploadingImage}
+                  className={`absolute -bottom-2 -right-2 w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white shadow-lg transition-colors ${
+                    uploadingImage
+                      ? 'opacity-50 cursor-not-allowed'
+                      : 'hover:bg-orange-600'
+                  }`}
+                >
+                  {uploadingImage ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Upload className="w-5 h-5" />
+                  )}
+                </button>
               </div>
-              <button
-                onClick={handleImageUpload}
-                disabled={uploadingImage}
-                className={`absolute -bottom-2 -right-2 w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white shadow-lg transition-colors ${
-                  uploadingImage
-                    ? 'opacity-50 cursor-not-allowed'
-                    : 'hover:bg-orange-600'
-                }`}
-              >
-                {uploadingImage ? (
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <Upload className="w-5 h-5" />
-                )}
-              </button>
             </div>
-            
-          </div>
 
-          {/* 프로필 정보 */}
-          <div className="space-y-4">
-            
-            <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
+            {/* 프로필 정보 */}
+            <div className="space-y-4 bg-white rounded-lg">
               {/* 이름 */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -258,7 +256,7 @@ const ProfileEdit: React.FC = () => {
                   type="text"
                   value={formData.name}
                   onChange={e => handleInputChange('name', e.target.value)}
-                  className="w-full p-3 border rounded-lg text-gray-900 border-gray-300"
+                  className="w-full p-3 border text-center border-gray-300 rounded-lg text-gray-900 bg-white"
                 />
                 {errors.name && (
                   <p className="text-red-500 text-sm mt-1">{errors.name}</p>
@@ -301,7 +299,7 @@ const ProfileEdit: React.FC = () => {
                   value={formData.birth}
                   onChange={handleBirthChange}
                   placeholder="YYYY-MM-DD"
-                  className="w-full p-3 border rounded-lg text-center text-gray-900 border-gray-300"
+                  className="w-full p-3 border text-center border-gray-300 rounded-lg text-gray-900 bg-white"
                   maxLength={10}
                   inputMode="numeric"
                   autoComplete="bday"
@@ -321,7 +319,7 @@ const ProfileEdit: React.FC = () => {
                   value={formData.address}
                   onChange={e => handleInputChange('address', e.target.value)}
                   placeholder="서울특별시 서초구"
-                  className={`w-full p-3 border rounded-lg transition-colors ${errors.address ? 'border-red-500' : 'border-gray-300'}`}
+                  className="w-full p-3 border text-center border-gray-300 rounded-lg text-gray-900 bg-white"
                 />
                 {errors.address && (
                   <p className="text-red-500 text-sm mt-1">{errors.address}</p>
@@ -338,42 +336,42 @@ const ProfileEdit: React.FC = () => {
                   value={formData.detailAddress}
                   onChange={e => handleInputChange('detailAddress', e.target.value)}
                   placeholder="상세 주소를 입력해주세요"
-                  className={`w-full p-3 border rounded-lg transition-colors ${errors.detailAddress ? 'border-red-500' : 'border-gray-300'}`}
+                  className="w-full p-3 border text-center border-gray-300 rounded-lg text-gray-900 bg-white "
                 />
                 {errors.detailAddress && (
                   <p className="text-red-500 text-sm mt-1">{errors.detailAddress}</p>
                 )}
               </div>
             </div>
-          </div>
 
-          {/* 버튼 그룹 */}
-          <div className="pt-6 space-y-3">
-            <button
-              onClick={handleSubmit}
-              disabled={!isFormValid() || loading || uploadingImage}
-              className={`w-full py-4 rounded-lg font-medium transition-colors ${
-                isFormValid() && !loading && !uploadingImage
-                  ? 'bg-orange-500 text-white hover:bg-orange-600'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-              }`}
-            >
-              {loading || uploadingImage ? (
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  {uploadingImage ? '이미지 업로드 중...' : '저장 중...'}
-                </div>
-              ) : (
-                '저장하기'
-              )}
-            </button>
+            {/* 버튼 그룹 */}
+            <div className="pt-1 space-y-3">
+              <button
+                onClick={handleSubmit}
+                disabled={!isFormValid() || loading || uploadingImage}
+                className={`w-full py-4 rounded-lg font-medium transition-colors ${
+                  isFormValid() && !loading && !uploadingImage
+                    ? 'bg-orange-500 text-white hover:bg-orange-600'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                }`}
+              >
+                {loading || uploadingImage ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    {uploadingImage ? '이미지 업로드 중...' : '저장 중...'}
+                  </div>
+                ) : (
+                  '저장하기'
+                )}
+              </button>
 
-            <button
-              onClick={() => navigate(ROUTES.CONSUMER.PROFILE)}
-              className="w-full py-4 bg-gray-500 text-white rounded-lg font-medium hover:bg-gray-600 transition-colors"
-            >
-              취소
-            </button>
+              <button
+                onClick={() => navigate(ROUTES.CONSUMER.PROFILE)}
+                className="w-full py-4 bg-gray-500 text-white rounded-lg font-medium hover:bg-gray-600 transition-colors"
+              >
+                취소
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -171,7 +171,7 @@ const Profile: React.FC = () => {
             </div>
 
             {/* 완료 버튼 */}
-            <div className="pt-6">
+            <div className="pt-1">
               <button
                 onClick={() => navigate(ROUTES.CONSUMER.PROFILE_EDIT)}
                 className="w-full py-4 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors"
