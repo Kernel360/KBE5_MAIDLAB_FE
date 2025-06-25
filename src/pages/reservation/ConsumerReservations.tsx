@@ -85,13 +85,13 @@ const ConsumerReservations: React.FC = () => {
   const currentReservations = filteredReservations.slice(startIndex, endIndex);
 
   return (
-    <div className="max-w-md mx-auto bg-[#F7F7F7] min-h-screen p-0 pb-20 relative">
-      {/* ReservationHeader를 absolute로 올리고, 탭 헤더에 pt-16 추가 */}
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="max-w-md mx-auto bg-gray-50  min-h-screen p-0 pb-20 relative">
       <div className="absolute top-0 left-0 w-full z-20">
         <ReservationHeader title="예약 내역" onBack={() => navigate(-1)} />
       </div>
       {/* 탭 헤더 */}
-      <div className="flex items-center justify-between border-b border-gray-200 bg-white px-6 pt-16 pb-2 sticky top-0 z-10">
+      <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 px-6 pt-16 pb-2 sticky top-0 z-10">
         <div className="flex gap-8">
           {FILTERS.map((f) => (
             <button
@@ -156,6 +156,7 @@ const ConsumerReservations: React.FC = () => {
         onTabClick={navigate}
         isAuthenticated={isAuthenticated}
       />
+    </div>
     </div>
   );
 };
