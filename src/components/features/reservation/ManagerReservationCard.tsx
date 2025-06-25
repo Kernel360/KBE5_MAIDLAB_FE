@@ -13,7 +13,6 @@ interface ManagerReservationCardProps {
   onDetailClick: () => void;
   onCheckIn?: () => void;
   onCheckOut?: () => void;
-  onCancel?: () => void;
 }
 
 export const ManagerReservationCard: React.FC<ManagerReservationCardProps> = ({
@@ -22,7 +21,6 @@ export const ManagerReservationCard: React.FC<ManagerReservationCardProps> = ({
   onDetailClick,
   onCheckIn,
   onCheckOut,
-  onCancel,
 }) => {
   // 오늘 날짜인지 확인
   const isToday = (dateString: string) => {
@@ -42,9 +40,6 @@ export const ManagerReservationCard: React.FC<ManagerReservationCardProps> = ({
 
   // 체크아웃 버튼 표시 여부
   const showCheckOutButton = reservation.status === RESERVATION_STATUS.WORKING;
-
-  // 예약취소 버튼 표시 여부
-  const showCancelButton = reservation.status === RESERVATION_STATUS.MATCHED && !isToday(reservation.reservationDate);
 
   // 상태 텍스트 변환
   const getStatusText = (status: string, reservationDate: string) => {
@@ -98,14 +93,6 @@ export const ManagerReservationCard: React.FC<ManagerReservationCardProps> = ({
             className="px-4 py-2 text-sm bg-green-500 text-white rounded-lg hover:bg-green-600 font-bold"
           >
             체크아웃
-          </button>
-        )}
-        {showCancelButton && onCancel && (
-          <button
-            onClick={onCancel}
-            className="px-4 py-2 text-sm bg-red-100 text-red-500 border border-red-300 rounded-lg hover:bg-red-200 font-bold"
-          >
-            예약취소
           </button>
         )}
         <button

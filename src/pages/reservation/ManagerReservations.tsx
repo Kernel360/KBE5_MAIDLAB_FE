@@ -259,11 +259,6 @@ const ManagerReservationsAndMatching: React.FC = () => {
   const handleConfirmModalClose = () => {
     setConfirmModal({ isOpen: false, isCheckIn: true });
   };
-  
-  const handleCancelReservation = async (reservationId: number) => {
-    // TODO : 예약 취소 기능
-    showToast('서비스 준비중입니다. 예약 취소를 원하실 경우 관리자에게 직접 문의해 주세요.', 'info');
-  };
 
   // 예약 일정 카드 UI (ManagerReservationCard 활용)
   const renderReservationCard = (reservation: any) => (
@@ -274,7 +269,6 @@ const ManagerReservationsAndMatching: React.FC = () => {
       onDetailClick={() => navigate(`/manager/reservations/${reservation.reservationId}`)}
       onCheckIn={() => handleCheckInOutClick(reservation, true)}
       onCheckOut={() => handleCheckInOutClick(reservation, false)}
-      onCancel={() => handleCancelReservation(reservation.reservationId)}
     />
   );
 
