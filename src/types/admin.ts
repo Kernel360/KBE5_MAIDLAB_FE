@@ -88,7 +88,7 @@ export interface AdminWeeklySettlementResponse {
 /**
  * 정산 상세 정보
  */
-export interface SettlementDetail {
+export interface SettlementDetailInfo {
   settlementId: number;
   serviceType: 'HOUSEKEEPING';
   serviceDetailType: string;
@@ -101,7 +101,7 @@ export interface SettlementDetail {
  * 정산 상세 응답
  */
 export interface SettlementDetailResponse {
-  data: SettlementDetail;
+  data: SettlementDetailInfo;
   message: string;
   code: string;
 }

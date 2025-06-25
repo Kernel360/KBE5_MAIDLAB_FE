@@ -17,7 +17,7 @@ import type {
   AdminWeeklySettlementResponse,
   AdminAnswerRequest,
   ManagerStatusParams,
-  SettlementDetailResponse,
+  SettlementDetailInfo,
   ManagerChangeRequest,
 } from '@/types/admin';
 import { API_ENDPOINTS } from '@/constants/api';
@@ -309,8 +309,8 @@ export const adminApi = {
    */
   getSettlementDetail: async (
     settlementId: number,
-  ): Promise<SettlementDetailResponse> => {
-    return apiCall<SettlementDetailResponse>(
+  ): Promise<SettlementDetailInfo> => {
+    return apiCall<SettlementDetailInfo>(
       'get',
       API_ENDPOINTS.ADMIN.RESERVATION.SETTLEMENT_DETAIL(settlementId),
     );

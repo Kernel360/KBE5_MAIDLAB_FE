@@ -3,20 +3,20 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAdmin } from '@/hooks/domain/useAdmin';
 import { Button, Card, Skeleton, Typography } from '@mui/material';
 import { formatNumber } from '@/utils';
-import type { SettlementDetail } from '@/types/admin';
+ import type { SettlementDetailInfo} from '@/types/admin';
 
 const SettlementDetail = () => {
   const { settlementId } = useParams<{ settlementId: string }>();
   const navigate = useNavigate();
   const { loading, reservationManagement } = useAdmin();
-  const [settlement, setSettlement] = useState<SettlementDetail | null>(null);
+  const [settlement, setSettlement] = useState<SettlementDetailInfo | null>(null);
 
   useEffect(() => {
     const fetchSettlementDetail = async () => {
       if (!settlementId) return;
       const data = await reservationManagement.fetchSettlementDetail(Number(settlementId));
       if (data) {
-        setSettlement(data.data);
+        setSettlement(data);
       }
     };
 
