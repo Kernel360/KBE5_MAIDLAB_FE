@@ -147,7 +147,7 @@ const Profile: React.FC = () => {
             {/* 주소 */}
             <div>
               <label className="block text-gray-700 font-medium mb-1">
-                주소 <span className="text-red-500">*</span>
+                주소 
               </label>
               <input
                 type="text"
@@ -160,7 +160,7 @@ const Profile: React.FC = () => {
             {/* 상세 주소 */}
             <div>
               <label className="block text-gray-700 font-medium mb-1">
-                상세 주소 <span className="text-red-500">*</span>
+                상세 주소 
               </label>
               <input
                 type="text"
@@ -171,7 +171,7 @@ const Profile: React.FC = () => {
             </div>
 
             {/* 완료 버튼 */}
-            <div className="pt-6">
+            <div className="pt-1">
               <button
                 onClick={() => navigate(ROUTES.CONSUMER.PROFILE_EDIT)}
                 className="w-full py-4 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors"
