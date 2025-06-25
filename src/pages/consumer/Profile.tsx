@@ -147,7 +147,7 @@ const Profile: React.FC = () => {
             {/* 주소 */}
             <div>
               <label className="block text-gray-700 font-medium mb-1">
-                주소 <span className="text-red-500">*</span>
+                주소 
               </label>
               <input
                 type="text"
@@ -160,7 +160,7 @@ const Profile: React.FC = () => {
             {/* 상세 주소 */}
             <div>
               <label className="block text-gray-700 font-medium mb-1">
-                상세 주소 <span className="text-red-500">*</span>
+                상세 주소 
               </label>
               <input
                 type="text"
