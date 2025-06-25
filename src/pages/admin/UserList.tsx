@@ -17,7 +17,6 @@ import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_PAGE_NUMBER,
   LOCAL_STORAGE_KEYS,
-  TABLE_COLUMNS,
   STATUS_FILTER_OPTIONS,
   USER_TYPES,
   TAB_INDICES
@@ -51,7 +50,6 @@ import {
   TableHead, 
   TablePagination, 
   TableRow, 
-  Button, 
   Chip, 
   CircularProgress, 
   Select, 
@@ -68,6 +66,15 @@ const FilterBox = styled(Box)(({ theme }) => ({
   display: 'flex',
   gap: theme.spacing(2),
   marginBottom: theme.spacing(3),
+}));
+
+// 클릭 가능한 테이블 행 스타일
+const ClickableTableRow = styled(TableRow)(({ theme }) => ({
+  cursor: 'pointer',
+  transition: 'background-color 0.2s ease',
+  '&:hover': {
+    backgroundColor: theme.palette.action.hover,
+  },
 }));
 
 function TabPanel(props: TabPanelProps) {
@@ -226,7 +233,7 @@ const UserList = () => {
     }
   }, [tabValue, page, rowsPerPage, selectedStatus]);
 
-  const handleDetailView = (type: UserType, id: number) => {
+  const handleRowClick = (type: UserType, id: number) => {
     setLocalStorage(LOCAL_STORAGE_KEYS.ADMIN_USER_TAB, tabValue);
     setLocalStorage(LOCAL_STORAGE_KEYS.ADMIN_MANAGER_STATUS, selectedStatus);
     navigate(`/admin/users/${type}/${id}`);
@@ -236,7 +243,7 @@ const UserList = () => {
     if (loading) {
       return (
         <TableRow>
-          <TableCell colSpan={TABLE_COLUMNS.CONSUMER} align="center">
+          <TableCell colSpan={3} align="center">
             <CircularProgress />
           </TableCell>
         </TableRow>
@@ -244,20 +251,14 @@ const UserList = () => {
     }
 
     return consumerData.content.map((consumer) => (
-      <TableRow key={consumer.uuid}>
+      <ClickableTableRow 
+        key={consumer.id}
+        onClick={() => handleRowClick(USER_TYPES.CONSUMER, consumer.id)}
+      >
+        <TableCell>{consumer.id}</TableCell>
         <TableCell>{consumer.name}</TableCell>
         <TableCell>{consumer.phoneNumber}</TableCell>
-        <TableCell>{consumer.uuid}</TableCell>
-        <TableCell>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => handleDetailView(USER_TYPES.CONSUMER, consumer.id)}
-          >
-            상세보기
-          </Button>
-        </TableCell>
-      </TableRow>
+      </ClickableTableRow>
     ));
   };
 
@@ -265,7 +266,7 @@ const UserList = () => {
     if (loading) {
       return (
         <TableRow>
-          <TableCell colSpan={TABLE_COLUMNS.MANAGER} align="center">
+          <TableCell colSpan={3} align="center">
             <CircularProgress />
           </TableCell>
         </TableRow>
@@ -276,7 +277,10 @@ const UserList = () => {
       const details = managerDetails[manager.id];
       const verificationStatus = details?.isVerified as ManagerVerificationStatus;
       return (
-        <TableRow key={manager.uuid}>
+        <ClickableTableRow 
+          key={manager.uuid}
+          onClick={() => handleRowClick(USER_TYPES.MANAGER, manager.id)}
+        >
           <TableCell>{manager.name}</TableCell>
           <TableCell>
             {details?.averageRate ?? '-'}
@@ -288,16 +292,7 @@ const UserList = () => {
               size="small"
             />
           </TableCell>
-          <TableCell>
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={() => handleDetailView(USER_TYPES.MANAGER, manager.id)}
-            >
-              상세보기
-            </Button>
-          </TableCell>
-        </TableRow>
+        </ClickableTableRow>
       );
     });
   };
@@ -320,10 +315,9 @@ const UserList = () => {
           <Table>
             <TableHead>
               <TableRow>
+                <TableCell>id</TableCell>
                 <TableCell>이름</TableCell>
                 <TableCell>전화번호</TableCell>
-                <TableCell>UUID</TableCell>
-                <TableCell>액션</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -369,7 +363,6 @@ const UserList = () => {
                 <TableCell>이름</TableCell>
                 <TableCell>평점</TableCell>
                 <TableCell>가입상태</TableCell>
-                <TableCell>액션</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
