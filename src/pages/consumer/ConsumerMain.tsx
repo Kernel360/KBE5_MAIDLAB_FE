@@ -125,23 +125,63 @@ const ConsumerMain: React.FC = () => {
 
       <main className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto">
-          {profile?.name ? (
-            <div className="mb-6 flex flex-col items-center text-gray-900">
-              <div className="font-bold text-xl">안녕하세요, {profile.name}님!</div>
-              <div className="text-base mt-1">오늘도 좋은 하루 보내세요.</div>
-            </div>
-          ) : (
-            <div className="mb-6 flex flex-col items-center text-gray-900">
-              <div className="font-bold text-xl">환영합니다!</div>
-            </div>
-          )}
-
           <HeroSection
             onEventClick={handleEventClick}
             events={activeEvents}
             loading={eventsLoading}
           />
-          <ServiceGrid onServiceClick={handleServiceClick} />
+          {/* Greeting + Service Button Card (색상 스왑) */}
+          <div className="flex justify-center mb-8">
+            <div className="w-full max-w-md bg-white bg-opacity-90 rounded-2xl p-6 text-orange-600 shadow-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-xl font-bold mb-1 text-black">
+                    {profile?.name ? `${profile.name}님, 반가워요!` : '환영합니다!'}
+                  </h1>
+                  <p className="text-sm text-black">
+                    {profile?.name ? '오늘도 좋은 하루 보내세요.' : '서비스를 신청해보세요.'}
+                  </p>
+                </div>
+                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center overflow-hidden">
+                  {profile?.profileImage ? (
+                    <img
+                      src={profile.profileImage}
+                      alt="프로필"
+                      className="w-full h-full object-cover"
+                      onError={e => {
+                        e.currentTarget.style.display = 'none';
+                        const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <svg
+                    className="w-7 h-7"
+                    style={{ display: profile?.profileImage ? 'none' : 'block' }}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                </div>
+              </div>
+              <div className="mt-6 flex flex-col items-center">
+                <button
+                  onClick={() => handleServiceClick('ALL')}
+                  className="w-full flex flex-col items-center justify-center bg-orange-400 rounded-xl shadow p-3 hover:bg-orange-500 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-orange-100 text-white"
+                >
+                  <span className="mb-1"></span>
+                  <span className="text-base font-bold text-white">예약하기</span>
+                </button>
+              </div>
+            </div>
+          </div>
 
           <div className="recent-reservation-card">
             <div className="flex justify-between items-start mb-2">

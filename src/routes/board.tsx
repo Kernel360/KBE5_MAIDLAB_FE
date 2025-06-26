@@ -10,7 +10,14 @@ import {
 
 export const BoardRoutes = () => (
   <>
-    <Route path={ROUTES.BOARD.LIST} element={<BoardList />} />
+    <Route
+      path={ROUTES.BOARD.LIST}
+      element={
+        <ProtectedRoute>
+          <BoardList />
+        </ProtectedRoute>
+      }
+    />
     <Route
       path={ROUTES.BOARD.CREATE}
       element={
@@ -19,7 +26,14 @@ export const BoardRoutes = () => (
         </ProtectedRoute>
       }
     />
-    <Route path={ROUTES.BOARD.DETAIL} element={<BoardDetail />} />
+    <Route
+      path={ROUTES.BOARD.DETAIL}
+      element={
+        <ProtectedRoute>
+          <BoardDetail />
+        </ProtectedRoute>
+      }
+    />
     <Route
       path={ROUTES.BOARD.EDIT}
       element={
