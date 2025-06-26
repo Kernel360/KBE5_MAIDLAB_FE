@@ -20,7 +20,7 @@ export const TabHeader: React.FC<TabHeaderProps> = ({
   setFilterOpen,
 }) => {
   return (
-    <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 px-6 pt-2 pb-2 sticky top-0 z-20">
+    <div className="flex items-center justify-between bg-gray-50 border-b border-gray-100 sticky pt-4 top-[64px] z-10">
       <div className="flex gap-8">
         <button
           className={`text-lg font-bold pb-2 border-b-2 ${tab === 'schedule' ? 'border-orange-500 text-orange-500' : 'border-transparent text-gray-400'}`}

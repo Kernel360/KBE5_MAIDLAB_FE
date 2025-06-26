@@ -194,7 +194,9 @@ const ManagerReservationsAndMatching: React.FC = () => {
   const now = new Date();
   return (
     <div className="min-h-screen bg-gray-50 flex-col">
+      <div className="sticky top-0 z-20 bg-white">
       <ReservationHeader title="예약 관리" onBack={() => navigate(-1)} />
+      </div>
       <div className="max-w-md mx-auto bg-gray-50 min-h-screen p-0 pb-20 relative">
         {/* 탭 헤더 */}
         <TabHeader
