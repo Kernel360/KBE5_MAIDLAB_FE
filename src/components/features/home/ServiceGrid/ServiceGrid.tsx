@@ -9,7 +9,7 @@ interface ServiceGridProps {
 export const ServiceGrid: React.FC<ServiceGridProps> = ({ onServiceClick }) => {
   const services = [
     {
-      id: SERVICE_TYPES.HOUSEKEEPING,
+      id: SERVICE_TYPES.GENERAL_CLEANING,
       icon: Home,
       label: '가사',
       color: 'text-orange-500',
@@ -27,7 +27,7 @@ export const ServiceGrid: React.FC<ServiceGridProps> = ({ onServiceClick }) => {
       color: 'text-orange-500',
     },
     {
-      id: SERVICE_TYPES.CARE,
+      id: SERVICE_TYPES.PET_CARE,
       icon: User,
       label: '돌봄',
       color: 'text-orange-500',
