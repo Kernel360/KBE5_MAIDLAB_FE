@@ -3,12 +3,13 @@ import React from 'react';
 interface CheckInOutModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: (reservationId: number, isCheckIn: boolean) => void;
   isCheckIn: boolean;
   reservationInfo: {
     serviceType: string;
     detailServiceType: string;
     time: string;
+    reservationId?: number;
   };
 }
 
@@ -60,7 +61,7 @@ export const CheckInOutModal: React.FC<CheckInOutModalProps> = ({
               취소
             </button>
             <button
-              onClick={onConfirm}
+              onClick={() => onConfirm(reservationInfo.reservationId!, isCheckIn)}
               className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600"
             >
               {isCheckIn ? '체크인' : '체크아웃'}

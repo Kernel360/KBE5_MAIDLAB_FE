@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useReservation } from '@/hooks/domain/useReservation';
-import { SERVICE_TYPE_LABELS, SERVICE_OPTIONS, HOUSING_TYPES, PET_TYPES } from '@/constants/service';
-import { RESERVATION_STATUS_LABELS, RESERVATION_STATUS_COLORS } from '@/constants/status';
+import { SERVICE_TYPE_LABELS, SERVICE_OPTIONS, HOUSING_TYPES, PET_TYPES, FEE_CONFIG } from '@/constants/service';
+import { RESERVATION_STATUS_LABELS, RESERVATION_STATUS_COLORS, RESERVATION_STATUS } from '@/constants/status';
 import { COLORS } from '@/constants/theme';
 import { formatDateTime, formatKoreanDate, formatTime, getKoreanWeekday } from '@/utils/date';
-import { formatPrice, formatRoomSize, formatPhoneNumber } from '@/utils/format';
+import { formatEstimatedPriceByRoomSize, formatMinutesToHourMinute, formatPrice, formatRoomSize, formatPhoneNumber } from '@/utils/format';
 import type { ReservationDetailResponse } from '@/types/reservation';
 import ReservationHeader from '@/components/features/consumer/ReservationHeader';
 import { ManagerFooter } from '@/components/layout/BottomNavigation/BottomNavigation';
 import { useAuth } from '@/hooks/useAuth';
 import { ArrowLeft, MessageCircle, Phone, Star, MapPin, Clock, Calendar, User, Home, PawPrint, Baby, CheckCircle, XCircle, AlertCircle, Coffee } from 'lucide-react';
+import { ROUTES } from '@/constants/route';
+import CheckInOutModal from '@/components/features/reservation/manager/CheckInOutModal';
 
 // 상태별 아이콘 매핑
 const STATUS_ICONS: Record<string, React.ElementType> = {
@@ -42,6 +44,7 @@ function parseAdditionalOptions(serviceAdd: string) {
       id,
       label: option.label,
       price: option.priceAdd,
+      time : option.timeAdd,
       ...(count !== undefined ? { count } : {}),
     };
   }).filter(Boolean);
@@ -53,15 +56,37 @@ function parsePet(pet: string) {
   return pet;
 }
 
+// 정산 금액 계산 함수
+function calcManagerSettlement(totalPrice: number) {
+  const platformFee = Math.max(FEE_CONFIG.MINIMUM_FEE, Math.min(FEE_CONFIG.MAXIMUM_FEE, totalPrice * FEE_CONFIG.PLATFORM_FEE_RATE));
+  const vat = totalPrice * FEE_CONFIG.VAT_RATE;
+  return {
+    platformFee,
+    vat,
+    settlement: totalPrice - platformFee - vat,
+  };
+}
+
+function isToday(dateStr: string) {
+  const today = new Date();
+  const date = new Date(dateStr);
+  return (
+    today.getFullYear() === date.getFullYear() &&
+    today.getMonth() === date.getMonth() &&
+    today.getDate() === date.getDate()
+  );
+}
+
 const ManagerReservationDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { fetchReservationDetail } = useReservation();
+  const { fetchReservationDetail, checkIn, checkOut } = useReservation();
   const { isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reservation, setReservation] = useState<ReservationDetailResponse | null>(null);
   const [showPhoneNumber, setShowPhoneNumber] = useState(false);
+  const [checkInOutModal, setCheckInOutModal] = useState({ isOpen: false, isCheckIn: true });
 
   useEffect(() => {
     const loadReservationDetail = async () => {
@@ -115,10 +140,13 @@ const ManagerReservationDetail: React.FC = () => {
   const housingTypeLabel = reservation && HOUSING_TYPES[reservation.housingType as keyof typeof HOUSING_TYPES] || reservation.housingType || '-';
   const phoneNumber = reservation.managerPhoneNumber ? formatPhoneNumber(reservation.managerPhoneNumber) : '';
 
+  const handleCheckInOut = (isCheckIn: boolean) => setCheckInOutModal({ isOpen: true, isCheckIn });
+  const handleCheckInOutClose = () => setCheckInOutModal({ ...checkInOutModal, isOpen: false });
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 헤더 */}
-      <ReservationHeader title="예약 상세" onBack={() => navigate(-1)} />
+      <ReservationHeader title="예약 상세" onBack={() => navigate(ROUTES.MANAGER.RESERVATIONS)} />
 
       <div className="max-w-md mx-auto">
         {/* 상태 카드 */}
@@ -186,49 +214,6 @@ const ManagerReservationDetail: React.FC = () => {
           </div>
         </div>
 
-        {/* 도우미 정보 */}
-        {reservation.managerName && (
-          <div className="mx-4 mt-4 bg-white rounded-2xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">담당 도우미</h3>
-            <div className="flex items-center space-x-4 mb-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center overflow-hidden">
-                {reservation.managerProfileImageUrl ? (
-                  <img src={reservation.managerProfileImageUrl} alt={reservation.managerName} className="w-16 h-16 object-cover rounded-full" />
-                ) : (
-                  <User className="w-8 h-8 text-white" />
-                )}
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center space-x-2 mb-1">
-                  <h4 className="text-lg font-semibold text-gray-900">{reservation.managerName}</h4>
-                  <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                    {reservation.managerRegion?.[0] || '경력 미입력'}
-                  </span>
-                </div>
-                <div className="flex items-center space-x-1 mb-2">
-                  <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                  <span className="text-sm font-medium text-gray-700">{reservation.managerAverageRate?.toFixed(1) || '0.0'}</span>
-                </div>
-              </div>
-            </div>
-            <div className="flex space-x-3">
-              <button
-                onClick={() => setShowPhoneNumber(!showPhoneNumber)}
-                className="flex-1 flex items-center justify-center space-x-2 py-3 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors"
-              >
-                <Phone className="w-5 h-5" />
-                <span>{showPhoneNumber ? phoneNumber : '연락처 보기'}</span>
-              </button>
-              <button
-                className="flex-1 flex items-center justify-center space-x-2 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
-                disabled
-              >
-                <MessageCircle className="w-5 h-5" />
-                <span>메시지</span>
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* 서비스 상세 정보 */}
         <div className="mx-4 mt-4 bg-white rounded-2xl shadow-sm p-6">
@@ -269,7 +254,7 @@ const ManagerReservationDetail: React.FC = () => {
                     )}
                   </div>
                   <span className="font-medium text-gray-900">
-                    +{formatPrice(option.price * (option.count || 1))}
+                    +{formatMinutesToHourMinute(option.time*(option.count??1))}
                   </span>
                 </div>
               ))}
@@ -278,15 +263,15 @@ const ManagerReservationDetail: React.FC = () => {
         )}
 
         {/* 결제 정보 */}
-        <div className="mx-4 mt-4 bg-white rounded-2xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">결제 정보</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between py-2">
-              <span className="text-gray-600">서비스 금액</span>
-              <span className="text-gray-900">{formatPrice(reservation.totalPrice)}</span>
+        <div className="mx-4 mt-4 bg-orange-50 rounded-2xl shadow-sm p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">서비스 금액 정보</h3>
+          <div className="space-y-2">
+            <div className="flex justify-between py-1">
+              <span className="text-gray-600">서비스 기본 요금</span>
+              <span className="text-gray-900">{formatEstimatedPriceByRoomSize(reservation.roomSize)}</span>
             </div>
             {additionalOptions.length > 0 && additionalOptions.map((option: any, idx: number) => (
-              <div key={option.id + idx} className="flex justify-between items-center py-2">
+              <div key={option.id + idx} className="flex justify-between items-center py-1">
                 <div className="flex-1">
                   <span className="text-gray-700">{option.label}</span>
                   {option.count && (
@@ -298,41 +283,81 @@ const ManagerReservationDetail: React.FC = () => {
                 </span>
               </div>
             ))}
-            <div className="border-t border-gray-200 pt-3 mt-3">
+            <div className="flex justify-between py-1">
+              <span className="text-gray-600">합증료</span>
+              <span className="text-gray-900">0원</span>
+            </div>
+            <div className="border-t border-gray-200 pt-3 mt-3 flex flex-col gap-1">
               <div className="flex justify-between items-center">
-                <span className="text-lg font-semibold text-gray-900">총 결제금액</span>
+                <span className="text-lg font-semibold text-gray-900">총 금액</span>
                 <span className="text-xl font-bold text-orange-500">{formatPrice(reservation.totalPrice)}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-base font-semibold text-gray-700">플랫폼 수수료 ({FEE_CONFIG.PLATFORM_FEE_RATE * 100}%)</span>
+                <span className="text-base font-bold text-red-500">-{formatPrice(calcManagerSettlement(reservation.totalPrice).platformFee)}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-base font-semibold text-gray-700">부가세 ({FEE_CONFIG.VAT_RATE * 100}%)</span>
+                <span className="text-base font-bold text-red-500">-{formatPrice(calcManagerSettlement(reservation.totalPrice).vat)}</span>
+              </div>
+              <div className="flex justify-between items-center mt-1">
+                <span className="text-lg font-semibold text-green-700">정산 금액</span>
+                <span className="text-lg font-bold text-green-600">{formatPrice(calcManagerSettlement(reservation.totalPrice).settlement)}</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* 예약 정보 */}
-        <div className="mx-4 mt-4 bg-white rounded-2xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">예약 정보</h3>
-          <div className="space-y-3">
-            <div className="flex justify-between py-2">
-              <span className="text-gray-600">예약일시</span>
-              <span className="font-medium text-gray-900">{formatDateTime(reservation.reservationDate)}</span>
-            </div>
-            <div className="flex justify-between py-2">
-              <span className="text-gray-600">예약번호</span>
-              <span className="font-medium text-gray-900">{reservation.managerUuId?.slice(0, 8) || '-'}</span>
-            </div>
-          </div>
-        </div>
-
         {/* 하단 버튼 */}
-        <div className="mx-4 mt-4 mb-8">
-          {reservation.managerPhoneNumber && (
+        <div className="mx-4 mt-4 pb-28 flex flex-row gap-3">
+          {/* 체크인/체크아웃/관리자문의 버튼 노출 조건 */}
+          {reservation.status === RESERVATION_STATUS.MATCHED && isToday(reservation.reservationDate) && (
             <button
-              className="w-full py-4 bg-orange-500 text-white font-semibold rounded-2xl hover:bg-orange-600 transition-colors shadow-lg"
-              onClick={() => setShowPhoneNumber(!showPhoneNumber)}
+              className="flex-1 py-4 bg-green-500 text-white font-semibold rounded-2xl hover:bg-green-600 transition-colors shadow-none"
+              onClick={() => handleCheckInOut(true)}
             >
-              {showPhoneNumber ? phoneNumber : '도우미 연락처 보기'}
+              체크인
             </button>
           )}
+          {reservation.status === RESERVATION_STATUS.WORKING && (
+            <button
+              className="flex-1 py-4 bg-red-500 text-white font-semibold rounded-2xl hover:bg-red-600 transition-colors shadow-none"
+              onClick={() => handleCheckInOut(false)}
+            >
+              체크아웃
+            </button>
+          )}
+          {/* 관리자 문의 버튼은 항상 노출 */}
+          <button
+            className="flex-1 py-4 bg-gray-200 text-gray-800 font-semibold rounded-2xl hover:bg-gray-400 transition-colors shadow"
+            onClick={() => navigate(ROUTES.BOARD.CREATE)}
+          >
+            관리자 문의
+          </button>
         </div>
+        <CheckInOutModal
+          isOpen={checkInOutModal.isOpen}
+          onClose={handleCheckInOutClose}
+          onConfirm={async (reservationId, isCheckIn) => {
+            if (!reservationId) return;
+            if (isCheckIn) {
+              await checkIn(reservationId, { checkTime: new Date().toISOString() });
+              setCheckInOutModal({ ...checkInOutModal, isOpen: false });
+              window.location.reload();
+            } else {
+              await checkOut(reservationId, { checkTime: new Date().toISOString() });
+              setCheckInOutModal({ ...checkInOutModal, isOpen: false });
+              navigate(ROUTES.MANAGER.REVIEW_REGISTER.replace(':id', String(reservationId)));
+            }
+          }}
+          isCheckIn={checkInOutModal.isCheckIn}
+          reservationInfo={{
+            serviceType: SERVICE_TYPE_LABELS[serviceType],
+            detailServiceType: reservation.serviceDetailType,
+            time: `${formatKoreanDate(reservation.reservationDate)} ${formatTime(reservation.startTime)} ~ ${formatTime(reservation.endTime)}`,
+            reservationId: Number(id),
+          }}
+        />
       </div>
       <ManagerFooter />
     </div>

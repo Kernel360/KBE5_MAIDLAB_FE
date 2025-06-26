@@ -251,6 +251,7 @@ export const ROOM_SIZES: RoomSizeOption[] = [
 ] as const;
 
 
+
 // ===== 생활청소 평수별 요금/시간 기준표 (이미지 표 기준) =====
 export const ROOM_SIZES_LIFE_CLEANING = [
   { range: '8평 이하', baseTime: 3.5, unitPrice: 15000, estimatedPrice: 52500},

@@ -12,6 +12,7 @@ import ReservationHeader from '@/components/features/consumer/ReservationHeader'
 import { ManagerFooter } from '@/components/layout/BottomNavigation/BottomNavigation';
 import { useToast } from '@/hooks/useToast';
 import {CheckInOutModal,ConfirmModal,MatchingCard,TabHeader} from '@/components'
+import { ROUTES } from '@/constants/route';
 
 const FILTERS = [
   { label: '예정', value: 'MATCHED' },
@@ -138,9 +139,12 @@ const ManagerReservationsAndMatching: React.FC = () => {
       key={reservation.reservationId}
       reservation={reservation}
       getStatusBadgeStyle={getStatusBadgeStyle}
-      onDetailClick={() => navigate(`/manager/reservations/${reservation.reservationId}`)}
+      onDetailClick={() => navigate(ROUTES.MANAGER.RESERVATION_DETAIL.replace(':id', String(reservation.reservationId)))}
       onCheckIn={() => handleCheckInOutClick(reservation, true)}
-      onCheckOut={() => handleCheckInOutClick(reservation, false)}
+      onCheckOut={async () => {
+        await checkOut(reservation.reservationId, { checkTime: new Date().toISOString() });
+        navigate(ROUTES.MANAGER.REVIEW_REGISTER.replace(':id', String(reservation.reservationId)));
+      }}
     />
   );
 

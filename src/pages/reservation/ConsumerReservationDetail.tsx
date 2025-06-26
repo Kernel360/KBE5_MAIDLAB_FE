@@ -2,15 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useReservation } from '@/hooks/domain/useReservation';
 import { SERVICE_TYPE_LABELS, SERVICE_OPTIONS, HOUSING_TYPES, PET_TYPES } from '@/constants/service';
-import { RESERVATION_STATUS_LABELS, RESERVATION_STATUS_COLORS } from '@/constants/status';
+import { RESERVATION_STATUS_LABELS, RESERVATION_STATUS_COLORS, RESERVATION_STATUS } from '@/constants/status';
 import { COLORS } from '@/constants/theme';
-import { formatDateTime, formatKoreanDate, formatTime, getKoreanWeekday } from '@/utils/date';
-import { formatPrice,formatMinutesToHourMinute, formatRoomSize, formatPhoneNumber } from '@/utils/format';
+import { formatKoreanDate, formatTime, getKoreanWeekday } from '@/utils/date';
+import { formatEstimatedPriceByRoomSize, formatPrice,formatMinutesToHourMinute, formatRoomSize, formatPhoneNumber } from '@/utils/format';
 import type { ReservationDetailResponse } from '@/types/reservation';
 import ReservationHeader from '@/components/features/consumer/ReservationHeader';
 import { BottomNavigation } from '@/components/layout/BottomNavigation/BottomNavigation';
 import { useAuth } from '@/hooks/useAuth';
 import { MessageCircle, Phone, Star, MapPin, Clock, Calendar, User, Home, PawPrint, Baby, CheckCircle, XCircle, AlertCircle, Coffee } from 'lucide-react';
+import { ROUTES } from '@/constants/route';
 
 // 상태별 아이콘 매핑
 const STATUS_ICONS: Record<string, React.ElementType> = {
@@ -57,7 +58,7 @@ function parsePet(pet: string) {
 const ConsumerReservationDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { fetchReservationDetail } = useReservation();
+  const { fetchReservationDetail, cancelReservation } = useReservation();
   const { isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -79,6 +80,16 @@ const ConsumerReservationDetail: React.FC = () => {
     };
     loadReservationDetail();
   }, [id, fetchReservationDetail]);
+
+  // 예약 취소 핸들러
+  const handleCancel = async () => {
+    if (!reservation) return;
+    if (window.confirm('정말 예약을 취소하시겠습니까?')) {
+      await cancelReservation(Number(id));
+      alert('예약이 취소되었습니다.');
+      navigate(-1);
+    }
+  };
 
   if (loading) {
     return (
@@ -280,8 +291,8 @@ const ConsumerReservationDetail: React.FC = () => {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">결제 정보</h3>
           <div className="space-y-3">
             <div className="flex justify-between py-2">
-              <span className="text-gray-600">서비스 금액</span>
-              <span className="text-gray-900">{formatPrice(reservation.totalPrice)}</span>
+              <span className="text-gray-600">서비스 기본 요금</span>
+              <span className="text-gray-900">{formatEstimatedPriceByRoomSize(reservation.roomSize)}</span>
             </div>
             {additionalOptions.length > 0 && additionalOptions.map((option: any, idx: number) => (
               <div key={option.id + idx} className="flex justify-between items-center py-2">
@@ -304,17 +315,25 @@ const ConsumerReservationDetail: React.FC = () => {
             </div>
           </div>
         </div>
-        
+
         {/* 하단 버튼 */}
-        <div className="mx-4 mt-4 mb-8">
-          {reservation.managerPhoneNumber && (
+        <div className="mx-4 mt-4 pb-28 flex flex-row gap-3">
+          {/* 예약 취소 버튼: 예약 가능 상태일 때만 노출 */}
+          {([RESERVATION_STATUS.PENDING, RESERVATION_STATUS.MATCHED, RESERVATION_STATUS.APPROVED] as string[]).includes(reservation.status) && (
             <button
-              className="w-full py-4 bg-orange-500 text-white font-semibold rounded-2xl hover:bg-orange-600 transition-colors shadow-lg"
-              onClick={() => setShowPhoneNumber(!showPhoneNumber)}
+              className = "flex-1 py-4 bg-red-500 text-white font-semibold rounded-2xl hover:bg-red-600 transition-colors shadow-lg"
+              onClick={handleCancel}
             >
-              {showPhoneNumber ? phoneNumber : '도우미 연락처 보기'}
+              예약 취소
             </button>
           )}
+          {/* 관리자 문의 버튼 */}
+          <button
+            className="flex-1 py-4 bg-gray-200 text-gray-800 font-semibold rounded-2xl hover:bg-gray-400 transition-colors shadow"
+            onClick={() => navigate(ROUTES.BOARD.CREATE)}
+          >
+            관리자 문의
+          </button>
         </div>
       </div>
       <BottomNavigation activeTab="reservation" onTabClick={navigate} isAuthenticated={isAuthenticated} />

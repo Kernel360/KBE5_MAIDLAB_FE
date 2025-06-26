@@ -105,9 +105,7 @@ const ConsumerReservations: React.FC = () => {
   }, [reservations, activeTab]);
 
   const handleReservationClick = (reservationId: number) => {
-    navigate(
-      ROUTES.CONSUMER.RESERVATION_DETAIL.replace(':id', String(reservationId)),
-    );
+    navigate(ROUTES.CONSUMER.RESERVATION_DETAIL.replace(':id', String(reservationId)));
   };
 
   const handleReviewClick = (

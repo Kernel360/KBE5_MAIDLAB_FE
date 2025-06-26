@@ -149,6 +149,25 @@ export const formatRoomSize = (size: number): string => {
 };
 
 /**
+ * roomSize에 따른 가격 포맷팅 (8 -> 52500원)
+ */
+export const formatEstimatedPriceByRoomSize = (size: number): string => {
+  const ESTIMATED_PRICE_BY_SIZE: Record<number, number> = {
+    8: 52500,
+    9: 54600,
+    11: 63000,
+    16: 64000,
+    21: 74250,
+    26: 75600,
+    31: 76500,
+    35: 78000,
+  };
+
+  const price = ESTIMATED_PRICE_BY_SIZE[size];
+  return price ? `${price.toLocaleString('ko-KR')}원` : '-';
+};
+
+/**
  * 서비스 시간 포맷팅 (2 -> 2시간, 0.5 -> 30분)
  */
 export const formatServiceDuration = (hours: number): string => {
