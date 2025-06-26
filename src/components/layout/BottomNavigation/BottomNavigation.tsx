@@ -84,10 +84,9 @@ export const ManagerFooter: React.FC = () => {
       label: '일정',
       path: '/manager/reservations',
     }, // 매니저 일정
-    { id: 'consultation', icon: MessageSquare, label: '상담', path: '/board' }, // 매니저 상담(공통 게시판)
+    { id: 'consultation', icon: MessageSquare, label: '문의', path: '/board' }, // 매니저 문의(공통 게시판)
     { id: 'profile', icon: User, label: '프로필', path: '/manager/mypage' }, // 매니저 마이페이지
   ];
-
   const handleTabClick = (id: string, path: string) => {
     setActiveTab(id);
     if (path) navigate(path);
