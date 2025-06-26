@@ -176,94 +176,96 @@ const MyPage: React.FC = () => {
 
       {/* Content */}
       <div className="px-4 py-6">
-        <div className="max-w-md mx-auto space-y-6">
-          {/* Profile Section */}
-          <div className="text-center mb-8">
-            <div className="relative inline-block mb-4">
-              <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden mx-auto">
-                {userInfo?.profileImage ? (
-                  <img
-                    src={userInfo.profileImage}
-                    alt="프로필"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <User className="w-12 h-12 text-gray-400" />
+        <div className="max-w-md mx-auto">
+          <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+            {/* Profile Section */}
+            <div className="text-center mb-8">
+              <div className="relative inline-block mb-4">
+                <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden mx-auto">
+                  {userInfo?.profileImage ? (
+                    <img
+                      src={userInfo.profileImage}
+                      alt="프로필"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User className="w-12 h-12 text-gray-400" />
+                  )}
+                </div>
+              </div>
+
+              <h2 className="text-xl font-bold text-gray-900 mb-2">
+                {userInfo?.name || '사용자'}
+              </h2>
+
+              <div className="flex items-center justify-center gap-2 mb-6">
+                <span className="text-gray-600">포인트:</span>
+                {userInfo?.point !== undefined && (
+                  <span className="text-[#FF6B00] font-medium">
+                    {userInfo.point}P
+                  </span>
                 )}
               </div>
+
+              <button
+                onClick={handleProfileEdit}
+                className="w-full py-3 bg-[#FF6B00] text-white rounded-lg font-medium hover:bg-[#FF8533] transition-colors mb-2"
+              >
+                프로필 조회
+              </button>
             </div>
 
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
-              {userInfo?.name || '사용자'}
-            </h2>
-
-            <div className="flex items-center justify-center gap-2 mb-6">
-              <span className="text-gray-600">포인트:</span>
-              {userInfo?.point !== undefined && (
-                <span className="text-[#FF6B00] font-medium">
-                  {userInfo.point}P
-                </span>
-              )}
-            </div>
-
-            <button
-              onClick={handleProfileEdit}
-              className="w-full py-3 bg-[#FF6B00] text-white rounded-lg font-medium hover:bg-[#FF8533] transition-colors mb-2"
-            >
-              프로필 조회
-            </button>
-          </div>
-
-          {/* Menu Items */}
-          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-            <div className="border-t border-gray-200">
-              <MenuItem
-                icon={<Ticket className="w-5 h-5" />}
-                title="프로모션 코드/쿠폰"
-                onClick={handlePromotions}
-              />
-            </div>
-            <div className="border-t border-gray-200">
-              <MenuItem
-                icon={<Coins className="w-5 h-5" />}
-                title="포인트"
-                onClick={handlePoints}
-              />
-            </div>
-            <div className="border-t border-gray-200">
-              <MenuItem
-                icon={<Heart className="w-5 h-5" />}
-                title="찜한 도우미"
-                onClick={handleLikedManagers}
-              />
-            </div>
-            <div className="border-t border-gray-200">
-              <MenuItem
-                icon={<Ban className="w-5 h-5" />}
-                title="블랙리스트 도우미"
-                onClick={handleBlacklist}
-              />
-            </div>
-            <div className="border-t border-gray-200">
-              <MenuItem
-                icon={<Users className="w-5 h-5" />}
-                title="친구 초대하기"
-                onClick={handleInviteFriends}
-              />
-            </div>
-            <div className="border-t border-gray-200">
-              <MenuItem
-                icon={<Lock className="w-5 h-5" />}
-                title="비밀번호 변경"
-                onClick={() => setShowPasswordModal(true)}
-              />
-            </div>
-            <div className="border-t border-gray-200">
-              <MenuItem
-                icon={<Settings className="w-5 h-5" />}
-                title="설정"
-                onClick={handleSettings}
-              />
+            {/* Menu Items */}
+            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+              <div className="border-t border-gray-200">
+                <MenuItem
+                  icon={<Ticket className="w-5 h-5" />}
+                  title="프로모션 코드/쿠폰"
+                  onClick={handlePromotions}
+                />
+              </div>
+              <div className="border-t border-gray-200">
+                <MenuItem
+                  icon={<Coins className="w-5 h-5" />}
+                  title="포인트"
+                  onClick={handlePoints}
+                />
+              </div>
+              <div className="border-t border-gray-200">
+                <MenuItem
+                  icon={<Heart className="w-5 h-5" />}
+                  title="찜한 도우미"
+                  onClick={handleLikedManagers}
+                />
+              </div>
+              <div className="border-t border-gray-200">
+                <MenuItem
+                  icon={<Ban className="w-5 h-5" />}
+                  title="블랙리스트 도우미"
+                  onClick={handleBlacklist}
+                />
+              </div>
+              <div className="border-t border-gray-200">
+                <MenuItem
+                  icon={<Users className="w-5 h-5" />}
+                  title="친구 초대하기"
+                  onClick={handleInviteFriends}
+                />
+              </div>
+              <div className="border-t border-gray-200">
+                <MenuItem
+                  icon={<Lock className="w-5 h-5" />}
+                  title="비밀번호 변경"
+                  onClick={() => setShowPasswordModal(true)}
+                />
+              </div>
+              <div className="border-t border-gray-200">
+                <MenuItem
+                  icon={<Settings className="w-5 h-5" />}
+                  title="설정"
+                  onClick={handleSettings}
+                />
+              </div>
             </div>
           </div>
         </div>
