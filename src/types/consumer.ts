@@ -41,6 +41,7 @@ export interface ConsumerMyPageResponse {
   name: string;
   point: number;
   profileImage?: string;
+  socialType?: string;
 }
 
 /**

@@ -252,13 +252,16 @@ const MyPage: React.FC = () => {
                   onClick={handleInviteFriends}
                 />
               </div>
-              <div className="border-t border-gray-200">
-                <MenuItem
-                  icon={<Lock className="w-5 h-5" />}
-                  title="비밀번호 변경"
-                  onClick={() => setShowPasswordModal(true)}
-                />
-              </div>
+              {/* 비밀번호 변경 메뉴: 소셜 로그인 사용자는 숨김 */}
+              {userInfo && !userInfo.socialType && (
+                <div className="border-t border-gray-200">
+                  <MenuItem
+                    icon={<Lock className="w-5 h-5" />}
+                    title="비밀번호 변경"
+                    onClick={() => setShowPasswordModal(true)}
+                  />
+                </div>
+              )}
               <div className="border-t border-gray-200">
                 <MenuItem
                   icon={<Settings className="w-5 h-5" />}
