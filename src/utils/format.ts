@@ -134,7 +134,18 @@ export const capitalize = (str: string): string => {
  * 평수 포맷팅 (84 -> 84평)
  */
 export const formatRoomSize = (size: number): string => {
-  return `${size}평`;
+  const ROOM_SIZE_BY_IDX: Record<number, string> = {
+    8: '8평 이하',
+    9: '9~10평',
+    11: '11~15평',
+    16: '16~20평',
+    21: '21~25평',
+    26: '26~30평',
+    31: '31~35평',
+    35: '35평 이상',
+  };
+
+  return ROOM_SIZE_BY_IDX[size] ?? `${size}평`;
 };
 
 /**
@@ -154,6 +165,26 @@ export const formatServiceDuration = (hours: number): string => {
     const minutes = Math.round(hours * 60);
     return `${minutes}분`;
   }
+};
+
+/**
+ * 서비스 시간 포맷팅 
+ * 분 단위 숫자를 "시간 분" 형식으로 포맷팅
+ * 예: 30 -> "30분", 90 -> "1시간 30분", 120 -> "2시간"
+ */
+export const formatMinutesToHourMinute = (minutes: number): string => {
+  if (minutes < 60) {
+    return `${minutes}분`;
+  }
+
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+
+  if (remainingMinutes === 0) {
+    return `${hours}시간`;
+  }
+
+  return `${hours}시간 ${remainingMinutes}분`;
 };
 
 /**
