@@ -10,7 +10,7 @@ interface ProtectedRouteProps {
   requireAuth?: boolean;
   requiredUserType?: 'CONSUMER' | 'MANAGER' | 'ADMIN';
   redirectTo?: string;
-  // 🆕 프로필 체크 관련 옵션들
+  // 프로필 체크 관련 옵션들
   checkProfile?: boolean; // 프로필 존재 여부를 체크할지
   redirectIfProfileExists?: boolean; // 프로필이 이미 있으면 리다이렉트할지
   redirectIfNoProfile?: boolean; // 프로필이 없으면 리다이렉트할지
@@ -22,12 +22,12 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requireAuth = true,
   requiredUserType,
   redirectTo = ROUTES.LOGIN,
-  // 🆕 프로필 체크 관련 기본값들
   checkProfile = false,
   redirectIfProfileExists = false,
   redirectIfNoProfile = false,
   profileRedirectTo = ROUTES.HOME,
 }) => {
+  // ✅ 모든 hooks를 맨 위에서 호출 (early return 전에)
   const { isAuthenticated, userType, isLoading } = useAuth();
   const { fetchProfile: fetchManagerProfile } = useManager();
   const { fetchProfile: fetchConsumerProfile } = useConsumer();
@@ -37,11 +37,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const [tokenCheckComplete, setTokenCheckComplete] = useState(false);
   const [isRefreshingToken, setIsRefreshingToken] = useState(false);
   const [authCheckFailed, setAuthCheckFailed] = useState(false);
-  // 🆕 프로필 체크 관련 상태들
   const [profileCheckComplete, setProfileCheckComplete] =
     useState(!checkProfile);
 
-  // 🔥 개선된 쿠키 확인 함수
+  // ✅ 모든 useEffect도 early return 전에 호출
+  // 개선된 쿠키 확인 함수
   const hasRefreshTokenInCookie = () => {
     try {
       const cookies = document.cookie.split(';').map((cookie) => cookie.trim());
@@ -52,13 +52,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
           cookie.startsWith('REFRESH_TOKEN='),
       );
 
-      console.log('🔍 Cookie check:', {
-        allCookies: document.cookie,
-        parsedCookies: cookies,
-        refreshTokenFound: !!refreshTokenCookie,
-        refreshTokenCookie: refreshTokenCookie,
-      });
-
       if (refreshTokenCookie) {
         const cookieValue = refreshTokenCookie.split('=')[1];
         const hasValue =
@@ -66,11 +59,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
           cookieValue.trim() !== '' &&
           cookieValue !== 'undefined' &&
           cookieValue !== 'null';
-
-        console.log('🔍 Cookie value check:', {
-          cookieValue: cookieValue,
-          hasValue: hasValue,
-        });
 
         return hasValue;
       }
@@ -82,7 +70,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     }
   };
 
-  // 🆕 완전 로그아웃 처리 함수
+  // 완전 로그아웃 처리 함수
   const forceLogout = (reason: string = '인증 실패') => {
     console.log(`🚨 강제 로그아웃: ${reason}`);
     setAuthCheckFailed(true);
@@ -113,7 +101,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     }
   };
 
-  // 🔧 토큰 갱신 함수
+  // 토큰 갱신 함수
   const refreshTokenIfNeeded = async () => {
     try {
       const accessToken = localStorage.getItem('accessToken');
@@ -128,13 +116,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       try {
         const payload = JSON.parse(atob(accessToken.split('.')[1]));
         const currentTime = Math.floor(Date.now() / 1000);
-
-        console.log('🔍 Token expiry check:', {
-          exp: payload.exp,
-          currentTime: currentTime,
-          timeUntilExpiry: payload.exp - currentTime,
-          needsRefresh: payload.exp <= currentTime + 300,
-        });
 
         if (payload.exp <= currentTime + 300) {
           tokenNeedsRefresh = true;
@@ -194,15 +175,13 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     }
   };
 
-  // 🆕 프로필 체크 함수 - 사용자 타입에 따라 다른 API 호출
+  // 프로필 체크 함수
   const checkUserProfile = async () => {
-    // 🔥 수정: requireAuth가 false여도 로그인된 사용자는 프로필 체크
     if (!checkProfile || (!isAuthenticated && requireAuth)) {
       setProfileCheckComplete(true);
       return;
     }
 
-    // 🔥 로그인되지 않은 사용자는 프로필 체크 건너뛰기
     if (!isAuthenticated) {
       setProfileCheckComplete(true);
       return;
@@ -212,7 +191,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       console.log('🔍 프로필 체크 시작...');
       let profile = null;
 
-      // 🔥 사용자 타입에 따라 다른 프로필 API 호출
+      // 사용자 타입에 따라 다른 프로필 API 호출
       if (requiredUserType === 'MANAGER') {
         profile = await fetchManagerProfile();
       } else if (requiredUserType === 'CONSUMER') {
@@ -226,28 +205,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         }
       }
 
-      // 🔥 프로필 존재 여부를 더 안전하게 체크
-      console.log('🔍 프로필 체크 결과:', {
-        profile: profile,
-        profileKeys: profile ? Object.keys(profile) : [],
-        profileType: typeof profile,
-        isArray: Array.isArray(profile),
-        redirectIfNoProfile: redirectIfNoProfile,
-        redirectIfProfileExists: redirectIfProfileExists,
-      });
-
       const hasProfile =
         profile &&
         (() => {
           try {
-            // 타입 안전을 위해 any로 캐스팅
             const profileData = profile as any;
-
-            console.log('🔍 프로필 데이터 상세:', {
-              userType: userType,
-              requiredUserType: requiredUserType,
-              profileData: profileData,
-            });
 
             // 매니저의 경우: 서비스, 지역, 스케줄이 모두 등록되어 있어야 함
             if (requiredUserType === 'MANAGER' || userType === 'MANAGER') {
@@ -264,15 +226,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
                 Array.isArray(profileData.schedules) &&
                 profileData.schedules.length > 0;
 
-              console.log('🔍 매니저 프로필 체크:', {
-                hasServices,
-                hasRegions,
-                hasSchedules,
-                services: profileData.services,
-                regions: profileData.regions,
-                schedules: profileData.schedules,
-              });
-
               return hasServices && hasRegions && hasSchedules;
             }
 
@@ -280,12 +233,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
             if (requiredUserType === 'CONSUMER' || userType === 'CONSUMER') {
               const hasAddress =
                 profileData.address && profileData.address.trim() !== '';
-
-              console.log('🔍 소비자 프로필 체크:', {
-                hasAddress,
-                address: profileData.address,
-              });
-
               return hasAddress;
             }
 
@@ -297,27 +244,12 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
               (profileData.userId && profileData.userId) ||
               (profileData.userid && profileData.userid);
 
-            console.log('🔍 기본 프로필 체크:', {
-              hasBasicProfile,
-              managerId: profileData.managerId,
-              consumerId: profileData.consumerId,
-              id: profileData.id,
-              userId: profileData.userId,
-              userid: profileData.userid,
-            });
-
             return hasBasicProfile;
           } catch (error) {
             console.error('🚨 프로필 체크 중 오류:', error);
             return false;
           }
         })();
-
-      console.log('🔍 프로필 존재 여부:', {
-        hasProfile: hasProfile,
-        shouldRedirectIfExists: redirectIfProfileExists && hasProfile,
-        shouldRedirectIfNoProfile: redirectIfNoProfile && !hasProfile,
-      });
 
       if (redirectIfProfileExists && hasProfile) {
         console.log('❌ 프로필이 이미 존재함 - 리다이렉트');
@@ -330,7 +262,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         console.log('❌ 프로필이 없음 - 리다이렉트');
         showToast('프로필 등록이 필요합니다.', 'error');
 
-        // 🔥 사용자 타입에 따라 다른 프로필 등록 페이지로 이동
+        // 사용자 타입에 따라 다른 프로필 등록 페이지로 이동
         const profileSetupRoute =
           (requiredUserType || userType) === 'MANAGER'
             ? '/manager/profile/setup'
@@ -349,7 +281,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     }
   };
 
-  // 🔧 컴포넌트 마운트 시 토큰 확인
+  // 컴포넌트 마운트 시 토큰 확인
   useEffect(() => {
     if (!requireAuth) {
       setTokenCheckComplete(true);
@@ -371,13 +303,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       const currentTime = Math.floor(Date.now() / 1000);
       const tokenAge = currentTime - payload.iat;
 
-      console.log('🔍 Token age check:', {
-        iat: payload.iat,
-        currentTime: currentTime,
-        tokenAge: tokenAge,
-        isRecentToken: tokenAge < 10,
-      });
-
       if (tokenAge < 10) {
         console.log('✅ 최근에 생성된 토큰 - 쿠키 확인 건너뛰기');
         setTokenCheckComplete(true);
@@ -390,15 +315,32 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     refreshTokenIfNeeded();
   }, [requireAuth, authCheckFailed]);
 
-  // 🆕 토큰 체크 완료 후 프로필 체크 실행
+  // 토큰 체크 완료 후 프로필 체크 실행
   useEffect(() => {
+    console.log('🔍 프로필 체크 useEffect 실행:', {
+      tokenCheckComplete,
+      isAuthenticated,
+      isLoading,
+      authCheckFailed,
+      checkProfile,
+    });
+
     if (
       tokenCheckComplete &&
       isAuthenticated &&
       !isLoading &&
-      !authCheckFailed
+      !authCheckFailed &&
+      checkProfile
     ) {
+      console.log('🔍 프로필 체크 조건 충족 - checkUserProfile 호출');
       checkUserProfile();
+    } else {
+      console.log('🔍 프로필 체크 조건 불충족 - 건너뛰기');
+      // ✅ tokenCheckComplete가 true이고 로딩이 끝났으면 완료 처리
+      if (tokenCheckComplete && !isLoading) {
+        console.log('✅ profileCheckComplete를 true로 설정');
+        setProfileCheckComplete(true);
+      }
     }
   }, [
     tokenCheckComplete,
@@ -406,10 +348,21 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     isLoading,
     authCheckFailed,
     checkProfile,
-    location.pathname,
-  ]); // 🔥 location.pathname 추가
+  ]);
 
-  // 🆕 인증 실패 상태면 즉시 null 반환 (profileCheckFailed 제거)
+  // ✅ 이제 모든 hooks 호출 후에 조건부 렌더링
+  // 비로그인 상태에서 프로필 체크가 필요한 경우 즉시 완료 처리
+  if (!requireAuth && !isAuthenticated && !isLoading) {
+    console.log('✅ 비로그인 사용자 - 즉시 렌더링');
+    return <>{children}</>;
+  }
+
+  // 로그인된 사용자지만 토큰 체크가 완료되지 않은 경우 로딩
+  if (isAuthenticated && !tokenCheckComplete) {
+    return <LoadingSpinner message="인증 확인 중..." />;
+  }
+
+  // 인증 실패 상태면 즉시 null 반환
   if (authCheckFailed) {
     return null;
   }
@@ -462,27 +415,3 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   return <>{children}</>;
 };
-
-// 🔥 추가: 쿠키 디버깅 유틸리티
-export const debugCookies = () => {
-  const allCookies = document.cookie;
-  const cookieArray = allCookies.split(';').map((cookie) => cookie.trim());
-
-  console.log('🔍 Cookie Debug:', {
-    raw: allCookies,
-    parsed: cookieArray,
-    refreshToken: cookieArray.find((c) => c.startsWith('refreshToken')),
-    refresh_token: cookieArray.find((c) => c.startsWith('refresh_token')),
-    REFRESH_TOKEN: cookieArray.find((c) => c.startsWith('REFRESH_TOKEN')),
-  });
-
-  return {
-    all: allCookies,
-    array: cookieArray,
-  };
-};
-
-// 개발 환경에서 전역 함수로 추가
-if (import.meta.env.DEV) {
-  (window as any).debugCookies = debugCookies;
-}
