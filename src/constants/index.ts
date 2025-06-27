@@ -30,3 +30,6 @@ export * from './message';
 
 // ui 관련
 export * from './ui';
+
+// 디자인 관련
+export * from './theme';

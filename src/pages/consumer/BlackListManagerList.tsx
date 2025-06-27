@@ -1,11 +1,52 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/useToast';
 import { consumerApi } from '@/apis/consumer';
 import type { BlackListedManagerResponse } from '@/types/consumer';
 import { ROUTES } from '@/constants/route';
-import { ArrowLeft, Star } from 'lucide-react';
+import { ArrowLeft, Star, Trash2 } from 'lucide-react';
 import { SEOUL_DISTRICT_LABELS } from '@/constants/region';
+import React from 'react';
+
+function ManagerNameModal({ name, introduceText, children }: { name: string, introduceText?: string, children: React.ReactNode }) {
+  const nameRef = useRef<HTMLHeadingElement | null>(null);
+  const [open, setOpen] = useState(false);
+  const isNameTruncated = (el: HTMLHeadingElement | null) => {
+    if (!el) return false;
+    return el.scrollWidth > el.clientWidth;
+  };
+  const handleClick = () => {
+    if (isNameTruncated(nameRef.current)) setOpen(true);
+  };
+  return (
+    <>
+      {React.cloneElement(children as React.ReactElement, {
+        ref: nameRef,
+        onClick: handleClick,
+        className: (children as React.ReactElement).props.className + ' cursor-pointer hover:text-orange-600 transition-colors',
+      })}
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30" onClick={() => setOpen(false)}>
+          <div
+            className="bg-white rounded-xl shadow-lg p-6 min-w-[220px] max-w-xs"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-2">
+              <span className="font-bold text-gray-900">도우미 정보</span>
+              <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+            </div>
+            <div className="mb-2">
+              <div className="font-semibold text-gray-800 break-words">{name}</div>
+            </div>
+            {introduceText && (
+              <div className="text-sm text-gray-600 mt-2 break-words">{introduceText}</div>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
 
 export default function BlackListManagerList() {
   const navigate = useNavigate();
@@ -91,7 +132,7 @@ export default function BlackListManagerList() {
         </div>
       </div>
       {/* 컨텐츠 */}
-      <div className="pt-14 pb-4">
+      <div className="pt-20 pb-6">
         <div className="max-w-2xl mx-auto px-4">
           <div className="space-y-3">
             {blacklistManagers.length > 0 ? (
@@ -100,7 +141,7 @@ export default function BlackListManagerList() {
                   {/* 상단 그라데이션 바 */}
                   <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-orange-500 to-orange-400 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
                   {/* 상단: 프로필, 정보, 삭제 버튼 */}
-                  <div className="flex items-center mb-4">
+                  <div className="flex items-start mb-4">
                     {/* 프로필 이미지 */}
                     <div className="w-20 h-20 min-w-[80px] min-h-[80px] relative flex-shrink-0">
                       <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
@@ -122,29 +163,34 @@ export default function BlackListManagerList() {
                       </div>
                     </div>
                     {/* 매니저 정보 */}
-                    <div className="flex-1 min-w-0 px-4">
-                      <div className="flex items-center gap-3 flex-wrap mb-1">
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          {manager.name}
-                        </h3>
-                        <div className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-br from-yellow-100 to-yellow-200 text-yellow-800 text-xs font-semibold rounded-full border border-yellow-400">
-                          <Star className="w-3 h-3" />
-                          <span>{manager.averageRate.toFixed(1)}</span>
+                    <div className="flex-1 min-w-0 px-4 flex flex-col justify-center h-20">
+                      <div className="flex items-center gap-2">
+                        <ManagerNameModal name={manager.name} introduceText={manager.introduceText}>
+                          <h3 className="text-lg font-semibold text-gray-900 truncate max-w-[120px] block">
+                            {manager.name}
+                          </h3>
+                        </ManagerNameModal>
+                        <div className="flex-shrink-0 inline-flex items-center gap-1 h-8 text-xs font-semibold rounded-full">
+                          <Star className="w-4 h-4 text-yellow-500" />
+                          <span className="text-yellow-800 text-base">{manager.averageRate.toFixed(1)}</span>
                         </div>
                       </div>
                       {manager.introduceText && (
-                        <p className="text-sm text-gray-500 line-clamp-2">
+                        <p className="text-sm text-gray-500 line-clamp-2 text-left mt-1">
                           {manager.introduceText}
                         </p>
                       )}
                     </div>
-                    {/* 삭제 버튼 */}
-                    <button
-                      onClick={() => handleRemoveBlacklist(manager.managerUuid)}
-                      className="px-4 py-2 text-red-500 text-sm font-medium border border-red-200 rounded-lg hover:bg-red-50 hover:border-red-300 transition-colors duration-200"
-                    >
-                      삭제
-                    </button>
+                    <div className="flex flex-row items-center justify-center h-20 mr-2 gap-2">
+                      <button
+                        onClick={() => handleRemoveBlacklist(manager.managerUuid)}
+                        className="h-8 w-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors duration-200"
+                        style={{ border: 'none', padding: 0 }}
+                        aria-label="삭제"
+                      >
+                        <Trash2 className="w-5 h-5 text-gray-400" />
+                      </button>
+                    </div>
                   </div>
                   {/* 하단: 지역 정보 */}
                   {manager.region && manager.region.length > 0 && (

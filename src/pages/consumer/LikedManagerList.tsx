@@ -1,11 +1,52 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/useToast';
 import { consumerApi } from '@/apis/consumer';
 import type { LikedManagerResponse } from '@/types/consumer';
 import { ROUTES } from '@/constants/route';
-import { ArrowLeft, Star } from 'lucide-react';
+import { ArrowLeft, Star, Trash2 } from 'lucide-react';
 import { SEOUL_DISTRICT_LABELS } from '@/constants/region';
+
+function ManagerNameModal({ name, introduceText }: { name: string, introduceText?: string }) {
+  const nameRef = useRef<HTMLHeadingElement | null>(null);
+  const [open, setOpen] = useState(false);
+  const isNameTruncated = (el: HTMLHeadingElement | null) => {
+    if (!el) return false;
+    return el.scrollWidth > el.clientWidth;
+  };
+  return (
+    <>
+      <h3
+        ref={nameRef}
+        className="text-lg font-semibold text-gray-900 truncate max-w-[120px] block cursor-pointer hover:text-orange-600 transition-colors"
+        onClick={() => {
+          if (isNameTruncated(nameRef.current)) setOpen(true);
+        }}
+      >
+        {name}
+      </h3>
+      {open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30" onClick={() => setOpen(false)}>
+          <div
+            className="bg-white rounded-xl shadow-lg p-6 min-w-[220px] max-w-xs"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-2">
+              <span className="font-bold text-gray-900">도우미 정보</span>
+              <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+            </div>
+            <div className="mb-2">
+              <div className="font-semibold text-gray-800 break-words">{name}</div>
+            </div>
+            {introduceText && (
+              <div className="text-sm text-gray-600 mt-2 break-words">{introduceText}</div>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
 
 export default function LikedManagerList() {
   const navigate = useNavigate();
@@ -91,7 +132,7 @@ export default function LikedManagerList() {
         </div>
       </div>
       {/* 컨텐츠 */}
-      <div className="pt-14 pb-4">
+      <div className="pt-20 pb-6">
         <div className="max-w-2xl mx-auto px-4">
           <div className="space-y-3">
             {favoriteManagers.length > 0 ? (
@@ -122,18 +163,16 @@ export default function LikedManagerList() {
                       </div>
                     </div>
                     {/* 매니저 정보 */}
-                    <div className="flex-1 min-w-0 px-4">
-                      <div className="flex items-center gap-3 flex-wrap mb-1">
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          {manager.name}
-                        </h3>
-                        <div className="inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-br from-yellow-100 to-yellow-200 text-yellow-800 text-xs font-semibold rounded-full border border-yellow-400">
-                          <Star className="w-3 h-3" />
-                          <span>{manager.averageRate.toFixed(1)}</span>
+                    <div className="flex-1 min-w-0 px-4 flex flex-col justify-center">
+                      <div className="flex items-center gap-2 mb-1 min-w-0">
+                        <ManagerNameModal name={manager.name} introduceText={manager.introduceText} />
+                        <div className="flex-shrink-0 inline-flex items-center gap-1 h-8 text-xs font-semibold rounded-full">
+                          <Star className="w-4 h-4 text-yellow-500" />
+                          <span className="text-yellow-800 text-base">{manager.averageRate.toFixed(1)}</span>
                         </div>
                       </div>
                       {manager.introduceText && (
-                        <p className="text-sm text-gray-500 line-clamp-2">
+                        <p className="text-sm text-gray-500 line-clamp-2 text-left mt-1">
                           {manager.introduceText}
                         </p>
                       )}
@@ -141,9 +180,11 @@ export default function LikedManagerList() {
                     {/* 삭제 버튼 */}
                     <button
                       onClick={() => handleRemoveFavorite(manager.managerUuid)}
-                      className="px-4 py-2 text-red-500 text-sm font-medium border border-red-200 rounded-lg hover:bg-red-50 hover:border-red-300 transition-colors duration-200"
+                      className="h-8 w-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors duration-200"
+                      style={{ border: 'none', padding: 0 }}
+                      aria-label="삭제"
                     >
-                      삭제
+                      <Trash2 className="w-5 h-5 text-gray-400" />
                     </button>
                   </div>
                   {/* 하단: 지역 정보 */}
