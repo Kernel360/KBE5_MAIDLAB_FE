@@ -11,11 +11,7 @@ import {
 import { openGoogleLoginPopup, cleanupOAuthStorage } from '@/utils/googleOAuth';
 import type { LoginRequest, SocialLoginRequest } from '@/types/auth';
 import type { SavedLoginInfo } from '@/types/user';
-import {
-  USER_TYPES,
-  LOGIN_USER_TYPES,
-  type LoginUserType,
-} from '@/constants/user';
+import { LOGIN_USER_TYPES, type LoginUserType } from '@/constants/user';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -80,7 +76,13 @@ const Login: React.FC = () => {
         } else {
           removeLocalStorage(STORAGE_KEYS.SAVED_LOGIN_INFO);
         }
-        await login(cleanedData);
+
+        const result = await login(cleanedData);
+
+        // ✅ 로그인 성공 시 무조건 홈으로 이동 (프로필 체크 로직 제거)
+        if (result?.success) {
+          navigate(ROUTES.HOME, { replace: true });
+        }
       },
     });
 
@@ -112,19 +114,13 @@ const Login: React.FC = () => {
 
           if (result.success) {
             if (result.newUser) {
+              // 신규 사용자는 소셜 회원가입 페이지로
               showToast('추가 정보를 입력해주세요.', 'info');
               navigate(ROUTES.SOCIAL_SIGNUP, { replace: true });
-            } else if (!result.profileCompleted) {
-              showToast('프로필을 완성해주세요.', 'info');
-
-              const profileRoute =
-                userType === USER_TYPES.MANAGER
-                  ? '/manager/profile/setup'
-                  : '/consumer/profile/setup';
-
-              navigate(profileRoute, { replace: true });
             } else {
-              navigate(ROUTES.HOME);
+              // ✅ 기존 사용자는 무조건 홈으로 (프로필 체크 로직 제거)
+              // 각 페이지의 ProtectedRoute에서 프로필 유무에 따라 리다이렉트 처리
+              navigate(ROUTES.HOME, { replace: true });
             }
           } else {
             showToast(result.error || 'Google 로그인에 실패했습니다.', 'error');

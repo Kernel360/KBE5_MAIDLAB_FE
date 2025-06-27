@@ -31,7 +31,13 @@ export const ConsumerRoutes = () => (
     <Route
       path={ROUTES.CONSUMER.PROFILE_SETUP}
       element={
-        <ProtectedRoute requiredUserType="CONSUMER">
+        <ProtectedRoute
+          requireAuth={true}
+          requiredUserType="CONSUMER"
+          checkProfile={true}
+          redirectIfProfileExists={true} // 🔥 프로필 있으면 차단
+          profileRedirectTo={ROUTES.CONSUMER.MYPAGE}
+        >
           <ConsumerProfileSetup />
         </ProtectedRoute>
       }

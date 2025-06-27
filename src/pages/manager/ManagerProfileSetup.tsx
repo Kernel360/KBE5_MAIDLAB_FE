@@ -6,7 +6,6 @@ import {
   SEOUL_DISTRICT_LABELS,
   WEEKDAYS,
   WEEKDAY_LABELS,
-  SUCCESS_MESSAGES,
   ERROR_MESSAGES,
   BUTTON_TEXTS,
   LENGTH_LIMITS,
@@ -44,6 +43,8 @@ const ManagerProfileSetup: React.FC = () => {
     documents: [],
   });
   const [errors, setErrors] = useState<ManagerProfileErrors>({});
+
+  // ✅ 프로필 체크 로직 제거됨 - ProtectedRoute에서 처리
 
   // 서울 25개 구
   const regionOptions = [
@@ -115,13 +116,11 @@ const ManagerProfileSetup: React.FC = () => {
       const file = target.files?.[0];
       if (!file) return;
 
-      // 파일 크기 검증 (5MB 제한)
       if (file.size > 5 * 1024 * 1024) {
         showToast('이미지 크기는 5MB 이하로 업로드해주세요.', 'error');
         return;
       }
 
-      // 이미지 타입 검증
       if (!file.type.startsWith('image/')) {
         showToast('이미지 파일만 업로드 가능합니다.', 'error');
         return;
@@ -129,13 +128,10 @@ const ManagerProfileSetup: React.FC = () => {
 
       setUploadingImage(true);
       try {
-        // 미리보기 설정
         const previewUrl = URL.createObjectURL(file);
         setImagePreview(previewUrl);
 
-        // S3 업로드
         const { url } = await uploadToS3(file);
-
         setFormData((prev) => ({ ...prev, profileImage: url }));
         showToast('프로필 이미지가 업로드되었습니다.', 'success');
       } catch (error) {
@@ -175,15 +171,14 @@ const ManagerProfileSetup: React.FC = () => {
     }
   };
 
-  // 가능 시간 중복 체크 함수 (시간 구간 겹침 포함)
+  // 가능 시간 중복 체크 함수
   const hasDuplicateTimeSlot = (slots: typeof formData.availableTimes) => {
-    // 요일별로 구간을 모아서 겹치는지 확인
     const byDay: Record<string, { start: number; end: number }[]> = {};
     for (const slot of slots) {
       if (!byDay[slot.day]) byDay[slot.day] = [];
       const start = Number(slot.startTime.replace(':', ''));
       const end = Number(slot.endTime.replace(':', ''));
-      // 겹치는 구간이 있는지 확인
+
       for (const range of byDay[slot.day]) {
         if (start < range.end && end > range.start) {
           return true;
@@ -259,7 +254,6 @@ const ManagerProfileSetup: React.FC = () => {
 
         setUploadingDocument(true);
         try {
-          // S3에 문서 업로드
           const { url } = await uploadToS3(file);
 
           const newDoc: Document = {
@@ -313,7 +307,7 @@ const ManagerProfileSetup: React.FC = () => {
         if (formData.availableTimes.length === 0) {
           newErrors.availableTimes = '하나 이상의 가능 시간을 등록해주세요.';
         }
-        // 각 구간이 1시간 이상 차이나는지 확인
+
         for (const slot of formData.availableTimes) {
           const start = Number(slot.startTime.replace(':', ''));
           const end = Number(slot.endTime.replace(':', ''));
@@ -326,11 +320,13 @@ const ManagerProfileSetup: React.FC = () => {
             return false;
           }
         }
+
         if (hasDuplicateTimeSlot(formData.availableTimes)) {
           showToast('중복된 가능 시간이 있습니다.', 'error');
           setErrors(newErrors);
           return false;
         }
+
         if (
           formData.introduceText &&
           formData.introduceText.length > LENGTH_LIMITS.INTRODUCE.MAX
