@@ -1,14 +1,8 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Upload, User } from 'lucide-react';
+import { Upload, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import {
-  SUCCESS_MESSAGES,
-  ERROR_MESSAGES,
-  ROUTES,
-  VALIDATION_MESSAGES,
-} from '@/constants';
+import { ERROR_MESSAGES, ROUTES, VALIDATION_MESSAGES } from '@/constants';
 import { useToast, useConsumer, useValidation } from '@/hooks';
-
 import { uploadToS3 } from '@/utils/s3';
 import type {
   ConsumerProfileCreateRequest,
@@ -31,6 +25,8 @@ const ConsumerProfileSetup: React.FC = () => {
   const [errors, setErrors] = useState<ConsumerProfileErrors>({});
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imagePreview, setImagePreview] = useState<string>('');
+
+  // ✅ 프로필 체크 로직 제거됨 - ProtectedRoute에서 처리
 
   const handleImageUpload = async () => {
     const input = document.createElement('input');
@@ -109,7 +105,6 @@ const ConsumerProfileSetup: React.FC = () => {
       const result = await createProfile(profileData);
 
       if (result?.success !== false) {
-        showToast(SUCCESS_MESSAGES.PROFILE_CREATED, 'success');
         setTimeout(() => {
           navigate(ROUTES.HOME, { replace: true });
         }, 1500);
@@ -129,15 +124,8 @@ const ConsumerProfileSetup: React.FC = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
-        <button
-          onClick={() => navigate(-1)}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6" />
-        </button>
+      <div className="flex items-center justify-center p-4 border-b">
         <h1 className="text-lg font-bold">프로필 등록</h1>
-        <div className="w-10" />
       </div>
 
       <div className="px-4 py-6">

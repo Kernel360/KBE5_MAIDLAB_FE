@@ -228,6 +228,21 @@ apiClient.interceptors.response.use(
       }
     }
 
+    // === [추가] 네트워크 에러(서버 꺼짐 등)도 인증 실패로 간주하여 강제 로그아웃 ===
+    if (
+      !error.response &&
+      error.code === 'ERR_NETWORK' &&
+      error.request &&
+      url &&
+      url.includes('/api/')
+    ) {
+      console.warn(
+        'ERR_NETWORK 발생 - 인증 실패로 간주하고 강제 로그아웃 처리',
+      );
+      handleAuthFailure();
+      return Promise.reject(error);
+    }
+
     return Promise.reject(error);
   },
 );

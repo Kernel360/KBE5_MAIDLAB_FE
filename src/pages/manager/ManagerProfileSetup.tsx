@@ -1,20 +1,11 @@
 import React, { useState } from 'react';
-import {
-  ArrowLeft,
-  Plus,
-  X,
-  Clock,
-  FileText,
-  User,
-  Upload,
-} from 'lucide-react';
+import { Plus, X, Clock, FileText, User, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   SERVICE_LIST,
   SEOUL_DISTRICT_LABELS,
   WEEKDAYS,
   WEEKDAY_LABELS,
-  SUCCESS_MESSAGES,
   ERROR_MESSAGES,
   BUTTON_TEXTS,
   LENGTH_LIMITS,
@@ -52,6 +43,8 @@ const ManagerProfileSetup: React.FC = () => {
     documents: [],
   });
   const [errors, setErrors] = useState<ManagerProfileErrors>({});
+
+  // ✅ 프로필 체크 로직 제거됨 - ProtectedRoute에서 처리
 
   // 서울 25개 구
   const regionOptions = [
@@ -123,13 +116,11 @@ const ManagerProfileSetup: React.FC = () => {
       const file = target.files?.[0];
       if (!file) return;
 
-      // 파일 크기 검증 (5MB 제한)
       if (file.size > 5 * 1024 * 1024) {
         showToast('이미지 크기는 5MB 이하로 업로드해주세요.', 'error');
         return;
       }
 
-      // 이미지 타입 검증
       if (!file.type.startsWith('image/')) {
         showToast('이미지 파일만 업로드 가능합니다.', 'error');
         return;
@@ -137,13 +128,10 @@ const ManagerProfileSetup: React.FC = () => {
 
       setUploadingImage(true);
       try {
-        // 미리보기 설정
         const previewUrl = URL.createObjectURL(file);
         setImagePreview(previewUrl);
 
-        // S3 업로드
         const { url } = await uploadToS3(file);
-
         setFormData((prev) => ({ ...prev, profileImage: url }));
         showToast('프로필 이미지가 업로드되었습니다.', 'success');
       } catch (error) {
@@ -181,6 +169,24 @@ const ManagerProfileSetup: React.FC = () => {
     if (errors.regions) {
       setErrors((prev) => ({ ...prev, regions: undefined }));
     }
+  };
+
+  // 가능 시간 중복 체크 함수
+  const hasDuplicateTimeSlot = (slots: typeof formData.availableTimes) => {
+    const byDay: Record<string, { start: number; end: number }[]> = {};
+    for (const slot of slots) {
+      if (!byDay[slot.day]) byDay[slot.day] = [];
+      const start = Number(slot.startTime.replace(':', ''));
+      const end = Number(slot.endTime.replace(':', ''));
+
+      for (const range of byDay[slot.day]) {
+        if (start < range.end && end > range.start) {
+          return true;
+        }
+      }
+      byDay[slot.day].push({ start, end });
+    }
+    return false;
   };
 
   const addTimeSlot = () => {
@@ -248,7 +254,6 @@ const ManagerProfileSetup: React.FC = () => {
 
         setUploadingDocument(true);
         try {
-          // S3에 문서 업로드
           const { url } = await uploadToS3(file);
 
           const newDoc: Document = {
@@ -298,10 +303,30 @@ const ManagerProfileSetup: React.FC = () => {
           newErrors.regions = '하나 이상의 지역을 선택해주세요.';
         }
         break;
-      case 3:
+      case 3: {
         if (formData.availableTimes.length === 0) {
           newErrors.availableTimes = '하나 이상의 가능 시간을 등록해주세요.';
         }
+
+        for (const slot of formData.availableTimes) {
+          const start = Number(slot.startTime.replace(':', ''));
+          const end = Number(slot.endTime.replace(':', ''));
+          if (end - start < 100) {
+            showToast(
+              '시작시간과 종료시간은 최소 1시간 이상 차이나야 합니다.',
+              'error',
+            );
+            setErrors(newErrors);
+            return false;
+          }
+        }
+
+        if (hasDuplicateTimeSlot(formData.availableTimes)) {
+          showToast('중복된 가능 시간이 있습니다.', 'error');
+          setErrors(newErrors);
+          return false;
+        }
+
         if (
           formData.introduceText &&
           formData.introduceText.length > LENGTH_LIMITS.INTRODUCE.MAX
@@ -309,6 +334,7 @@ const ManagerProfileSetup: React.FC = () => {
           newErrors.introduceText = `소개글은 ${LENGTH_LIMITS.INTRODUCE.MAX}자 이하로 입력해주세요.`;
         }
         break;
+      }
       case 4:
         if (formData.documents.length < 3) {
           newErrors.documents = '필수 서류 3개를 모두 업로드해주세요.';
@@ -370,7 +396,6 @@ const ManagerProfileSetup: React.FC = () => {
       const result = await createProfile(profileData);
 
       if (result.success) {
-        showToast(SUCCESS_MESSAGES.PROFILE_CREATED, 'success');
         setTimeout(() => {
           navigate(ROUTES.HOME, { replace: true });
         }, 1500);
@@ -384,7 +409,7 @@ const ManagerProfileSetup: React.FC = () => {
   const isStepValid = (): boolean => {
     switch (currentStep) {
       case 1:
-        return formData.serviceTypes.length > 0;
+        return formData.serviceTypes.length > 0 && !!formData.profileImage;
       case 2:
         return formData.regions.length > 0;
       case 3:
@@ -713,15 +738,8 @@ const ManagerProfileSetup: React.FC = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
-        <button
-          onClick={() => navigate(-1)}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6" />
-        </button>
+      <div className="flex items-center justify-center p-4 border-b">
         <h1 className="text-lg font-bold">프로필 등록</h1>
-        <div className="w-10" />
       </div>
 
       {/* Progress */}

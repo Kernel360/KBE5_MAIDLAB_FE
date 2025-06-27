@@ -62,7 +62,10 @@ const initialState: AuthState = {
   isAuthenticated: false,
   isLoading: true,
   userType: null,
-  userInfo: null,
+  userInfo:
+    typeof window !== 'undefined'
+      ? JSON.parse(localStorage.getItem('userInfo') || 'null')
+      : null,
   error: null,
 };
 
@@ -255,10 +258,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         authLogin(response.accessToken, data.userType);
 
+        // userInfo에 서버 응답 전체 저장 및 localStorage에도 저장
         dispatch({
           type: 'AUTH_SUCCESS',
-          payload: { userType: data.userType as UserType },
+          payload: { userType: data.userType as UserType, userInfo: response },
         });
+        localStorage.setItem('userInfo', JSON.stringify(response));
 
         showToast(SUCCESS_MESSAGES.LOGIN, 'success');
         navigateToProfileSetup(
@@ -291,8 +296,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         } else {
           dispatch({
             type: 'AUTH_SUCCESS',
-            payload: { userType: data.userType as UserType },
+            payload: {
+              userType: data.userType as UserType,
+              userInfo: response,
+            },
           });
+          localStorage.setItem('userInfo', JSON.stringify(response));
           return handleExistingUser(response, data.userType as UserType);
         }
       } catch (error: any) {
@@ -387,6 +396,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     } finally {
       // 항상 로컬 로그아웃 처리
       authLogout();
+      localStorage.removeItem('userInfo');
       dispatch({ type: 'AUTH_LOGOUT' });
       showToast(SUCCESS_MESSAGES.LOGOUT, 'success');
       navigate(ROUTES.HOME);
