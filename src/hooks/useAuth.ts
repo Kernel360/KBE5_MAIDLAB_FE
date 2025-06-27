@@ -183,7 +183,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     showToastForSocialLogin,
   );
 
-  // 🆕 전역 로그아웃 핸들러 등록
+  // 전역 로그아웃 핸들러 등록
   useEffect(() => {
     const globalLogout = () => {
       console.log('🚨 전역 로그아웃 핸들러 실행됨');
@@ -193,28 +193,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         authLogout();
         dispatch({ type: 'AUTH_LOGOUT' });
 
-        // 2. 즉시 홈으로 이동 (replace 사용)
+        // 2. 즉시 홈으로 이동 (window.location 사용으로 안정성 확보)
         console.log('🔄 홈으로 리다이렉트 중...');
-        navigate(ROUTES.HOME, { replace: true });
-
-        // 🆕 3. 추가 안전장치: 0.5초 후에도 여전히 보호된 페이지에 있으면 강제 리다이렉트
-        setTimeout(() => {
-          const currentPath = window.location.pathname;
-          const protectedPaths = ['/consumer', '/manager', '/admin'];
-          const isOnProtectedPage = protectedPaths.some((path) =>
-            currentPath.startsWith(path),
-          );
-
-          if (isOnProtectedPage) {
-            console.log('🚨 여전히 보호된 페이지에 있음 - 강제 리다이렉트');
-            window.location.replace(ROUTES.HOME);
-          }
-        }, 500);
+        window.location.replace('/');
       } catch (error) {
         console.error('🚨 전역 로그아웃 핸들러 실행 중 오류:', error);
-
         // 오류 발생 시 강제 리다이렉트
-        window.location.replace(ROUTES.HOME);
+        window.location.replace('/');
       }
     };
 
@@ -226,7 +211,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       console.log('🗑️ 전역 로그아웃 핸들러 해제됨');
       setGlobalLogoutHandler(null);
     };
-  }, [navigate, dispatch]);
+  }, []); // ✅ 빈 의존성 배열 - 마운트 시 한 번만 실행
 
   // 🔧 초기 인증 상태 확인 - utils/auth.ts 활용
   useEffect(() => {
@@ -388,7 +373,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     [showToast],
   );
 
-  // 🆕 로그아웃 함수 수정 - API 호출 실패해도 로컬 로그아웃 진행
+  // 🆕 로그아웃 함수 - API 호출 실패해도 로컬 로그아웃 진행
   const logout = useCallback(async () => {
     try {
       // API 호출 시도

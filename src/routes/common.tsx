@@ -7,6 +7,8 @@ import {
   SocialSignUp,
   GoogleCallback,
   NotFound,
+  EventDetail,
+  EventList,
 } from '@/pages';
 
 export const CommonRoutes = () => (
@@ -17,6 +19,8 @@ export const CommonRoutes = () => (
     <Route path={ROUTES.SOCIAL_SIGNUP} element={<SocialSignUp />} />
     <Route path={ROUTES.GOOGLE_CALLBACK} element={<GoogleCallback />} />
     <Route path={ROUTES.NOT_FOUND} element={<NotFound />} />
+    <Route path={ROUTES.EVENTS} element={<EventList />} />
+    <Route path={ROUTES.EVENT_DETAIL} element={<EventDetail />} />
     <Route path="*" element={<NotFound />} />
   </>
 );

@@ -118,12 +118,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     .nextElementSibling as HTMLElement;
                   if (fallback) {
                     fallback.classList.remove('hidden');
+                    fallback.classList.add('flex');
                   }
                 }}
               />
 
               {/* 이미지 로드 실패 시 기본 디자인 */}
-              <div className="hidden w-full h-full bg-gradient-to-r from-orange-400 to-orange-500 absolute inset-0 flex items-center justify-center">
+              <div className="hidden w-full h-full bg-gradient-to-r from-orange-400 to-orange-500 absolute inset-0 items-center justify-center">
                 <div className="text-center text-white">
                   <div className="w-16 h-16 bg-white/20 rounded-full mx-auto mb-4 flex items-center justify-center">
                     <Calendar className="w-8 h-8" />
@@ -137,24 +138,27 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               {/* 이미지 위 어두운 오버레이 */}
               <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors" />
 
-              {/* 텍스트 오버레이 */}
+              {/* 텍스트 오버레이 - 화살표 영역 고려하여 중앙에 배치 */}
               <div className="absolute inset-0 flex items-end">
-                <div className="p-6 text-white">
-                  <h2 className="text-2xl font-bold mb-2">
-                    {currentEvent.title}
-                  </h2>
-                  <p className="text-sm opacity-90">
-                    {new Date(currentEvent.createdAt).toLocaleDateString(
-                      'ko-KR',
-                    )}
-                  </p>
+                <div className="p-6 text-white w-full">
+                  {/* 화살표와 겹치지 않게 중앙 영역에만 타이틀 배치 */}
+                  <div className="mx-16">
+                    <h2 className="text-2xl font-bold mb-2 text-center">
+                      {currentEvent.title}
+                    </h2>
+                    <p className="text-sm opacity-90 text-center">
+                      {new Date(currentEvent.createdAt).toLocaleDateString(
+                        'ko-KR',
+                      )}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
           ) : (
-            /* 기본 스타일 (이미지 없는 경우) */
+            /* 기본 스타일 (이미지 없는 경우) - 화살표 영역 고려 */
             <div className="w-full h-48 bg-gradient-to-r from-orange-400 to-orange-500 relative flex items-center justify-center">
-              <div className="text-center text-white">
+              <div className="text-center text-white mx-16">
                 <div className="w-16 h-16 bg-white/20 rounded-full mx-auto mb-4 flex items-center justify-center">
                   <Calendar className="w-8 h-8" />
                 </div>
