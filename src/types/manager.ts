@@ -1,5 +1,5 @@
 import type { BaseUser } from './user';
-import type { Gender, UserType } from '@/constants/user';
+import type { Gender, UserType, SocialType } from '@/constants/user';
 import type { ServiceType } from '@/constants/service';
 import type { ManagerVerificationStatus } from '@/constants/status';
 
@@ -98,6 +98,7 @@ export interface ManagerMyPageResponse {
   profileImage?: string;
   name: string;
   isVerified: boolean;
+  socialType: SocialType;
 }
 
 /**
