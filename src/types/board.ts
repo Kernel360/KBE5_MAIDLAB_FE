@@ -51,6 +51,8 @@ export interface BoardResponse {
   updatedAt: string;
   managerName?: string;
   consumerName?: string;
+  answerContent?: string;
+  answerCreatedAt?: string;
 }
 
 /**

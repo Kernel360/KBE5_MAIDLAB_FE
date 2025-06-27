@@ -251,7 +251,7 @@ export default function BoardDetail() {
           )}
 
           {/* 답변 섹션 */}
-          <AnswerSection answer={board.answer?.content} />
+          <AnswerSection answer={board.answer?.content} answerCreatedAt={board.answer?.createdAt} />
 
           {/* 이미지 모달 */}
           {selectedImage && (
