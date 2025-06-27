@@ -7,6 +7,7 @@ import {
 } from '@/constants/board';
 import type { BoardResponse } from '@/types/board';
 import type { BoardType } from '@/constants/board';
+import { useState } from 'react';
 
 interface BoardItemProps {
   board: BoardResponse;
@@ -15,6 +16,7 @@ interface BoardItemProps {
 
 export default function BoardItem({ board }: BoardItemProps) {
   const navigate = useNavigate();
+  const [openAnswer, setOpenAnswer] = useState(false);
 
   // ✅ 더 안전한 타입 체크
   const isValidBoardType = (type: string): type is BoardType => {
@@ -80,6 +82,32 @@ export default function BoardItem({ board }: BoardItemProps) {
         {board.title.length > 20 ? `${board.title.slice(0, 20)}...` : board.title}
       </h2>
       <p className="text-gray-600 line-clamp-2 text-left">{board.content}</p>
+      {/* 답변 토글 */}
+      {board.answerContent && (
+        <div className="mt-3">
+          <button
+            type="button"
+            className="text-green-700 text-sm font-semibold underline hover:text-green-800 mb-2"
+            onClick={e => {
+              e.stopPropagation();
+              setOpenAnswer(v => !v);
+            }}
+          >
+            {openAnswer ? '답변 닫기' : '답변 보기'}
+          </button>
+          {openAnswer && (
+            <div className="p-3 bg-gray-50 rounded text-sm text-gray-700">
+              <div className="mb-1 flex items-center gap-2">
+                <span className="font-semibold text-green-700">답변</span>
+                {board.answerCreatedAt && (
+                  <span className="text-xs text-gray-400">{formatDate(board.answerCreatedAt)}</span>
+                )}
+              </div>
+              <div className="whitespace-pre-line">{board.answerContent}</div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
