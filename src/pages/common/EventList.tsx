@@ -278,26 +278,22 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
         </div>
 
         {/* 이벤트 정보 */}
-        <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-gray-900 text-base line-clamp-2 mb-2">
-            {event.title}
-          </h3>
+        <div className="flex-1 min-w-0 flex flex-col justify-between">
+          <div>
+            <h3 className="font-semibold text-gray-900 text-base line-clamp-2 mb-2">
+              {event.title}
+            </h3>
 
-          <div className="flex items-center text-sm text-gray-500 mb-1">
-            <Clock className="w-4 h-4 mr-1.5 flex-shrink-0" />
-            <span>{formatDate(event.createdAt)} 등록</span>
+            <div className="flex items-center text-sm text-gray-500">
+              <Clock className="w-4 h-4 mr-1.5 flex-shrink-0" />
+              <span>{formatDate(event.createdAt)} 등록</span>
+            </div>
           </div>
 
-          <div className="flex items-center justify-between mt-3">
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-600">
-              이벤트
-            </span>
-
-            <div className="text-right">
-              <span className="text-xs text-gray-400">자세히 보기</span>
-              <div className="text-orange-500">
-                <ChevronRight className="w-4 h-4" />
-              </div>
+          <div className="flex items-center justify-end">
+            <div className="flex items-center text-orange-500">
+              <span className="text-xs text-gray-400 mr-1">자세히 보기</span>
+              <ChevronRight className="w-4 h-4" />
             </div>
           </div>
         </div>
