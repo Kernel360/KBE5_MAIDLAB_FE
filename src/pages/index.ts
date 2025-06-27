@@ -20,13 +20,11 @@ export { default as GoogleCallback } from './common/GoogleCallback';
 // 소셜 회원가입 페이지
 export { default as SocialSignUp } from './common/SocialSignUp';
 
-/**
- * event
- */
+// 이벤트 리스트 페이지
+export { default as EventList } from './common/EventList';
 
-// 이벤트 페이지
-// export { default as Events } from './Events';
-// export { default as EventDetail } from './EventDetail';
+// 이벤트 상세 페이지
+export { default as EventDetail } from './common/EventDetail';
 
 /**
  * consumer
