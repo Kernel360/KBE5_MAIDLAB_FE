@@ -109,7 +109,6 @@ const ConsumerProfileSetup: React.FC = () => {
       const result = await createProfile(profileData);
 
       if (result?.success !== false) {
-        showToast(SUCCESS_MESSAGES.PROFILE_CREATED, 'success');
         setTimeout(() => {
           navigate(ROUTES.HOME, { replace: true });
         }, 1500);
