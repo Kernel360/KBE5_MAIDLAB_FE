@@ -1,13 +1,5 @@
 import React, { useState } from 'react';
-import {
-  ArrowLeft,
-  Plus,
-  X,
-  Clock,
-  FileText,
-  User,
-  Upload,
-} from 'lucide-react';
+import { Plus, X, Clock, FileText, User, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   SERVICE_LIST,
@@ -183,6 +175,25 @@ const ManagerProfileSetup: React.FC = () => {
     }
   };
 
+  // 가능 시간 중복 체크 함수 (시간 구간 겹침 포함)
+  const hasDuplicateTimeSlot = (slots: typeof formData.availableTimes) => {
+    // 요일별로 구간을 모아서 겹치는지 확인
+    const byDay: Record<string, { start: number; end: number }[]> = {};
+    for (const slot of slots) {
+      if (!byDay[slot.day]) byDay[slot.day] = [];
+      const start = Number(slot.startTime.replace(':', ''));
+      const end = Number(slot.endTime.replace(':', ''));
+      // 겹치는 구간이 있는지 확인
+      for (const range of byDay[slot.day]) {
+        if (start < range.end && end > range.start) {
+          return true;
+        }
+      }
+      byDay[slot.day].push({ start, end });
+    }
+    return false;
+  };
+
   const addTimeSlot = () => {
     setFormData((prev) => ({
       ...prev,
@@ -298,9 +309,27 @@ const ManagerProfileSetup: React.FC = () => {
           newErrors.regions = '하나 이상의 지역을 선택해주세요.';
         }
         break;
-      case 3:
+      case 3: {
         if (formData.availableTimes.length === 0) {
           newErrors.availableTimes = '하나 이상의 가능 시간을 등록해주세요.';
+        }
+        // 각 구간이 1시간 이상 차이나는지 확인
+        for (const slot of formData.availableTimes) {
+          const start = Number(slot.startTime.replace(':', ''));
+          const end = Number(slot.endTime.replace(':', ''));
+          if (end - start < 100) {
+            showToast(
+              '시작시간과 종료시간은 최소 1시간 이상 차이나야 합니다.',
+              'error',
+            );
+            setErrors(newErrors);
+            return false;
+          }
+        }
+        if (hasDuplicateTimeSlot(formData.availableTimes)) {
+          showToast('중복된 가능 시간이 있습니다.', 'error');
+          setErrors(newErrors);
+          return false;
         }
         if (
           formData.introduceText &&
@@ -309,6 +338,7 @@ const ManagerProfileSetup: React.FC = () => {
           newErrors.introduceText = `소개글은 ${LENGTH_LIMITS.INTRODUCE.MAX}자 이하로 입력해주세요.`;
         }
         break;
+      }
       case 4:
         if (formData.documents.length < 3) {
           newErrors.documents = '필수 서류 3개를 모두 업로드해주세요.';
@@ -384,7 +414,7 @@ const ManagerProfileSetup: React.FC = () => {
   const isStepValid = (): boolean => {
     switch (currentStep) {
       case 1:
-        return formData.serviceTypes.length > 0;
+        return formData.serviceTypes.length > 0 && !!formData.profileImage;
       case 2:
         return formData.regions.length > 0;
       case 3:
@@ -713,15 +743,8 @@ const ManagerProfileSetup: React.FC = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
-        <button
-          onClick={() => navigate(-1)}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6" />
-        </button>
+      <div className="flex items-center justify-center p-4 border-b">
         <h1 className="text-lg font-bold">프로필 등록</h1>
-        <div className="w-10" />
       </div>
 
       {/* Progress */}
