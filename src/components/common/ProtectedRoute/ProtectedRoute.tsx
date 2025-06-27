@@ -40,7 +40,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // 🆕 프로필 체크 관련 상태들
   const [profileCheckComplete, setProfileCheckComplete] =
     useState(!checkProfile);
-  const [profileCheckFailed, setProfileCheckFailed] = useState(false);
 
   // 🔥 개선된 쿠키 확인 함수
   const hasRefreshTokenInCookie = () => {
