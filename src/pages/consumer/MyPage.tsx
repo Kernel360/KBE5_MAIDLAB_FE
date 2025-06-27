@@ -19,6 +19,7 @@ import { useToast } from '@/hooks/useToast';
 import type { ConsumerMyPageResponse } from '@/types/consumer';
 import { ROUTES } from '@/constants';
 import { useAuth } from '@/hooks/useAuth';
+import { BottomNavigation } from '@/components/layout/BottomNavigation/BottomNavigation';
 
 interface MenuItemProps {
   icon: React.ReactNode;
@@ -161,205 +162,212 @@ const MyPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-white">
-        <button
-          onClick={handleBack}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6" />
-        </button>
-        <h1 className="text-lg font-bold">마이페이지</h1>
-        <div className="w-10" />
-      </div>
+    <>
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b bg-white">
+          <button
+            onClick={handleBack}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <ArrowLeft className="w-6 h-6" />
+          </button>
+          <h1 className="text-lg font-bold">마이페이지</h1>
+          <div className="w-10" />
+        </div>
 
-      {/* Content */}
-      <div className="px-4 py-6">
-        <div className="max-w-md mx-auto">
-          <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
-            {/* Profile Section */}
-            <div className="text-center mb-8">
-              <div className="relative inline-block mb-4">
-                <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden mx-auto">
-                  {userInfo?.profileImage ? (
-                    <img
-                      src={userInfo.profileImage}
-                      alt="프로필"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <User className="w-12 h-12 text-gray-400" />
+        {/* Content */}
+        <div className="px-4 py-6">
+          <div className="max-w-md mx-auto">
+            <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+              {/* Profile Section */}
+              <div className="text-center mb-8">
+                <div className="relative inline-block mb-4">
+                  <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden mx-auto">
+                    {userInfo?.profileImage ? (
+                      <img
+                        src={userInfo.profileImage}
+                        alt="프로필"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <User className="w-12 h-12 text-gray-400" />
+                    )}
+                  </div>
+                </div>
+
+                <h2 className="text-xl font-bold text-gray-900 mb-2">
+                  {userInfo?.name || '사용자'}
+                </h2>
+
+                <div className="flex items-center justify-center gap-2 mb-6">
+                  <span className="text-gray-600">포인트:</span>
+                  {userInfo?.point !== undefined && (
+                    <span className="text-[#FF6B00] font-medium">
+                      {userInfo.point}P
+                    </span>
                   )}
                 </div>
+
+                <button
+                  onClick={handleProfileEdit}
+                  className="w-full py-3 bg-[#FF6B00] text-white rounded-lg font-medium hover:bg-[#FF8533] transition-colors mb-2"
+                >
+                  프로필 조회
+                </button>
               </div>
 
-              <h2 className="text-xl font-bold text-gray-900 mb-2">
-                {userInfo?.name || '사용자'}
-              </h2>
-
-              <div className="flex items-center justify-center gap-2 mb-6">
-                <span className="text-gray-600">포인트:</span>
-                {userInfo?.point !== undefined && (
-                  <span className="text-[#FF6B00] font-medium">
-                    {userInfo.point}P
-                  </span>
-                )}
-              </div>
-
-              <button
-                onClick={handleProfileEdit}
-                className="w-full py-3 bg-[#FF6B00] text-white rounded-lg font-medium hover:bg-[#FF8533] transition-colors mb-2"
-              >
-                프로필 조회
-              </button>
-            </div>
-
-            {/* Menu Items */}
-            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-              <div className="border-t border-gray-200">
-                <MenuItem
-                  icon={<Ticket className="w-5 h-5" />}
-                  title="프로모션 코드/쿠폰"
-                  onClick={handlePromotions}
-                />
-              </div>
-              <div className="border-t border-gray-200">
-                <MenuItem
-                  icon={<Coins className="w-5 h-5" />}
-                  title="포인트"
-                  onClick={handlePoints}
-                />
-              </div>
-              <div className="border-t border-gray-200">
-                <MenuItem
-                  icon={<Heart className="w-5 h-5" />}
-                  title="찜한 도우미"
-                  onClick={handleLikedManagers}
-                />
-              </div>
-              <div className="border-t border-gray-200">
-                <MenuItem
-                  icon={<Ban className="w-5 h-5" />}
-                  title="블랙리스트 도우미"
-                  onClick={handleBlacklist}
-                />
-              </div>
-              <div className="border-t border-gray-200">
-                <MenuItem
-                  icon={<Users className="w-5 h-5" />}
-                  title="친구 초대하기"
-                  onClick={handleInviteFriends}
-                />
-              </div>
-              {/* 비밀번호 변경 메뉴: 소셜 로그인 사용자는 숨김 */}
-              {userInfo && !userInfo.socialType && (
+              {/* Menu Items */}
+              <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
                 <div className="border-t border-gray-200">
                   <MenuItem
-                    icon={<Lock className="w-5 h-5" />}
-                    title="비밀번호 변경"
-                    onClick={() => setShowPasswordModal(true)}
+                    icon={<Ticket className="w-5 h-5" />}
+                    title="프로모션 코드/쿠폰"
+                    onClick={handlePromotions}
                   />
                 </div>
-              )}
-              <div className="border-t border-gray-200">
-                <MenuItem
-                  icon={<Settings className="w-5 h-5" />}
-                  title="설정"
-                  onClick={handleSettings}
-                />
+                <div className="border-t border-gray-200">
+                  <MenuItem
+                    icon={<Coins className="w-5 h-5" />}
+                    title="포인트"
+                    onClick={handlePoints}
+                  />
+                </div>
+                <div className="border-t border-gray-200">
+                  <MenuItem
+                    icon={<Heart className="w-5 h-5" />}
+                    title="찜한 도우미"
+                    onClick={handleLikedManagers}
+                  />
+                </div>
+                <div className="border-t border-gray-200">
+                  <MenuItem
+                    icon={<Ban className="w-5 h-5" />}
+                    title="블랙리스트 도우미"
+                    onClick={handleBlacklist}
+                  />
+                </div>
+                <div className="border-t border-gray-200">
+                  <MenuItem
+                    icon={<Users className="w-5 h-5" />}
+                    title="친구 초대하기"
+                    onClick={handleInviteFriends}
+                  />
+                </div>
+                {/* 비밀번호 변경 메뉴: 소셜 로그인 사용자는 숨김 */}
+                {userInfo && !userInfo.socialType && (
+                  <div className="border-t border-gray-200">
+                    <MenuItem
+                      icon={<Lock className="w-5 h-5" />}
+                      title="비밀번호 변경"
+                      onClick={() => setShowPasswordModal(true)}
+                    />
+                  </div>
+                )}
+                <div className="border-t border-gray-200">
+                  <MenuItem
+                    icon={<Settings className="w-5 h-5" />}
+                    title="설정"
+                    onClick={handleSettings}
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* 비밀번호 변경 모달 */}
-      {showPasswordModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-gray-900">비밀번호 변경</h3>
-              <button
-                onClick={() => setShowPasswordModal(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  새 비밀번호
-                </label>
-                <div className="relative">
-                  <input
-                    type={passwordData.showPassword ? 'text' : 'password'}
-                    value={passwordData.newPassword}
-                    onChange={(e) => handlePasswordChange('newPassword', e.target.value)}
-                    placeholder="새 비밀번호를 입력하세요"
-                    className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                      passwordErrors.newPassword ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setPasswordData(prev => ({ ...prev, showPassword: !prev.showPassword }))}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
-                  >
-                    {passwordData.showPassword ? (
-                      <EyeOff className="w-5 h-5" />
-                    ) : (
-                      <Eye className="w-5 h-5" />
-                    )}
-                  </button>
-                </div>
-                {passwordErrors.newPassword && (
-                  <p className="text-red-500 text-sm mt-1">{passwordErrors.newPassword}</p>
-                )}
+        {/* 비밀번호 변경 모달 */}
+        {showPasswordModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-gray-900">비밀번호 변경</h3>
+                <button
+                  onClick={() => setShowPasswordModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ✕
+                </button>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  비밀번호 확인
-                </label>
-                <div className="relative">
-                  <input
-                    type={passwordData.showConfirmPassword ? 'text' : 'password'}
-                    value={passwordData.confirmPassword}
-                    onChange={(e) => handlePasswordChange('confirmPassword', e.target.value)}
-                    placeholder="비밀번호를 한 번 더 입력하세요"
-                    className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                      passwordErrors.confirmPassword ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setPasswordData(prev => ({ ...prev, showConfirmPassword: !prev.showConfirmPassword }))}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
-                  >
-                    {passwordData.showConfirmPassword ? (
-                      <EyeOff className="w-5 h-5" />
-                    ) : (
-                      <Eye className="w-5 h-5" />
-                    )}
-                  </button>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    새 비밀번호
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={passwordData.showPassword ? 'text' : 'password'}
+                      value={passwordData.newPassword}
+                      onChange={(e) => handlePasswordChange('newPassword', e.target.value)}
+                      placeholder="새 비밀번호를 입력하세요"
+                      className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                        passwordErrors.newPassword ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setPasswordData(prev => ({ ...prev, showPassword: !prev.showPassword }))}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
+                    >
+                      {passwordData.showPassword ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
+                  {passwordErrors.newPassword && (
+                    <p className="text-red-500 text-sm mt-1">{passwordErrors.newPassword}</p>
+                  )}
                 </div>
-                {passwordErrors.confirmPassword && (
-                  <p className="text-red-500 text-sm mt-1">{passwordErrors.confirmPassword}</p>
-                )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    비밀번호 확인
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={passwordData.showConfirmPassword ? 'text' : 'password'}
+                      value={passwordData.confirmPassword}
+                      onChange={(e) => handlePasswordChange('confirmPassword', e.target.value)}
+                      placeholder="비밀번호를 한 번 더 입력하세요"
+                      className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                        passwordErrors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setPasswordData(prev => ({ ...prev, showConfirmPassword: !prev.showConfirmPassword }))}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
+                    >
+                      {passwordData.showConfirmPassword ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
+                  {passwordErrors.confirmPassword && (
+                    <p className="text-red-500 text-sm mt-1">{passwordErrors.confirmPassword}</p>
+                  )}
+                </div>
+                <button
+                  onClick={handlePasswordSubmit}
+                  disabled={changingPassword}
+                  className={`w-full py-3 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors mt-4`}
+                >
+                  {changingPassword ? '변경 중...' : '비밀번호 변경'}
+                </button>
               </div>
-              <button
-                onClick={handlePasswordSubmit}
-                disabled={changingPassword}
-                className={`w-full py-3 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors mt-4`}
-              >
-                {changingPassword ? '변경 중...' : '비밀번호 변경'}
-              </button>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+      <BottomNavigation
+        activeTab="profile"
+        onTabClick={navigate}
+        isAuthenticated={!!userInfo}
+      />
+    </>
   );
 };
 
