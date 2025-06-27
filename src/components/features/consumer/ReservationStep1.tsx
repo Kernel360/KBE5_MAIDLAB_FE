@@ -1,13 +1,13 @@
 // src/components/features/consumer/ReservationStep1.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReservationHeader from './ReservationHeader';
 import { BottomNavigation } from '@/components/layout/BottomNavigation/BottomNavigation';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth, useToast, useConsumer } from '@/hooks';
 import { useNavigate } from 'react-router-dom';
 import { SERVICE_DETAIL_TYPES } from '@/constants/service';
 
 interface Props {
-  onNext: (data: { serviceType: string; serviceDetailType: string }) => void;
+  onNext: (data: { serviceType: string; serviceDetailType: string, address : string, addressDetail : string }) => void;
   onBack?: () => void;
 }
 
@@ -18,17 +18,33 @@ const TABS = [
 
 const ReservationStep1: React.FC<Props> = ({ onNext, onBack }) => {
   const [selectedTab, setSelectedTab] = useState<'생활청소' | '부분청소'>('생활청소');
+  const [ FetchAddress, setAdresss] = useState('');
+  const [FetchAddressDetail, setDetailAddress] = useState('');
   const { isAuthenticated } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
 
   const detail = SERVICE_DETAIL_TYPES[selectedTab];
+  const {fetchProfile} = useConsumer();
+
+  useEffect(() => {
+    fetchProfile().then(profile => {
+      if (profile && profile.address) {
+        setAdresss(profile.address);
+        if (profile.detailAddress){
+          setDetailAddress(profile.detailAddress);
+        }
+      }
+    });
+  }, []);
+
 
   const handleNext = () => {
     if (selectedTab === '부분청소') {
-      window.alert('서비스 준비중입니다.');
+      showToast('서비스 준비중입니다.');
       return;
     }
-    onNext({ serviceType: 'GENERAL_CLEANING', serviceDetailType: selectedTab });
+    onNext({ serviceType: 'GENERAL_CLEANING', serviceDetailType: selectedTab, address : FetchAddress, addressDetail : FetchAddressDetail });
   };
 
   return (

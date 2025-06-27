@@ -217,19 +217,27 @@ const ReservationStep3: React.FC<Props> = ({ data, onBack, onSubmit }) => {
               </div>
             </div>
           </div>
-          <div className="mt-4 flex flex-col items-center justify-center">
-            <div className="text-gray-700 text-base font-semibold">
-              선택한 날짜: <span className="text-orange-600 font-bold">{data.reservationDate}</span>
+        <div className="mt-8 pt-10 flex flex-col items-center justify-center border-t border-orange-100">
+          <div className="flex flex-row items-center justify-center gap-8 w-full max-w-xl mx-auto">
+            <div className="flex flex-col items-center flex-1">
+              <CalendarDaysIcon className="w-6 h-6 text-orange-400 mb-1" />
+              <span className="text-xs text-gray-500">선택한 날짜</span>
+              <span className="text-base font-bold text-orange-600 mt-1">{data.reservationDate}</span>
             </div>
-            <div className="text-gray-700 text-base font-semibold mt-1">
-              시작 시간: <span className="text-orange-600 font-bold">{data.startTime || '선택 전'}</span>
+            <div className="flex flex-col items-center flex-1">
+              <ClockIcon className="w-6 h-6 text-orange-400 mb-1" />
+              <span className="text-xs text-gray-500">시작 시간</span>
+              <span className="text-base font-bold text-orange-600 mt-1">{data.startTime || '선택 전'}</span>
             </div>
-            <div className="text-orange-500 text-base font-bold mt-1">
-              예상 종료 시간: {getExpectedEndTime()}
+            <div className="flex flex-col items-center flex-1">
+              <ClockIcon className="w-6 h-6 text-orange-400 mb-1" />
+              <span className="text-xs text-gray-500">예상 종료</span>
+              <span className="text-base font-bold text-orange-600 mt-1">{getExpectedEndTime()}</span>
             </div>
-            <div className="text-gray-400 text-sm mt-1">(종료 시간은 서비스/옵션에 따라 자동 계산됩니다)</div>
           </div>
+          <div className="text-gray-400 text-sm mt-3 text-center">(종료 시간은 서비스/옵션에 따라 자동 계산됩니다)</div>
         </div>
+      </div>
 
         {/* 서비스 추가 */}
         <div className="space-y-4">
@@ -291,7 +299,7 @@ const ReservationStep3: React.FC<Props> = ({ data, onBack, onSubmit }) => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="font-semibold text-lg truncate">{data.managerInfo.name}</span>
-                  {data.managerInfo.averageRate && <span className="text-orange-500 font-bold text-sm">★ {data.managerInfo.averageRate}</span>}
+                  ★ {data.managerInfo.averageRate && <span className="text-orange-500 font-bold text-sm">★ {data.managerInfo.averageRate}</span>}
                 </div>
                 <div className="text-gray-600 text-sm truncate">{data.managerInfo.introduceText || '소개 정보 없음'}</div>
               </div>

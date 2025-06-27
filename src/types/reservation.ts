@@ -40,6 +40,7 @@ export interface ReservationListResponse {
  * 예약 상세 응답
  */
 export interface ReservationDetailResponse {
+  status: string;
   serviceType: string;
   serviceDetailType: string;
   address: string;

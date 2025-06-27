@@ -15,7 +15,7 @@ export type ReservationStatus =
 
 // ===== 예약 상태 한글명 =====
 export const RESERVATION_STATUS_LABELS = {
-  [RESERVATION_STATUS.PENDING]: '대기중',
+  [RESERVATION_STATUS.PENDING]: '매니저 매칭 대기중',
   [RESERVATION_STATUS.APPROVED]: '승인됨',
   [RESERVATION_STATUS.REJECTED]: '거절됨',
   [RESERVATION_STATUS.MATCHED]: '매칭됨',
