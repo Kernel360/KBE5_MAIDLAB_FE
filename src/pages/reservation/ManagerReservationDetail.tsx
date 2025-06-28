@@ -283,10 +283,6 @@ const ManagerReservationDetail: React.FC = () => {
                 </span>
               </div>
             ))}
-            <div className="flex justify-between py-1">
-              <span className="text-gray-600">합증료</span>
-              <span className="text-gray-900">0원</span>
-            </div>
             <div className="border-t border-gray-200 pt-3 mt-3 flex flex-col gap-1">
               <div className="flex justify-between items-center">
                 <span className="text-lg font-semibold text-gray-900">총 금액</span>

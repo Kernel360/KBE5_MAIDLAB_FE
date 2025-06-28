@@ -83,6 +83,7 @@ export interface CheckInOutRequest {
 export interface ReviewRegisterRequest {
   rating: number;
   comment: string;
+  keywords : string[];
   likes?: boolean;
 }
 
