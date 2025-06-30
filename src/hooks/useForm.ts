@@ -65,6 +65,12 @@ export const useForm = <T extends Record<string, any>>({
     async (e?: React.FormEvent) => {
       e?.preventDefault();
 
+      const allFieldsAsTouched: Partial<Record<keyof T, boolean>> = {};
+      Object.keys(values).forEach((key) => {
+        allFieldsAsTouched[key as keyof T] = true;
+      });
+      setTouched(allFieldsAsTouched);
+
       if (!validate()) return;
 
       if (onSubmit) {
