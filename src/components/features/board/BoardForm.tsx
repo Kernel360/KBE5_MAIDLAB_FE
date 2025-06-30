@@ -197,7 +197,7 @@ export default function BoardForm({
                     }
                   }}
                   maxLength={30}
-                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-left"
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#f97316] text-left"
                   placeholder="제목을 입력해주세요 (최대 30자)"
                 />
                 <div className="mt-1 text-right text-sm text-gray-500">
@@ -219,7 +219,7 @@ export default function BoardForm({
                   }}
                   maxLength={2000}
                   rows={6}
-                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-left"
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#f97316] text-left"
                   placeholder="문의 내용을 입력해주세요 (최대 2000자)"
                 />
                 <div className="mt-1 text-right text-sm text-gray-500">
