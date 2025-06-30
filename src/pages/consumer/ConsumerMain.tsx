@@ -174,7 +174,7 @@ const ConsumerMain: React.FC = () => {
               <div className="mt-6 flex flex-col items-center">
                 <button
                   onClick={() => handleServiceClick('ALL')}
-                  className="w-full flex flex-col items-center justify-center bg-orange-400 rounded-xl shadow p-3 hover:bg-orange-500 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-orange-100 text-white"
+                  className="w-full flex flex-col items-center justify-center bg-[#FF6B00] rounded-xl shadow p-3 hover:bg-[#ea580c] transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-orange-100 text-white"
                 >
                   <span className="mb-1"></span>
                   <span className="text-base font-bold text-white">예약하기</span>
