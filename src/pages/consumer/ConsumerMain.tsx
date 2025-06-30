@@ -195,7 +195,7 @@ const ConsumerMain: React.FC = () => {
             </div>
             <hr className="border-t border-gray-200 mb-2" />
             <div
-              className="flex justify-between items-start cursor-pointer hover:bg-orange-50 rounded-lg transition-colors duration-150"
+              className="flex justify-between items-start cursor-pointer rounded-lg transition-colors duration-150 border border-gray-200 p-4 hover:border-orange-400 hover:shadow-lg"
               role="button"
               tabIndex={0}
               onClick={() => {
