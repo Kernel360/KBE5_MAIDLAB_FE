@@ -189,7 +189,7 @@ const SignUp: React.FC = () => {
                 onChange={(e) => handlePhoneChange(e.target.value)}
                 onBlur={() => setFieldTouched('phoneNumber')}
                 placeholder="010-0000-0000"
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                   errors.phoneNumber && touched.phoneNumber
                     ? 'border-red-500'
                     : 'border-gray-300'
@@ -214,7 +214,7 @@ const SignUp: React.FC = () => {
                   onChange={(e) => setValue('password', e.target.value)}
                   onBlur={() => setFieldTouched('password')}
                   placeholder="••••••••"
-                  className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                  className={`w-full px-4 py-3 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                     errors.password && touched.password
                       ? 'border-red-500'
                       : 'border-gray-300'
@@ -270,7 +270,7 @@ const SignUp: React.FC = () => {
                 value={values.confirmPassword}
                 onChange={(e) => setValue('confirmPassword', e.target.value)}
                 placeholder="••••••••"
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                   values.confirmPassword &&
                   values.password !== values.confirmPassword
                     ? 'border-red-500'
@@ -296,7 +296,7 @@ const SignUp: React.FC = () => {
                 onChange={(e) => setValue('name', e.target.value)}
                 onBlur={() => setFieldTouched('name')}
                 placeholder="홍길동"
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                   errors.name && touched.name
                     ? 'border-red-500'
                     : 'border-gray-300'
@@ -352,7 +352,7 @@ const SignUp: React.FC = () => {
                 onBlur={() => setFieldTouched('birth')}
                 placeholder="1990-01-01"
                 maxLength={10}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                   errors.birth && touched.birth
                     ? 'border-red-500'
                     : 'border-gray-300'
