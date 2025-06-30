@@ -3,7 +3,6 @@ import { AuthProvider, ThemeProvider, ToastProvider } from '@/hooks';
 import { ToastContainer } from '@/components/common';
 import { AppRoutes } from '@/routes';
 import { Analytics } from '@vercel/analytics/react'; // next가 아니라 react로 import
-import { SpeedInsights } from '@vercel/speed-insights/next';
 
 import '@/styles/index.css';
 
@@ -16,7 +15,6 @@ const App: React.FC = () => {
             <AppRoutes />
             <ToastContainer />
             <Analytics />
-            <SpeedInsights />
           </div>
         </AuthProvider>
       </ToastProvider>
