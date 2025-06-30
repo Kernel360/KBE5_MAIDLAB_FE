@@ -54,7 +54,7 @@ const ConsumerReservationCreate: React.FC = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-md p-8 my-8">
+    <div className="min-h-screen bg-gray-50">
       {step === 0 && <ReservationStep0 onNext={handleNextFromStep0} />}
       {step === 1 && (
         <ReservationStep1
