@@ -3,17 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, User } from 'lucide-react';
 import { useManager } from '@/hooks';
 import { LoadingSpinner } from '@/components/common';
-import {
-  SERVICE_TYPES,
-  SERVICE_TYPE_LABELS,
-  WEEKDAY_LABELS,
-} from '@/constants/service';
+import { SERVICE_TYPES, SERVICE_TYPE_LABELS } from '@/constants/service';
 import { SEOUL_DISTRICT_LABELS } from '@/constants/region';
 import { GENDER_LABELS, GENDER } from '@/constants/user';
 import { ROUTES } from '@/constants/route';
 import type { ManagerProfileResponse } from '@/types/manager';
 import type { ServiceType } from '@/constants/service';
 import type { SeoulDistrict } from '@/constants/region';
+import ScheduleSummary from '@/components/features/manager/ScheduleSummary';
 
 const ManagerProfile: React.FC = () => {
   const navigate = useNavigate();
@@ -25,7 +22,7 @@ const ManagerProfile: React.FC = () => {
       const data = await fetchProfile();
       setProfile(data ?? null);
     })();
-  }, [fetchProfile]);
+  }, []);
 
   if (loading || !profile) {
     return <LoadingSpinner message="프로필을 불러오는 중..." />;
@@ -74,7 +71,7 @@ const ManagerProfile: React.FC = () => {
                 type="text"
                 value={profile.name}
                 disabled
-                className="w-full p-3 text-center rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50"
+                className="w-full p-3 text-center text-sm rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50"
               />
             </div>
 
@@ -87,9 +84,9 @@ const ManagerProfile: React.FC = () => {
                 <button
                   type="button"
                   disabled
-                  className={`flex-1 py-2 rounded-lg text-center font-medium transition-all ${
+                  className={`flex-1 py-2 rounded-lg text-center font-medium text-sm transition-all ${
                     profile.gender === GENDER.MALE
-                      ? 'bg-orange-50 text-orange-600'
+                      ? 'bg-gray-50 text-gray-900'
                       : 'text-gray-400'
                   }`}
                 >
@@ -98,9 +95,9 @@ const ManagerProfile: React.FC = () => {
                 <button
                   type="button"
                   disabled
-                  className={`flex-1 py-2 rounded-lg text-center font-medium transition-all ${
+                  className={`flex-1 py-2 rounded-lg text-center font-medium text-sm transition-all ${
                     profile.gender === GENDER.FEMALE
-                      ? 'bg-orange-50 text-orange-600'
+                      ? 'bg-gray-50 text-gray-900'
                       : 'text-gray-400'
                   }`}
                 >
@@ -118,7 +115,7 @@ const ManagerProfile: React.FC = () => {
                 type="text"
                 value={profile.birth}
                 disabled
-                className="w-full p-3 text-center rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50"
+                className="w-full p-3 text-center rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50 text-sm"
               />
             </div>
 
@@ -135,7 +132,7 @@ const ManagerProfile: React.FC = () => {
                     disabled
                     className={`w-full h-12 flex items-center justify-center rounded-lg  font-medium text-sm transition-all ${
                       profile.services.includes(service)
-                        ? 'bg-orange-50 text-orange-600'
+                        ? 'bg-gray-50 text-gray-900'
                         : 'text-gray-400'
                     }`}
                   >
@@ -156,7 +153,7 @@ const ManagerProfile: React.FC = () => {
                     key={region.region}
                     type="button"
                     disabled
-                    className="px-4 py-2 rounded-lg bg-orange-50 text-orange-600 font-medium text-sm"
+                    className="px-4 py-2 rounded-lg bg-gray-50 text-gray-900 font-medium text-sm"
                   >
                     {SEOUL_DISTRICT_LABELS[region.region as SeoulDistrict] ||
                       region.region}
@@ -166,42 +163,12 @@ const ManagerProfile: React.FC = () => {
             </div>
 
             {/* 가능 시간 */}
-            <div className="mt-8 mb-6">
+            <div>
               <label className="block text-gray-700 font-medium mb-1">
                 가능 시간
               </label>
-              <div className="space-y-2">
-                {profile.schedules.map((slot, idx) => (
-                  <div key={idx} className="flex items-center gap-2">
-                    <select
-                      value={slot.day}
-                      disabled
-                      className="w-28 p-2  text-center rounded text-gray-900 bg-gray-50 disabled:bg-gray-50 appearance-none"
-                    >
-                      {Object.entries(WEEKDAY_LABELS).map(([key, label]) => (
-                        <option key={key} value={key}>
-                          {label}
-                        </option>
-                      ))}
-                    </select>
-                    <input
-                      type="text"
-                      value={slot.startTime}
-                      disabled
-                      className="w-24 p-2  text-center rounded text-gray-900 bg-gray-50 disabled:bg-gray-50"
-                    />
-                    <span className="mx-1">~</span>
-                    <input
-                      type="text"
-                      value={slot.endTime}
-                      disabled
-                      className="w-24 p-2  text-center rounded text-gray-900 bg-gray-50 disabled:bg-gray-50"
-                    />
-                  </div>
-                ))}
-              </div>
+              <ScheduleSummary schedules={profile.schedules} />
             </div>
-
             {/* 소개글 */}
             <div>
               <label className="block text-gray-700 font-medium mb-1">
@@ -210,7 +177,7 @@ const ManagerProfile: React.FC = () => {
               <textarea
                 value={profile.introduceText || ''}
                 disabled
-                className="w-full p-3  text-center rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50 resize-none min-h-[48px]"
+                className="w-full p-3  text-center text-sm rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50 resize-none min-h-[48px]"
                 rows={3}
               />
             </div>
