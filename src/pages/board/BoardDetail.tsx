@@ -170,35 +170,27 @@ export default function BoardDetail() {
             <div className="space-y-4">
               {/* 게시글 타입과 답변 상태 */}
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-500">
-                    {BOARD_TYPE_LABELS[board.boardType]}
-                  </span>
-                  <span className="text-xs text-gray-400">
-                    {formatDate(board.createdAt)}
-                  </span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm text-gray-500 whitespace-nowrap">{BOARD_TYPE_LABELS[board.boardType]}</span>
+                  <span className="text-xs text-gray-400 whitespace-nowrap">{formatDate(board.createdAt)}</span>
                   {board.answered ? (
-                    <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
-                      답변완료
-                    </span>
+                    <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full whitespace-nowrap">답변완료</span>
                   ) : (
-                    <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">
-                      답변대기
-                    </span>
+                    <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full whitespace-nowrap">답변대기</span>
                   )}
                 </div>
                 {board && (
-                  <div className="flex gap-2">
+                  <div className="flex gap-1 sm:gap-2 min-w-0">
                     <button
                       onClick={() => {
                         if (id) {
                           navigate(`${ROUTES.BOARD.EDIT.replace(':id', id)}`);
                         }
                       }}
-                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-orange-600 hover:bg-orange-50 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-transparent"
+                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-orange-600 hover:bg-orange-50 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-transparent whitespace-nowrap flex-shrink-0 overflow-hidden"
                       disabled={isDeleting}
                     >
-                      <Edit className="w-4 h-4 mr-1.5" />
+                      <Edit className="w-4 h-4 mr-1.5 flex-shrink-0" />
                       수정
                     </button>
                     <button
@@ -219,9 +211,9 @@ export default function BoardDetail() {
               </h1>
 
               {/* 내용 */}
-              <p className="text-gray-700 whitespace-pre-wrap break-words text-left">
+              <div className="text-gray-900 text-base break-words">
                 {board.content}
-              </p>
+              </div>
             </div>
           </div>
 
