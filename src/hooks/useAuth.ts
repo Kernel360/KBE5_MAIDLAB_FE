@@ -273,8 +273,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         return { success: true };
       } catch (error: any) {
-        const errorMessage =
-          error.message || ERROR_MESSAGES.INVALID_CREDENTIALS;
+        const errorMessage = ERROR_MESSAGES.INVALID_CREDENTIALS;
         dispatch({ type: 'AUTH_FAILURE', payload: errorMessage });
         showToast(errorMessage, 'error');
         return { success: false, error: errorMessage };
