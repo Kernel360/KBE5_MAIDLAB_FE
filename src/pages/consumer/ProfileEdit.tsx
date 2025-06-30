@@ -256,7 +256,7 @@ const ProfileEdit: React.FC = () => {
                   type="text"
                   value={formData.name}
                   onChange={e => handleInputChange('name', e.target.value)}
-                  className="w-full p-3 border text-center border-gray-300 rounded-lg text-gray-900 bg-white"
+                  className="w-full p-3 border text-center border-gray-300 rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 />
                 {errors.name && (
                   <p className="text-red-500 text-sm mt-1">{errors.name}</p>
@@ -299,7 +299,7 @@ const ProfileEdit: React.FC = () => {
                   value={formData.birth}
                   onChange={handleBirthChange}
                   placeholder="YYYY-MM-DD"
-                  className="w-full p-3 border text-center border-gray-300 rounded-lg text-gray-900 bg-white"
+                  className="w-full p-3 border text-center border-gray-300 rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   maxLength={10}
                   inputMode="numeric"
                   autoComplete="bday"
@@ -319,7 +319,7 @@ const ProfileEdit: React.FC = () => {
                   value={formData.address}
                   onChange={e => handleInputChange('address', e.target.value)}
                   placeholder="서울특별시 서초구"
-                  className="w-full p-3 border text-center border-gray-300 rounded-lg text-gray-900 bg-white"
+                  className="w-full p-3 border text-center border-gray-300 rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 />
                 {errors.address && (
                   <p className="text-red-500 text-sm mt-1">{errors.address}</p>
@@ -336,7 +336,7 @@ const ProfileEdit: React.FC = () => {
                   value={formData.detailAddress}
                   onChange={e => handleInputChange('detailAddress', e.target.value)}
                   placeholder="상세 주소를 입력해주세요"
-                  className="w-full p-3 border text-center border-gray-300 rounded-lg text-gray-900 bg-white "
+                  className="w-full p-3 border text-center border-gray-300 rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 />
                 {errors.detailAddress && (
                   <p className="text-red-500 text-sm mt-1">{errors.detailAddress}</p>
