@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import ReservationStep0 from '@/components/features/consumer/ReservationStep0';
 import ReservationStep1 from '@/components/features/consumer/ReservationStep1';
 import ReservationStep2 from '@/components/features/consumer/ReservationStep2';
-import ReservationStep3 from '@/components/features/consumer/ReservationStep3';
 import type { ReservationFormData } from '@/types/reservation';
 import { useLocation } from 'react-router-dom';
 
@@ -39,20 +38,6 @@ const ConsumerReservationCreate: React.FC = () => {
   };
   const handleBackToStep0 = () => setStep(0);
 
-  // step2: 예약 정보 입력
-  const handleSubmitFromStep2 = (data: Partial<ReservationFormData>) => {
-    setFormData((prev) => ({ ...prev, ...data }));
-    setStep(3);
-  };
-  const handleBackToStep2 = () => setStep(2);
-
-  // step3: 완료
-  const handleCompleteReservation = () => {
-    setStep(0);
-    setFormData({});
-    setSelectedServiceType('');
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       {step === 0 && <ReservationStep0 onNext={handleNextFromStep0} />}
@@ -66,14 +51,11 @@ const ConsumerReservationCreate: React.FC = () => {
         <ReservationStep2
           initialData={formData}
           onBack={handleBackToStep0}
-          onSubmit={handleSubmitFromStep2}
-        />
-      )}
-      {step === 3 && (
-        <ReservationStep3
-          data={formData as ReservationFormData}
-          onBack={handleBackToStep2}
-          onSubmit={handleCompleteReservation}
+          onSubmit={() => {
+            setStep(0);
+            setFormData({});
+            setSelectedServiceType('');
+          }}
         />
       )}
     </div>
