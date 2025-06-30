@@ -191,7 +191,7 @@ const Login: React.FC = () => {
                 onChange={(e) => handlePhoneChange(e.target.value)}
                 onBlur={() => setFieldTouched('phoneNumber')}
                 placeholder="010-0000-0000"
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                   errors.phoneNumber && touched.phoneNumber
                     ? 'border-red-500'
                     : 'border-gray-300'
@@ -216,7 +216,7 @@ const Login: React.FC = () => {
                   onChange={(e) => setValue('password', e.target.value)}
                   onBlur={() => setFieldTouched('password')}
                   placeholder="••••••••"
-                  className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                  className={`w-full px-4 py-3 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                     errors.password && touched.password
                       ? 'border-red-500'
                       : 'border-gray-300'
@@ -248,7 +248,7 @@ const Login: React.FC = () => {
                 type="checkbox"
                 checked={values.rememberMe}
                 onChange={(e) => setValue('rememberMe', e.target.checked)}
-                className="w-4 h-4 text-orange-500 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 focus:ring-2"
+                className="checkbox-orange"
               />
               <label
                 htmlFor="remember-me"
