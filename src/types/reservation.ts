@@ -45,12 +45,6 @@ export interface ReservationDetailResponse {
   serviceDetailType: string;
   address: string;
   addressDetail: string;
-  managerUuId: string;
-  managerName: string;
-  managerProfileImageUrl: string;
-  managerAverageRate: number;
-  managerRegion: string[];
-  managerPhoneNumber: string;
   housingType: string;
   roomSize: number;
   housingInformation: string;
@@ -61,6 +55,18 @@ export interface ReservationDetailResponse {
   pet: string;
   specialRequest: string;
   totalPrice: number;
+  canceledAt: string | null;
+  checkinTime: string | null;
+  checkoutTime: string | null;
+  consumerId: number;
+  managerId: number;
+  managerName: string;
+  managerProfileImage: string;
+  managerRate: string;
+  consumerName: string;
+  consumerProfileImage: string;
+  managerPhoneNumber: string;
+  consumerPhoneNumber: string;
 }
 
 /**

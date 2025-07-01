@@ -4,7 +4,8 @@ import { AdminProtectedRoute } from '@/components/common';
 import {
   AdminLogin,
   AdminLayout,
-  AdminUserList,
+  AdminManagerList,
+  AdminConsumerList,
   AdminManagerDetail,
   AdminConsumerDetail,
   AdminReservationList,
@@ -13,7 +14,8 @@ import {
   AdminSettlementDetail,
   AdminEvents,
   AdminEventCreate,
-  AdminBoards,
+  AdminManagerBoards,
+  AdminConsumerBoards,
   AdminBoardDetail,
   AdminBoardEdit,
   AdminEventEdit,
@@ -32,9 +34,10 @@ export const AdminRoutes = () => (
         </AdminProtectedRoute>
       }
     >
-      <Route path="users" element={<AdminUserList />} />
-      <Route path="users/manager/:id" element={<AdminManagerDetail />} />
-      <Route path="users/consumer/:id" element={<AdminConsumerDetail />} />
+      <Route path="managers" element={<AdminManagerList />} />
+      <Route path="manager/:id" element={<AdminManagerDetail />} />
+      <Route path="consumers" element={<AdminConsumerList />} />
+      <Route path="consumer/:id" element={<AdminConsumerDetail />} />
       <Route path="reservations" element={<AdminReservationList />} />
       <Route path="reservations/:id" element={<AdminReservationDetail />} />
       <Route path="settlements" element={<AdminSettlementList />} />
@@ -46,7 +49,8 @@ export const AdminRoutes = () => (
       <Route path="events/create" element={<AdminEventCreate />} />
       <Route path="events/:id/edit" element={<AdminEventEdit />} />
       <Route path="events/:id" element={<AdminEventDetail />} />
-      <Route path="boards" element={<AdminBoards />} />
+      <Route path="boards/manager" element={<AdminManagerBoards />} />
+      <Route path="boards/consumer" element={<AdminConsumerBoards />} />
       <Route path="boards/:id" element={<AdminBoardDetail />} />
       <Route path="boards/:id/edit" element={<AdminBoardEdit />} />
       <Route index element={<Dashboard />} />

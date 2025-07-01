@@ -62,15 +62,15 @@ const Profile: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pt-20">
       <Header
         variant="sub"
         title="프로필"
         backRoute={ROUTES.CONSUMER.MYPAGE}
-        showMenu={false}
+        showMenu={true}
       />
 
-      <div className="px-4 py-6">
+      <div className="px-4 py-0">
         <div className="max-w-md mx-auto">
           <div className="bg-white rounded-xl shadow-sm p-6 space-y-8">
             {/* 프로필 이미지 */}
@@ -117,14 +117,14 @@ const Profile: React.FC = () => {
                 <button
                   type="button"
                   disabled
-                  className={`flex-1 py-2 rounded-lg text-center font-medium transition-all ${formData.gender === 'MALE' ? 'bg-orange-50 text-orange-600' : 'text-gray-400'}`}
+                  className={`flex-1 py-2 rounded-lg text-center font-medium transition-all ${formData.gender === 'MALE' ? 'bg-gray-50 text-gray-900' : 'text-gray-400'}`}
                 >
                   남성
                 </button>
                 <button
                   type="button"
                   disabled
-                  className={`flex-1 py-2 rounded-lg text-center font-medium transition-all ${formData.gender === 'FEMALE' ? 'bg-orange-50 text-orange-600' : 'text-gray-400'}`}
+                  className={`flex-1 py-2 rounded-lg text-center font-medium transition-all ${formData.gender === 'FEMALE' ? 'bg-gray-50 text-gray-900' : 'text-gray-400'}`}
                 >
                   여성
                 </button>
