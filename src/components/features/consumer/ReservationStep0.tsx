@@ -2,7 +2,7 @@ import React from 'react';
 import { Header } from '@/components/layout/Header/Header';
 import { useToast } from '@/hooks';
 import { ROUTES } from '@/constants';
-import {SERVICE_LIST} from '@/constants/service'
+import { SERVICE_LIST } from '@/constants/service';
 interface Props {
   onNext: (serviceType: string) => void;
 }
@@ -44,4 +44,4 @@ const ReservationStep0: React.FC<Props> = ({ onNext }) => {
   );
 };
 
-export default ReservationStep0; 
+export default ReservationStep0;
