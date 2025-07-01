@@ -4,6 +4,7 @@ import { ArrowLeft, User } from 'lucide-react';
 import { useConsumer } from '@/hooks/domain/useConsumer';
 import { ROUTES } from '@/constants';
 import type { ProfileData } from '@/types/consumer';
+import { Header } from '@/components/layout/Header/Header';
 
 const DEFAULT_PROFILE_IMAGE = '/default-profile.png';
 
@@ -15,7 +16,7 @@ const Profile: React.FC = () => {
     gender: 'MALE',
     address: '',
     detailAddress: '',
-    profileImage: undefined
+    profileImage: undefined,
   });
   const [imageError, setImageError] = useState(false);
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ const Profile: React.FC = () => {
         gender: profile.gender || 'MALE',
         address: profile.address || '',
         detailAddress: profile.detailAddress || '',
-        profileImage: profile.profileImage
+        profileImage: profile.profileImage,
       });
     }
   }, [profile]);
@@ -56,23 +57,18 @@ const Profile: React.FC = () => {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
-          </div>
+      </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-white">
-        <button
-          onClick={() => navigate(ROUTES.CONSUMER.MYPAGE)}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6" />
-        </button>
-        <h1 className="text-lg font-bold">프로필 </h1>
-        <div className="w-10" />
-      </div>
+      <Header
+        variant="sub"
+        title="프로필"
+        backRoute={ROUTES.CONSUMER.MYPAGE}
+        showMenu={false}
+      />
 
       <div className="px-4 py-6">
         <div className="max-w-md mx-auto">
@@ -83,7 +79,11 @@ const Profile: React.FC = () => {
                 <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
                   {formData.profileImage ? (
                     <img
-                      src={imageError ? DEFAULT_PROFILE_IMAGE : formData.profileImage}
+                      src={
+                        imageError
+                          ? DEFAULT_PROFILE_IMAGE
+                          : formData.profileImage
+                      }
                       alt="프로필"
                       className="w-full h-full object-cover"
                       onError={handleImageError}
@@ -147,7 +147,7 @@ const Profile: React.FC = () => {
             {/* 주소 */}
             <div>
               <label className="block text-gray-700 font-medium mb-1">
-                주소 
+                주소
               </label>
               <input
                 type="text"
@@ -160,7 +160,7 @@ const Profile: React.FC = () => {
             {/* 상세 주소 */}
             <div>
               <label className="block text-gray-700 font-medium mb-1">
-                상세 주소 
+                상세 주소
               </label>
               <input
                 type="text"
@@ -186,4 +186,4 @@ const Profile: React.FC = () => {
   );
 };
 
-export default Profile; 
+export default Profile;

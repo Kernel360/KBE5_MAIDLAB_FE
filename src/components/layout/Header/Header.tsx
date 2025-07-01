@@ -21,6 +21,7 @@ interface HeaderProps {
   onBackClick?: () => void;
   backRoute?: string;
   showMenu?: boolean;
+  hideBackButton?: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -31,9 +32,10 @@ export const Header: React.FC<HeaderProps> = ({
   onBackClick,
   backRoute,
   showMenu = false,
+  hideBackButton = false,
 }) => {
   const navigate = useNavigate();
-  const { logout, isAuthenticated } = useAuth();
+  const { logout, isAuthenticated, userType } = useAuth();
   const { showToast } = useToast();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -77,8 +79,17 @@ export const Header: React.FC<HeaderProps> = ({
   }, []);
 
   if (variant === 'sub') {
+    if (hideBackButton) {
+      return (
+        <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-[18px] border-b bg-white">
+          <div className="w-10" />
+          <h1 className="text-lg font-bold text-center w-full">{title}</h1>
+          <div className="w-10" />
+        </header>
+      );
+    }
     return (
-      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-3 border-b bg-white">
+      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 p-3 border-b bg-white">
         <button
           onClick={handleBackClick}
           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -117,11 +128,15 @@ export const Header: React.FC<HeaderProps> = ({
                     </span>
                     <span>MAIDLAB</span>
                   </button>
-                  {isAuthenticated ? (
+                  {isAuthenticated && (
                     <>
                       <button
                         onClick={() =>
-                          handleMenuClick(ROUTES.MANAGER.RESERVATIONS)
+                          handleMenuClick(
+                            userType === 'MANAGER'
+                              ? ROUTES.MANAGER.RESERVATIONS
+                              : ROUTES.CONSUMER.RESERVATIONS,
+                          )
                         }
                         className="flex items-center px-4 py-2 hover:bg-gray-100 gap-2"
                       >
@@ -136,7 +151,13 @@ export const Header: React.FC<HeaderProps> = ({
                         <span>문의</span>
                       </button>
                       <button
-                        onClick={() => handleMenuClick(ROUTES.MANAGER.MYPAGE)}
+                        onClick={() =>
+                          handleMenuClick(
+                            userType === 'MANAGER'
+                              ? ROUTES.MANAGER.MYPAGE
+                              : ROUTES.CONSUMER.MYPAGE,
+                          )
+                        }
                         className="flex items-center px-4 py-2 hover:bg-gray-100 gap-2"
                       >
                         <User className="w-5 h-5 text-gray-600" />
@@ -150,14 +171,6 @@ export const Header: React.FC<HeaderProps> = ({
                         <span>로그아웃</span>
                       </button>
                     </>
-                  ) : (
-                    <button
-                      onClick={() => handleMenuClick(ROUTES.LOGIN)}
-                      className="flex items-center px-4 py-2 hover:bg-gray-100 gap-2"
-                    >
-                      <User className="w-5 h-5 text-gray-600" />
-                      <span>로그인</span>
-                    </button>
                   )}
                 </div>
               )}
@@ -214,34 +227,50 @@ export const Header: React.FC<HeaderProps> = ({
                   </span>
                   <span>MAIDLAB</span>
                 </button>
-                <button
-                  onClick={() => handleMenuClick(ROUTES.MANAGER.RESERVATIONS)}
-                  className="flex items-center px-4 py-2 hover:bg-gray-100 gap-2"
-                >
-                  <CalendarDays className="w-5 h-5 text-gray-600" />
-                  <span>예약</span>
-                </button>
-                <button
-                  onClick={() => handleMenuClick(ROUTES.BOARD.LIST)}
-                  className="flex items-center px-4 py-2 hover:bg-gray-100 gap-2"
-                >
-                  <HelpCircle className="w-5 h-5 text-gray-600" />
-                  <span>문의</span>
-                </button>
-                <button
-                  onClick={() => handleMenuClick(ROUTES.MANAGER.MYPAGE)}
-                  className="flex items-center px-4 py-2 hover:bg-gray-100 gap-2"
-                >
-                  <User className="w-5 h-5 text-gray-600" />
-                  <span>마이페이지</span>
-                </button>
-                <button
-                  onClick={() => handleMenuClick(logout)}
-                  className="flex items-center px-4 py-2 hover:bg-gray-100 gap-2"
-                >
-                  <LogOut className="w-5 h-5 text-gray-600" />
-                  <span>로그아웃</span>
-                </button>
+                {isAuthenticated && (
+                  <>
+                    <button
+                      onClick={() =>
+                        handleMenuClick(
+                          userType === 'MANAGER'
+                            ? ROUTES.MANAGER.RESERVATIONS
+                            : ROUTES.CONSUMER.RESERVATIONS,
+                        )
+                      }
+                      className="flex items-center px-4 py-2 hover:bg-gray-100 gap-2"
+                    >
+                      <CalendarDays className="w-5 h-5 text-gray-600" />
+                      <span>예약</span>
+                    </button>
+                    <button
+                      onClick={() => handleMenuClick(ROUTES.BOARD.LIST)}
+                      className="flex items-center px-4 py-2 hover:bg-gray-100 gap-2"
+                    >
+                      <HelpCircle className="w-5 h-5 text-gray-600" />
+                      <span>문의</span>
+                    </button>
+                    <button
+                      onClick={() =>
+                        handleMenuClick(
+                          userType === 'MANAGER'
+                            ? ROUTES.MANAGER.MYPAGE
+                            : ROUTES.CONSUMER.MYPAGE,
+                        )
+                      }
+                      className="flex items-center px-4 py-2 hover:bg-gray-100 gap-2"
+                    >
+                      <User className="w-5 h-5 text-gray-600" />
+                      <span>마이페이지</span>
+                    </button>
+                    <button
+                      onClick={() => handleMenuClick(logout)}
+                      className="flex items-center px-4 py-2 hover:bg-gray-100 gap-2"
+                    >
+                      <LogOut className="w-5 h-5 text-gray-600" />
+                      <span>로그아웃</span>
+                    </button>
+                  </>
+                )}
               </div>
             )}
           </>

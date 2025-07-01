@@ -9,6 +9,7 @@ import type {
   ConsumerProfileFormData,
   ConsumerProfileErrors,
 } from '@/types/consumer';
+import { Header } from '@/components/layout/Header/Header';
 
 const ConsumerProfileSetup: React.FC = () => {
   const navigate = useNavigate();
@@ -124,11 +125,14 @@ const ConsumerProfileSetup: React.FC = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="flex items-center justify-center p-4 border-b">
-        <h1 className="text-lg font-bold">프로필 등록</h1>
-      </div>
+      <Header
+        variant="sub"
+        title="프로필 등록"
+        showMenu={false}
+        hideBackButton={true}
+      />
 
-      <div className="px-4 py-6">
+      <div className="px-4 py-6 pt-20">
         <div className="max-w-md mx-auto space-y-6">
           {/* 프로필 이미지 */}
           <div className="text-center">

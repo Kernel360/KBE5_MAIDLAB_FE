@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
 import { useAuth, useForm, useToast } from '@/hooks';
 import { ROUTES } from '@/constants';
 import type { SocialSignUpRequest } from '@/types/auth';
+import { Header } from '@/components/layout/Header/Header';
 
 const SocialSignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -96,19 +96,14 @@ const SocialSignUp: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 헤더 */}
-      <header className="bg-white px-4 py-3 flex items-center shadow-sm">
-        <button
-          onClick={() => navigate(ROUTES.LOGIN)}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6 text-gray-700" />
-        </button>
-        <h1 className="text-lg font-semibold text-gray-900 ml-3">
-          추가 정보 입력
-        </h1>
-      </header>
+      <Header
+        variant="sub"
+        title="추가 정보 입력"
+        backRoute={ROUTES.LOGIN}
+        showMenu={false}
+      />
 
-      <main className="px-4 py-6">
+      <main className="px-4 py-6 pt-20">
         <div className="max-w-md mx-auto">
           <div className="mb-6">
             <div className="text-center mb-6">
@@ -166,7 +161,7 @@ const SocialSignUp: React.FC = () => {
                 onBlur={() => setFieldTouched('birth')}
                 placeholder="1990-01-01"
                 maxLength={10}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                className={`w-full px-4 py-3 border focus:outline-none rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                   errors.birth && touched.birth
                     ? 'border-red-500'
                     : 'border-gray-300'

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { useAuth, useForm, useToast } from '@/hooks';
 import { ROUTES } from '@/constants';
 import type { SignUpRequest } from '@/types/auth';
+import { Header } from '@/components/layout/Header/Header';
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -139,17 +140,14 @@ const SignUp: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 헤더 */}
-      <header className="bg-white px-4 py-3 flex items-center shadow-sm">
-        <button
-          onClick={() => navigate(-1)}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6 text-gray-700" />
-        </button>
-        <h1 className="text-lg font-semibold text-gray-900 ml-3">회원가입</h1>
-      </header>
+      <Header
+        variant="sub"
+        title="회원가입"
+        backRoute={ROUTES.LOGIN}
+        showMenu={false}
+      />
 
-      <main className="px-4 py-6">
+      <main className="px-4 py-6 pt-20">
         <div className="max-w-md mx-auto">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* 사용자 타입 선택 */}

@@ -20,6 +20,7 @@ import type { ConsumerMyPageResponse } from '@/types/consumer';
 import { ROUTES } from '@/constants';
 import { useAuth } from '@/hooks/useAuth';
 import { BottomNavigation } from '@/components/layout/BottomNavigation/BottomNavigation';
+import { Header } from '@/components/layout/Header/Header';
 
 interface MenuItemProps {
   icon: React.ReactNode;
@@ -51,11 +52,11 @@ const MyPage: React.FC = () => {
     newPassword: '',
     confirmPassword: '',
     showPassword: false,
-    showConfirmPassword: false
+    showConfirmPassword: false,
   });
   const [passwordErrors, setPasswordErrors] = useState({
     newPassword: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
   const [changingPassword, setChangingPassword] = useState(false);
 
@@ -102,15 +103,15 @@ const MyPage: React.FC = () => {
   };
 
   const handlePasswordChange = (field: string, value: string) => {
-    setPasswordData(prev => ({
+    setPasswordData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
     if (field === 'newPassword' && passwordErrors.newPassword) {
-      setPasswordErrors(prev => ({ ...prev, newPassword: '' }));
+      setPasswordErrors((prev) => ({ ...prev, newPassword: '' }));
     }
     if (field === 'confirmPassword' && passwordErrors.confirmPassword) {
-      setPasswordErrors(prev => ({ ...prev, confirmPassword: '' }));
+      setPasswordErrors((prev) => ({ ...prev, confirmPassword: '' }));
     }
   };
 
@@ -118,7 +119,10 @@ const MyPage: React.FC = () => {
     const newErrors = { newPassword: '', confirmPassword: '' };
     if (!passwordData.newPassword.trim()) {
       newErrors.newPassword = '새 비밀번호를 입력해주세요.';
-    } else if (passwordData.newPassword.length < 8 || passwordData.newPassword.length > 20) {
+    } else if (
+      passwordData.newPassword.length < 8 ||
+      passwordData.newPassword.length > 20
+    ) {
       newErrors.newPassword = '8~20자 영문, 숫자를 입력해주세요.';
     }
     if (!passwordData.confirmPassword.trim()) {
@@ -141,7 +145,7 @@ const MyPage: React.FC = () => {
           newPassword: '',
           confirmPassword: '',
           showPassword: false,
-          showConfirmPassword: false
+          showConfirmPassword: false,
         });
         setPasswordErrors({ newPassword: '', confirmPassword: '' });
         showToast('비밀번호가 변경되었습니다.', 'success');
@@ -165,16 +169,12 @@ const MyPage: React.FC = () => {
     <>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b bg-white">
-          <button
-            onClick={handleBack}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </button>
-          <h1 className="text-lg font-bold">마이페이지</h1>
-          <div className="w-10" />
-        </div>
+        <Header
+          variant="sub"
+          title="마이페이지"
+          backRoute={ROUTES.HOME}
+          showMenu={false}
+        />
 
         {/* Content */}
         <div className="px-4 py-6">
@@ -281,7 +281,9 @@ const MyPage: React.FC = () => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-gray-900">비밀번호 변경</h3>
+                <h3 className="text-lg font-bold text-gray-900">
+                  비밀번호 변경
+                </h3>
                 <button
                   onClick={() => setShowPasswordModal(false)}
                   className="text-gray-400 hover:text-gray-600"
@@ -298,15 +300,24 @@ const MyPage: React.FC = () => {
                     <input
                       type={passwordData.showPassword ? 'text' : 'password'}
                       value={passwordData.newPassword}
-                      onChange={(e) => handlePasswordChange('newPassword', e.target.value)}
+                      onChange={(e) =>
+                        handlePasswordChange('newPassword', e.target.value)
+                      }
                       placeholder="새 비밀번호를 입력하세요"
                       className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                        passwordErrors.newPassword ? 'border-red-500' : 'border-gray-300'
+                        passwordErrors.newPassword
+                          ? 'border-red-500'
+                          : 'border-gray-300'
                       }`}
                     />
                     <button
                       type="button"
-                      onClick={() => setPasswordData(prev => ({ ...prev, showPassword: !prev.showPassword }))}
+                      onClick={() =>
+                        setPasswordData((prev) => ({
+                          ...prev,
+                          showPassword: !prev.showPassword,
+                        }))
+                      }
                       className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
                     >
                       {passwordData.showPassword ? (
@@ -317,7 +328,9 @@ const MyPage: React.FC = () => {
                     </button>
                   </div>
                   {passwordErrors.newPassword && (
-                    <p className="text-red-500 text-sm mt-1">{passwordErrors.newPassword}</p>
+                    <p className="text-red-500 text-sm mt-1">
+                      {passwordErrors.newPassword}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -326,17 +339,28 @@ const MyPage: React.FC = () => {
                   </label>
                   <div className="relative">
                     <input
-                      type={passwordData.showConfirmPassword ? 'text' : 'password'}
+                      type={
+                        passwordData.showConfirmPassword ? 'text' : 'password'
+                      }
                       value={passwordData.confirmPassword}
-                      onChange={(e) => handlePasswordChange('confirmPassword', e.target.value)}
+                      onChange={(e) =>
+                        handlePasswordChange('confirmPassword', e.target.value)
+                      }
                       placeholder="비밀번호를 한 번 더 입력하세요"
                       className={`w-full px-4 py-3 pr-12 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
-                        passwordErrors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                        passwordErrors.confirmPassword
+                          ? 'border-red-500'
+                          : 'border-gray-300'
                       }`}
                     />
                     <button
                       type="button"
-                      onClick={() => setPasswordData(prev => ({ ...prev, showConfirmPassword: !prev.showConfirmPassword }))}
+                      onClick={() =>
+                        setPasswordData((prev) => ({
+                          ...prev,
+                          showConfirmPassword: !prev.showConfirmPassword,
+                        }))
+                      }
                       className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
                     >
                       {passwordData.showConfirmPassword ? (
@@ -347,7 +371,9 @@ const MyPage: React.FC = () => {
                     </button>
                   </div>
                   {passwordErrors.confirmPassword && (
-                    <p className="text-red-500 text-sm mt-1">{passwordErrors.confirmPassword}</p>
+                    <p className="text-red-500 text-sm mt-1">
+                      {passwordErrors.confirmPassword}
+                    </p>
                   )}
                 </div>
                 <button

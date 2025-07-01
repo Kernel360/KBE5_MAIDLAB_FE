@@ -25,6 +25,7 @@ import type {
   Document,
 } from '@/types/manager';
 import type { TimeSlot } from '@/types/common';
+import { Header } from '@/components/layout/Header/Header';
 
 const ManagerProfileSetup: React.FC = () => {
   const navigate = useNavigate();
@@ -738,12 +739,15 @@ const ManagerProfileSetup: React.FC = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <div className="flex items-center justify-center p-4 border-b">
-        <h1 className="text-lg font-bold">프로필 등록</h1>
-      </div>
+      <Header
+        variant="sub"
+        title="프로필 등록"
+        showMenu={false}
+        hideBackButton={true}
+      />
 
       {/* Progress */}
-      <div className="px-4 py-6">
+      <div className="px-4 py-6 pt-20">
         <div className="max-w-md mx-auto">
           <div className="flex items-center justify-between mb-6">
             {[1, 2, 3, 4].map((step) => (
