@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useReservation } from '@/hooks/domain/useReservation';
 import { useAuth } from '@/hooks/useAuth';
+import { managerApi } from '@/apis/manager';
 import { ROUTES } from '@/constants';
 import { LENGTH_LIMITS } from '@/constants/validation';
 import { ArrowLeft, Star, Sparkles, Edit3, X } from 'lucide-react';
-import type { ReviewRegisterRequest, ReservationDetailResponse } from '@/types/reservation';
+import type { ReviewRegisterRequest } from '@/types/reservation';
 import type { ReviewFormData } from '@/types/consumer';
 
 // 매니저용 키워드 템플릿 데이터
@@ -173,7 +174,7 @@ const ReviewTextArea: React.FC<{
   isOptional: boolean;
 }> = ({ comment, onChange, isOptional }) => {
   const remainingChars = LENGTH_LIMITS.REVIEW_COMMENT.MAX - comment.length;
-  const isValid = isOptional || comment.length >= LENGTH_LIMITS.REVIEW_COMMENT.MIN;
+  const isValid = comment.length <= LENGTH_LIMITS.REVIEW_COMMENT.MAX;
   
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
@@ -200,7 +201,7 @@ const ReviewTextArea: React.FC<{
         placeholder={
           isOptional 
             ? `키워드 외에 추가로 하고 싶은 말이 있다면 작성해주세요.\n(선택사항)`
-            : `고객과의 업무는 어떠셨나요? 솔직한 후기를 남겨주세요.\n(업무 환경, 고객 태도, 요청사항 등)\n최소 ${LENGTH_LIMITS.REVIEW_COMMENT.MIN}자 이상 작성해주세요.`
+            : `고객과의 업무는 어떠셨나요? 솔직한 후기를 남겨주세요.\n(업무 환경, 고객 태도, 요청사항 등)`
         }
       />
       
@@ -208,7 +209,7 @@ const ReviewTextArea: React.FC<{
         <div>
           {!isValid && comment.length > 0 && (
             <span className="text-red-500 text-sm font-medium">
-              최소 {LENGTH_LIMITS.REVIEW_COMMENT.MIN}자 이상 작성해주세요
+              최대 {LENGTH_LIMITS.REVIEW_COMMENT.MAX}자까지 작성 가능합니다
             </span>
           )}
         </div>
@@ -225,13 +226,9 @@ const ReviewTextArea: React.FC<{
 const ManagerReviewRegister: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { registerReview, fetchReservationDetail } = useReservation();
-  const { userInfo } = useAuth();
+  const { registerReview } = useReservation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
-  const [reservationDetail, setReservationDetail] = useState<ReservationDetailResponse | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [accessError, setAccessError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<ReviewFormData>({
     rating: 5,
@@ -239,58 +236,6 @@ const ManagerReviewRegister: React.FC = () => {
     preference: 'NONE', // 매니저 리뷰에서는 사용하지 않지만 타입 맞추기 위해 유지
   });
 
-  // 예약 정보 및 접근 권한 검증
-  useEffect(() => {
-    const validateAccess = async () => {
-      if (!id) {
-        setAccessError('예약 ID가 없습니다.');
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        const detail = await fetchReservationDetail(parseInt(id));
-        
-        if (!detail) {
-          setAccessError('존재하지 않는 예약입니다.');
-          setIsLoading(false);
-          return;
-        }
-
-        // 매니저 본인이 담당한 예약인지 확인
-        if (detail.managerUuId !== userInfo?.uuId) {
-          setAccessError('이 예약에 대한 접근 권한이 없습니다.');
-          setIsLoading(false);
-          return;
-        }
-
-        // 예약 상태가 완료인지 확인
-        if (detail.status !== 'COMPLETED') {
-          setAccessError('완료된 예약만 리뷰 작성이 가능합니다.');
-          setIsLoading(false);
-          return;
-        }
-
-        // 추가 검증은 백엔드에서 처리
-        // - 매니저 리뷰 중복 작성 방지
-
-        setReservationDetail(detail);
-        setAccessError(null);
-      } catch (error) {
-        console.error('예약 정보 조회 실패:', error);
-        // 404 에러인 경우 접근 권한 없음으로 처리
-        if (error instanceof Error && error.message.includes('404')) {
-          setAccessError('이 예약에 대한 접근 권한이 없습니다.');
-        } else {
-          setAccessError('예약 정보를 불러오는데 실패했습니다.');
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    validateAccess();
-  }, [id, fetchReservationDetail, userInfo]);
 
   const handleKeywordToggle = (keyword: string) => {
     setSelectedKeywords(prev => 
@@ -308,13 +253,9 @@ const ManagerReviewRegister: React.FC = () => {
 
   // 키워드가 선택되었으면 comment는 선택사항
   const hasSelectedKeywords = selectedKeywords.length > 0;
-  const isCommentValid = hasSelectedKeywords || (
-    formData.comment.length >= LENGTH_LIMITS.REVIEW_COMMENT.MIN && 
-    formData.comment.length <= LENGTH_LIMITS.REVIEW_COMMENT.MAX
-  );
   
-  // 폼 유효성: 키워드가 있거나 코멘트가 유효해야 함
-  const isFormValid = hasSelectedKeywords || isCommentValid;
+  // 폼 유효성: 키워드가 있거나 코멘트가 있어야 함
+  const isFormValid = hasSelectedKeywords || formData.comment.length > 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -329,11 +270,6 @@ const ManagerReviewRegister: React.FC = () => {
       return;
     }
 
-    // 코멘트 길이 체크 (코멘트가 있는 경우에만)
-    if (formData.comment.length > 0 && formData.comment.length < LENGTH_LIMITS.REVIEW_COMMENT.MIN) {
-      alert(`리뷰는 ${LENGTH_LIMITS.REVIEW_COMMENT.MIN}자 이상 작성해주세요.`);
-      return;
-    }
 
     if (formData.comment.length > LENGTH_LIMITS.REVIEW_COMMENT.MAX) {
       alert(`리뷰는 ${LENGTH_LIMITS.REVIEW_COMMENT.MAX}자 이하로 작성해주세요.`);
@@ -344,13 +280,14 @@ const ManagerReviewRegister: React.FC = () => {
 
     try {
       const data: ReviewRegisterRequest = {
+        reservationId: parseInt(id),
         rating: formData.rating,
         comment: formData.comment,
         keywords: selectedKeywords.length > 0 ? selectedKeywords : [''],
         // 매니저 리뷰에서는 likes 필드 제외
       };
 
-      await registerReview(parseInt(id), data);
+      await registerReview(data);
       alert('고객 리뷰가 등록되었습니다.');
       navigate(ROUTES.MANAGER.RESERVATIONS); // 매니저용 라우트로 변경 필요
     } catch (error) {
@@ -360,38 +297,6 @@ const ManagerReviewRegister: React.FC = () => {
     }
   };
 
-  // 로딩 상태
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">예약 정보를 확인하고 있습니다...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // 접근 권한 에러
-  if (accessError) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center p-8">
-          <div className="mb-4">
-            <X className="w-16 h-16 text-red-500 mx-auto" />
-          </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">접근 불가</h2>
-          <p className="text-gray-600 mb-6">{accessError}</p>
-          <button
-            onClick={() => navigate(ROUTES.MANAGER.RESERVATIONS)}
-            className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-          >
-            예약 목록으로 돌아가기
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">

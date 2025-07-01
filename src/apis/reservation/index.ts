@@ -4,6 +4,7 @@ import type {
   ReservationListResponse,
   ReservationDetailResponse,
   ReservationApprovalRequest,
+  PaymentRequestBody,
   CheckInOutRequest,
   ReviewRegisterRequest,
   WeeklySettlementResponse,
@@ -60,10 +61,11 @@ export const reservationApi = {
   /**
    * 예약 결제
    */
-  payment: async (reservationId: number): Promise<string> => {
+  payment: async (data: PaymentRequestBody): Promise<string> => {
     return apiCall<string>(
       'post',
-      API_ENDPOINTS.RESERVATION.PAYMENT(reservationId),
+      API_ENDPOINTS.RESERVATION.PAYMENT(),
+      data,
     );
   },
 
@@ -113,12 +115,11 @@ export const reservationApi = {
    * 리뷰 등록
    */
   registerReview: async (
-    reservationId: number,
     data: ReviewRegisterRequest,
   ): Promise<string> => {
     return apiCall<string>(
       'post',
-      API_ENDPOINTS.RESERVATION.REVIEW(reservationId),
+      API_ENDPOINTS.RESERVATION.REVIEW(),
       data,
     );
   },

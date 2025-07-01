@@ -142,8 +142,13 @@ const ManagerReservationsAndMatching: React.FC = () => {
       onDetailClick={() => navigate(ROUTES.MANAGER.RESERVATION_DETAIL.replace(':id', String(reservation.reservationId)))}
       onCheckIn={() => handleCheckInOutClick(reservation, true)}
       onCheckOut={async () => {
-        await checkOut(reservation.reservationId, { checkTime: new Date().toISOString() });
-        navigate(ROUTES.MANAGER.REVIEW_REGISTER.replace(':id', String(reservation.reservationId)));
+        const result = await checkOut(reservation.reservationId, { checkTime: new Date().toISOString() });
+        if (result.success) {
+          // 상태 업데이트를 위한 짧은 지연 후 네비게이션
+          setTimeout(() => {
+            navigate(ROUTES.MANAGER.REVIEW_REGISTER.replace(':id', String(reservation.reservationId)));
+          }, 100);
+        }
       }}
     />
   );

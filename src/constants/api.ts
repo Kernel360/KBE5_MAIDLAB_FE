@@ -93,11 +93,11 @@ export const API_ENDPOINTS = {
     DETAIL: (id: number) => `/api/reservations/${id}`,
     CANCEL: (id: number) => `/api/reservations/${id}/cancel`,
     PRICE_CHECK: '/api/reservations/price',
-    PAYMENT: (id: number) => `/api/reservations/${id}/payment`,
+    PAYMENT: () => `/api/reservations/payment`,
     RESPONSE: (id: number) => `/api/reservations/${id}/response`,
     CHECKIN: (id: number) => `/api/reservations/${id}/checkin`,
     CHECKOUT: (id: number) => `/api/reservations/${id}/checkout`,
-    REVIEW: (id: number) => `/api/reservations/${id}/review`,
+    REVIEW: () => '/api/reservations/review',
     SETTLEMENTS: '/api/reservations/settlements/weekly-details',
   },
   MATCHING: {

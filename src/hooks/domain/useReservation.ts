@@ -8,6 +8,7 @@ import type {
   ReservationCreateRequest,
   ReservationListResponse,
   ReservationApprovalRequest,
+  PaymentRequestBody,
   CheckInOutRequest,
   ReviewRegisterRequest,
 } from '@/types/reservation';
@@ -145,8 +146,12 @@ export const useReservation = () => {
   // 예약 결제
   const payReservation = useCallback(
     async (reservationId: number) => {
+      const paymentData: PaymentRequestBody = {
+        reservationId: reservationId,
+      };
+
       const result = await callApi(
-        () => reservationApi.payment(reservationId),
+        () => reservationApi.payment(paymentData as any),
         {
           successMessage: '결제가 완료되었습니다.',
           errorMessage: '결제에 실패했습니다.',
@@ -228,17 +233,17 @@ export const useReservation = () => {
 
   // 리뷰 등록
   const registerReview = useCallback(
-    async (reservationId: number, data: ReviewRegisterRequest) => {
+    async (data: ReviewRegisterRequest) => {
       const result = await callApi(
-        () => reservationApi.registerReview(reservationId, data),
+        () => reservationApi.registerReview(data),
         {
           successMessage: '리뷰가 등록되었습니다.',
           errorMessage: '리뷰 등록에 실패했습니다.',
         },
       );
 
-      if (result.success) {
-        updateLocalReservation(reservationId, { isExistReview: true });
+      if (result.success && data.reservationId) {
+        updateLocalReservation(data.reservationId, { isExistReview: true });
       }
 
       return result;

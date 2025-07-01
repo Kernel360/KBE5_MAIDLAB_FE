@@ -71,6 +71,13 @@ export interface ReservationApprovalRequest {
 }
 
 /**
+ * 결제 요청
+ */
+export interface PaymentRequestBody {
+  reservationId: number;
+}
+
+/**
  * 체크인/체크아웃 요청
  */
 export interface CheckInOutRequest {
@@ -81,6 +88,7 @@ export interface CheckInOutRequest {
  * 리뷰 등록 요청
  */
 export interface ReviewRegisterRequest {
+  reservationId: number;
   rating: number;
   comment: string;
   keywords : string[];
