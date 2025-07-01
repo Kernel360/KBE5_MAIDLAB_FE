@@ -37,12 +37,17 @@ export interface ManagerListResponse
  * 매니저 상세 정보 (관리자용)
  */
 export interface AdminManagerDetail {
-  uuid: string;
+  id: number;
   phoneNumber: string;
   name: string;
   birth: string;
   gender: Gender;
   averageRate: number;
+  createdAt: string;
+  updatedAt: string;
+  introduceText: string;
+  profileImage: string;
+  socialType: string;
   region: string[];
   isVerified: string;
   isDeleted: boolean;
@@ -64,6 +69,19 @@ export interface ConsumerListItem {
 export interface ConsumerListResponse
   extends PaginationResponse<ConsumerListItem> {}
 
+// 소비자 상세 정보
+export interface ConsumerProfileDetail {
+  profileImage: string;
+  phoneNumber: string;
+  name: string;
+  birth: string; // 'YYYY-MM-DD' 형식의 문자열로 받는다고 가정
+  gender: Gender;
+  address: string;
+  detailAddress: string;
+  point: number;
+  isDeleted: boolean;
+  socialType: string;
+}
 /**
  * 관리자용 정산 정보 (통합)
  */
@@ -127,6 +145,8 @@ export interface ManagerStatusParams {
   page?: number;
   size?: number;
   status: string;
+  sortByRating?: boolean;
+  isDescending?: boolean;
 }
 
 /**

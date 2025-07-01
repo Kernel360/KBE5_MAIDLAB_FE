@@ -4,9 +4,10 @@ import { useToast } from '@/hooks/useToast';
 import { consumerApi } from '@/apis/consumer';
 import type { LikedManagerResponse } from '@/types/consumer';
 import { ROUTES } from '@/constants/route';
-import { ArrowLeft, Star, Trash2 } from 'lucide-react';
+import { Star, Trash2 } from 'lucide-react';
 import { SEOUL_DISTRICT_LABELS } from '@/constants/region';
 import { usePagination } from '@/hooks';
+import { Header } from '@/components/layout/Header/Header';
 
 function ManagerNameModal({ name, introduceText }: { name: string, introduceText?: string }) {
   const nameRef = useRef<HTMLHeadingElement | null>(null);
@@ -135,17 +136,7 @@ export default function LikedManagerList() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 헤더 */}
-      <div className="fixed top-0 left-0 right-0 z-10 bg-white shadow-sm">
-        <div className="flex items-center justify-between px-4 h-14">
-          <button onClick={handleBack} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-            <ArrowLeft className="w-6 h-6" />
-          </button>
-          <h1 className="absolute left-1/2 transform -translate-x-1/2 text-lg font-semibold">찜한 도우미</h1>
-          <div className="w-10" />
-        </div>
-      </div>
-      {/* 컨텐츠 */}
+      <Header variant="sub" title="찜한 도우미" backRoute={ROUTES.CONSUMER.MYPAGE} showMenu={true} />
       <div className="pt-20 pb-6">
         <div className="max-w-2xl mx-auto px-4">
           <div className="space-y-3">

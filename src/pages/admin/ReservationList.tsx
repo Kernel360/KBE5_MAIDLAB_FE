@@ -22,6 +22,7 @@ import {
 import { type ReservationListResponse } from '@/types/reservation';
 import { type MatchingResponse } from '@/types/matching';
 import { adminApi } from '../../apis/admin';
+import { getServiceTypeName } from '@/constants/admin';
 import MatchingChangeDialog from '../../components/features/admin/MatchingChangeDialog';
 import type { TabPanelProps } from '@/types/userList';
 
@@ -228,7 +229,7 @@ const ReservationList = () => {
                 .map((reservation) => (
                   <TableRow key={reservation.reservationId}>
                     <TableCell>{reservation.reservationId}</TableCell>
-                    <TableCell>{reservation.serviceType}</TableCell>
+                    <TableCell>{getServiceTypeName(reservation.serviceType)}</TableCell>
                     <TableCell>{reservation.detailServiceType}</TableCell>
                     <TableCell>
                       {formatDateTime(

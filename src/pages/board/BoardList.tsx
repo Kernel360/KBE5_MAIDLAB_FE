@@ -1,33 +1,23 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, MessageSquare } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import { useBoard } from '@/hooks/domain/useBoard';
 import { ROUTES } from '@/constants/route';
 import type { BoardResponse } from '@/types/board';
 import BoardItem from '@/components/features/board/BoardItem';
-import { BottomNavigation, ManagerFooter } from '@/components/layout/BottomNavigation/BottomNavigation';
-import { useAuth } from '@/hooks';
 import { usePagination } from '@/hooks';
+import { Header } from '@/components/layout/Header/Header';
 
 export default function BoardList() {
   const navigate = useNavigate();
   const { boards, loading: isLoading, fetchBoards } = useBoard();
-  const { isAuthenticated, userType } = useAuth();
-
+  
   useEffect(() => {
     fetchBoards();
   }, [fetchBoards]);
 
-  const handleBack = () => {
-    navigate(ROUTES.HOME);
-  };
-
   const handleCreate = () => {
     navigate(ROUTES.BOARD.CREATE);
-  };
-
-  const handleNavigation = (path: string) => {
-    navigate(path);
   };
 
   // 페이지네이션 적용 (5개씩)
@@ -52,21 +42,15 @@ export default function BoardList() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-white">
-        <button
-          onClick={handleBack}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6" />
-        </button>
-        <h1 className="text-lg font-bold">상담 게시판</h1>
-        <div className="w-10" />
-      </div>
-
+    <div className="min-h-screen bg-gray-50 pt-20">
+      <Header
+        variant="sub"
+        title="상담 게시판"
+        backRoute={ROUTES.HOME}
+        showMenu={true}
+      />
       {/* Content */}
-      <div className="px-4 py-6 pb-20">
+      <div className="px-4 py-0 pb-6">
         <div className="max-w-md mx-auto">
           {boards.length > 0 ? (
             <>
@@ -138,17 +122,6 @@ export default function BoardList() {
           )}
         </div>
       </div>
-
-      {/* Footer */}
-      {userType === 'MANAGER' ? (
-        <ManagerFooter />
-      ) : (
-        <BottomNavigation
-          activeTab="consultation"
-          onTabClick={handleNavigation}
-          isAuthenticated={isAuthenticated}
-        />
-      )}
     </div>
   );
 }

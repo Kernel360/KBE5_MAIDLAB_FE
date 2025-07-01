@@ -159,20 +159,9 @@ export default function BoardForm({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-white">
-        <button
-          onClick={handleBack}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6" />
-        </button>
-        <h1 className="text-lg font-bold">{`문의 ${mode === 'create' ? '작성' : '수정'}`}</h1>
-        <div className="w-10" />
-      </div>
 
       {/* Content */}
-      <div className="px-4 py-6">
+      <div className="px-4 py-0 pb-4">
         <div className="max-w-md mx-auto">
           <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
             <form onSubmit={handleSubmit} className="space-y-6">

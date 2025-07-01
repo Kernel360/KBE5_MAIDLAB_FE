@@ -6,13 +6,14 @@ import {
   ChevronLeft,
   ChevronRight,
   Search,
-  ArrowLeft,
+  ArrowRight,
 } from 'lucide-react';
 import { useEvent } from '@/hooks/domain/useEvent';
 import { usePagination } from '@/hooks/usePagination';
 import { formatDate } from '@/utils';
 import { ROUTES, INFO_MESSAGES } from '@/constants';
 import type { EventListItem } from '@/types/event';
+import { Header } from '@/components';
 
 const EventList: React.FC = () => {
   const navigate = useNavigate();
@@ -48,10 +49,6 @@ const EventList: React.FC = () => {
   // 현재 페이지에 표시할 이벤트들
   const currentEvents = filteredEvents.slice(startIndex, endIndex);
 
-  // 뒤로가기
-  const handleBack = () => {
-    navigate(ROUTES.HOME);
-  };
 
   // 이벤트 상세로 이동
   const handleEventClick = (eventId: number) => {
@@ -73,37 +70,24 @@ const EventList: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 헤더 */}
-      <header className="sticky top-0 bg-white border-b border-gray-200 z-40">
-        <div className="flex items-center justify-between h-16 px-4">
-          <div className="flex items-center">
-            <button
-              onClick={handleBack}
-              className="p-2 -ml-2 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <ArrowLeft className="w-6 h-6" />
-            </button>
-          </div>
+      <Header
+        variant="sub"
+        title="이벤트"
+        backRoute={ROUTES.HOME}
+        showMenu={true}
+      />
 
-          <h1 className="text-lg font-semibold absolute left-1/2 transform -translate-x-1/2">
-            이벤트
-          </h1>
-
-          <div className="w-10"></div>
-        </div>
-      </header>
-
-      <main className="px-4 py-6 pb-20">
+      <main className="pt-20 px-4 py-6 pb-20">
         <div className="max-w-md mx-auto">
           {/* 검색바 */}
-          <div className="mb-6">
+          <div className="mb-8">
             <form onSubmit={handleSearch} className="relative">
               <input
                 type="text"
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
                 placeholder="이벤트 검색..."
-                className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent"
               />
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             </form>
@@ -157,7 +141,7 @@ const EventList: React.FC = () => {
 
           {/* 이벤트 리스트 */}
           {!loading && currentEvents.length > 0 && (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {currentEvents.map((event) => (
                 <EventCard
                   key={event.eventId}
@@ -170,64 +154,52 @@ const EventList: React.FC = () => {
 
           {/* 페이지네이션 */}
           {!loading && filteredEvents.length > 5 && (
-            <div className="flex items-center justify-center pt-8">
-              <div className="flex items-center space-x-2">
-                {/* 이전 버튼 */}
-                <button
-                  onClick={goToPrevious}
-                  disabled={!hasPrevious}
-                  className={`p-2 rounded-lg border transition-colors ${
-                    hasPrevious
-                      ? 'border-gray-300 hover:border-orange-500 hover:text-orange-500'
-                      : 'border-gray-200 text-gray-400 cursor-not-allowed'
-                  }`}
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
+            <div className="flex items-center justify-center gap-2 mt-6 mb-4">
+              {/* 이전 페이지 버튼 */}
+              <button
+                onClick={goToPrevious}
+                disabled={!hasPrevious}
+                className={`p-2 rounded-lg ${
+                  hasPrevious
+                    ? 'bg-white border border-gray-200 hover:bg-gray-50'
+                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                }`}
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
 
-                {/* 페이지 번호들 */}
-                <div className="flex items-center space-x-1">
-                  {Array.from({ length: totalPages }, (_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => goToPage(index)}
-                      className={`w-10 h-10 rounded-lg transition-colors ${
-                        currentPage === index
-                          ? 'bg-orange-500 text-white'
-                          : 'hover:bg-gray-100 text-gray-700'
-                      }`}
-                    >
-                      {index + 1}
-                    </button>
-                  ))}
-                </div>
-
-                {/* 다음 버튼 */}
-                <button
-                  onClick={goToNext}
-                  disabled={!hasNext}
-                  className={`p-2 rounded-lg border transition-colors ${
-                    hasNext
-                      ? 'border-gray-300 hover:border-orange-500 hover:text-orange-500'
-                      : 'border-gray-200 text-gray-400 cursor-not-allowed'
-                  }`}
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
+              {/* 페이지 번호 */}
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }, (_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => goToPage(index)}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium ${
+                      currentPage === index
+                        ? 'bg-orange-500 text-white'
+                        : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                    }`}
+                  >
+                    {index + 1}
+                  </button>
+                ))}
               </div>
+
+              {/* 다음 페이지 버튼 */}
+              <button
+                onClick={goToNext}
+                disabled={!hasNext}
+                className={`p-2 rounded-lg ${
+                  hasNext
+                    ? 'bg-white border border-gray-200 hover:bg-gray-50'
+                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                }`}
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
           )}
 
-          {/* 페이지 정보 */}
-          {!loading && filteredEvents.length > 0 && (
-            <div className="text-center pt-4">
-              <p className="text-sm text-gray-500">
-                {startIndex + 1}-{endIndex} / 총 {filteredEvents.length}개
-                이벤트
-                {searchKeyword && ` (검색: ${searchKeyword})`}
-              </p>
-            </div>
-          )}
         </div>
       </main>
     </div>
@@ -244,13 +216,13 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
   return (
     <div
       onClick={onClick}
-      className="bg-white rounded-2xl p-4 shadow-sm border border-gray-200 hover:shadow-md hover:border-orange-200 transition-all cursor-pointer"
+      className="bg-white rounded-2xl p-5 border border-gray-100 hover:border-orange-200 transition-all cursor-pointer"
     >
       <div className="flex space-x-4">
         {/* 이벤트 이미지 */}
         <div className="flex-shrink-0">
           {event.mainImageUrl ? (
-            <div className="w-20 h-20 rounded-xl overflow-hidden">
+            <div className="w-16 h-16 rounded-xl overflow-hidden">
               <img
                 src={event.mainImageUrl}
                 alt={event.title}
@@ -266,13 +238,13 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
                 }}
               />
               {/* 이미지 로드 실패 시 폴백 */}
-              <div className="hidden w-full h-full bg-gradient-to-br from-orange-400 to-orange-500 items-center justify-center">
-                <Calendar className="w-8 h-8 text-white opacity-80" />
+              <div className="hidden w-full h-full bg-orange-100 items-center justify-center">
+                <Calendar className="w-6 h-6 text-orange-600" />
               </div>
             </div>
           ) : (
-            <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-orange-500 rounded-xl flex items-center justify-center">
-              <Calendar className="w-8 h-8 text-white opacity-80" />
+            <div className="w-16 h-16 bg-orange-100 rounded-xl flex items-center justify-center">
+              <Calendar className="w-6 h-6 text-orange-600" />
             </div>
           )}
         </div>
@@ -280,20 +252,20 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
         {/* 이벤트 정보 */}
         <div className="flex-1 min-w-0 flex flex-col justify-between">
           <div>
-            <h3 className="font-semibold text-gray-900 text-base line-clamp-2 mb-2">
+            <h3 className="font-bold text-gray-900 text-base line-clamp-2 mb-2 leading-tight">
               {event.title}
             </h3>
 
             <div className="flex items-center text-sm text-gray-500">
-              <Clock className="w-4 h-4 mr-1.5 flex-shrink-0" />
-              <span>{formatDate(event.createdAt)} 등록</span>
+              <Clock className="w-4 h-4 mr-2 flex-shrink-0 text-orange-400" />
+              <span>{formatDate(event.createdAt)}</span>
             </div>
           </div>
 
-          <div className="flex items-center justify-end">
+          <div className="flex items-center justify-end mt-3">
             <div className="flex items-center text-orange-500">
-              <span className="text-xs text-gray-400 mr-1">자세히 보기</span>
-              <ChevronRight className="w-4 h-4" />
+              <span className="text-sm font-medium mr-1">전체보기</span>
+              <ArrowRight className="w-4 h-4" />
             </div>
           </div>
         </div>

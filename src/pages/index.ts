@@ -123,7 +123,9 @@ export { default as AdminLogin } from '@/pages/admin/AdminLogin';
 // 관리자 어쩌구 페이지...
 export { default as AdminLayout } from '@/pages/admin/layout/AdminLayout';
 export { default as AdminUserList } from '@/pages/admin/UserList';
+export { default as AdminManagerList} from '@/pages/admin/ManagerList'
 export { default as AdminManagerDetail } from '@/pages/admin/ManagerDetail';
+export { default as AdminConsumerList} from '@/pages/admin/ConsumerList'
 export { default as AdminConsumerDetail } from '@/pages/admin/ConsumerDetail';
 export { default as AdminReservationList } from '@/pages/admin/ReservationList';
 export { default as AdminReservationDetail } from '@/pages/admin/ReservationDetail';
@@ -133,7 +135,8 @@ export { default as AdminEvents } from '@/pages/admin/EventList';
 export { default as AdminEventCreate } from '@/pages/admin/EventCreate';
 export { default as AdminEventEdit } from '@/pages/admin/EventEdit';
 export { default as AdminEventDetail } from '@/pages/admin/EventDetail';
-export { default as AdminBoards } from '@/pages/admin/BoardList';
+export { default as AdminManagerBoards } from '@/pages/admin/ManagerBoard';
+export { default as AdminConsumerBoards } from '@/pages/admin/ConsumerBoard';
 export { default as AdminBoardDetail } from '@/pages/admin/BoardDetail';
 export { default as AdminBoardEdit } from '@/pages/admin/BoardEdit';
 export { default as Dashboard } from '@/pages/admin/Dashboard';
