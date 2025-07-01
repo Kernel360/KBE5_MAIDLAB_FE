@@ -93,11 +93,6 @@ const ManagerMyPage: React.FC = () => {
     navigate(ROUTES.MANAGER.PROFILE);
   };
 
-  // TODO: 정산계좌 관리 기능 추가
-  const handlePaymentAccount = () => {
-    showToast('정산계좌 관리 기능을 준비 중입니다.', 'info');
-  };
-
   const handleSettlementHistory = () => {
     navigate(ROUTES.MANAGER.SETTLEMENTS);
   };
@@ -231,11 +226,6 @@ const ManagerMyPage: React.FC = () => {
 
             {/* Menu Items */}
             <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-              <MenuItem
-                icon={<FileText className="w-5 h-5" />}
-                title="정산계좌 관리"
-                onClick={handlePaymentAccount}
-              />
               <div className="border-t border-gray-200">
                 <MenuItem
                   icon={<FileText className="w-5 h-5" />}
@@ -269,7 +259,7 @@ const ManagerMyPage: React.FC = () => {
               <div className="border-t border-gray-200">
                 <MenuItem
                   icon={<Settings className="w-5 h-5" />}
-                  title="설정"
+                  title="알림 설정"
                   onClick={handleSettings}
                 />
               </div>
