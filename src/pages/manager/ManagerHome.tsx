@@ -233,87 +233,89 @@ const ManagerHome: React.FC = () => {
         <div className="max-w-md mx-auto space-y-6">
           {/* 매니저 프로필 섹션 */}
           <section
-            className="bg-gradient-to-r from-orange-400 to-orange-500 rounded-2xl p-6 text-white cursor-pointer hover:from-orange-500 hover:to-orange-600 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+            className="bg-white rounded-2xl cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] p-6"
             onClick={() => navigate(ROUTES.MANAGER.MYPAGE)}
           >
-            {profileLoading ? (
-              // 로딩 상태
-              <div className="animate-pulse">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="h-6 bg-white/20 rounded w-48 mb-2"></div>
-                    <div className="h-4 bg-white/20 rounded w-32"></div>
+              {profileLoading ? (
+                // 로딩 상태
+                <div className="animate-pulse">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="h-6 bg-gray-200 rounded w-48 mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded w-32"></div>
+                    </div>
+                    <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
                   </div>
-                  <div className="w-16 h-16 bg-white/20 rounded-full"></div>
-                </div>
-                <div className="mt-4 flex items-center space-x-4">
-                  <div className="h-6 bg-white/20 rounded w-20"></div>
-                  <div className="h-4 bg-white/20 rounded w-16"></div>
-                </div>
-              </div>
-            ) : (
-              // 실제 매니저 정보
-              <div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h1 className="text-xl font-bold mb-1">
-                      {profile?.name || '매니저'}님, 좋은 하루 보내세요!
-                    </h1>
-                    <p className="text-orange-100 text-sm">
-                      승인 상태:{' '}
-                      {profile?.isVerified ? '활동 가능' : '승인 대기중'}
-                    </p>
+                  <div className="mt-6 flex items-center space-x-4">
+                    <div className="h-6 bg-gray-200 rounded w-20"></div>
+                    <div className="h-4 bg-gray-200 rounded w-16"></div>
                   </div>
-                  <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center overflow-hidden">
-                    {profile?.profileImage ? (
-                      <img
-                        src={profile.profileImage}
-                        alt={`${profile.name} 프로필`}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          // 이미지 로드 실패시 기본 아이콘 표시
-                          e.currentTarget.style.display = 'none';
-                          const fallback = e.currentTarget
-                            .nextElementSibling as HTMLElement;
-                          if (fallback) fallback.style.display = 'flex';
+                </div>
+              ) : (
+                // 실제 매니저 정보
+                <div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h1 className="text-xl font-bold mb-1 text-gray-900">
+                        {profile?.name || '매니저'}님, 좋은 하루 보내세요!
+                      </h1>
+                      <p className="text-gray-600 text-sm">
+                        승인 상태:{' '}
+                        <span className={`font-medium ${profile?.isVerified ? 'text-green-600' : 'text-orange-500'}`}>
+                          {profile?.isVerified ? '활동 가능' : '승인 대기중'}
+                        </span>
+                      </p>
+                    </div>
+                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-lg">
+                      {profile?.profileImage ? (
+                        <img
+                          src={profile.profileImage}
+                          alt={`${profile.name} 프로필`}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            // 이미지 로드 실패시 기본 아이콘 표시
+                            e.currentTarget.style.display = 'none';
+                            const fallback = e.currentTarget
+                              .nextElementSibling as HTMLElement;
+                            if (fallback) fallback.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <User
+                        className="w-7 h-7 text-gray-400"
+                        style={{
+                          display: profile?.profileImage ? 'none' : 'block',
                         }}
                       />
-                    ) : null}
-                    <User
-                      className="w-7 h-7"
-                      style={{
-                        display: profile?.profileImage ? 'none' : 'block',
-                      }}
-                    />
+                    </div>
                   </div>
-                </div>
 
-                <div className="mt-4 flex items-center space-x-4">
-                  <div className="bg-white/20 rounded-xl px-3 py-1">
-                    <span className="text-sm">
-                      {profile?.services
-                        ?.map(
-                          (service) =>
-                            SERVICE_TYPE_LABELS[service as ServiceType] ||
-                            service,
-                        )
-                        .join(', ') || '가사도우미'}
-                    </span>
+                  <div className="mt-6 flex items-center space-x-4">
+                    <div className="bg-orange-100 rounded-xl px-3 py-1.5">
+                      <span className="text-sm font-medium text-orange-700">
+                        {profile?.services
+                          ?.map(
+                            (service) =>
+                              SERVICE_TYPE_LABELS[service as ServiceType] ||
+                              service,
+                          )
+                          .join(', ') || '가사도우미'}
+                      </span>
+                    </div>
+                    {profile?.schedules && profile.schedules.length > 0 && (
+                      <span className="text-sm text-gray-600 bg-gray-100 rounded-xl px-3 py-1.5 font-medium">
+                        주{' '}
+                        {
+                          new Set(
+                            profile.schedules.map((schedule) => schedule.day),
+                          ).size
+                        }
+                        일 근무
+                      </span>
+                    )}
                   </div>
-                  {profile?.schedules && profile.schedules.length > 0 && (
-                    <span className="text-sm text-orange-100">
-                      주{' '}
-                      {
-                        new Set(
-                          profile.schedules.map((schedule) => schedule.day),
-                        ).size
-                      }
-                      일 근무
-                    </span>
-                  )}
                 </div>
-              </div>
-            )}
+              )}
           </section>
 
           {/* 간단한 통계 정보 */}
