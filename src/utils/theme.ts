@@ -2,7 +2,6 @@ import {
   SYSTEM_THEME_QUERY,
   SUPPORTED_THEMES,
   DEFAULT_THEME,
-  THEME_ERRORS,
   THEME_CONFIG,
   type Theme,
   type ResolvedTheme,
@@ -66,9 +65,6 @@ export const createSystemThemeListener = (
       try {
         // 시스템이 다크모드로 변경되어도 현재는 라이트모드 유지
         if (process.env.NODE_ENV === 'development') {
-          console.log(
-            '시스템 테마가 변경되었지만, 앱은 라이트모드를 유지합니다.',
-          );
         }
         callback();
       } catch (error) {
@@ -235,11 +231,7 @@ export const debugTheme = () => {
   if (process.env.NODE_ENV !== 'development') return;
 
   console.group('🎨 Theme Debug Info');
-  console.log('Supported themes:', SUPPORTED_THEMES);
-  console.log('Default theme:', DEFAULT_THEME);
-  console.log('System theme detection:', isThemeSupported());
-  console.log('Dark mode detection:', isDarkModeSupported());
-  console.log('Current system preference:', getSystemTheme());
+
   console.groupEnd();
 };
 

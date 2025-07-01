@@ -189,15 +189,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   // 전역 로그아웃 핸들러 등록
   useEffect(() => {
     const globalLogout = () => {
-      console.log('🚨 전역 로그아웃 핸들러 실행됨');
-
       try {
         // 1. 로컬 상태 정리
         authLogout();
         dispatch({ type: 'AUTH_LOGOUT' });
 
         // 2. 즉시 홈으로 이동 (window.location 사용으로 안정성 확보)
-        console.log('🔄 홈으로 리다이렉트 중...');
         window.location.replace('/');
       } catch (error) {
         console.error('🚨 전역 로그아웃 핸들러 실행 중 오류:', error);
@@ -206,12 +203,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     };
 
-    console.log('📝 전역 로그아웃 핸들러 등록됨');
     setGlobalLogoutHandler(globalLogout);
 
     // cleanup 함수
     return () => {
-      console.log('🗑️ 전역 로그아웃 핸들러 해제됨');
       setGlobalLogoutHandler(null);
     };
   }, []); // ✅ 빈 의존성 배열 - 마운트 시 한 번만 실행
