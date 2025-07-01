@@ -53,6 +53,7 @@ const ManagerHome: React.FC = () => {
       return (
         reservationDateTime >= now &&
         (reservation.status === RESERVATION_STATUS.MATCHED ||
+          reservation.status === RESERVATION_STATUS.PAID ||
           reservation.status === RESERVATION_STATUS.WORKING ||
           reservation.status === RESERVATION_STATUS.PENDING ||
           reservation.status === RESERVATION_STATUS.APPROVED)
@@ -108,6 +109,7 @@ const ManagerHome: React.FC = () => {
         (reservation) =>
           reservation.reservationDate === dateString &&
           (reservation.status === RESERVATION_STATUS.MATCHED ||
+            reservation.status === RESERVATION_STATUS.PAID ||
             reservation.status === RESERVATION_STATUS.WORKING ||
             reservation.status === RESERVATION_STATUS.PENDING ||
             reservation.status === RESERVATION_STATUS.APPROVED),
@@ -134,6 +136,8 @@ const ManagerHome: React.FC = () => {
     switch (status) {
       case RESERVATION_STATUS.MATCHED:
         return 'bg-blue-100 text-blue-600';
+      case RESERVATION_STATUS.PAID:
+        return 'bg-teal-100 text-teal-600';
       case RESERVATION_STATUS.WORKING:
         return 'bg-green-100 text-green-600';
       case RESERVATION_STATUS.COMPLETED:
@@ -147,6 +151,8 @@ const ManagerHome: React.FC = () => {
   const getStatusText = (status: string) => {
     switch (status) {
       case RESERVATION_STATUS.MATCHED:
+        return '미결제';
+      case RESERVATION_STATUS.PAID:
         return '예정';
       case RESERVATION_STATUS.WORKING:
         return '진행중';
@@ -535,6 +541,9 @@ const ManagerHome: React.FC = () => {
                       )}
                       {reservation.status === RESERVATION_STATUS.MATCHED && (
                         <AlertCircle className="w-4 h-4 text-blue-500" />
+                      )}
+                      {reservation.status === RESERVATION_STATUS.PAID && (
+                        <CheckCircle2 className="w-4 h-4 text-teal-500" />
                       )}
                     </div>
                   </div>

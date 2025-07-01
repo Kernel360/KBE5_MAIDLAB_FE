@@ -48,48 +48,52 @@ const ReservationStep1: React.FC<Props> = ({ onNext, onBack }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <div className="absolute top-0 left-0 w-full z-20">
+    <div className="min-h-screen bg-gray-50">
+      <div className="sticky top-0 left-0 w-full z-20">
         <ReservationHeader title="일반 청소를 선택하셨네요!" onBack={onBack || (() => window.history.back())} />
       </div>
-      <div className="flex-1 flex flex-col items-center pt-20 px-4">
-        <h2 className="text-lg font-bold mb-2 mt-2">하위 옵션을 선택해 주세요.</h2>
-        <div className="w-full max-w-md flex gap-2 mt-4 mb-6">
-          {TABS.map((tab) => (
-            <button
-              key={tab.key}
-              className={`flex-1 py-2 rounded-lg font-semibold border transition text-base ${selectedTab === tab.key ? 'bg-orange-50 border-orange-500 text-orange-500' : 'bg-white border-gray-200 text-gray-500'}`}
-              onClick={() => setSelectedTab(tab.key as '생활청소' | '부분청소')}
-            >
-              {tab.label}
-            </button>
-          ))}
+      <main className="px-4 py-6 pb-20">
+        <div className="max-w-md mx-auto space-y-6">
+          <section className="bg-white rounded-2xl shadow p-6">
+            <h2 className="text-lg font-bold mb-2 mt-2">하위 옵션을 선택해 주세요.</h2>
+            <div className="w-full flex gap-2 mt-4 mb-6">
+              {TABS.map((tab) => (
+                <button
+                  key={tab.key}
+                  className={`flex-1 py-2 rounded-lg font-semibold border transition text-base ${selectedTab === tab.key ? 'bg-orange-50 border-orange-500 text-orange-500' : 'bg-white border-gray-200 text-gray-500'}`}
+                  onClick={() => setSelectedTab(tab.key as '\uC0DD\uD65C\uCCAD\uC18C' | '\uBD80\uBD84\uCCAD\uC18C')}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+            <div className="card mt-2 mb-6">
+              <ul className="text-sm space-y-2 text-gray-700">
+                {detail.options?.map((opt, idx) => (
+                  <li key={idx} className="flex items-start gap-2">
+                    <span className="text-blue-500 mt-0.5">✔</span>
+                    <span>{opt}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="flex justify-between w-full mt-4">
+              <button
+                onClick={onBack || (() => window.history.back())}
+                className="btn btn-secondary w-1/3"
+              >
+                이전
+              </button>
+              <button
+                onClick={handleNext}
+                className="btn btn-primary w-1/2"
+              >
+                다음
+              </button>
+            </div>
+          </section>
         </div>
-        <div className="w-full max-w-md card mt-2 mb-6">
-          <ul className="text-sm space-y-2 text-gray-700">
-            {detail.options?.map((opt, idx) => (
-              <li key={idx} className="flex items-start gap-2">
-                <span className="text-blue-500 mt-0.5">✔</span>
-                <span>{opt}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="flex justify-between w-full max-w-md mt-4">
-          <button
-            onClick={onBack || (() => window.history.back())}
-            className="btn btn-secondary w-1/3"
-          >
-            이전
-          </button>
-          <button
-            onClick={handleNext}
-            className="btn btn-primary w-1/2"
-          >
-            다음
-          </button>
-        </div>
-      </div>
+      </main>
       <BottomNavigation
         activeTab="reservation"
         onTabClick={navigate}

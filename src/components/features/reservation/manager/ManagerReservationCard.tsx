@@ -36,7 +36,7 @@ export const ManagerReservationCard: React.FC<ManagerReservationCardProps> = ({
 
   // 체크인 버튼 표시 여부
   const showCheckInButton =
-    reservation.status === RESERVATION_STATUS.MATCHED &&
+    reservation.status === RESERVATION_STATUS.PAID &&
     isToday(reservation.reservationDate);
 
   // 체크아웃 버튼 표시 여부
@@ -49,6 +49,8 @@ export const ManagerReservationCard: React.FC<ManagerReservationCardProps> = ({
         return 'bg-amber-100 text-amber-800 border-amber-200';
       case 'MATCHED':
         return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'PAID':
+        return 'bg-teal-100 text-teal-800 border-teal-200';
       case 'WORKING':
         return 'bg-purple-100 text-purple-800 border-purple-200';
       case 'COMPLETED':
