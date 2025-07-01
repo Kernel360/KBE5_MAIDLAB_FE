@@ -16,7 +16,10 @@ function GoogleMap() {
     geocoder.geocode({ location: { lat, lng } }, (results, status) => {
       if (status === "OK" && results && results[0]) {
         const koResult = results.find(r => r.formatted_address.match(/[가-힣]/));
-        setAddress(koResult ? koResult.formatted_address : results[0].formatted_address);
+        let address = koResult ? koResult.formatted_address : results[0].formatted_address;
+        // '대한민국' 제거
+        address = address.replace(/대한민국\s*/, '').trim();
+        setAddress(address);
       } else {
         setAddress("");
       }

@@ -7,12 +7,10 @@ import { COLORS } from '@/constants/theme';
 import { formatKoreanDate, formatTime, getKoreanWeekday } from '@/utils/date';
 import { formatEstimatedPriceByRoomSize, formatPrice,formatMinutesToHourMinute, formatRoomSize, formatPhoneNumber } from '@/utils/format';
 import type { ReservationDetailResponse } from '@/types/reservation';
-import ReservationHeader from '@/components/features/consumer/ReservationHeader';
-import { BottomNavigation } from '@/components/layout/BottomNavigation/BottomNavigation';
 import { useAuth } from '@/hooks/useAuth';
 import { MessageCircle, Phone, Star, MapPin, Clock, Calendar, User, Home, PawPrint, Baby, CheckCircle, XCircle, AlertCircle, Coffee } from 'lucide-react';
 import { ROUTES } from '@/constants/route';
-
+import { Header } from '@/components';
 // 상태별 아이콘 매핑
 const STATUS_ICONS: Record<string, React.ElementType> = {
   PENDING: Clock,
@@ -130,7 +128,12 @@ const ConsumerReservationDetail: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 헤더 */}
-      <ReservationHeader title="예약 상세" onBack={() => navigate(-1)} />
+      <Header
+        variant="sub"
+        title="예약 상세 페이지"
+        backRoute={ROUTES.CONSUMER.RESERVATIONS}
+        showMenu={true}
+      />
 
       <div className="max-w-md mx-auto">
         {/* 상태 카드 */}
@@ -336,7 +339,6 @@ const ConsumerReservationDetail: React.FC = () => {
           </button>
         </div>
       </div>
-      <BottomNavigation activeTab="reservation" onTabClick={navigate} isAuthenticated={isAuthenticated} />
     </div>
   );
 };

@@ -1,11 +1,11 @@
 // src/components/features/consumer/ReservationStep1.tsx
 import React, { useState, useEffect } from 'react';
-import ReservationHeader from './ReservationHeader';
 import { BottomNavigation } from '@/components/layout/BottomNavigation/BottomNavigation';
 import { useAuth, useToast, useConsumer } from '@/hooks';
 import { useNavigate } from 'react-router-dom';
 import { SERVICE_DETAIL_TYPES } from '@/constants/service';
-
+import { ROUTES } from '@/constants';
+import { Header } from '@/components';
 interface Props {
   onNext: (data: { serviceType: string; serviceDetailType: string, address : string, addressDetail : string }) => void;
   onBack?: () => void;
@@ -49,13 +49,18 @@ const ReservationStep1: React.FC<Props> = ({ onNext, onBack }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="sticky top-0 left-0 w-full z-20">
-        <ReservationHeader title="일반 청소를 선택하셨네요!" onBack={onBack || (() => window.history.back())} />
-      </div>
+      <Header
+        variant="sub"
+        title="서비스 상세 옵션 선택"
+        backRoute={ROUTES.HOME}
+        showMenu={true}
+      />
       <main className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto space-y-6">
+        <h2 className="text-lg font-bold mb-2 mt-2 text-center">하위 옵션을 선택해 주세요.</h2>
+
           <section className="bg-white rounded-2xl shadow p-6">
-            <h2 className="text-lg font-bold mb-2 mt-2">하위 옵션을 선택해 주세요.</h2>
+            
             <div className="w-full flex gap-2 mt-4 mb-6">
               {TABS.map((tab) => (
                 <button

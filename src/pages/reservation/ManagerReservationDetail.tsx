@@ -7,8 +7,7 @@ import { COLORS } from '@/constants/theme';
 import { formatDateTime, formatKoreanDate, formatTime, getKoreanWeekday } from '@/utils/date';
 import { formatEstimatedPriceByRoomSize, formatMinutesToHourMinute, formatPrice, formatRoomSize, formatPhoneNumber } from '@/utils/format';
 import type { ReservationDetailResponse } from '@/types/reservation';
-import ReservationHeader from '@/components/features/consumer/ReservationHeader';
-import { ManagerFooter } from '@/components/layout/BottomNavigation/BottomNavigation';
+import { Header } from '@/components';
 import { useAuth } from '@/hooks/useAuth';
 import { ArrowLeft, MessageCircle, Phone, Star, MapPin, Clock, Calendar, User, Home, PawPrint, Baby, CheckCircle, XCircle, AlertCircle, Coffee } from 'lucide-react';
 import { ROUTES } from '@/constants/route';
@@ -146,9 +145,13 @@ const ManagerReservationDetail: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 헤더 */}
-      <ReservationHeader title="예약 상세" onBack={() => navigate(ROUTES.MANAGER.RESERVATIONS)} />
-
-      <div className="max-w-md mx-auto">
+      <Header
+        variant="sub"
+        title="예약 상세"
+        backRoute={ROUTES.MANAGER.RESERVATIONS}
+        showMenu={true}
+      />
+      <div className="max-w-md mx-auto pt-20">
         {/* 상태 카드 */}
         <div className="mx-4 mt-4 bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="p-6">
@@ -355,7 +358,6 @@ const ManagerReservationDetail: React.FC = () => {
           }}
         />
       </div>
-      <ManagerFooter />
     </div>
   );
 };
