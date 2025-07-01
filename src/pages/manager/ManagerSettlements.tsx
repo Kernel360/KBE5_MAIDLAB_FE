@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { useReservation } from '@/hooks';
 import { formatDate } from '@/utils/date';
 import type { SettlementResponse } from '@/types/reservation';
-import ReservationHeader from '@/components/features/consumer/ReservationHeader';
-import { ManagerFooter } from '@/components/layout/BottomNavigation/BottomNavigation';
 import WeekSelector from '@/components/features/manager/WeekSelector';
 import SettlementSummary from '@/components/features/manager/SettlementSummary';
 import StatusFilter from '@/components/features/manager/StatusFilter';
 import SettlementCard from '@/components/features/manager/SettlementCard';
 import EmptyState from '@/components/features/manager/EmptyState';
 import LoadingSkeleton from '@/components/features/manager/LoadingSkeleton';
+import { ROUTES } from '@/constants';
+import { Header } from '@/components';
 
 const SETTLEMENT_STATUS_LABELS: Record<string, string> = {
   PENDING: '대기중',
@@ -98,12 +98,14 @@ const ManagerSettlements: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <ReservationHeader 
-        title="정산 내역" 
-        onBack={handleBackClick}
+      <Header
+        variant="sub"
+        title="정산 내역"
+        backRoute={ROUTES.HOME}
+        showMenu={true}
       />
       
-      <div className="px-4 py-6 pb-20">
+      <div className="px-4 py-6 pb-20 pt-20">
         <div className="max-w-md mx-auto space-y-6">
           
           <WeekSelector
@@ -148,8 +150,6 @@ const ManagerSettlements: React.FC = () => {
           </div>
         </div>
       </div>
-      
-      <ManagerFooter />
     </div>
   );
 };
