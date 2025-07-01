@@ -257,7 +257,7 @@ const ManagerHome: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <h1 className="text-xl font-bold mb-1">
-                      {profile?.name || '매니저'}님, 좋은 아침이에요!
+                      {profile?.name || '매니저'}님, 좋은 하루 보내세요!
                     </h1>
                     <p className="text-orange-100 text-sm">
                       승인 상태:{' '}
