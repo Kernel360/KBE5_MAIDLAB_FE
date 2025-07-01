@@ -2,20 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Header,
-  BottomNavigation,
-  ServiceGrid,
   HeroSection,
 } from '@/components';
 import { ROUTES } from '@/constants';
 import { useAuth, useUser, useEvent } from '@/hooks';
-import { ManagerFooter } from '@/components/layout/BottomNavigation/BottomNavigation';
 import { reservationApi } from '@/apis/reservation';
 import { RESERVATION_STATUS_LABELS } from '@/constants/status';
 import { SERVICE_TYPE_LABELS } from '@/constants/service';
 
 const ConsumerMain: React.FC = () => {
   const navigate = useNavigate();
-  const { isAuthenticated, userType } = useAuth();
+  const { isAuthenticated,  } = useAuth();
   const { profile, fetchProfile } = useUser();
   const { activeEvents, loading: eventsLoading } = useEvent();
 
@@ -117,13 +114,13 @@ const ConsumerMain: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pt-14">
       <Header
         showNotification={true}
         onNotificationClick={handleNotificationClick}
       />
 
-      <main className="px-4 py-6 pb-20">
+      <main className="px-4 pt-6">
         <div className="max-w-md mx-auto">
           <HeroSection
             onEventClick={handleEventClick}
@@ -246,16 +243,6 @@ const ConsumerMain: React.FC = () => {
           </div>
         </div>
       </main>
-
-      {userType === 'MANAGER' ? (
-        <ManagerFooter />
-      ) : (
-        <BottomNavigation
-          activeTab="home"
-          onTabClick={handleNavigation}
-          isAuthenticated={isAuthenticated}
-        />
-      )}
     </div>
   );
 };
