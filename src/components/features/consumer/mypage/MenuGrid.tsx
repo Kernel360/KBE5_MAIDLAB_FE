@@ -15,16 +15,16 @@ const MenuButton = styled.button`
   gap: 12px;
   padding: 20px 24px;
   background: #fff;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #e5e7eb;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s;
   width: 100%;
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    border-color: #F97316;
+    border-color: #f97316;
   }
 `;
 
@@ -38,26 +38,41 @@ const MenuIcon = styled.span`
 const MenuLabel = styled.span`
   font-size: 16px;
   font-weight: 600;
-  color: #1F2937;
+  color: #1f2937;
 `;
 
 const menuItems = [
-  { id: 'payment', label: '결제수단 관리', icon: '💳', path: '/consumers/payment' },
-  { id: 'coupon', label: '프로모션 코드/쿠폰', icon: '🎟️', path: '/consumers/coupon' },
+  {
+    id: 'payment',
+    label: '결제수단 관리',
+    icon: '💳',
+    path: '/consumers/payment',
+  },
+  {
+    id: 'coupon',
+    label: '프로모션 코드/쿠폰',
+    icon: '🎟️',
+    path: '/consumers/coupon',
+  },
   { id: 'point', label: '포인트', icon: '💰', path: '/consumer/point' },
   {
     id: 'helpers',
     label: '찜한 도우미',
     icon: '❤️',
-    path: ROUTES.CONSUMER.LIKED_MANAGERS
+    path: ROUTES.CONSUMER.LIKED_MANAGERS,
   },
-  { 
-    id: 'blacklist', 
-    label: '블랙리스트 도우미', 
-    icon: '🚫', 
-    path: ROUTES.CONSUMER.BLACKLIST 
+  {
+    id: 'blacklist',
+    label: '블랙리스트 도우미',
+    icon: '🚫',
+    path: ROUTES.CONSUMER.BLACKLIST,
   },
-  { id: 'invite', label: '친구 초대하기', icon: '👥', path: '/consumer/invite' },
+  {
+    id: 'invite',
+    label: '친구 초대하기',
+    icon: '👥',
+    path: '/consumer/invite',
+  },
   { id: 'settings', label: '설정', icon: '⚙️', path: '/consumer/settings' },
 ];
 
@@ -65,7 +80,6 @@ export default function MenuGrid() {
   const navigate = useNavigate();
 
   const handleMenuClick = (path: string) => {
-    console.log('Navigating to:', path);
     navigate(path);
   };
 
@@ -75,7 +89,6 @@ export default function MenuGrid() {
         <MenuButton
           key={item.id}
           onClick={() => {
-            console.log('Button clicked:', item.id, item.path);
             handleMenuClick(item.path);
           }}
         >

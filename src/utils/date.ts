@@ -4,8 +4,16 @@ import { WEEKDAY_SHORT_LABELS, WEEKDAYS } from '@/constants/service';
  * 날짜를 YYYY-MM-DD 형식으로 포맷팅
  */
 export const formatDate = (date: Date | string): string => {
+  // 이미 YYYY-MM-DD 형식인지 확인
+  if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    return date;
+  }
+
   const d = new Date(date);
-  if (isNaN(d.getTime())) return '';
+  if (isNaN(d.getTime())) {
+    console.warn('formatDate: Invalid date format:', date);
+    return '';
+  }
 
   const year = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, '0');
@@ -30,10 +38,25 @@ export const formatKoreanDate = (date: Date | string): string => {
 
 /**
  * 시간을 HH:MM 형식으로 포맷팅
+ * Date 객체, ISO 날짜 문자열, 또는 HH:MM 형식의 시간 문자열을 처리
  */
 export const formatTime = (date: Date | string): string => {
+  // 이미 HH:MM 형식인지 확인
+  if (typeof date === 'string' && /^\d{2}:\d{2}$/.test(date)) {
+    return date;
+  }
+  
+  // 시간 문자열이 HH:MM:SS 형식인 경우
+  if (typeof date === 'string' && /^\d{2}:\d{2}:\d{2}$/.test(date)) {
+    return date.substring(0, 5); // HH:MM만 반환
+  }
+
+  // Date 객체 또는 ISO 문자열 처리
   const d = new Date(date);
-  if (isNaN(d.getTime())) return '';
+  if (isNaN(d.getTime())) {
+    console.warn('formatTime: Invalid date/time format:', date);
+    return '';
+  }
 
   const hours = String(d.getHours()).padStart(2, '0');
   const minutes = String(d.getMinutes()).padStart(2, '0');
@@ -228,4 +251,45 @@ export const getHoursBetween = (startTime: string, endTime: string): number => {
   const endTotalMinutes = endHours * 60 + endMinutes;
 
   return (endTotalMinutes - startTotalMinutes) / 60;
+};
+
+/**
+ * 날짜와 시간 문자열을 안전하게 Date 객체로 변환
+ * @param dateString YYYY-MM-DD 형식의 날짜 문자열
+ * @param timeString HH:MM 또는 HH:MM:SS 형식의 시간 문자열
+ * @returns Date 객체 또는 null (변환 실패시)
+ */
+export const safeCreateDateTime = (
+  dateString: string,
+  timeString: string,
+): Date | null => {
+  try {
+    // 시간 문자열 정규화 (HH:MM:SS -> HH:MM)
+    const normalizedTime = timeString.includes(':')
+      ? timeString.split(':').slice(0, 2).join(':')
+      : timeString;
+
+    // ISO 형식으로 변환
+    const isoString = `${dateString}T${normalizedTime}:00`;
+    const date = new Date(isoString);
+
+    // 유효한 날짜인지 확인
+    if (isNaN(date.getTime())) {
+      console.warn('safeCreateDateTime: Invalid date created:', {
+        dateString,
+        timeString,
+        normalizedTime,
+        isoString,
+      });
+      return null;
+    }
+
+    return date;
+  } catch (error) {
+    console.error('safeCreateDateTime: Error creating date:', error, {
+      dateString,
+      timeString,
+    });
+    return null;
+  }
 };

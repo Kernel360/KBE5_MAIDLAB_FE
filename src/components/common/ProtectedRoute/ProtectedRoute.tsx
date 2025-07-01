@@ -72,7 +72,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // 완전 로그아웃 처리 함수
   const forceLogout = (reason: string = '인증 실패') => {
-    console.log(`🚨 강제 로그아웃: ${reason}`);
     setAuthCheckFailed(true);
 
     // 모든 localStorage 삭제
@@ -80,8 +79,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     localStorage.removeItem('userType');
     localStorage.removeItem('userInfo');
     sessionStorage.clear();
-
-    console.log('🔄 로그인 페이지로 강제 리다이렉트');
 
     try {
       navigate(ROUTES.LOGIN, {
@@ -91,7 +88,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
       setTimeout(() => {
         if (window.location.pathname !== ROUTES.LOGIN) {
-          console.log('🚨 navigate 실패 - window.location으로 강제 이동');
           window.location.replace(ROUTES.LOGIN);
         }
       }, 300);
@@ -140,11 +136,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         setIsRefreshingToken(true);
 
         try {
-          console.log('🔄 토큰 갱신 시도 중...');
           const response = await authApi.refreshToken();
 
           if (response.accessToken) {
-            console.log('✅ 토큰 갱신 성공');
             localStorage.setItem('accessToken', response.accessToken);
             setTokenCheckComplete(true);
             return true;
@@ -164,7 +158,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
           setIsRefreshingToken(false);
         }
       } else {
-        console.log('✅ 토큰이 아직 유효함');
         setTokenCheckComplete(true);
         return true;
       }
@@ -188,7 +181,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     }
 
     try {
-      console.log('🔍 프로필 체크 시작...');
       let profile = null;
 
       // 사용자 타입에 따라 다른 프로필 API 호출
@@ -252,14 +244,12 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         })();
 
       if (redirectIfProfileExists && hasProfile) {
-        console.log('❌ 프로필이 이미 존재함 - 리다이렉트');
         showToast('이미 프로필이 등록되어 있습니다.', 'error');
         navigate(profileRedirectTo, { replace: true });
         return;
       }
 
       if (redirectIfNoProfile && !hasProfile) {
-        console.log('❌ 프로필이 없음 - 리다이렉트');
         showToast('프로필 등록이 필요합니다.', 'error');
 
         // 사용자 타입에 따라 다른 프로필 등록 페이지로 이동
@@ -272,7 +262,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         return;
       }
 
-      console.log('✅ 프로필 체크 완료');
       setProfileCheckComplete(true);
     } catch (error) {
       console.error('프로필 체크 중 오류:', error);
@@ -304,7 +293,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       const tokenAge = currentTime - payload.iat;
 
       if (tokenAge < 10) {
-        console.log('✅ 최근에 생성된 토큰 - 쿠키 확인 건너뛰기');
         setTokenCheckComplete(true);
         return;
       }
@@ -317,14 +305,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // 토큰 체크 완료 후 프로필 체크 실행
   useEffect(() => {
-    console.log('🔍 프로필 체크 useEffect 실행:', {
-      tokenCheckComplete,
-      isAuthenticated,
-      isLoading,
-      authCheckFailed,
-      checkProfile,
-    });
-
     if (
       tokenCheckComplete &&
       isAuthenticated &&
@@ -332,13 +312,10 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       !authCheckFailed &&
       checkProfile
     ) {
-      console.log('🔍 프로필 체크 조건 충족 - checkUserProfile 호출');
       checkUserProfile();
     } else {
-      console.log('🔍 프로필 체크 조건 불충족 - 건너뛰기');
       // ✅ tokenCheckComplete가 true이고 로딩이 끝났으면 완료 처리
       if (tokenCheckComplete && !isLoading) {
-        console.log('✅ profileCheckComplete를 true로 설정');
         setProfileCheckComplete(true);
       }
     }
@@ -353,7 +330,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // ✅ 이제 모든 hooks 호출 후에 조건부 렌더링
   // 비로그인 상태에서 프로필 체크가 필요한 경우 즉시 완료 처리
   if (!requireAuth && !isAuthenticated && !isLoading) {
-    console.log('✅ 비로그인 사용자 - 즉시 렌더링');
     return <>{children}</>;
   }
 
@@ -391,7 +367,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // 인증이 필요한데 인증되지 않은 경우
   if (requireAuth && !isAuthenticated) {
-    console.log('인증되지 않은 사용자 - 로그인 페이지로 리다이렉트');
     return (
       <Navigate to={redirectTo} replace state={{ from: location.pathname }} />
     );
@@ -399,8 +374,6 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // 특정 사용자 타입이 필요한데 맞지 않는 경우
   if (requiredUserType && userType !== requiredUserType) {
-    console.log(`잘못된 사용자 타입: ${userType}, 필요: ${requiredUserType}`);
-
     const defaultPage =
       userType === 'CONSUMER'
         ? ROUTES.HOME

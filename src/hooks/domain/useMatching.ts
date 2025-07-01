@@ -26,7 +26,7 @@ export const useMatching = () => {
         return managers;
       } catch (error: any) {
         showToast(
-          error.message || '매니저 목록을 불러오는데 실패했습니다.',
+          '해당 날짜와 예약 시간에 가능한 매니저가 없습니다. 예약 날짜와 시간을 변경해주세요.',
           'error',
         );
         return [];

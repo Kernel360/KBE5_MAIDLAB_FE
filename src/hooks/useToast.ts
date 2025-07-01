@@ -194,7 +194,6 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({
       // 통계 조회 함수
       (window as any).__toastStats = () => {
         if (!managerRef.current) {
-          console.log('ToastManager가 초기화되지 않았습니다.');
           return;
         }
 
@@ -214,7 +213,6 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({
       // 모든 토스트 제거 함수
       (window as any).__clearAllToasts = () => {
         clearToasts();
-        console.log('모든 토스트가 제거되었습니다.');
       };
 
       // 테스트 토스트 생성 함수
@@ -227,7 +225,6 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({
         };
 
         showToast(messages[type], type);
-        console.log(`${type} 타입 테스트 토스트가 생성되었습니다.`);
       };
     }
 

@@ -8,6 +8,7 @@ import type {
   ReservationCreateRequest,
   ReservationListResponse,
   ReservationApprovalRequest,
+  PaymentRequestBody,
   CheckInOutRequest,
   ReviewRegisterRequest,
 } from '@/types/reservation';
@@ -91,30 +92,37 @@ export const useReservation = () => {
         throw new Error('서비스 종류가 선택되지 않았습니다.');
       }
 
-        const formattedData: ReservationCreateRequest = {
-          serviceDetailTypeId: reservationData.serviceDetailTypeId,
-          address: reservationData.address,
-          addressDetail: reservationData.addressDetail,
-          managerUuId: reservationData.managerUuId,
-          housingType: reservationData.housingType,
-          lifeCleaningRoomIdx: reservationData.lifeCleaningRoomIdx,
-          housingInformation: reservationData.housingInformation,
-          reservationDate: toISODateTime(reservationData.reservationDate, reservationData.startTime),
-          startTime: toISODateTime(reservationData.reservationDate, reservationData.startTime),
-          endTime: toISODateTime(reservationData.reservationDate, reservationData.endTime),
-          serviceOptions: reservationData.serviceOptions,
-          pet: reservationData.pet,
-          specialRequest: reservationData.specialRequest,
-          totalPrice: reservationData.totalPrice,
-        };
-        console.log("----------");
-        console.log("request data:",formattedData);
-        const result = await callApi(() => reservationApi.create(formattedData), {
-          successMessage: '예약이 완료되었습니다.',
-          errorMessage: '예약에 실패했습니다.',
-        });
-  
-        if (result.success) {
+      const formattedData: ReservationCreateRequest = {
+        serviceDetailTypeId: reservationData.serviceDetailTypeId,
+        address: reservationData.address,
+        addressDetail: reservationData.addressDetail,
+        managerUuId: reservationData.managerUuId,
+        housingType: reservationData.housingType,
+        lifeCleaningRoomIdx: reservationData.lifeCleaningRoomIdx,
+        housingInformation: reservationData.housingInformation,
+        reservationDate: toISODateTime(
+          reservationData.reservationDate,
+          reservationData.startTime,
+        ),
+        startTime: toISODateTime(
+          reservationData.reservationDate,
+          reservationData.startTime,
+        ),
+        endTime: toISODateTime(
+          reservationData.reservationDate,
+          reservationData.endTime,
+        ),
+        serviceOptions: reservationData.serviceOptions,
+        pet: reservationData.pet,
+        specialRequest: reservationData.specialRequest,
+        totalPrice: reservationData.totalPrice,
+      };
+      const result = await callApi(() => reservationApi.create(formattedData), {
+        successMessage: '예약이 완료되었습니다.',
+        errorMessage: '예약에 실패했습니다.',
+      });
+
+      if (result.success) {
         await fetchReservations(true); // 강제 새로고침
       }
 
@@ -140,6 +148,30 @@ export const useReservation = () => {
       return result;
     },
     [callApi],
+  );
+
+  // 예약 결제
+  const payReservation = useCallback(
+    async (reservationId: number) => {
+      const paymentData: PaymentRequestBody = {
+        reservationId: reservationId,
+      };
+
+      const result = await callApi(
+        () => reservationApi.payment(paymentData as any),
+        {
+          successMessage: '결제가 완료되었습니다.',
+          errorMessage: '결제에 실패했습니다.',
+        },
+      );
+
+      if (result.success) {
+        updateLocalReservation(reservationId, { status: 'PAID' });
+      }
+
+      return result;
+    },
+    [callApi, updateLocalReservation],
   );
 
   // 예약 승인/거절 (매니저용)
@@ -208,17 +240,14 @@ export const useReservation = () => {
 
   // 리뷰 등록
   const registerReview = useCallback(
-    async (reservationId: number, data: ReviewRegisterRequest) => {
-      const result = await callApi(
-        () => reservationApi.registerReview(reservationId, data),
-        {
-          successMessage: '리뷰가 등록되었습니다.',
-          errorMessage: '리뷰 등록에 실패했습니다.',
-        },
-      );
+    async (data: ReviewRegisterRequest) => {
+      const result = await callApi(() => reservationApi.registerReview(data), {
+        successMessage: '리뷰가 등록되었습니다.',
+        errorMessage: '리뷰 등록에 실패했습니다.',
+      });
 
-      if (result.success) {
-        updateLocalReservation(reservationId, { isExistReview: true });
+      if (result.success && data.reservationId) {
+        updateLocalReservation(data.reservationId, { isExistReview: true });
       }
 
       return result;
@@ -269,6 +298,7 @@ export const useReservation = () => {
     fetchReservationDetail,
     createReservation,
     cancelReservation,
+    payReservation,
     respondToReservation,
     checkIn,
     checkOut,

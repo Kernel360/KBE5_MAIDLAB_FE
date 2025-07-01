@@ -276,15 +276,11 @@ export class ToastManager {
 
   private logToastCreated(toast: Toast): void {
     if (process.env.NODE_ENV === 'development') {
-      console.log(`🍞 Toast: [${toast.type.toUpperCase()}] ${toast.message}`);
     }
   }
 
   private logDuplicateBlocked(message: string, type: ToastType): void {
     if (process.env.NODE_ENV === 'development') {
-      console.log(
-        `🚫 Toast duplicate blocked: [${type.toUpperCase()}] ${message}`,
-      );
       this.stats.duplicatesBlocked++;
     }
   }

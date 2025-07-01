@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useManager } from '@/hooks';
 import { useToast } from '@/hooks';
 import { usePagination } from '@/hooks/usePagination';
@@ -124,28 +124,34 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4 mb-3">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow duration-200">
       {/* 리뷰어 정보 */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <h3 className="font-semibold text-gray-900">{review.name}</h3>
+          <h3 className="font-semibold text-gray-900 text-base">{review.name}</h3>
           <div className="flex items-center gap-1">
             {renderStars(review.rating)}
+            <span className="text-sm text-gray-500 ml-1">({review.rating})</span>
           </div>
         </div>
       </div>
 
       {/* 리뷰 내용 */}
-      <p className="text-gray-700 mb-3 leading-relaxed">{review.comment}</p>
+      <div className="bg-gray-50 rounded-lg p-4 mb-4">
+        <p className="text-gray-700 leading-relaxed text-sm">{review.comment}</p>
+      </div>
 
       {/* 서비스 정보 */}
-      <div className="flex items-center justify-between text-sm text-gray-500">
-        <span>
-          {SERVICE_TYPE_LABELS[
-            review.serviceType as keyof typeof SERVICE_TYPE_LABELS
-          ] || review.serviceType}{' '}
-          &gt; {review.serviceDetailType}
-        </span>
+      <div className="flex items-center justify-between text-xs">
+        <div className="flex items-center gap-2">
+          <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded-full font-medium">
+            {SERVICE_TYPE_LABELS[
+              review.serviceType as keyof typeof SERVICE_TYPE_LABELS
+            ] || review.serviceType}
+          </span>
+          <span className="text-gray-500">•</span>
+          <span className="text-gray-600">{review.serviceDetailType}</span>
+        </div>
       </div>
     </div>
   );
@@ -218,14 +224,14 @@ const ReviewStats: React.FC<ReviewStatsProps> = ({ reviews }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
       {/* 전체 평점 */}
-      <div className="flex items-end gap-3 mb-4">
-        <div className="text-6xl font-bold text-orange-500">
+      <div className="flex items-end gap-4 mb-6">
+        <div className="text-5xl font-bold text-orange-500">
           {averageRating}
         </div>
         <div className="flex flex-col justify-end">
-          <div className="flex items-center gap-1 mb-1">
+          <div className="flex items-center gap-1 mb-2">
             {renderStars(averageRating)}
           </div>
           <div className="text-sm text-gray-500">
@@ -235,17 +241,17 @@ const ReviewStats: React.FC<ReviewStatsProps> = ({ reviews }) => {
       </div>
 
       {/* 평점별 분포 */}
-      <div className="space-y-2">
+      <div className="space-y-3">
         {ratingCounts.map(({ rating, count, percentage }) => (
-          <div key={rating} className="flex items-center gap-2">
-            <span className="text-sm text-gray-600 w-8">{rating}점</span>
-            <div className="flex-1 bg-gray-200 rounded-full h-2">
+          <div key={rating} className="flex items-center gap-3">
+            <span className="text-sm text-gray-600 w-8 font-medium">{rating}점</span>
+            <div className="flex-1 bg-gray-200 rounded-full h-2.5">
               <div
-                className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
+                className="bg-gradient-to-r from-yellow-400 to-orange-400 h-2.5 rounded-full transition-all duration-500 ease-out"
                 style={{ width: `${percentage}%` }}
               />
             </div>
-            <span className="text-sm text-gray-500 w-8 text-right">
+            <span className="text-sm text-gray-500 w-8 text-right font-medium">
               {count}
             </span>
           </div>
@@ -274,14 +280,34 @@ const ManagerReviews: React.FC = () => {
     endIndex,
     hasNext,
     hasPrevious,
-    goToNext,
-    goToPrevious,
-    goToPage,
+    goToNext: originalGoToNext,
+    goToPrevious: originalGoToPrevious,
+    goToPage: originalGoToPage,
   } = usePagination({
     totalItems: reviews.length,
     itemsPerPage: 5,
     initialPage: 0,
   });
+
+  // 페이지 변경 시 스크롤을 위로 이동하는 함수들
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const goToNext = () => {
+    originalGoToNext();
+    scrollToTop();
+  };
+
+  const goToPrevious = () => {
+    originalGoToPrevious();
+    scrollToTop();
+  };
+
+  const goToPage = (page: number) => {
+    originalGoToPage(page);
+    scrollToTop();
+  };
 
   // 현재 페이지에 표시할 리뷰들
   const currentReviews = reviews.slice(startIndex, endIndex);
@@ -300,10 +326,6 @@ const ManagerReviews: React.FC = () => {
       console.error('리뷰 데이터 로드 실패:', error);
       showToast('리뷰를 불러오는데 실패했습니다.', 'error');
     }
-  };
-
-  const handleBack = () => {
-    navigate(ROUTES.MANAGER.MYPAGE);
   };
 
   if (loading) {
@@ -329,7 +351,7 @@ const ManagerReviews: React.FC = () => {
               <ReviewStats reviews={reviews} />
 
               {/* 현재 페이지 리뷰 목록 */}
-              <div className="space-y-0">
+              <div className="space-y-4">
                 {currentReviews.map((review) => (
                   <ReviewCard key={review.reviewId} review={review} />
                 ))}

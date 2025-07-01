@@ -61,8 +61,6 @@ export const openGoogleLoginPopup = (
   onSuccess: (code: string, userType: 'CONSUMER' | 'MANAGER') => void,
   onError: (error: string) => void,
 ): void => {
-  console.log('🔑 구글 로그인 팝업 시작:', userType);
-
   const authUrl = generateGoogleOAuthUrl(userType);
   const sessionId = `oauth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
@@ -77,7 +75,6 @@ export const openGoogleLoginPopup = (
   const cleanup = () => {
     if (messageProcessed) return;
 
-    console.log('🧹 OAuth 정리 시작');
     messageProcessed = true;
 
     // 타이머들 정리
@@ -92,15 +89,11 @@ export const openGoogleLoginPopup = (
     // localStorage 정리
     localStorage.removeItem(OAUTH_MESSAGE_KEY);
     localStorage.removeItem(OAUTH_STATUS_KEY);
-
-    console.log('✅ OAuth 정리 완료');
   };
 
   // ✅ 메시지 처리 통합 함수
   const processMessage = (messageData: any) => {
     if (messageProcessed) return;
-
-    console.log('📨 OAuth 메시지 처리:', messageData);
 
     cleanup();
 
@@ -109,19 +102,14 @@ export const openGoogleLoginPopup = (
       try {
         if (popup && typeof popup.close === 'function') {
           popup.close();
-          console.log('🔒 팝업 닫기 완료');
         }
-      } catch (e: any) {
-        console.log('🔒 팝업 닫기 실패 (COOP):', e.message);
-      }
+      } catch (e: any) {}
     }, 200);
 
     // 콜백 실행
     if (messageData.type === 'GOOGLE_AUTH_SUCCESS') {
-      console.log('✅ OAuth 성공 콜백 실행');
       onSuccess(messageData.code, messageData.userType);
     } else {
-      console.log('❌ OAuth 에러 콜백 실행');
       onError(messageData.error || 'OAuth 인증에 실패했습니다.');
     }
   };
@@ -132,7 +120,6 @@ export const openGoogleLoginPopup = (
 
     if (e.key === OAUTH_MESSAGE_KEY && e.newValue) {
       try {
-        console.log('🔔 localStorage 이벤트 감지:', e.newValue);
         const data = JSON.parse(e.newValue);
 
         // 세션 ID 확인
@@ -140,7 +127,6 @@ export const openGoogleLoginPopup = (
         if (status) {
           const statusData = JSON.parse(status);
           if (statusData.sessionId !== sessionId) {
-            console.log('⚠️ 세션 ID 불일치, 무시');
             return;
           }
         }
@@ -164,7 +150,6 @@ export const openGoogleLoginPopup = (
     try {
       const message = localStorage.getItem(OAUTH_MESSAGE_KEY);
       if (message) {
-        console.log('🔍 빠른 폴링에서 메시지 발견:', message);
         const data = JSON.parse(message);
 
         // 세션 ID 확인
@@ -172,7 +157,6 @@ export const openGoogleLoginPopup = (
         if (status) {
           const statusData = JSON.parse(status);
           if (statusData.sessionId !== sessionId) {
-            console.log('⚠️ 빠른 폴링: 세션 ID 불일치, 무시');
             return;
           }
         }
@@ -187,24 +171,20 @@ export const openGoogleLoginPopup = (
     // 빠른 폴링 종료
     if (fastPollCount >= maxFastPolls) {
       clearInterval(fastPollInterval);
-      console.log('⏱️ 빠른 폴링 종료, 느린 폴링으로 전환');
     }
   };
 
   // ✅ 느린 폴링 백업 (3초마다)
   let slowPollCount = 0;
-  const maxSlowPolls = 200; // 10분
 
   const slowPollForMessage = () => {
     if (messageProcessed) return;
 
     slowPollCount++;
-    console.log(`🐌 느린 폴링 체크 ${slowPollCount}/${maxSlowPolls}`);
 
     try {
       const message = localStorage.getItem(OAUTH_MESSAGE_KEY);
       if (message) {
-        console.log('🔍 느린 폴링에서 메시지 발견:', message);
         const data = JSON.parse(message);
 
         // 세션 ID 확인
@@ -212,7 +192,6 @@ export const openGoogleLoginPopup = (
         if (status) {
           const statusData = JSON.parse(status);
           if (statusData.sessionId !== sessionId) {
-            console.log('⚠️ 느린 폴링: 세션 ID 불일치, 무시');
             return;
           }
         }
@@ -227,7 +206,6 @@ export const openGoogleLoginPopup = (
 
   // ✅ 페이지 종료 처리
   const handlePageUnload = () => {
-    console.log('🚪 페이지 종료, OAuth 정리');
     cleanup();
   };
 
@@ -262,8 +240,6 @@ export const openGoogleLoginPopup = (
     return;
   }
 
-  console.log('🪟 팝업 열기 성공');
-
   // ✅ 빠른 폴링 시작 (500ms마다, 30초간)
   fastPollInterval = setInterval(fastPollForMessage, 500);
 
@@ -278,60 +254,49 @@ export const openGoogleLoginPopup = (
   timeoutHandle = setTimeout(
     () => {
       if (!messageProcessed) {
-        console.log('⏰ OAuth 최종 타임아웃');
         cleanup();
 
         try {
           if (popup && typeof popup.close === 'function') {
             popup.close();
           }
-        } catch (e: any) {
-          console.log('🔒 타임아웃 팝업 닫기 실패:', e.message);
-        }
+        } catch (e: any) {}
 
         onError('로그인 시간이 초과되었습니다. 다시 시도해주세요.');
       }
     },
     15 * 60 * 1000,
   ); // 15분
-
-  console.log('⏱️ OAuth 타이머들 시작 완료');
 };
 
 /**
  * 구글 로그인 콜백 처리 (GoogleCallback 페이지에서 사용)
  */
 export const handleGoogleOAuthCallback = () => {
-  console.log('📞 OAuth 콜백 처리 시작');
-
   const { code, error, state } = extractOAuthParams();
   const userType = extractUserTypeFromState(state);
 
   let message;
 
   if (error) {
-    console.log('❌ OAuth 에러:', error);
     message = {
       type: 'GOOGLE_AUTH_ERROR',
       error: `OAuth 인증 실패: ${error}`,
       timestamp: Date.now(),
     };
   } else if (!code) {
-    console.log('❌ 인증 코드 없음');
     message = {
       type: 'GOOGLE_AUTH_ERROR',
       error: '인증 코드를 받지 못했습니다.',
       timestamp: Date.now(),
     };
   } else if (!userType) {
-    console.log('❌ 사용자 타입 없음');
     message = {
       type: 'GOOGLE_AUTH_ERROR',
       error: '사용자 타입 정보가 없습니다.',
       timestamp: Date.now(),
     };
   } else {
-    console.log('✅ OAuth 성공, 코드:', code.substring(0, 10) + '...');
     message = {
       type: 'GOOGLE_AUTH_SUCCESS',
       code,
@@ -345,7 +310,6 @@ export const handleGoogleOAuthCallback = () => {
     try {
       const messageStr = JSON.stringify(message);
       localStorage.setItem(OAUTH_MESSAGE_KEY, messageStr);
-      console.log(`💾 메시지 저장 성공 (${attempt}번째 시도):`, messageStr);
 
       // 상태 업데이트
       const currentStatus = localStorage.getItem(OAUTH_STATUS_KEY);
@@ -373,11 +337,8 @@ export const handleGoogleOAuthCallback = () => {
     try {
       if (typeof window.close === 'function') {
         window.close();
-        console.log(`🔒 팝업 닫기 시도 ${attempt}번째 성공`);
       }
     } catch (closeError: any) {
-      console.log(`🔒 팝업 닫기 시도 ${attempt}번째 실패:`, closeError.message);
-
       // 재시도 (최대 3번)
       if (attempt < 3) {
         setTimeout(() => closePopup(attempt + 1), 200);
@@ -413,7 +374,6 @@ export const validateGoogleOAuthConfig = (): {
 export const cleanupOAuthStorage = () => {
   localStorage.removeItem(OAUTH_MESSAGE_KEY);
   localStorage.removeItem(OAUTH_STATUS_KEY);
-  console.log('🧹 OAuth 스토리지 정리 완료');
 };
 
 /**
