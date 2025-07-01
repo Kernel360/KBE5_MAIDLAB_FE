@@ -307,7 +307,7 @@ const ManagerReservationDetail: React.FC = () => {
         {/* 하단 버튼 */}
         <div className="mx-4 mt-4 pb-28 flex flex-row gap-3">
           {/* 체크인/체크아웃/관리자문의 버튼 노출 조건 */}
-          {reservation.status === RESERVATION_STATUS.MATCHED && isToday(reservation.reservationDate) && (
+          {reservation.status === RESERVATION_STATUS.PAID && isToday(reservation.reservationDate) && (
             <button
               className="flex-1 py-4 bg-green-500 text-white font-semibold rounded-2xl hover:bg-green-600 transition-colors shadow-none"
               onClick={() => handleCheckInOut(true)}

@@ -58,6 +58,16 @@ export const reservationApi = {
   },
 
   /**
+   * 예약 결제
+   */
+  payment: async (reservationId: number): Promise<string> => {
+    return apiCall<string>(
+      'post',
+      API_ENDPOINTS.RESERVATION.PAYMENT(reservationId),
+    );
+  },
+
+  /**
    * 예약 요청 응답 (매니저용)
    */
   respondToReservation: async (

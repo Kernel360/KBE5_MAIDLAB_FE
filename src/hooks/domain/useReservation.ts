@@ -142,6 +142,26 @@ export const useReservation = () => {
     [callApi],
   );
 
+  // 예약 결제
+  const payReservation = useCallback(
+    async (reservationId: number) => {
+      const result = await callApi(
+        () => reservationApi.payment(reservationId),
+        {
+          successMessage: '결제가 완료되었습니다.',
+          errorMessage: '결제에 실패했습니다.',
+        },
+      );
+
+      if (result.success) {
+        updateLocalReservation(reservationId, { status: 'PAID' });
+      }
+
+      return result;
+    },
+    [callApi, updateLocalReservation],
+  );
+
   // 예약 승인/거절 (매니저용)
   const respondToReservation = useCallback(
     async (reservationId: number, data: ReservationApprovalRequest) => {
@@ -269,6 +289,7 @@ export const useReservation = () => {
     fetchReservationDetail,
     createReservation,
     cancelReservation,
+    payReservation,
     respondToReservation,
     checkIn,
     checkOut,

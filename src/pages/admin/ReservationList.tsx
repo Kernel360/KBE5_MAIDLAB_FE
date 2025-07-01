@@ -124,6 +124,8 @@ const ReservationList = () => {
       case 'pending':
         return 'warning';
       case 'matched':
+        return 'info';
+      case 'paid':
         return 'success';
       case 'completed':
         return 'info';
