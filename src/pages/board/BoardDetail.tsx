@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
 import { useBoard } from '@/hooks/domain/useBoard';
 import { ROUTES } from '@/constants/route';
 import { BOARD_TYPE_LABELS } from '@/constants/board';
 import type { BoardDetailResponse, ImageInfo } from '@/types/board';
 import AnswerSection from '@/components/features/board/AnswerSection';
-import { BottomNavigation, ManagerFooter } from '@/components/layout/BottomNavigation/BottomNavigation';
-import { useAuth } from '@/hooks';
+import { Header } from '@/components/layout/Header/Header';
 
 // 이미지 모달 컴포넌트
 const ImageModal = ({
@@ -46,7 +45,6 @@ export default function BoardDetail() {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { fetchBoardDetail, deleteBoard } = useBoard();
-  const { isAuthenticated, userType } = useAuth();
   const [board, setBoard] = useState<BoardDetailResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -129,14 +127,6 @@ export default function BoardDetail() {
     }
   };
 
-  const handleBack = () => {
-    navigate(ROUTES.BOARD.LIST);
-  };
-
-  const handleNavigation = (path: string) => {
-    navigate(path);
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex justify-center items-center">
@@ -150,21 +140,15 @@ export default function BoardDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-white">
-        <button
-          onClick={handleBack}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6" />
-        </button>
-        <h1 className="text-lg font-bold">문의 상세</h1>
-        <div className="w-10" />
-      </div>
-
+    <div className="min-h-screen bg-gray-50 pt-20">
+      <Header
+        variant="sub"
+        title="문의 상세"
+        backRoute={ROUTES.BOARD.LIST}
+        showMenu={false}
+      />
       {/* Content */}
-      <div className="px-4 py-6 pb-20">
+      <div className="px-4 py-0 pb-0">
         <div className="max-w-md mx-auto space-y-6">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="space-y-4">
@@ -254,17 +238,6 @@ export default function BoardDetail() {
           )}
         </div>
       </div>
-
-      {/* Footer */}
-      {userType === 'MANAGER' ? (
-        <ManagerFooter />
-      ) : (
-        <BottomNavigation
-          activeTab="consultation"
-          onTabClick={handleNavigation}
-          isAuthenticated={isAuthenticated}
-        />
-      )}
     </div>
   );
 }
