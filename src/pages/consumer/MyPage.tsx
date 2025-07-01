@@ -167,7 +167,7 @@ const MyPage: React.FC = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 content-with-bottom-nav">
         {/* Header */}
         <Header
           variant="sub"
@@ -177,7 +177,7 @@ const MyPage: React.FC = () => {
         />
 
         {/* Content */}
-        <div className="px-4 py-6">
+        <div className="px-4 pt-6 pb-3">
           <div className="max-w-md mx-auto">
             <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
               {/* Profile Section */}
