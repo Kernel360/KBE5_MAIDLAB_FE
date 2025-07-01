@@ -133,13 +133,9 @@ const ManagerKeywordSelection: React.FC<{
                     type="button"
                     onClick={() => onKeywordToggle(keyword)}
                     disabled={isDisabled}
-                    className={`px-3 py-1.5 rounded-full text-sm transition-all ${
-                      isSelected
-                        ? 'bg-blue-100 text-blue-700 border-2 border-blue-300'
-                        : isDisabled
-                          ? 'bg-gray-50 text-gray-400 border-2 border-transparent cursor-not-allowed'
-                          : 'bg-gray-100 text-gray-600 border-2 border-transparent hover:bg-gray-200'
-                    }`}
+                    className={`px-3 py-1.5 rounded-full text-sm transition-all
+                      ${isSelected ? 'bg-orange-100 text-orange-700 border-2 border-orange-400' : isDisabled ? 'bg-gray-50 text-gray-400 border-2 border-transparent cursor-not-allowed' : 'bg-gray-100 text-gray-600 border-2 border-transparent hover:bg-orange-50'}
+                    `}
                   >
                     {keyword}
                   </button>
@@ -151,23 +147,14 @@ const ManagerKeywordSelection: React.FC<{
       </div>
 
       {selectedKeywords.length > 0 && (
-        <div className="mt-6 p-4 bg-blue-50 rounded-xl">
-          <h4 className="text-sm font-medium text-blue-800 mb-2">
-            선택된 키워드 ({selectedKeywords.length}/{maxKeywords}개)
-          </h4>
+        <div className="mt-6 p-4 bg-orange-50 rounded-xl">
+          <h4 className="text-sm font-medium text-orange-800 mb-2">선택된 키워드 ({selectedKeywords.length}/{maxKeywords}개)</h4>
           <div className="flex flex-wrap gap-2">
             {selectedKeywords.map((keyword) => (
-              <div
-                key={keyword}
-                className="relative inline-flex items-center px-3 py-1.5 bg-blue-200 text-blue-800 text-xs rounded-full pr-8"
-              >
+              <div key={keyword} className="relative inline-flex items-center px-3 py-1.5 bg-orange-200 text-orange-800 text-xs rounded-full pr-8">
                 <span>{keyword}</span>
-                <button
-                  type="button"
-                  onClick={() => onKeywordRemove(keyword)}
-                  className="absolute right-1 top-1/2 -translate-y-1/2 w-4 h-4 bg-blue-300 hover:bg-blue-400 rounded-full flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
-                >
-                  <X className="w-2.5 h-2.5 text-blue-700" />
+                <button type="button" onClick={() => onKeywordRemove(keyword)} className="absolute right-1 top-1/2 -translate-y-1/2 w-4 h-4 bg-orange-300 hover:bg-orange-400 rounded-full flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1">
+                  <X className="w-2.5 h-2.5 text-orange-700" />
                 </button>
               </div>
             ))}
