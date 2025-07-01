@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { Plus, X, Clock, FileText, User, Upload } from 'lucide-react';
+import { Plus, X, FileText, User, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   SERVICE_LIST,
   SEOUL_DISTRICT_LABELS,
   WEEKDAYS,
-  WEEKDAY_LABELS,
   ERROR_MESSAGES,
   BUTTON_TEXTS,
   LENGTH_LIMITS,
@@ -24,8 +23,9 @@ import type {
   ManagerProfileErrors,
   Document,
 } from '@/types/manager';
-import type { TimeSlot } from '@/types/common';
 import { Header } from '@/components/layout/Header/Header';
+import RegionSelectionModal from '@/components/features/manager/RegionSelectionModal';
+import ScheduleSelector from '@/components/features/manager/ScheduleSelector';
 
 const ManagerProfileSetup: React.FC = () => {
   const navigate = useNavigate();
@@ -35,6 +35,7 @@ const ManagerProfileSetup: React.FC = () => {
   const [uploadingDocument, setUploadingDocument] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imagePreview, setImagePreview] = useState<string>('');
+  const [isRegionModalOpen, setIsRegionModalOpen] = useState(false);
   const [formData, setFormData] = useState<ManagerProfileFormData>({
     profileImage: undefined,
     serviceTypes: [],
@@ -47,34 +48,6 @@ const ManagerProfileSetup: React.FC = () => {
 
   // ✅ 프로필 체크 로직 제거됨 - ProtectedRoute에서 처리
 
-  // 서울 25개 구
-  const regionOptions = [
-    SEOUL_DISTRICT_LABELS.GANGNAM,
-    SEOUL_DISTRICT_LABELS.GANGDONG,
-    SEOUL_DISTRICT_LABELS.GANGBUK,
-    SEOUL_DISTRICT_LABELS.GANGSEO,
-    SEOUL_DISTRICT_LABELS.GWANAK,
-    SEOUL_DISTRICT_LABELS.GWANGJIN,
-    SEOUL_DISTRICT_LABELS.GURO,
-    SEOUL_DISTRICT_LABELS.GEUMCHEON,
-    SEOUL_DISTRICT_LABELS.NOWON,
-    SEOUL_DISTRICT_LABELS.DOBONG,
-    SEOUL_DISTRICT_LABELS.DONGDAEMUN,
-    SEOUL_DISTRICT_LABELS.DONGJAK,
-    SEOUL_DISTRICT_LABELS.MAPO,
-    SEOUL_DISTRICT_LABELS.SEODAEMUN,
-    SEOUL_DISTRICT_LABELS.SEOCHO,
-    SEOUL_DISTRICT_LABELS.SEONGDONG,
-    SEOUL_DISTRICT_LABELS.SEONGBUK,
-    SEOUL_DISTRICT_LABELS.SONGPA,
-    SEOUL_DISTRICT_LABELS.YANGCHEON,
-    SEOUL_DISTRICT_LABELS.YEONGDEUNGPO,
-    SEOUL_DISTRICT_LABELS.YONGSAN,
-    SEOUL_DISTRICT_LABELS.EUNPYEONG,
-    SEOUL_DISTRICT_LABELS.JONGNO,
-    SEOUL_DISTRICT_LABELS.JUNG,
-    SEOUL_DISTRICT_LABELS.JUNGNANG,
-  ];
 
   const timeSlots = [
     '06:00',
@@ -96,10 +69,6 @@ const ManagerProfileSetup: React.FC = () => {
     '22:00',
   ];
 
-  const weekdays = Object.entries(WEEKDAY_LABELS).map(([key, label]) => ({
-    id: key,
-    label,
-  }));
 
   const documentTypes = [
     { id: 'ID_CARD', label: '신분증 사본' },
@@ -172,6 +141,25 @@ const ManagerProfileSetup: React.FC = () => {
     }
   };
 
+  const handleSelectAllRegions = () => {
+    const allRegions = Object.values(SEOUL_DISTRICT_LABELS);
+    setFormData((prev) => ({
+      ...prev,
+      regions: allRegions,
+    }));
+
+    if (errors.regions) {
+      setErrors((prev) => ({ ...prev, regions: undefined }));
+    }
+  };
+
+  const handleClearAllRegions = () => {
+    setFormData((prev) => ({
+      ...prev,
+      regions: [],
+    }));
+  };
+
   // 가능 시간 중복 체크 함수
   const hasDuplicateTimeSlot = (slots: typeof formData.availableTimes) => {
     const byDay: Record<string, { start: number; end: number }[]> = {};
@@ -206,7 +194,7 @@ const ManagerProfileSetup: React.FC = () => {
 
   const updateTimeSlot = (
     index: number,
-    field: keyof TimeSlot,
+    field: string,
     value: string,
   ) => {
     setFormData((prev) => ({
@@ -502,32 +490,28 @@ const ManagerProfileSetup: React.FC = () => {
               </p>
             </div>
 
-            <div className="grid grid-cols-3 gap-2 max-h-60 overflow-y-auto">
-              {regionOptions.map((region) => (
-                <button
-                  key={region}
-                  onClick={() => handleRegionToggle(region)}
-                  className={`p-2 text-sm rounded-lg border transition-all ${
-                    formData.regions.includes(region)
-                      ? 'border-orange-500 bg-orange-50 text-orange-600'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  {region}
-                </button>
-              ))}
-            </div>
+            <button
+              onClick={() => setIsRegionModalOpen(true)}
+              className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-orange-500 hover:text-orange-500 transition-colors"
+            >
+              지역 선택하기
+            </button>
 
             {formData.regions.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {formData.regions.map((region) => (
-                  <span
-                    key={region}
-                    className="px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-sm"
-                  >
-                    {region}
-                  </span>
-                ))}
+              <div className="space-y-3">
+                <div className="text-sm text-gray-600">
+                  선택된 지역: {formData.regions.length}개
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {formData.regions.map((region) => (
+                    <span
+                      key={region}
+                      className="px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-sm"
+                    >
+                      {region}
+                    </span>
+                  ))}
+                </div>
               </div>
             )}
 
@@ -547,106 +531,16 @@ const ManagerProfileSetup: React.FC = () => {
               <p className="text-gray-600">언제 서비스 제공이 가능하신가요?</p>
             </div>
 
-            <div className="space-y-4">
-              {formData.availableTimes.map((slot, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg"
-                >
-                  <select
-                    value={slot.day}
-                    onChange={(e) =>
-                      updateTimeSlot(index, 'day', e.target.value)
-                    }
-                    className="flex-1 p-2 border border-gray-300 rounded"
-                  >
-                    {weekdays.map((day) => (
-                      <option key={day.id} value={day.id}>
-                        {day.label}
-                      </option>
-                    ))}
-                  </select>
-                  <select
-                    value={slot.startTime}
-                    onChange={(e) =>
-                      updateTimeSlot(index, 'startTime', e.target.value)
-                    }
-                    className="flex-1 p-2 border border-gray-300 rounded"
-                  >
-                    {timeSlots.map((time) => (
-                      <option key={time} value={time}>
-                        {time}
-                      </option>
-                    ))}
-                  </select>
-                  <span className="text-gray-500">~</span>
-                  <select
-                    value={slot.endTime}
-                    onChange={(e) =>
-                      updateTimeSlot(index, 'endTime', e.target.value)
-                    }
-                    className="flex-1 p-2 border border-gray-300 rounded"
-                  >
-                    {timeSlots.map((time) => (
-                      <option key={time} value={time}>
-                        {time}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    onClick={() => removeTimeSlot(index)}
-                    className="p-2 text-red-500 hover:bg-red-50 rounded"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            <button
-              onClick={addTimeSlot}
-              className="w-full p-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-orange-500 hover:text-orange-500 flex items-center justify-center gap-2"
-            >
-              <Plus className="w-5 h-5" />
-              시간 추가
-            </button>
-
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                <Clock className="w-4 h-4" />
-                <span>소개글 (선택사항)</span>
-              </div>
-              <textarea
-                value={formData.introduceText}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    introduceText: e.target.value,
-                  }))
-                }
-                placeholder="고객에게 보여질 간단한 소개를 작성해주세요."
-                className="w-full p-3 border border-gray-300 rounded-lg resize-none"
-                rows={3}
-                maxLength={LENGTH_LIMITS.INTRODUCE.MAX}
-              />
-              <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
-                <span>고객에게 보여질 간단한 소개를 작성해주세요.</span>
-                <span>
-                  {formData.introduceText.length}/{LENGTH_LIMITS.INTRODUCE.MAX}
-                </span>
-              </div>
-            </div>
-
-            {errors.availableTimes && (
-              <p className="text-red-500 text-sm mt-2">
-                {errors.availableTimes}
-              </p>
-            )}
-            {errors.introduceText && (
-              <p className="text-red-500 text-sm mt-2">
-                {errors.introduceText}
-              </p>
-            )}
+            <ScheduleSelector
+              schedules={formData.availableTimes}
+              timeSlots={timeSlots}
+              onUpdateTimeSlot={updateTimeSlot}
+              onAddTimeSlot={addTimeSlot}
+              onRemoveTimeSlot={removeTimeSlot}
+              error={errors.availableTimes}
+              label="가능 시간"
+              required={true}
+            />
           </div>
         );
 
@@ -727,6 +621,39 @@ const ManagerProfileSetup: React.FC = () => {
 
             {errors.documents && (
               <p className="text-red-500 text-sm mt-2">{errors.documents}</p>
+            )}
+
+            {/* 소개글 섹션 */}
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+                <FileText className="w-4 h-4" />
+                <span>소개글 (선택사항)</span>
+              </div>
+              <textarea
+                value={formData.introduceText}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    introduceText: e.target.value,
+                  }))
+                }
+                placeholder="고객에게 보여질 간단한 소개를 작성해주세요."
+                className="w-full p-3 border border-gray-300 rounded-lg resize-none"
+                rows={3}
+                maxLength={LENGTH_LIMITS.INTRODUCE.MAX}
+              />
+              <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
+                <span>고객에게 보여질 간단한 소개를 작성해주세요.</span>
+                <span>
+                  {formData.introduceText.length}/{LENGTH_LIMITS.INTRODUCE.MAX}
+                </span>
+              </div>
+            </div>
+
+            {errors.introduceText && (
+              <p className="text-red-500 text-sm mt-2">
+                {errors.introduceText}
+              </p>
             )}
           </div>
         );
@@ -817,6 +744,18 @@ const ManagerProfileSetup: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* 지역 선택 모달 */}
+      <RegionSelectionModal
+        isOpen={isRegionModalOpen}
+        onClose={() => setIsRegionModalOpen(false)}
+        selectedRegions={formData.regions.map((region) => ({ region }))}
+        onRegionToggle={handleRegionToggle}
+        onSelectAll={handleSelectAllRegions}
+        onClearAll={handleClearAllRegions}
+        title="가능 지역 선택"
+        showSelectAllButtons={true}
+      />
     </div>
   );
 };
