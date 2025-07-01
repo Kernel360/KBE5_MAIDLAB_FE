@@ -1,7 +1,7 @@
 import React from 'react';
 import ReservationHeader from './ReservationHeader';
 import { BottomNavigation } from '@/components/layout/BottomNavigation/BottomNavigation';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth, useToast } from '@/hooks';
 import { useNavigate } from 'react-router-dom';
 import {SERVICE_LIST} from '@/constants/service'
 interface Props {
@@ -11,12 +11,12 @@ interface Props {
 const ReservationStep0: React.FC<Props> = ({ onNext }) => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-
+  const { showToast } = useToast();
   const handleSelect = (key: string) => {
     if (key === 'GENERAL_CLEANING') {
       onNext(key);
     } else {
-      window.alert('서비스 준비중입니다.');
+      showToast('서비스 준비중입니다.');
     }
   };
 

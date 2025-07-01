@@ -50,12 +50,14 @@ const ReservationStep1: React.FC<Props> = ({ onNext, onBack }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="sticky top-0 left-0 w-full z-20">
-        <ReservationHeader title="일반 청소를 선택하셨네요!" onBack={onBack || (() => window.history.back())} />
+        <ReservationHeader title="서비스 상세 옵션 선택" onBack={onBack || (() => window.history.back())} />
       </div>
       <main className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto space-y-6">
+        <h2 className="text-lg font-bold mb-2 mt-2 text-center">하위 옵션을 선택해 주세요.</h2>
+
           <section className="bg-white rounded-2xl shadow p-6">
-            <h2 className="text-lg font-bold mb-2 mt-2">하위 옵션을 선택해 주세요.</h2>
+            
             <div className="w-full flex gap-2 mt-4 mb-6">
               {TABS.map((tab) => (
                 <button
