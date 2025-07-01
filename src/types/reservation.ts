@@ -112,6 +112,7 @@ export interface ReviewListResponse {
  */
 export interface SettlementResponse {
   settlementId: number;
+  reservationId: number;
   serviceType: ServiceType;
   serviceDetailType: string;
   status: string;
