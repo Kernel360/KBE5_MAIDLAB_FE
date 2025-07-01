@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
+import { ScrollToTop } from './components/common';
 import './styles/index.css';
 import { injectSpeedInsights } from '@vercel/speed-insights';
 
@@ -13,6 +14,7 @@ const root = ReactDOM.createRoot(
 
 const AppWithProviders = () => (
   <BrowserRouter>
+    <ScrollToTop />
     <App />
   </BrowserRouter>
 );
