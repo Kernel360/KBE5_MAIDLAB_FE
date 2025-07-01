@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Upload, User} from 'lucide-react';
+import { ArrowLeft, Upload, User } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
 import { useConsumer } from '@/hooks/domain/useConsumer';
-import type { ConsumerProfileUpdateRequest, ProfileData } from '@/types/consumer';
+import type {
+  ConsumerProfileUpdateRequest,
+  ProfileData,
+} from '@/types/consumer';
 import { ROUTES } from '@/constants';
 import { uploadToS3 } from '@/utils/s3';
+import { Header } from '@/components/layout/Header/Header';
 
 const DEFAULT_PROFILE_IMAGE = '/default-profile.png';
 
@@ -17,14 +21,21 @@ const ProfileEdit: React.FC = () => {
     gender: 'MALE',
     address: '',
     detailAddress: '',
-    profileImage: undefined
+    profileImage: undefined,
   });
-  const [previewImage, setPreviewImage] = useState<string | undefined>(undefined);
+  const [previewImage, setPreviewImage] = useState<string | undefined>(
+    undefined,
+  );
   const [imageError, setImageError] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [errors, setErrors] = useState({ name: '', gender: '', birth: '', address: '', detailAddress: '' });
+  const [errors, setErrors] = useState({
+    name: '',
+    gender: '',
+    birth: '',
+    address: '',
+    detailAddress: '',
+  });
 
-  
   // 1. Add a new state to store the selected image file
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
 
@@ -45,23 +56,23 @@ const ProfileEdit: React.FC = () => {
         gender: profile.gender || 'MALE',
         address: profile.address || '',
         detailAddress: profile.detailAddress || '',
-        profileImage: profile.profileImage
+        profileImage: profile.profileImage,
       });
     }
   }, [profile]);
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
 
     // 에러 메시지 초기화
     if (field === 'address' && errors.address) {
-      setErrors(prev => ({ ...prev, address: '' }));
+      setErrors((prev) => ({ ...prev, address: '' }));
     }
     if (field === 'detailAddress' && errors.detailAddress) {
-      setErrors(prev => ({ ...prev, detailAddress: '' }));
+      setErrors((prev) => ({ ...prev, detailAddress: '' }));
     }
   };
 
@@ -96,7 +107,12 @@ const ProfileEdit: React.FC = () => {
   };
 
   const isFormValid = (): boolean => {
-    return !errors.address && !errors.detailAddress && formData.address.trim() !== '' && formData.detailAddress.trim() !== '';
+    return (
+      !errors.address &&
+      !errors.detailAddress &&
+      formData.address.trim() !== '' &&
+      formData.detailAddress.trim() !== ''
+    );
   };
 
   // 생년월일 자동 하이픈 처리
@@ -118,7 +134,7 @@ const ProfileEdit: React.FC = () => {
       gender: '',
       birth: '',
       address: '',
-      detailAddress: ''
+      detailAddress: '',
     };
     if (!formData.name.trim()) {
       newErrors.name = '이름을 입력해주세요.';
@@ -136,7 +152,7 @@ const ProfileEdit: React.FC = () => {
       newErrors.detailAddress = '상세 주소를 입력해주세요.';
     }
 
-    if (Object.values(newErrors).some(v => v)) {
+    if (Object.values(newErrors).some((v) => v)) {
       setErrors(newErrors);
       return;
     }
@@ -155,7 +171,7 @@ const ProfileEdit: React.FC = () => {
         birth: formData.birth,
         profileImage: profileImageUrl,
         address: formData.address,
-        detailAddress: formData.detailAddress
+        detailAddress: formData.detailAddress,
       };
       await updateProfile(profileData);
       navigate(ROUTES.CONSUMER.PROFILE);
@@ -197,17 +213,12 @@ const ProfileEdit: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-white">
-        <button
-          onClick={() => navigate(ROUTES.CONSUMER.PROFILE)}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6" />
-        </button>
-        <h1 className="text-lg font-bold">프로필 수정</h1>
-        <div className="w-10" />
-      </div>
+      <Header
+        variant="sub"
+        title="프로필 수정"
+        backRoute={ROUTES.CONSUMER.PROFILE}
+        showMenu={false}
+      />
 
       <div className="px-4 py-6">
         <div className="max-w-md mx-auto">
@@ -218,7 +229,11 @@ const ProfileEdit: React.FC = () => {
                 <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
                   {previewImage || formData.profileImage ? (
                     <img
-                      src={imageError ? DEFAULT_PROFILE_IMAGE : (previewImage || formData.profileImage)}
+                      src={
+                        imageError
+                          ? DEFAULT_PROFILE_IMAGE
+                          : previewImage || formData.profileImage
+                      }
                       alt="프로필"
                       className="w-full h-full object-cover"
                       onError={handleImageError}
@@ -312,12 +327,12 @@ const ProfileEdit: React.FC = () => {
               {/* 주소 */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  주소 
+                  주소
                 </label>
                 <input
                   type="text"
                   value={formData.address}
-                  onChange={e => handleInputChange('address', e.target.value)}
+                  onChange={(e) => handleInputChange('address', e.target.value)}
                   placeholder="서울특별시 서초구"
                   className="w-full p-3 border text-center border-gray-300 rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                 />
@@ -329,17 +344,21 @@ const ProfileEdit: React.FC = () => {
               {/* 상세 주소 */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  상세 주소 
+                  상세 주소
                 </label>
                 <input
                   type="text"
                   value={formData.detailAddress}
-                  onChange={e => handleInputChange('detailAddress', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange('detailAddress', e.target.value)
+                  }
                   placeholder="상세 주소를 입력해주세요"
                   className="w-full p-3 border text-center border-gray-300 rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                 />
                 {errors.detailAddress && (
-                  <p className="text-red-500 text-sm mt-1">{errors.detailAddress}</p>
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.detailAddress}
+                  </p>
                 )}
               </div>
             </div>

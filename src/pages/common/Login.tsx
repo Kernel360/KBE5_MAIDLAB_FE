@@ -12,6 +12,7 @@ import { openGoogleLoginPopup, cleanupOAuthStorage } from '@/utils/googleOAuth';
 import type { LoginRequest, SocialLoginRequest } from '@/types/auth';
 import type { SavedLoginInfo } from '@/types/user';
 import { LOGIN_USER_TYPES, type LoginUserType } from '@/constants/user';
+import { Header } from '@/components/layout/Header/Header';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -138,20 +139,16 @@ const Login: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 헤더 */}
-      <header className="bg-white px-4 py-3 flex items-center justify-between shadow-sm">
-        <div className="flex items-center">
-          <Link to={ROUTES.HOME} className="text-xl font-bold text-orange-500">
-            MaidLab
-          </Link>
-        </div>
-      </header>
+      <Header
+        variant="sub"
+        title="로그인"
+        backRoute={ROUTES.HOME}
+        showMenu={false}
+      />
 
-      <main className="px-4 py-6">
+      <main className="px-4 py-6 pt-12">
         <div className="max-w-md mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">로그인</h1>
-            <p className="text-gray-600">MaidLab에 오신 것을 환영합니다</p>
-          </div>
+          <div className="text-center mb-8"></div>
 
           {/* 사용자 타입 선택 */}
           <div className="flex bg-gray-100 rounded-lg p-1 mb-6">

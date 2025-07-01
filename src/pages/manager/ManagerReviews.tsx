@@ -11,6 +11,7 @@ import type {
   ManagerReviewListResponse,
   ManagerReviewItem,
 } from '@/types/manager';
+import { Header } from '@/components/layout/Header/Header';
 
 interface PaginationProps {
   currentPage: number;
@@ -218,14 +219,12 @@ const ReviewStats: React.FC<ReviewStatsProps> = ({ reviews }) => {
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
-      <h2 className="text-lg font-semibold mb-4">리뷰 통계</h2>
-
       {/* 전체 평점 */}
-      <div className="flex items-center gap-3 mb-4">
-        <div className="text-3xl font-bold text-orange-500">
+      <div className="flex items-end gap-3 mb-4">
+        <div className="text-6xl font-bold text-orange-500">
           {averageRating}
         </div>
-        <div>
+        <div className="flex flex-col justify-end">
           <div className="flex items-center gap-1 mb-1">
             {renderStars(averageRating)}
           </div>
@@ -314,19 +313,15 @@ const ManagerReviews: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-white">
-        <button
-          onClick={handleBack}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6" />
-        </button>
-        <h1 className="text-lg font-bold">리뷰</h1>
-        <div className="w-10" />
-      </div>
+      <Header
+        variant="sub"
+        title="리뷰"
+        backRoute={ROUTES.MANAGER.MYPAGE}
+        showMenu={true}
+      />
 
       {/* Content */}
-      <div className="px-4 py-6">
+      <div className="px-4 py-6 pt-20">
         <div className="max-w-md mx-auto">
           {reviews.length > 0 ? (
             <>

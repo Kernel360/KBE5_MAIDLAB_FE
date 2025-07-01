@@ -427,7 +427,7 @@ const ManagerProfileEdit: React.FC = () => {
         variant="sub"
         title="프로필 수정"
         backRoute={ROUTES.MANAGER.PROFILE}
-        showNotification={true}
+        showMenu={true}
       />
 
       <div className="px-4 py-6 pt-20">

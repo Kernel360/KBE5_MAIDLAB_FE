@@ -36,7 +36,7 @@ const ManagerProfile: React.FC = () => {
         variant="sub"
         title="프로필"
         backRoute={ROUTES.MANAGER.MYPAGE}
-        showNotification={true}
+        showMenu={true}
       />
 
       <div className="px-4 py-6 pt-20">
