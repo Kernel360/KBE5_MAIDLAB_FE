@@ -108,10 +108,8 @@ export const useReservation = () => {
           specialRequest: reservationData.specialRequest,
           totalPrice: reservationData.totalPrice,
         };
-        console.log("----------");
-        console.log("request data:",formattedData);
         const result = await callApi(() => reservationApi.create(formattedData), {
-          successMessage: '예약이 완료되었습니다.',
+          showSuccessToast: false,
           errorMessage: '예약에 실패했습니다.',
         });
   
