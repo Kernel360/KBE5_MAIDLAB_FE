@@ -128,7 +128,7 @@ export const Header: React.FC<HeaderProps> = ({
                     </span>
                     <span>MAIDLAB</span>
                   </button>
-                  {isAuthenticated && (
+                  {isAuthenticated ? (
                     <>
                       <button
                         onClick={() =>
@@ -171,6 +171,14 @@ export const Header: React.FC<HeaderProps> = ({
                         <span>로그아웃</span>
                       </button>
                     </>
+                  ) : (
+                    <button
+                      onClick={() => handleMenuClick(ROUTES.LOGIN)}
+                      className="flex items-center px-4 py-2 hover:bg-gray-100 gap-2"
+                    >
+                      <User className="w-5 h-5 text-gray-600" />
+                      <span>로그인</span>
+                    </button>
                   )}
                 </div>
               )}
