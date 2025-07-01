@@ -60,10 +60,11 @@ const ManagerHome: React.FC = () => {
   );
 
   // 다가오는 예약 (가장 가까운 예약 1건)
+  console.log('예약 데이터 샘플:', managerReservations[0]);
   const upcomingReservations = managerReservations
     .filter((reservation) => {
       // 날짜만 비교 (오늘 이후의 예약) 또는 오늘 예약 중 시간이 남은 것
-      const reservationDate = reservation.reservationDate;
+      const reservationDate = reservation.reservationDate.split(' ')[0];
       const now = new Date();
       const nowDateString = now.toISOString().split('T')[0];
 
@@ -80,7 +81,7 @@ const ManagerHome: React.FC = () => {
       // 오늘 날짜의 예약 중 시간이 남은 것
       if (reservationDate === nowDateString) {
         const reservationDateTime = safeCreateDateTime(
-          reservation.reservationDate,
+          reservationDate,
           reservation.startTime,
         );
         const isValidTime = reservationDateTime !== null;
@@ -98,13 +99,15 @@ const ManagerHome: React.FC = () => {
       return false;
     })
     .sort((a, b) => {
-      const dateA = safeCreateDateTime(a.reservationDate, a.startTime);
-      const dateB = safeCreateDateTime(b.reservationDate, b.startTime);
+      const dateA = safeCreateDateTime(a.reservationDate.split(' ')[0], a.startTime);
+      const dateB = safeCreateDateTime(b.reservationDate.split(' ')[0], b.startTime);
       
       if (!dateA || !dateB) return 0;
       return dateA.getTime() - dateB.getTime();
     })
     .slice(0, 1); // 가장 가까운 예약 1건만
+  
+  console.log('필터링된 다가오는 예약:', upcomingReservations);
 
   // 예약 상태별 색상
   const getStatusColor = (status: string) => {
@@ -406,8 +409,10 @@ const ManagerHome: React.FC = () => {
             ) : upcomingReservations.length > 0 ? (
               <div className="space-y-3">
                 {upcomingReservations.map((reservation) => {
+                  // 날짜에서 YYYY-MM-DD 부분만 추출
+                  const dateOnly = reservation.reservationDate.split(' ')[0];
                   const reservationDateTime = safeCreateDateTime(
-                    reservation.reservationDate,
+                    dateOnly,
                     reservation.startTime,
                   );
                   const now = new Date();
@@ -468,8 +473,7 @@ const ManagerHome: React.FC = () => {
                         <div className="flex items-center">
                           <Clock className="w-4 h-4 mr-2 text-gray-400" />
                           <span>
-                            {formatTime(reservation.startTime) || '시간 미정'} -{' '}
-                            {formatTime(reservation.endTime) || '시간 미정'}
+                            {reservation.startTime} - {reservation.endTime}
                           </span>
                         </div>
                       </div>
