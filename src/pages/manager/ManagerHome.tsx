@@ -1,20 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Calendar,
   Clock,
   MapPin,
-  ChevronLeft,
-  ChevronRight,
   User,
   CheckCircle2,
   AlertCircle,
 } from 'lucide-react';
 import { Header } from '@/components';
+import WeeklySettlementChart from '@/components/features/manager/WeeklySettlementChart';
 
 import { ROUTES } from '@/constants';
 import { useAuth, useReservation, useManager } from '@/hooks';
-import { formatDate, formatTime } from '@/utils/date';
+import { formatDate, formatTime, safeCreateDateTime } from '@/utils/date';
 import { formatPrice } from '@/utils/format';
 import { RESERVATION_STATUS } from '@/constants/status';
 import { SERVICE_TYPE_LABELS } from '@/constants/service';
@@ -23,11 +22,19 @@ import type { ServiceType } from '@/constants/service';
 const ManagerHome: React.FC = () => {
   const navigate = useNavigate();
   const { userType } = useAuth();
-  const { reservations, loading, fetchReservations } = useReservation();
-  const { profile, loading: profileLoading, fetchProfile } = useManager();
+  const { reservations, loading, fetchReservations, fetchWeeklySettlements } =
+    useReservation();
+  const {
+    profile,
+    loading: profileLoading,
+    fetchProfile,
+    fetchMyReviews,
+  } = useManager();
 
-  // 캘린더 상태
-  const [currentDate, setCurrentDate] = useState(new Date());
+  // 리뷰 데이터 상태
+  const [reviewData, setReviewData] = useState<any>(null);
+  // 주간 정산 데이터 상태
+  const [weeklySettlements, setWeeklySettlements] = useState<any[]>([]);
 
   // 오늘 날짜
   const today = new Date();
@@ -38,6 +45,15 @@ const ManagerHome: React.FC = () => {
     (reservation) => reservation.status !== RESERVATION_STATUS.CANCELED,
   );
 
+  // 디버깅을 위한 로그 (개발 환경에서만)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Manager 예약 데이터:', {
+      총예약수: reservations.length,
+      유효예약수: managerReservations.length,
+      예약목록: managerReservations.length > 0 ? managerReservations.slice(0, 2) : []
+    });
+  }
+
   // 오늘의 예약
   const todayReservations = managerReservations.filter(
     (reservation) => reservation.reservationDate === todayString,
@@ -46,88 +62,49 @@ const ManagerHome: React.FC = () => {
   // 다가오는 예약 (가장 가까운 예약 1건)
   const upcomingReservations = managerReservations
     .filter((reservation) => {
-      const reservationDateTime = new Date(
-        `${reservation.reservationDate}T${reservation.startTime}`,
-      );
+      // 날짜만 비교 (오늘 이후의 예약) 또는 오늘 예약 중 시간이 남은 것
+      const reservationDate = reservation.reservationDate;
       const now = new Date();
-      return (
-        reservationDateTime >= now &&
-        (reservation.status === RESERVATION_STATUS.MATCHED ||
+      const nowDateString = now.toISOString().split('T')[0];
+
+      // 오늘 이후 날짜의 예약
+      if (reservationDate > nowDateString) {
+        return (
+          reservation.status === RESERVATION_STATUS.MATCHED ||
           reservation.status === RESERVATION_STATUS.WORKING ||
           reservation.status === RESERVATION_STATUS.PENDING ||
-          reservation.status === RESERVATION_STATUS.APPROVED)
-      );
+          reservation.status === RESERVATION_STATUS.APPROVED
+        );
+      }
+
+      // 오늘 날짜의 예약 중 시간이 남은 것
+      if (reservationDate === nowDateString) {
+        const reservationDateTime = safeCreateDateTime(
+          reservation.reservationDate,
+          reservation.startTime,
+        );
+        const isValidTime = reservationDateTime !== null;
+        const isFuture = reservationDateTime ? reservationDateTime >= now : false;
+        const isValidStatus = (
+          reservation.status === RESERVATION_STATUS.MATCHED ||
+          reservation.status === RESERVATION_STATUS.WORKING ||
+          reservation.status === RESERVATION_STATUS.PENDING ||
+          reservation.status === RESERVATION_STATUS.APPROVED
+        );
+        
+        return isValidTime && isFuture && isValidStatus;
+      }
+
+      return false;
     })
     .sort((a, b) => {
-      const dateA = new Date(`${a.reservationDate}T${a.startTime}`);
-      const dateB = new Date(`${b.reservationDate}T${b.startTime}`);
+      const dateA = safeCreateDateTime(a.reservationDate, a.startTime);
+      const dateB = safeCreateDateTime(b.reservationDate, b.startTime);
+      
+      if (!dateA || !dateB) return 0;
       return dateA.getTime() - dateB.getTime();
     })
     .slice(0, 1); // 가장 가까운 예약 1건만
-
-  // 캘린더 네비게이션
-  const navigateMonth = (direction: 'prev' | 'next') => {
-    setCurrentDate((prev) => {
-      const newDate = new Date(prev);
-      if (direction === 'prev') {
-        newDate.setMonth(prev.getMonth() - 1);
-      } else {
-        newDate.setMonth(prev.getMonth() + 1);
-      }
-      return newDate;
-    });
-  };
-
-  // 오늘로 돌아가기
-  const goToToday = () => {
-    setCurrentDate(new Date());
-  };
-
-  // 현재 표시 중인 달이 오늘이 포함된 달인지 확인
-  const isCurrentMonth =
-    currentDate.getFullYear() === today.getFullYear() &&
-    currentDate.getMonth() === today.getMonth();
-
-  // 캘린더 날짜 생성
-  const generateCalendarDays = () => {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-
-    const firstDay = new Date(year, month, 1);
-    const startDate = new Date(firstDay);
-    startDate.setDate(startDate.getDate() - firstDay.getDay());
-
-    const days = [];
-    const current = new Date(startDate);
-
-    for (let i = 0; i < 42; i++) {
-      const dateString = current.toISOString().split('T')[0];
-
-      // 예정된 예약만 필터링 (완료/취소 제외)
-      const hasUpcomingReservation = managerReservations.some(
-        (reservation) =>
-          reservation.reservationDate === dateString &&
-          (reservation.status === RESERVATION_STATUS.MATCHED ||
-            reservation.status === RESERVATION_STATUS.WORKING ||
-            reservation.status === RESERVATION_STATUS.PENDING ||
-            reservation.status === RESERVATION_STATUS.APPROVED),
-      );
-
-      days.push({
-        date: new Date(current),
-        isCurrentMonth: current.getMonth() === month,
-        isToday: current.toDateString() === today.toDateString(),
-        hasReservation: hasUpcomingReservation,
-        dateString,
-      });
-
-      current.setDate(current.getDate() + 1);
-    }
-
-    return days;
-  };
-
-  const calendarDays = generateCalendarDays();
 
   // 예약 상태별 색상
   const getStatusColor = (status: string) => {
@@ -168,7 +145,89 @@ const ManagerHome: React.FC = () => {
   useEffect(() => {
     fetchReservations();
     fetchProfile(); // 매니저 프로필 정보 가져오기
+    loadReviews(); // 리뷰 데이터 가져오기
+    loadWeeklySettlements(); // 주간 정산 데이터 가져오기
   }, []);
+
+  // 리뷰 데이터 로드
+  const loadReviews = async () => {
+    try {
+      const data = await fetchMyReviews();
+      if (data) {
+        setReviewData(data);
+      }
+    } catch (error) {
+      console.error('리뷰 데이터 로드 실패:', error);
+    }
+  };
+
+  // 주간 정산 데이터 로드
+  const loadWeeklySettlements = async () => {
+    try {
+      const weeklyData = [];
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+
+      // 이번 달의 첫째 주부터 마지막 주까지 계산
+      const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+      const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
+
+      // 월요일 기준으로 주 계산
+      let currentWeekStart = new Date(firstDayOfMonth);
+      currentWeekStart.setDate(
+        currentWeekStart.getDate() - ((currentWeekStart.getDay() + 6) % 7),
+      );
+
+      let weekNumber = 1;
+
+      while (currentWeekStart <= lastDayOfMonth) {
+        const weekStartString = currentWeekStart.toISOString().split('T')[0];
+
+        try {
+          const data = await fetchWeeklySettlements(weekStartString);
+          weeklyData.push({
+            week: weekNumber,
+            startDate: new Date(currentWeekStart),
+            totalAmount: data?.totalAmount || 0,
+            settlementsCount: data?.settlements?.length || 0,
+          });
+        } catch (error) {
+          // 데이터가 없는 주는 0으로 처리
+          weeklyData.push({
+            week: weekNumber,
+            startDate: new Date(currentWeekStart),
+            totalAmount: 0,
+            settlementsCount: 0,
+          });
+        }
+
+        // 다음 주로 이동
+        currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+        weekNumber++;
+
+        // 최대 5주까지만
+        if (weekNumber > 5) break;
+      }
+
+      setWeeklySettlements(weeklyData);
+    } catch (error) {
+      console.error('주간 정산 데이터 로드 실패:', error);
+    }
+  };
+
+  // 평균 평점 계산
+  const calculateAverageRating = () => {
+    const reviews = reviewData?.reviews || [];
+    if (reviews.length === 0) return 0;
+
+    const totalRating = reviews.reduce(
+      (sum: number, review: any) => sum + Number(review.rating),
+      0,
+    );
+    return Number((totalRating / reviews.length).toFixed(1));
+  };
+
+  const averageRating = calculateAverageRating();
 
   if (userType !== 'MANAGER') {
     navigate(ROUTES.HOME);
@@ -185,7 +244,10 @@ const ManagerHome: React.FC = () => {
       <main className="px-4 py-6 pb-20 pt-20">
         <div className="max-w-md mx-auto space-y-6">
           {/* 매니저 프로필 섹션 */}
-          <section className="bg-gradient-to-r from-orange-400 to-orange-500 rounded-2xl p-6 text-white">
+          <section
+            className="bg-gradient-to-r from-orange-400 to-orange-500 rounded-2xl p-6 text-white cursor-pointer hover:from-orange-500 hover:to-orange-600 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+            onClick={() => navigate(ROUTES.MANAGER.MYPAGE)}
+          >
             {profileLoading ? (
               // 로딩 상태
               <div className="animate-pulse">
@@ -298,103 +360,42 @@ const ManagerHome: React.FC = () => {
                 <p className="text-xs text-gray-400">건</p>
               </div>
               <div>
-                <p className="text-gray-500 text-xs mb-1">제공 서비스</p>
+                <p className="text-gray-500 text-xs mb-1">평균 평점</p>
                 <p className="text-2xl font-bold text-green-500">
-                  {profile?.services?.length || 0}
+                  {averageRating > 0 ? averageRating : '-'}
                 </p>
-                <p className="text-xs text-gray-400">개</p>
+                <p className="text-xs text-gray-400">점</p>
               </div>
             </div>
           </section>
 
-          {/* 예약 일정 캘린더 */}
+          {/* 이번달 주간별 정산 */}
           <section className="bg-white rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-gray-900">예약 일정</h2>
+              <h2 className="text-lg font-bold text-gray-900">
+                이번 달 주간별 정산
+              </h2>
               <button
-                onClick={() => navigate(ROUTES.MANAGER.RESERVATIONS)}
-                className="text-orange-500 text-sm font-medium"
+                onClick={() => navigate(ROUTES.MANAGER.SETTLEMENTS)}
+                className="text-orange-500 text-sm font-medium hover:text-orange-600 transition-colors"
               >
-                전체보기
+                상세보기 →
               </button>
             </div>
 
-            {/* 캘린더 헤더 */}
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-base font-semibold text-gray-900">
-                {currentDate.getFullYear()}년 {currentDate.getMonth() + 1}월
-              </h3>
-              <div className="flex items-center space-x-2">
-                {/* 오늘 버튼 - 현재 달이 아닐 때만 표시 */}
-                {!isCurrentMonth && (
-                  <button
-                    onClick={goToToday}
-                    className="px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-xs font-medium hover:bg-orange-200 transition-colors"
-                  >
-                    오늘
-                  </button>
-                )}
-
-                {/* 이전/다음 달 버튼 */}
-                <div className="flex space-x-1">
-                  <button
-                    onClick={() => navigateMonth('prev')}
-                    className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
-                  >
-                    <ChevronLeft className="w-4 h-4 text-gray-600" />
-                  </button>
-                  <button
-                    onClick={() => navigateMonth('next')}
-                    className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
-                  >
-                    <ChevronRight className="w-4 h-4 text-gray-600" />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* 요일 헤더 */}
-            <div className="grid grid-cols-7 gap-1 mb-2">
-              {['일', '월', '화', '수', '목', '금', '토'].map((day) => (
-                <div key={day} className="h-8 flex items-center justify-center">
-                  <span className="text-xs font-medium text-gray-500">
-                    {day}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            {/* 캘린더 그리드 */}
-            <div className="grid grid-cols-7 gap-1">
-              {calendarDays.map((day, index) => (
-                <button
-                  key={index}
-                  className={`
-                    h-10 flex items-center justify-center text-sm relative
-                    ${day.isCurrentMonth ? 'text-gray-900' : 'text-gray-300'}
-                    ${day.isToday ? 'bg-orange-500 text-white rounded-full font-medium' : ''}
-                    ${day.hasReservation && !day.isToday ? 'bg-orange-100 rounded-full' : ''}
-                    hover:bg-gray-100 transition-colors
-                  `}
-                >
-                  {day.date.getDate()}
-                  {day.hasReservation && !day.isToday && (
-                    <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-orange-500 rounded-full" />
-                  )}
-                </button>
-              ))}
-            </div>
+            {/* 주간별 정산 그래프 */}
+            <WeeklySettlementChart weeklySettlements={weeklySettlements} />
           </section>
 
-          {/* 다가오는 예약 */}
+          {/* 가까운 예약 */}
           <section className="bg-white rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-gray-900">다음 예약</h2>
+              <h2 className="text-lg font-bold text-gray-900">가까운 예약</h2>
               <button
                 onClick={() => navigate(ROUTES.MANAGER.RESERVATIONS)}
                 className="text-orange-500 text-sm font-medium"
               >
-                전체보기
+                전체보기 →
               </button>
             </div>
 
@@ -403,24 +404,30 @@ const ManagerHome: React.FC = () => {
                 <div className="h-24 bg-gray-200 rounded-xl" />
               </div>
             ) : upcomingReservations.length > 0 ? (
-              <div>
+              <div className="space-y-3">
                 {upcomingReservations.map((reservation) => {
-                  const reservationDateTime = new Date(
-                    `${reservation.reservationDate}T${reservation.startTime}`,
+                  const reservationDateTime = safeCreateDateTime(
+                    reservation.reservationDate,
+                    reservation.startTime,
                   );
                   const now = new Date();
-                  const timeDiff =
-                    reservationDateTime.getTime() - now.getTime();
-                  const daysUntil = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-                  const hoursUntil = Math.ceil(timeDiff / (1000 * 60 * 60));
+                  
+                  let timeUntilText = '시간 미정';
+                  
+                  if (reservationDateTime) {
+                    const timeDiff = reservationDateTime.getTime() - now.getTime();
+                    const daysUntil = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+                    const hoursUntil = Math.ceil(timeDiff / (1000 * 60 * 60));
 
-                  let timeUntilText = '';
-                  if (daysUntil > 1) {
-                    timeUntilText = `${daysUntil}일 후`;
-                  } else if (hoursUntil > 1) {
-                    timeUntilText = `${hoursUntil}시간 후`;
-                  } else {
-                    timeUntilText = '곧 시작';
+                    if (daysUntil > 1) {
+                      timeUntilText = `${daysUntil}일 후`;
+                    } else if (hoursUntil > 1) {
+                      timeUntilText = `${hoursUntil}시간 후`;
+                    } else if (timeDiff > 0) {
+                      timeUntilText = '곧 시작';
+                    } else {
+                      timeUntilText = '진행 중';
+                    }
                   }
 
                   return (
@@ -429,23 +436,22 @@ const ManagerHome: React.FC = () => {
                       onClick={() =>
                         handleReservationClick(reservation.reservationId)
                       }
-                      className="w-full bg-gradient-to-r from-orange-50 to-orange-100 rounded-xl p-4 text-left hover:from-orange-100 hover:to-orange-200 transition-all border border-orange-200"
+                      className="w-full bg-white border border-gray-200 rounded-xl p-4 text-left hover:border-orange-300 hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-1"
                     >
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse" />
-                          <span className="text-orange-600 font-semibold text-sm">
+                          <span className="text-orange-600 font-medium text-sm">
                             {timeUntilText}
                           </span>
                         </div>
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(reservation.status)}`}
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(reservation.status)}`}
                         >
                           {getStatusText(reservation.status)}
                         </span>
                       </div>
 
-                      <h3 className="font-bold text-gray-900 text-lg mb-2">
+                      <h3 className="font-semibold text-gray-900 text-base mb-3">
                         {reservation.detailServiceType ||
                           reservation.serviceType ||
                           '가사도우미'}{' '}
@@ -454,28 +460,27 @@ const ManagerHome: React.FC = () => {
 
                       <div className="space-y-2 text-sm text-gray-600">
                         <div className="flex items-center">
-                          <Calendar className="w-4 h-4 mr-2 text-orange-500" />
-                          <span className="font-medium">
-                            {formatDate(reservation.reservationDate)}
-                          </span>
-                        </div>
-                        <div className="flex items-center">
-                          <Clock className="w-4 h-4 mr-2 text-orange-500" />
+                          <Calendar className="w-4 h-4 mr-2 text-gray-400" />
                           <span>
-                            {formatTime(reservation.startTime)} -{' '}
-                            {formatTime(reservation.endTime)}
+                            {formatDate(reservation.reservationDate) || '날짜 미정'}
                           </span>
                         </div>
                         <div className="flex items-center">
-                          <MapPin className="w-4 h-4 mr-2 text-orange-500" />
-                          <span className="truncate">서울시 강남구</span>
+                          <Clock className="w-4 h-4 mr-2 text-gray-400" />
+                          <span>
+                            {formatTime(reservation.startTime) || '시간 미정'} -{' '}
+                            {formatTime(reservation.endTime) || '시간 미정'}
+                          </span>
                         </div>
                       </div>
 
-                      <div className="mt-3 pt-3 border-t border-orange-200">
-                        <span className="text-orange-600 font-bold text-lg">
+                      <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
+                        <span className="text-orange-600 font-semibold text-lg">
                           {formatPrice(reservation.totalPrice)}
                         </span>
+                        <div className="text-xs text-gray-500">
+                          자세히 보기 →
+                        </div>
                       </div>
                     </button>
                   );
