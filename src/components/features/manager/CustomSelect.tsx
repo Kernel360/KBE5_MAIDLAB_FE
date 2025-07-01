@@ -66,7 +66,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
           disabled
             ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200'
             : isOpen
-            ? 'border-orange-500 ring-2 ring-orange-200 shadow-md'
+            ? 'border-orange-500 ring-1 ring-orange-200 shadow-md'
             : 'border-gray-300 hover:border-orange-400 shadow-sm'
         }`}
       >

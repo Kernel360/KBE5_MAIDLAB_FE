@@ -483,7 +483,7 @@ const ManagerProfileEdit: React.FC = () => {
                   )
                 }
                 onBlur={() => setFieldTouched('name')}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all text-center ${
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-all text-center ${
                   errors.name && touched.name
                     ? 'border-red-500'
                     : 'border-gray-300'
@@ -548,7 +548,7 @@ const ManagerProfileEdit: React.FC = () => {
                 value={profile.birth}
                 onChange={handleBirthChange}
                 onBlur={() => setFieldTouched('birth')}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all text-center ${
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-all text-center ${
                   errors.birth && touched.birth
                     ? 'border-red-500'
                     : 'border-gray-300'
@@ -673,7 +673,7 @@ const ManagerProfileEdit: React.FC = () => {
                   })
                 }
                 placeholder="고객에게 보여질 간단한 소개를 작성해주세요."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 resize-none transition-all"
                 rows={3}
                 maxLength={LENGTH_LIMITS.INTRODUCE.MAX}
               />
