@@ -63,7 +63,7 @@ const RESERVATION_FILTERS = {
   '요청 대기중': (reservations: ReservationListResponse[]) =>
     reservations.filter((r) => r.status === RESERVATION_STATUS.PENDING),
   예정: (reservations: ReservationListResponse[]) =>
-    reservations.filter((r) => r.status === RESERVATION_STATUS.MATCHED),
+    reservations.filter((r) => r.status === RESERVATION_STATUS.MATCHED || r.status === RESERVATION_STATUS.PAID),
   진행중: (reservations: ReservationListResponse[]) =>
     reservations.filter((r) => r.status === RESERVATION_STATUS.WORKING),
   완료: (reservations: ReservationListResponse[]) =>
@@ -72,7 +72,7 @@ const RESERVATION_FILTERS = {
 
 const ConsumerReservations: React.FC = () => {
   const navigate = useNavigate();
-  const { reservations, loading, fetchReservations } = useReservation();
+  const { reservations, loading, fetchReservations, payReservation } = useReservation();
   const [activeTab, setActiveTab] = useState<TabType>('전체');
   const [filteredReservations, setFilteredReservations] = useState<
     ReservationListResponse[]
@@ -116,6 +116,14 @@ const ConsumerReservations: React.FC = () => {
     navigate(
       ROUTES.CONSUMER.REVIEW_REGISTER.replace(':id', String(reservationId)),
     );
+  };
+
+  const handlePaymentClick = async (
+    reservationId: number,
+    event: React.MouseEvent,
+  ) => {
+    event.stopPropagation();
+    await payReservation(reservationId);
   };
 
   const currentReservations = filteredReservations.slice(startIndex, endIndex);
@@ -205,6 +213,7 @@ const ConsumerReservations: React.FC = () => {
                     getStatusBadgeStyle={(status, reservationDate) => getStatusBadgeStyle(status, reservationDate)}
                     onReviewClick={handleReviewClick}
                     onDetailClick={handleReservationClick}
+                    onPaymentClick={handlePaymentClick}
                   />
                 ))}
               </div>

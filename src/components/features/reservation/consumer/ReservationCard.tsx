@@ -10,6 +10,7 @@ interface ReservationCardProps {
   getStatusBadgeStyle: (status: string, reservationDate: string) => string;
   onReviewClick?: (reservationId: number, event: React.MouseEvent) => void;
   onDetailClick?: (reservationId: number) => void;
+  onPaymentClick?: (reservationId: number, event: React.MouseEvent) => void;
 }
 
 export const ReservationCard: React.FC<ReservationCardProps> = ({
@@ -17,6 +18,7 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
   getStatusBadgeStyle,
   onReviewClick,
   onDetailClick,
+  onPaymentClick,
 }) => {
   // 상태별 색상 매핑
   const getStatusColor = (status: string) => {
@@ -25,6 +27,8 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
         return 'bg-amber-100 text-amber-800 border-amber-200';
       case 'MATCHED':
         return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'PAID':
+        return 'bg-teal-100 text-teal-800 border-teal-200';
       case 'WORKING':
         return 'bg-purple-100 text-purple-800 border-purple-200';
       case 'COMPLETED':
@@ -38,6 +42,7 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
   };
 
   const showReviewButton = !reservation.isExistReview && reservation.status === 'COMPLETED';
+  const showPaymentButton = reservation.status === 'MATCHED';
 
   return (
     <div 
@@ -104,6 +109,14 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
           <span>자세히 보기</span>
           <ChevronRight className="w-4 h-4 ml-1" />
         </button>
+        {showPaymentButton && onPaymentClick && (
+          <button
+            className="flex-1 flex items-center justify-center text-sm bg-blue-500 text-white rounded-xl px-3 py-2 hover:bg-blue-600 transition"
+            onClick={(e) => onPaymentClick(reservation.reservationId, e)}
+          >
+            <span>결제하기</span>
+          </button>
+        )}
         {showReviewButton && onReviewClick && (
           <button
             className="flex-1 flex items-center justify-center text-sm bg-orange-500 text-white rounded-xl px-3 py-2 hover:bg-orange-600 transition"

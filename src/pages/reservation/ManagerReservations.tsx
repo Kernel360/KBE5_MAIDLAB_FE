@@ -15,7 +15,7 @@ import {CheckInOutModal,ConfirmModal,MatchingCard,TabHeader} from '@/components'
 import { ROUTES } from '@/constants/route';
 
 const FILTERS = [
-  { label: '예정', value: 'MATCHED' },
+  { label: '예정', value: 'PAID' },
   { label: '오늘', value: 'TODAY' },
   { label: '진행중', value: 'WORKING' },
   { label: '완료', value: 'COMPLETED' },
@@ -37,7 +37,7 @@ const ManagerReservationsAndMatching: React.FC = () => {
   const { getStatusBadgeStyle } = useReservationStatus();
   const [tab, setTab] = useState<'schedule' | 'request'>('schedule');
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'MATCHED' | 'TODAY' | 'WORKING' | 'COMPLETED'>('MATCHED');
+  const [filter, setFilter] = useState<'PAID' | 'TODAY' | 'WORKING' | 'COMPLETED'>('PAID');
   const [filterOpen, setFilterOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [modal, setModal] = useState<{ type: 'success' | 'fail' | null, info?: any }>({ type: null });
@@ -72,23 +72,23 @@ const ManagerReservationsAndMatching: React.FC = () => {
   // 예약 일정 필터링
   const todayStr = new Date().toISOString().slice(0, 10);
   let filteredReservations: ReservationListResponse[] = [];
-  if (filter === 'MATCHED') {
+  if (filter === 'PAID') {
     filteredReservations = reservations.filter(r => {
       const dateOnly = getDateOnly(r.reservationDate);
       return (
-        (r.status === RESERVATION_STATUS.MATCHED && dateOnly > todayStr) ||
-        (dateOnly === todayStr && ([RESERVATION_STATUS.MATCHED] as string[]).includes(r.status))
+        (r.status === RESERVATION_STATUS.PAID && dateOnly > todayStr) ||
+        (dateOnly === todayStr && ([RESERVATION_STATUS.PAID] as string[]).includes(r.status))
       );
     });
   } else if (filter === 'TODAY') {
     filteredReservations = reservations
       .filter(r =>
-        ([RESERVATION_STATUS.MATCHED, RESERVATION_STATUS.WORKING, RESERVATION_STATUS.COMPLETED] as string[]).includes(r.status) &&
+        ([RESERVATION_STATUS.PAID, RESERVATION_STATUS.WORKING, RESERVATION_STATUS.COMPLETED] as string[]).includes(r.status) &&
         (getDateOnly(r.reservationDate) === todayStr)
       )
       .sort((a, b) => {
         const order = {
-          [RESERVATION_STATUS.MATCHED]: 0,
+          [RESERVATION_STATUS.PAID]: 0,
           [RESERVATION_STATUS.WORKING]: 1,
           [RESERVATION_STATUS.COMPLETED]: 2,
         };
@@ -142,8 +142,13 @@ const ManagerReservationsAndMatching: React.FC = () => {
       onDetailClick={() => navigate(ROUTES.MANAGER.RESERVATION_DETAIL.replace(':id', String(reservation.reservationId)))}
       onCheckIn={() => handleCheckInOutClick(reservation, true)}
       onCheckOut={async () => {
-        await checkOut(reservation.reservationId, { checkTime: new Date().toISOString() });
-        navigate(ROUTES.MANAGER.REVIEW_REGISTER.replace(':id', String(reservation.reservationId)));
+        const result = await checkOut(reservation.reservationId, { checkTime: new Date().toISOString() });
+        if (result.success) {
+          // 상태 업데이트를 위한 짧은 지연 후 네비게이션
+          setTimeout(() => {
+            navigate(ROUTES.MANAGER.REVIEW_REGISTER.replace(':id', String(reservation.reservationId)));
+          }, 100);
+        }
       }}
     />
   );
@@ -179,7 +184,7 @@ const ManagerReservationsAndMatching: React.FC = () => {
           {FILTERS.map((f) => (
             <button
               key={f.value}
-              onClick={() => { setFilter(f.value as 'MATCHED' | 'TODAY' | 'WORKING' | 'COMPLETED'); setFilterOpen(false); setCurrentPage(1); }}
+              onClick={() => { setFilter(f.value as 'PAID' | 'TODAY' | 'WORKING' | 'COMPLETED'); setFilterOpen(false); setCurrentPage(1); }}
               className={`block w-full px-4 py-2 text-left text-gray-700 hover:bg-orange-50 ${filter === f.value ? 'font-bold text-orange-500' : ''}`}
             >
               {f.label}
