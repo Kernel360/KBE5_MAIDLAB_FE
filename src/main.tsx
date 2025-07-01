@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './styles/index.css';
+import { injectSpeedInsights } from '@vercel/speed-insights';
 
 const isDev = import.meta.env.DEV;
 
@@ -15,6 +16,8 @@ const AppWithProviders = () => (
     <App />
   </BrowserRouter>
 );
+
+injectSpeedInsights();
 
 if (isDev) {
   root.render(

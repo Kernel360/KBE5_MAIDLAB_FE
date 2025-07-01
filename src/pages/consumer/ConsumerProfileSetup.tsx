@@ -187,7 +187,7 @@ const ConsumerProfileSetup: React.FC = () => {
                   }))
                 }
                 placeholder="서울특별시 서초구"
-                className={`w-full p-3 border rounded-lg transition-colors ${
+                className={`w-full p-3 border focus:outline-none focus:ring-2 focus:ring-orange-500 rounded-lg transition-colors ${
                   errors.address ? 'border-red-500' : 'border-gray-300'
                 }`}
               />
@@ -211,7 +211,7 @@ const ConsumerProfileSetup: React.FC = () => {
                   }))
                 }
                 placeholder="상세 주소를 입력해주세요"
-                className={`w-full p-3 border rounded-lg transition-colors ${
+                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 transition-colors ${
                   errors.detailAddress ? 'border-red-500' : 'border-gray-300'
                 }`}
               />

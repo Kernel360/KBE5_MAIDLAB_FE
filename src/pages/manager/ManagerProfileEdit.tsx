@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Upload, Plus, X, Clock } from 'lucide-react';
 import { useManager, useToast } from '@/hooks';
 import { LoadingSpinner } from '@/components/common';
+import RegionSelectionModal from '@/components/features/manager/RegionSelectionModal';
+import ScheduleSelector from '@/components/features/manager/ScheduleSelector';
+
 import {
   SERVICE_TYPES,
   SERVICE_TYPE_LABELS,
-  WEEKDAY_LABELS,
   WEEKDAYS,
 } from '@/constants/service';
 import { SUCCESS_MESSAGES, ERROR_MESSAGES } from '@/constants/message';
@@ -19,7 +21,6 @@ import type {
   ManagerProfileUpdateRequest,
 } from '@/types/manager';
 import type { ServiceType } from '@/constants/service';
-import type { SeoulDistrict } from '@/constants/region';
 import { uploadToS3 } from '@/utils/s3';
 import { validateImageFile } from '@/utils/validation';
 
@@ -28,10 +29,26 @@ const ManagerProfileEdit: React.FC = () => {
   const { fetchProfile, updateProfile, loading } = useManager();
   const { showToast } = useToast();
   const [profile, setProfile] = useState<ManagerProfileResponse | null>(null);
-  const [errors, setErrors] = useState({ name: '', gender: '', birth: '' });
+  const [errors, setErrors] = useState({
+    name: '',
+    gender: '',
+    birth: '',
+    regions: '',
+    schedules: '',
+    services: '',
+  });
+  const [touched, setTouched] = useState({
+    name: false,
+    gender: false,
+    birth: false,
+    regions: false,
+    schedules: false,
+    services: false,
+  });
   const [isValid, setIsValid] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imagePreview, setImagePreview] = useState<string>('');
+  const [isRegionModalOpen, setIsRegionModalOpen] = useState(false);
 
   // profile 상태가 바뀔 때마다 추적
   useEffect(() => {
@@ -65,14 +82,18 @@ const ManagerProfileEdit: React.FC = () => {
       setProfile((prev) => {
         if (prev && prev.profileImage && data) {
           if (prev.profileImage !== data.profileImage) {
-            // data의 모든 필드를 유지하되, profileImage만 prev.profileImage로 덮어씀
             return { ...data, profileImage: prev.profileImage };
           }
         }
         return data ?? null;
       });
     })();
-  }, [fetchProfile]);
+  }, []);
+
+  // 필드별 터치 설정 함수
+  const setFieldTouched = (field: keyof typeof touched) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+  };
 
   // 생년월일 자동 하이픈 처리
   const handleBirthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,32 +117,122 @@ const ManagerProfileEdit: React.FC = () => {
   }
 
   const validate = () => {
-    const newErrors = { name: '', gender: '', birth: '' };
+    const newErrors = {
+      name: '',
+      gender: '',
+      birth: '',
+      regions: '',
+      schedules: '',
+      services: '',
+    };
+
+    // 이름 검증
     if (!profile?.name || profile.name.trim() === '') {
       newErrors.name = '이름을 입력해주세요.';
+    } else if (profile.name.length < 2 || profile.name.length > 20) {
+      newErrors.name = '이름은 2-20자로 입력해주세요.';
     }
+
+    // 성별 검증
     if (!profile?.gender) {
       newErrors.gender = '성별을 선택해주세요.';
     }
+
+    // 생년월일 검증
     if (!profile?.birth || profile.birth.trim() === '') {
       newErrors.birth = '생년월일을 입력해주세요.';
     } else if (!/^\d{4}-\d{2}-\d{2}$/.test(profile.birth)) {
-      newErrors.birth = '생년월일 8자리를 입력해주세요.';
+      newErrors.birth = '올바른 생년월일을 입력해주세요.';
     } else if (!isValidDate(profile.birth)) {
       newErrors.birth = '올바른 생년월일이 아닙니다.';
     }
+
+    // 서비스 검증
+    if (!profile?.services || profile.services.length === 0) {
+      newErrors.services = '제공 가능한 서비스를 1개 이상 선택해주세요.';
+    }
+
+    // 지역 검증
+    if (!profile?.regions || profile.regions.length === 0) {
+      newErrors.regions = '가능 지역을 1개 이상 선택해주세요.';
+    }
+
+    // 스케줄 검증
+    if (!profile?.schedules || profile.schedules.length === 0) {
+      newErrors.schedules = '가능 시간을 1개 이상 등록해주세요.';
+    }
+
     setErrors(newErrors);
     return Object.values(newErrors).every((v) => v === '');
   };
 
   useEffect(() => {
     setIsValid(validate());
-  }, [profile?.name, profile?.gender, profile?.birth]);
+  }, [
+    profile?.name,
+    profile?.gender,
+    profile?.birth,
+    profile?.services,
+    profile?.regions,
+    profile?.schedules,
+  ]);
 
+  // 시간 중복 체크 함수
+  const hasDuplicateTimeSlot = (
+    slots: { day: string; startTime: string; endTime: string }[] = [],
+  ) => {
+    const byDay: Record<string, { start: number; end: number }[]> = {};
+    for (const slot of slots) {
+      if (!byDay[slot.day]) byDay[slot.day] = [];
+      const start = Number(slot.startTime.replace(':', ''));
+      const end = Number(slot.endTime.replace(':', ''));
+      for (const range of byDay[slot.day]) {
+        if (start < range.end && end > range.start) {
+          return true;
+        }
+      }
+      byDay[slot.day].push({ start, end });
+    }
+    return false;
+  };
+
+  // 시간 슬롯 유효성 검사 함수
+  const validateTimeSlots = () => {
+    if (!profile) return true;
+    for (const slot of profile.schedules) {
+      const start = Number(slot.startTime.replace(':', ''));
+      const end = Number(slot.endTime.replace(':', ''));
+      if (end - start < 100) {
+        showToast(
+          '시작시간과 종료시간은 최소 1시간 이상 차이나야 합니다.',
+          'error',
+        );
+        return false;
+      }
+    }
+    if (hasDuplicateTimeSlot(profile.schedules)) {
+      showToast('같은 요일에 겹치는 시간이 있습니다.', 'error');
+      return false;
+    }
+    return true;
+  };
+
+  // 제출 함수
   const handleSubmit = async () => {
     if (!profile) return;
 
-    console.log(profile.profileImage);
+    setTouched({
+      name: true,
+      gender: true,
+      birth: true,
+      services: true,
+      regions: true,
+      schedules: true,
+    });
+
+    if (!validate() || !validateTimeSlots()) {
+      return;
+    }
 
     try {
       const profileData: ManagerProfileUpdateRequest = {
@@ -161,9 +272,8 @@ const ManagerProfileEdit: React.FC = () => {
     });
   };
 
+  // 지역 관련 핸들러 함수들
   const handleRegionToggle = (region: string) => {
-    if (!profile) return;
-
     setProfile((prev) => {
       if (!prev) return prev;
       return {
@@ -175,21 +285,35 @@ const ManagerProfileEdit: React.FC = () => {
     });
   };
 
-  const addTimeSlot = () => {
-    if (!profile) return;
-
+  const handleSelectAll = () => {
+    const allRegions = Object.values(SEOUL_DISTRICT_LABELS).map((region) => ({
+      region,
+    }));
     setProfile((prev) => {
       if (!prev) return prev;
       return {
         ...prev,
-        schedules: [
-          ...prev.schedules,
-          {
-            day: WEEKDAYS.MONDAY,
-            startTime: '09:00',
-            endTime: '17:00',
-          },
-        ],
+        regions: allRegions,
+      };
+    });
+  };
+
+  const handleClearAll = () => {
+    setProfile((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        regions: [],
+      };
+    });
+  };
+
+  const handleRemoveRegion = (region: string) => {
+    setProfile((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        regions: prev.regions.filter((r) => r.region !== region),
       };
     });
   };
@@ -206,11 +330,44 @@ const ManagerProfileEdit: React.FC = () => {
         ),
       };
     });
+
+    const updatedSchedules = profile.schedules.map((slot, i) =>
+      i === index ? { ...slot, [field]: value } : slot,
+    );
+    const currentSlot = updatedSchedules[index];
+    if (currentSlot.startTime && currentSlot.endTime) {
+      const start = Number(currentSlot.startTime.replace(':', ''));
+      const end = Number(currentSlot.endTime.replace(':', ''));
+      if (end <= start) {
+        showToast('종료시간은 시작시간보다 늦어야 합니다.', 'error');
+      } else if (end - start < 100) {
+        showToast(
+          '시작시간과 종료시간은 최소 1시간 이상 차이나야 합니다.',
+          'error',
+        );
+      }
+    }
+  };
+
+  const addTimeSlot = () => {
+    if (!profile) return;
+    const newSlot = {
+      day: WEEKDAYS.MONDAY,
+      startTime: '09:00',
+      endTime: '17:00',
+    };
+    const updatedSchedules = [...profile.schedules, newSlot];
+    setProfile((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        schedules: updatedSchedules,
+      };
+    });
   };
 
   const removeTimeSlot = (index: number) => {
     if (!profile) return;
-
     setProfile((prev) => {
       if (!prev) return prev;
       return {
@@ -230,7 +387,6 @@ const ManagerProfileEdit: React.FC = () => {
       const file = target.files?.[0];
       if (!file) return;
 
-      // 이미지 타입/크기 검증
       const validation = validateImageFile(file);
       if (!validation.isValid) {
         showToast(validation.error || '이미지 업로드 오류', 'error');
@@ -239,11 +395,9 @@ const ManagerProfileEdit: React.FC = () => {
 
       setUploadingImage(true);
       try {
-        // 미리보기
         const previewUrl = URL.createObjectURL(file);
         setImagePreview(previewUrl);
 
-        // S3 업로드
         const { url } = await uploadToS3(file);
         setProfile((prev) => {
           const next = prev ? { ...prev, profileImage: url } : prev;
@@ -317,7 +471,7 @@ const ManagerProfileEdit: React.FC = () => {
 
             {/* 이름 */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 이름
               </label>
               <input
@@ -328,78 +482,90 @@ const ManagerProfileEdit: React.FC = () => {
                     prev ? { ...prev, name: e.target.value } : prev,
                   )
                 }
-                className="w-full p-3 border text-center border-gray-300 rounded-lg text-gray-900"
+                onBlur={() => setFieldTouched('name')}
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all text-center ${
+                  errors.name && touched.name
+                    ? 'border-red-500'
+                    : 'border-gray-300'
+                }`}
               />
-              {errors.name && (
+              {errors.name && touched.name && (
                 <p className="text-red-500 text-sm mt-1">{errors.name}</p>
               )}
             </div>
 
             {/* 성별 */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 성별
               </label>
               <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={() =>
+                  onClick={() => {
                     setProfile((prev) =>
                       prev ? { ...prev, gender: GENDER.MALE } : prev,
-                    )
-                  }
-                  className={`flex-1 py-2 rounded-lg border text-center font-medium transition-all ${
+                    );
+                    setFieldTouched('gender');
+                  }}
+                  className={`flex-1 py-3 px-4 rounded-lg border text-center font-medium transition-all ${
                     profile.gender === GENDER.MALE
                       ? 'border-orange-500 bg-orange-50 text-orange-600'
-                      : 'border-gray-200 text-gray-400'
+                      : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
                   }`}
                 >
                   {GENDER_LABELS[GENDER.MALE]}
                 </button>
                 <button
                   type="button"
-                  onClick={() =>
+                  onClick={() => {
                     setProfile((prev) =>
                       prev ? { ...prev, gender: GENDER.FEMALE } : prev,
-                    )
-                  }
-                  className={`flex-1 py-2 rounded-lg border text-center font-medium transition-all ${
+                    );
+                    setFieldTouched('gender');
+                  }}
+                  className={`flex-1 py-3 px-4 rounded-lg border text-center font-medium transition-all ${
                     profile.gender === GENDER.FEMALE
                       ? 'border-orange-500 bg-orange-50 text-orange-600'
-                      : 'border-gray-200 text-gray-400'
+                      : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
                   }`}
                 >
                   {GENDER_LABELS[GENDER.FEMALE]}
                 </button>
               </div>
-              {errors.gender && (
+              {errors.gender && touched.gender && (
                 <p className="text-red-500 text-sm mt-1">{errors.gender}</p>
               )}
             </div>
 
             {/* 생년월일 */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 생년월일
               </label>
               <input
                 type="text"
                 value={profile.birth}
                 onChange={handleBirthChange}
-                className="w-full p-3 border text-center border-gray-300 rounded-lg text-gray-900"
-                placeholder="YYYY-MM-DD"
+                onBlur={() => setFieldTouched('birth')}
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all text-center ${
+                  errors.birth && touched.birth
+                    ? 'border-red-500'
+                    : 'border-gray-300'
+                }`}
+                placeholder="1990-01-01"
                 maxLength={10}
                 inputMode="numeric"
                 autoComplete="bday"
               />
-              {errors.birth && (
+              {errors.birth && touched.birth && (
                 <p className="text-red-500 text-sm mt-1">{errors.birth}</p>
               )}
             </div>
 
             {/* 제공 서비스 */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 제공 가능한 서비스
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -407,122 +573,91 @@ const ManagerProfileEdit: React.FC = () => {
                   <button
                     key={service}
                     type="button"
-                    onClick={() => handleServiceToggle(service)}
+                    onClick={() => {
+                      handleServiceToggle(service);
+                      setFieldTouched('services');
+                    }}
                     className={`w-full h-12 flex items-center justify-center rounded-lg border font-medium text-sm transition-all ${
                       profile.services.includes(service)
                         ? 'border-orange-500 bg-orange-50 text-orange-600'
-                        : 'border-gray-200 hover:border-gray-300 text-gray-400'
+                        : 'border-gray-300 hover:border-gray-400 text-gray-700'
                     }`}
                   >
                     {SERVICE_TYPE_LABELS[service as ServiceType]}
                   </button>
                 ))}
               </div>
+              {errors.services && touched.services && (
+                <p className="text-red-500 text-sm mt-1">{errors.services}</p>
+              )}
             </div>
 
             {/* 가능 지역 */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 가능 지역
               </label>
-              <div className="grid grid-cols-3 gap-2 max-h-60 overflow-y-auto mb-4">
-                {Object.values(SEOUL_DISTRICT_LABELS).map((region) => (
-                  <button
-                    key={region}
-                    type="button"
-                    onClick={() => handleRegionToggle(region)}
-                    className={`p-2 text-sm rounded-lg border transition-all ${
-                      profile.regions.some((r) => r.region === region)
-                        ? 'border-orange-500 bg-orange-50 text-orange-600'
-                        : 'border-gray-200 hover:border-gray-300 text-gray-400'
-                    }`}
-                  >
-                    {region}
-                  </button>
-                ))}
-              </div>
-              <div className="flex gap-2 flex-wrap">
-                {profile.regions.map((region) => (
-                  <span
-                    key={region.region}
-                    className="px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-sm"
-                  >
-                    {SEOUL_DISTRICT_LABELS[region.region as SeoulDistrict] ||
-                      region.region}
-                  </span>
-                ))}
-              </div>
-            </div>
 
-            {/* 가능 시간 */}
-            <div className="mt-8 mb-6">
-              <label className="block text-gray-700 font-medium mb-1">
-                가능 시간
-              </label>
-              <div className="space-y-4">
-                {profile.schedules.map((slot, idx) => (
-                  <div key={idx} className="flex items-center gap-2">
-                    <select
-                      value={slot.day}
-                      onChange={(e) =>
-                        updateTimeSlot(idx, 'day', e.target.value)
-                      }
-                      className="flex-1 p-2 border text-center border-gray-300 rounded"
-                    >
-                      {Object.entries(WEEKDAY_LABELS).map(([key, label]) => (
-                        <option key={key} value={key}>
-                          {label}
-                        </option>
-                      ))}
-                    </select>
-                    <select
-                      value={slot.startTime}
-                      onChange={(e) =>
-                        updateTimeSlot(idx, 'startTime', e.target.value)
-                      }
-                      className="flex-1 p-2 border text-center border-gray-300 rounded"
-                    >
-                      {timeSlots.map((time) => (
-                        <option key={time} value={time}>
-                          {time}
-                        </option>
-                      ))}
-                    </select>
-                    <span className="text-gray-500">~</span>
-                    <select
-                      value={slot.endTime}
-                      onChange={(e) =>
-                        updateTimeSlot(idx, 'endTime', e.target.value)
-                      }
-                      className="flex-1 p-2 border text-center border-gray-300 rounded"
-                    >
-                      {timeSlots.map((time) => (
-                        <option key={time} value={time}>
-                          {time}
-                        </option>
-                      ))}
-                    </select>
-                    <button
-                      onClick={() => removeTimeSlot(idx)}
-                      className="p-2 text-red-500 hover:bg-red-50 rounded"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
+              {/* 선택된 지역 표시 */}
+              <div className="mb-3">
+                {profile.regions.length > 0 ? (
+                  <div className="flex gap-2 flex-wrap">
+                    {profile.regions.map((region) => (
+                      <span
+                        key={region.region}
+                        className="px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-sm flex items-center gap-1"
+                      >
+                        {region.region}
+                        <button
+                          onClick={() => handleRemoveRegion(region.region)}
+                          className="text-orange-400 hover:text-orange-600 transition-colors"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
                   </div>
-                ))}
+                ) : (
+                  <p className="text-gray-400 text-sm py-2">
+                    지역을 선택해주세요
+                  </p>
+                )}
+                {errors.regions && touched.regions && (
+                  <p className="text-red-500 text-sm mt-1">{errors.regions}</p>
+                )}
               </div>
+
+              {/* 지역 추가 버튼 */}
               <button
-                onClick={addTimeSlot}
-                className="w-full mt-2 p-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-orange-500 hover:text-orange-500 flex items-center justify-center gap-2"
+                type="button"
+                onClick={() => {
+                  setIsRegionModalOpen(true);
+                  setFieldTouched('regions');
+                }}
+                className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-orange-500 hover:text-orange-500 flex items-center justify-center gap-2 transition-colors"
               >
                 <Plus className="w-5 h-5" />
-                시간 추가
+                지역 추가 ({profile.regions.length}개 선택됨)
               </button>
+            </div>
+
+            {/* 가능 시간 - ScheduleSelector로 대체 */}
+            <div className="mt-8 mb-6">
+              <ScheduleSelector
+                schedules={profile.schedules}
+                onUpdateTimeSlot={updateTimeSlot}
+                onAddTimeSlot={addTimeSlot}
+                onRemoveTimeSlot={removeTimeSlot}
+                error={errors.schedules}
+                touched={touched.schedules}
+                onTouch={() => setFieldTouched('schedules')}
+                timeSlots={timeSlots}
+              />
             </div>
 
             {/* 소개글 */}
             <div>
-              <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+              <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
                 <Clock className="w-4 h-4" />
                 <label className="font-medium">소개글 (선택사항)</label>
               </div>
@@ -538,7 +673,7 @@ const ManagerProfileEdit: React.FC = () => {
                   })
                 }
                 placeholder="고객에게 보여질 간단한 소개를 작성해주세요."
-                className="w-full p-3 border border-gray-300 rounded-lg resize-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none transition-all"
                 rows={3}
                 maxLength={LENGTH_LIMITS.INTRODUCE.MAX}
               />
@@ -554,18 +689,37 @@ const ManagerProfileEdit: React.FC = () => {
             {/* 저장하기 버튼 */}
             <button
               onClick={handleSubmit}
-              disabled={!isValid || loading || uploadingImage}
-              className={`w-full mt-8 p-3 rounded-lg font-medium transition-colors ${
-                !isValid || loading || uploadingImage
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              disabled={loading || uploadingImage}
+              className={`w-full mt-8 py-3 px-4 rounded-lg font-medium transition-colors ${
+                loading || uploadingImage
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-orange-500 text-white hover:bg-orange-600'
               }`}
             >
-              저장하기
+              {loading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  저장 중...
+                </div>
+              ) : (
+                '저장하기'
+              )}
             </button>
           </div>
         </div>
       </div>
+
+      {/* 지역 선택 모달 */}
+      <RegionSelectionModal
+        isOpen={isRegionModalOpen}
+        onClose={() => setIsRegionModalOpen(false)}
+        selectedRegions={profile.regions}
+        onRegionToggle={handleRegionToggle}
+        onSelectAll={handleSelectAll}
+        onClearAll={handleClearAll}
+        title="가능 지역 선택"
+        showSelectAllButtons={true}
+      />
     </div>
   );
 };
