@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Upload, Plus, X, Clock } from 'lucide-react';
+import { User, Upload, Plus, X, Clock } from 'lucide-react';
 import { useManager, useToast } from '@/hooks';
 import { LoadingSpinner } from '@/components/common';
+import { Header } from '@/components/layout/Header/Header';
 import RegionSelectionModal from '@/components/features/manager/RegionSelectionModal';
 import ScheduleSelector from '@/components/features/manager/ScheduleSelector';
 
@@ -422,18 +423,14 @@ const ManagerProfileEdit: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-white">
-        <button
-          onClick={() => navigate(ROUTES.MANAGER.PROFILE)}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6" />
-        </button>
-        <h1 className="text-lg font-bold">프로필 수정</h1>
-        <div className="w-10" />
-      </div>
+      <Header
+        variant="sub"
+        title="프로필 수정"
+        backRoute={ROUTES.MANAGER.PROFILE}
+        showNotification={true}
+      />
 
-      <div className="px-4 py-6">
+      <div className="px-4 py-6 pt-20">
         <div className="max-w-md mx-auto">
           <div className="bg-white rounded-xl shadow-sm p-6 space-y-8">
             {/* 프로필 이미지 */}
