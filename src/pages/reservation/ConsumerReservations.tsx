@@ -2,54 +2,45 @@ import React, { useEffect, useState } from 'react';
 import { useReservation } from '@/hooks/domain/useReservation';
 import { usePagination } from '@/hooks/usePagination';
 import { ReservationCard } from '@/components';
-import {
-  ROUTES,
-  RESERVATION_STATUS,
-} from '@/constants';
+import { ROUTES, RESERVATION_STATUS } from '@/constants';
 import { useNavigate } from 'react-router-dom';
 import type { ReservationListResponse } from '@/types/reservation';
 import { Header } from '@/components';
 import { useReservationStatus } from '@/hooks/useReservationStatus';
-import { 
-  Clock, 
-  Calendar, 
-  Coffee, 
-  Check,
-  CalendarDays
-} from 'lucide-react';
+import { Clock, Calendar, Coffee, Check, CalendarDays } from 'lucide-react';
 
 type TabType = '전체' | '요청 대기중' | '예정' | '진행중' | '완료';
 
 const TABS = [
-  { 
-    key: '전체' as TabType, 
+  {
+    key: '전체' as TabType,
     label: '전체',
     icon: CalendarDays,
-    color: 'text-gray-600'
+    color: 'text-gray-600',
   },
-  { 
-    key: '요청 대기중' as TabType, 
+  {
+    key: '요청 대기중' as TabType,
     label: '대기중',
     icon: Clock,
-    color: 'text-amber-600'
+    color: 'text-amber-600',
   },
-  { 
-    key: '예정' as TabType, 
+  {
+    key: '예정' as TabType,
     label: '예정',
     icon: Calendar,
-    color: 'text-blue-600'
+    color: 'text-blue-600',
   },
-  { 
-    key: '진행중' as TabType, 
+  {
+    key: '진행중' as TabType,
     label: '진행중',
     icon: Coffee,
-    color: 'text-purple-600'
+    color: 'text-purple-600',
   },
-  { 
-    key: '완료' as TabType, 
+  {
+    key: '완료' as TabType,
     label: '완료',
     icon: Check,
-    color: 'text-green-600'
+    color: 'text-green-600',
   },
 ];
 
@@ -58,7 +49,11 @@ const RESERVATION_FILTERS = {
   '요청 대기중': (reservations: ReservationListResponse[]) =>
     reservations.filter((r) => r.status === RESERVATION_STATUS.PENDING),
   예정: (reservations: ReservationListResponse[]) =>
-    reservations.filter((r) => r.status === RESERVATION_STATUS.MATCHED || r.status === RESERVATION_STATUS.PAID),
+    reservations.filter(
+      (r) =>
+        r.status === RESERVATION_STATUS.MATCHED ||
+        r.status === RESERVATION_STATUS.PAID,
+    ),
   진행중: (reservations: ReservationListResponse[]) =>
     reservations.filter((r) => r.status === RESERVATION_STATUS.WORKING),
   완료: (reservations: ReservationListResponse[]) =>
@@ -67,7 +62,8 @@ const RESERVATION_FILTERS = {
 
 const ConsumerReservations: React.FC = () => {
   const navigate = useNavigate();
-  const { reservations, loading, fetchReservations, payReservation } = useReservation();
+  const { reservations, loading, fetchReservations, payReservation } =
+    useReservation();
   const [activeTab, setActiveTab] = useState<TabType>('전체');
   const [filteredReservations, setFilteredReservations] = useState<
     ReservationListResponse[]
@@ -98,9 +94,10 @@ const ConsumerReservations: React.FC = () => {
     }
   }, [reservations, activeTab]);
 
-
   const handleReservationClick = (reservationId: number) => {
-    navigate(ROUTES.CONSUMER.RESERVATION_DETAIL.replace(':id', String(reservationId)));
+    navigate(
+      ROUTES.CONSUMER.RESERVATION_DETAIL.replace(':id', String(reservationId)),
+    );
   };
 
   const handleReviewClick = (
@@ -121,7 +118,10 @@ const ConsumerReservations: React.FC = () => {
     await payReservation(reservationId);
   };
 
-  const currentReservations = filteredReservations.slice(pagination.startIndex, pagination.endIndex);
+  const currentReservations = filteredReservations.slice(
+    pagination.startIndex,
+    pagination.endIndex,
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -136,13 +136,12 @@ const ConsumerReservations: React.FC = () => {
       <div className="max-w-md mx-auto bg-gray-50 min-h-screen pt-20">
         {/* 탭 네비게이션 */}
         <div className="bg-gray-50 border-b border-gray-100 sticky top-[64px] z-10">
-
           <div className="flex">
             {TABS.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.key;
               const count = getTabCount(tab.key);
-              
+
               return (
                 <button
                   key={tab.key}
@@ -152,29 +151,35 @@ const ConsumerReservations: React.FC = () => {
                   }}
                   className={`
                     flex-1 flex flex-col items-center justify-center py-4 px-2 relative
-                    ${isActive 
-                      ? 'text-orange-600 bg-orange-50' 
-                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                    ${
+                      isActive
+                        ? 'text-orange-600 bg-orange-50'
+                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                     }
                     transition-all duration-200
                   `}
                 >
                   <div className="flex items-center justify-center mb-1">
-                    <Icon className={`w-5 h-5 ${isActive ? 'text-orange-600' : 'text-gray-400'}`} />
+                    <Icon
+                      className={`w-5 h-5 ${isActive ? 'text-orange-600' : 'text-gray-400'}`}
+                    />
                     {count > 0 && (
-                      <span className={`
+                      <span
+                        className={`
                         ml-1 px-1.5 py-0.5 text-xs font-medium rounded-full min-w-[18px] text-center
-                        ${isActive 
-                          ? 'bg-orange-600 text-white' 
-                          : 'bg-gray-400 text-white'
+                        ${
+                          isActive
+                            ? 'bg-orange-600 text-white'
+                            : 'bg-gray-400 text-white'
                         }
-                      `}>
+                      `}
+                      >
                         {count}
                       </span>
                     )}
                   </div>
                   <span className="text-xs font-medium">{tab.label}</span>
-                  
+
                   {/* 활성 탭 인디케이터 */}
                   {isActive && (
                     <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-600"></div>
@@ -191,7 +196,10 @@ const ConsumerReservations: React.FC = () => {
             <div className="space-y-4">
               {/* 로딩 스켈레톤 */}
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white rounded-xl p-4 border border-gray-100 animate-pulse">
+                <div
+                  key={i}
+                  className="bg-white rounded-xl p-4 border border-gray-100 animate-pulse"
+                >
                   <div className="flex justify-between items-start mb-3">
                     <div className="h-6 bg-gray-200 rounded-full w-16"></div>
                     <div className="h-4 bg-gray-200 rounded w-20"></div>
@@ -211,7 +219,9 @@ const ConsumerReservations: React.FC = () => {
                   <ReservationCard
                     key={reservation.reservationId}
                     reservation={reservation}
-                    getStatusBadgeStyle={(status, reservationDate) => getStatusBadgeStyle(status, reservationDate)}
+                    getStatusBadgeStyle={(status, reservationDate) =>
+                      getStatusBadgeStyle(status, reservationDate)
+                    }
                     onReviewClick={handleReviewClick}
                     onDetailClick={handleReservationClick}
                     onPaymentClick={handlePaymentClick}
@@ -228,9 +238,10 @@ const ConsumerReservations: React.FC = () => {
                       onClick={() => pagination.goToPage(i)}
                       className={`
                         w-10 h-10 rounded-xl font-semibold text-sm transition-all duration-200
-                        ${pagination.currentPage === i
-                          ? 'bg-orange-500 text-white shadow-md scale-110'
-                          : 'bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-500 hover:scale-105'
+                        ${
+                          pagination.currentPage === i
+                            ? 'bg-orange-500 text-white shadow-md scale-110'
+                            : 'bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-500 hover:scale-105'
                         }
                       `}
                     >
@@ -247,13 +258,14 @@ const ConsumerReservations: React.FC = () => {
                 <CalendarDays className="w-8 h-8 text-gray-400" />
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                {activeTab === '전체' ? '예약 내역이 없습니다' : `${activeTab} 예약이 없습니다`}
+                {activeTab === '전체'
+                  ? '예약 내역이 없습니다'
+                  : `${activeTab} 예약이 없습니다`}
               </h3>
               <p className="text-gray-500 text-sm">
-                {activeTab === '전체' 
-                  ? '첫 예약을 진행해보세요' 
-                  : '다른 탭에서 예약을 확인해보세요'
-                }
+                {activeTab === '전체'
+                  ? '첫 예약을 진행해보세요'
+                  : '다른 탭에서 예약을 확인해보세요'}
               </p>
             </div>
           )}
