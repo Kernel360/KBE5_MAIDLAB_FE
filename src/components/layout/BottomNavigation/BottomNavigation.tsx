@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Home, FileText, MessageSquare, User, Calendar } from 'lucide-react';
 import { ROUTES } from '@/constants';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface BottomNavigationProps {
   activeTab: 'home' | 'reservation' | 'consultation' | 'profile';
@@ -73,9 +73,15 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
   );
 };
 
-export const ManagerFooter: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('home'); // 기본값 '홈' 활성화
+// 방법 2: Props로 activeTab을 받는 경우
+interface ManagerFooterProps {
+  activeTab?: string;
+}
+
+export const ManagerFooter: React.FC<ManagerFooterProps> = ({ activeTab: propActiveTab }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  
   const navItems = [
     { id: 'home', icon: Home, label: '홈', path: ROUTES.HOME },
     {
@@ -83,24 +89,39 @@ export const ManagerFooter: React.FC = () => {
       icon: Calendar,
       label: '일정',
       path: '/manager/reservations',
-    }, // 매니저 일정
-    { id: 'consultation', icon: MessageSquare, label: '문의', path: '/board' }, // 매니저 문의(공통 게시판)
-    { id: 'profile', icon: User, label: '프로필', path: '/manager/mypage' }, // 매니저 마이페이지
+    },
+    { id: 'consultation', icon: MessageSquare, label: '문의', path: '/board' },
+    { id: 'profile', icon: User, label: '프로필', path: '/manager/mypage' },
   ];
-  const handleTabClick = (id: string, path: string) => {
-    setActiveTab(id);
-    if (path) navigate(path);
+
+  // props로 받은 activeTab이 있으면 우선 사용, 없으면 현재 경로 기반으로 결정
+  const getActiveTab = () => {
+    if (propActiveTab) return propActiveTab;
+    
+    const currentPath = location.pathname;
+    
+    if (currentPath === ROUTES.HOME) return 'home';
+    if (currentPath.includes('/manager/reservations')) return 'calendar';
+    if (currentPath.includes('/board')) return 'consultation';
+    if (currentPath.includes('/manager/mypage')) return 'profile';
+    
+    return 'home'; // 기본값
+  };
+
+  const handleTabClick = (path: string) => {
+    navigate(path);
   };
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 z-50">
       <div className="flex items-center justify-around">
         {navItems.map(({ id, icon: Icon, label, path }) => {
-          const isActive = activeTab === id;
+          const isActive = getActiveTab() === id;
+          
           return (
             <button
               key={id}
-              onClick={() => handleTabClick(id, path)}
+              onClick={() => handleTabClick(path)}
               className="flex flex-col items-center py-2 transition-colors focus:outline-none"
               type="button"
             >

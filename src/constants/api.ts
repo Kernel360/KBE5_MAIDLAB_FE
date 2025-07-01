@@ -56,7 +56,7 @@ export const HTTP_STATUS = {
 // ===== API 기본 설정 =====
 export const API_CONFIG = {
   BASE_URL:
-    import.meta.env.VITE_API_BASE_URL || 'https://api-maidlab.duckdns.org',
+    import.meta.env.VITE_API_BASE_URL,
   TIMEOUT: 10000,
   RETRY_COUNT: 3,
   RETRY_DELAY: 1000,
@@ -155,6 +155,10 @@ export const API_ENDPOINTS = {
       SETTLEMENT_REJECT: (id: number) =>
         `/api/admin/reservations/settlement/${id}/reject`,
       GETTODAYCOUNT: '/api/admin/reservations/todayreservation',
+      CONSUMER: (id: number) => 
+        `/api/admin/reservations/consumer/${id}`,
+      MANAGER: (id: number) =>
+        `/api/admin/reservations/manager/${id}`
     },
     MATCHING: {
       LIST: '/api/admin/matching',

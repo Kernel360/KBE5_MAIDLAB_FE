@@ -18,6 +18,7 @@ export const TABLE_COLUMNS = {
 
 // 상태 필터 옵션
 export const STATUS_FILTER_OPTIONS = {
+  APPROVED: 'APPROVED',
   ALL: 'ALL',
 } as const;
 
@@ -52,4 +53,18 @@ export const BOARD_TYPE_COLORS: Record<
   SERVICE: 'info',
   ETC: 'default',
 } as const;
+
+// 서비스 타입별 한글 이름 (관리자용)
+export const SERVICE_TYPE_NAMES: Record<string, string> = {
+  BABYSITTER: '베이비시터',
+  CARE: '돌봄 서비스',
+  GENERAL_CLEANING: '일반청소',
+  HOUSEKEEPING: '가사 서비스',
+  PET_CARE: '반려동물 케어',
+} as const;
+
+// 서비스 타입을 한글로 변환하는 함수
+export const getServiceTypeName = (serviceType: string): string => {
+  return SERVICE_TYPE_NAMES[serviceType] || serviceType;
+};
 

@@ -167,6 +167,35 @@ export const useAdmin = () => {
       [showToast],
     ),
 
+    // 수요자별 예약 조회
+    fetchConsumerReservation: useCallback(
+      async (consumerId: number, params?: AdminPageParams) => {
+        try {
+          const data = await adminApi.getConsumerReservations(consumerId, params);
+          return data;
+        } catch (error: any) {
+          showToast(error.message || '수요자별 예약 조회에 실패했습니다.')
+          return [];
+        }
+      },
+      [showToast]
+    ),
+
+    //매니저별 예약 조회
+        // 수요자별 예약 조회
+    fetchManagerReservation: useCallback(
+      async (managerId: number, params?: AdminPageParams) => {
+        try {
+          const data = await adminApi.getManagerReservations(managerId, params);
+          return data;
+        } catch (error: any) {
+          showToast(error.message || '매니저별 예약 조회에 실패했습니다.')
+          return [];
+        }
+      },
+      [showToast]
+    ),
+
     // 주간 정산 조회
     fetchWeeklySettlements: useCallback(
       async (startDate: string, params?: AdminPageParams) => {
