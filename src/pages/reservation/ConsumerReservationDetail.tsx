@@ -130,12 +130,12 @@ const ConsumerReservationDetail: React.FC = () => {
       {/* 헤더 */}
       <Header
         variant="sub"
-        title="서비스 상세 옵션 선택"
+        title="예약 상세 페이지"
         backRoute={ROUTES.CONSUMER.RESERVATIONS}
         showMenu={true}
       />
 
-      <div className="max-w-md mx-auto pt-20">
+      <div className="max-w-md mx-auto">
         {/* 상태 카드 */}
         <div className="mx-4 mt-4 bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="p-6">
