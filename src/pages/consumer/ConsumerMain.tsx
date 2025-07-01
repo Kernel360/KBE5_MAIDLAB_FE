@@ -174,7 +174,7 @@ const ConsumerMain: React.FC = () => {
               <div className="mt-6 flex flex-col items-center">
                 <button
                   onClick={() => handleServiceClick('ALL')}
-                  className="w-full flex flex-col items-center justify-center bg-orange-400 rounded-xl shadow p-3 hover:bg-orange-500 transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-orange-100 text-white"
+                  className="w-full flex flex-col items-center justify-center bg-[#FF6B00] rounded-xl shadow p-3 hover:bg-[#ea580c] transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-orange-100 text-white"
                 >
                   <span className="mb-1"></span>
                   <span className="text-base font-bold text-white">예약하기</span>
@@ -195,7 +195,7 @@ const ConsumerMain: React.FC = () => {
             </div>
             <hr className="border-t border-gray-200 mb-2" />
             <div
-              className="flex justify-between items-start cursor-pointer hover:bg-orange-50 rounded-lg transition-colors duration-150"
+              className="flex justify-between items-start cursor-pointer rounded-lg transition-colors duration-150 border border-gray-200 p-4 hover:border-orange-400 hover:shadow-lg"
               role="button"
               tabIndex={0}
               onClick={() => {

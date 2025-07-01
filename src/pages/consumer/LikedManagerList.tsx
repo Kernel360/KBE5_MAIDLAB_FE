@@ -6,6 +6,7 @@ import type { LikedManagerResponse } from '@/types/consumer';
 import { ROUTES } from '@/constants/route';
 import { ArrowLeft, Star, Trash2 } from 'lucide-react';
 import { SEOUL_DISTRICT_LABELS } from '@/constants/region';
+import { usePagination } from '@/hooks';
 
 function ManagerNameModal({ name, introduceText }: { name: string, introduceText?: string }) {
   const nameRef = useRef<HTMLHeadingElement | null>(null);
@@ -55,6 +56,19 @@ export default function LikedManagerList() {
   const [favoriteManagers, setFavoriteManagers] = useState<LikedManagerResponse[]>([]);
   const [imageLoadErrors, setImageLoadErrors] = useState<Record<string, boolean>>({});
   const [expandedRegions, setExpandedRegions] = useState<Record<string, boolean>>({});
+
+  const PAGE_SIZE = 10;
+  const {
+    currentPage,
+    totalPages,
+    startIndex,
+    endIndex,
+    hasNext,
+    hasPrevious,
+    goToPage,
+    goToNext,
+    goToPrevious,
+  } = usePagination({ totalItems: favoriteManagers.length, itemsPerPage: PAGE_SIZE });
 
   useEffect(() => {
     const loadData = async () => {
@@ -136,7 +150,7 @@ export default function LikedManagerList() {
         <div className="max-w-2xl mx-auto px-4">
           <div className="space-y-3">
             {favoriteManagers.length > 0 ? (
-              favoriteManagers.map((manager) => (
+              favoriteManagers.slice(startIndex, endIndex).map((manager) => (
                 <div key={manager.managerUuid} className="relative bg-white rounded-xl p-6 shadow-sm border border-slate-200 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 hover:border-slate-300 overflow-hidden group">
                   {/* 상단 그라데이션 바 */}
                   <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-orange-500 to-orange-400 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
@@ -218,6 +232,33 @@ export default function LikedManagerList() {
                 <p className="text-gray-400 text-sm mt-1">
                   마음에 드는 도우미를 찜해보세요
                 </p>
+              </div>
+            )}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-2 mt-4">
+                <button
+                  onClick={goToPrevious}
+                  disabled={!hasPrevious}
+                  className="px-3 py-1 rounded bg-gray-100 text-gray-500 hover:bg-gray-200 disabled:opacity-50"
+                >
+                  이전
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => goToPage(i)}
+                    className={`px-3 py-1 rounded font-medium ${currentPage === i ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+                <button
+                  onClick={goToNext}
+                  disabled={!hasNext}
+                  className="px-3 py-1 rounded bg-gray-100 text-gray-500 hover:bg-gray-200 disabled:opacity-50"
+                >
+                  다음
+                </button>
               </div>
             )}
           </div>
