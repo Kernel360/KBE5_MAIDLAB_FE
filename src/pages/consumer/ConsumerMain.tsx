@@ -112,9 +112,17 @@ const ConsumerMain: React.FC = () => {
     navigate(`${ROUTES.EVENTS}/${eventId}`);
   };
 
+  const handleNotificationClick = () => {
+    // 알림 기능 준비 중 메시지 또는 알림 페이지로 이동
+    console.log('알림 클릭');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header showNotification={true} />
+      <Header
+        showNotification={true}
+        onNotificationClick={handleNotificationClick}
+      />
 
       <main className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto">
