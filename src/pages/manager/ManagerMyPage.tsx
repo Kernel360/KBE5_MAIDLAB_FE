@@ -13,7 +13,7 @@ import {
   EyeOff,
 } from 'lucide-react';
 import { useManager, useToast, useAuth } from '@/hooks';
-import { LoadingSpinner } from '@/components/common';
+import { LoadingSpinner, ShareModal } from '@/components/common';
 import { ROUTES } from '@/constants';
 import type { ManagerMyPageResponse } from '@/types/manager';
 
@@ -57,6 +57,7 @@ const ManagerMyPage: React.FC = () => {
   });
   const [changingPassword, setChangingPassword] = useState(false);
   const [isGoogleUser, setIsGoogleUser] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -105,9 +106,8 @@ const ManagerMyPage: React.FC = () => {
     navigate(ROUTES.MANAGER.REVIEWS);
   };
 
-  // TODO: 친구초대 기능 추가
   const handleInviteFriend = () => {
-    showToast('친구 초대 기능을 준비 중입니다.', 'info');
+    setShowShareModal(true);
   };
 
   // TODO: 설정 페이지 추가
@@ -257,7 +257,7 @@ const ManagerMyPage: React.FC = () => {
               <div className="border-t border-gray-200">
                 <MenuItem
                   icon={<Share2 className="w-5 h-5" />}
-                  title="친구 조대하기"
+                  title="친구 초대하기"
                   onClick={handleInviteFriend}
                 />
               </div>
@@ -391,6 +391,15 @@ const ManagerMyPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* 공유 모달 */}
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        title="MaidLab 매니저 초대"
+        url={`${window.location.origin}/manager/register?ref=${profileData?.userId || 'unknown'}`}
+        text={`${profileData?.name || '매니저'}님이 MaidLab 매니저로 초대합니다!`}
+      />
     </div>
   );
 };
