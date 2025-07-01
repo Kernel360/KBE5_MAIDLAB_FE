@@ -8,12 +8,10 @@ import { useReservationStatus } from '@/hooks/domain/useReservationStatus';
 import { SERVICE_TYPE_LABELS, SERVICE_TYPES } from '@/constants/service';
 import { RESERVATION_STATUS } from '@/constants/status';
 import { ManagerReservationCard } from '@/components';
-import ReservationHeader from '@/components/features/consumer/ReservationHeader';
-import { ManagerFooter } from '@/components/layout/BottomNavigation/BottomNavigation';
 import { useToast } from '@/hooks/useToast';
 import {CheckInOutModal,ConfirmModal,MatchingCard,TabHeader} from '@/components'
 import { ROUTES } from '@/constants/route';
-
+import { Header } from '@/components';
 const FILTERS = [
   { label: '예정', value: 'PAID' },
   { label: '오늘', value: 'TODAY' },
@@ -200,9 +198,14 @@ const ManagerReservationsAndMatching: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex-col">
       <div className="sticky top-0 z-20 bg-white">
-      <ReservationHeader title="예약 관리" onBack={() => navigate(-1)} />
+      <Header
+        variant="sub"
+        title="예약 관리"
+        backRoute={ROUTES.HOME}
+        showMenu={true}
+      />
       </div>
-      <div className="max-w-md mx-auto bg-gray-50 min-h-screen p-0 pb-20 relative">
+      <div className="max-w-md mx-auto bg-gray-50 min-h-screen p-0 pb-20 relative pt-20">
         {/* 탭 헤더 */}
         <TabHeader
           tab={tab}
@@ -278,7 +281,6 @@ const ManagerReservationsAndMatching: React.FC = () => {
           reservationInfo={checkInOutModal.reservationInfo}
         />
       </div>
-      <ManagerFooter />
     </div>
   );
 };

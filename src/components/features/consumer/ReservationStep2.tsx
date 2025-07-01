@@ -1,15 +1,14 @@
 // src/components/features/consumer/ReservationStep2.tsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { ReservationFormData } from '@/types/reservation';
 import { useMatching } from '@/hooks/domain/useMatching';
 import { format, addDays } from 'date-fns';
-import { HOUSING_TYPES, SERVICE_OPTIONS, ROOM_SIZES, SERVICE_TYPES, ROOM_SIZES_LIFE_CLEANING, MAX_COUNTABLE_ITEMS, SERVICE_DETAIL_TYPES } from '@/constants/service';
+import { HOUSING_TYPES, SERVICE_OPTIONS, ROOM_SIZES_LIFE_CLEANING, MAX_COUNTABLE_ITEMS, SERVICE_DETAIL_TYPES } from '@/constants/service';
 import { useReservation } from '@/hooks/domain/useReservation';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks';
 import { 
-  CalendarDaysIcon, 
-  ClockIcon, 
+  CalendarDaysIcon,
   MapPinIcon, 
   HomeIcon,
   SparklesIcon,
@@ -19,10 +18,11 @@ import {
   ChevronLeftIcon,
   CheckCircleIcon
 } from '@heroicons/react/24/outline';
+import { ROUTES } from '@/constants';
+import { Header } from '@/components';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { ko } from 'date-fns/locale';
-import ReservationHeader from './ReservationHeader';
 
 interface Props {
   initialData: Partial<ReservationFormData>;
@@ -969,9 +969,12 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="sticky top-0 left-0 w-full z-20">
-        <ReservationHeader title="예약 정보 입력" onBack={handlePrev} />
-      </div>
+      <Header
+        variant="sub"
+        title="서비스 상세 옵션 선택"
+        backRoute={ROUTES.HOME}
+        showMenu={true}
+      />
 
       {/* 진행 단계 표시 */}
       <div className="bg-gray-50 px-10 py-6">

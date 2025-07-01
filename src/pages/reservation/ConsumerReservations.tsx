@@ -10,8 +10,7 @@ import {
 } from '@/constants';
 import { useNavigate } from 'react-router-dom';
 import type { ReservationListResponse } from '@/types/reservation';
-import ReservationHeader from '@/components/features/consumer/ReservationHeader';
-import { BottomNavigation } from '@/components/layout/BottomNavigation/BottomNavigation';
+import { Header } from '@/components';
 import { useAuth } from '@/hooks/useAuth';
 import { useReservationStatus } from '@/hooks/useReservationStatus';
 import { 
@@ -131,11 +130,14 @@ const ConsumerReservations: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 헤더 */}
-      <div className="sticky top-0 z-20 bg-white">
-        <ReservationHeader title="예약 내역" onBack={() => navigate(-1)} />
-      </div>
+      <Header
+        variant="sub"
+        title="예약 내역"
+        backRoute={ROUTES.HOME}
+        showMenu={true}
+      />
 
-      <div className="max-w-md mx-auto bg-gray-50 min-h-screen">
+      <div className="max-w-md mx-auto bg-gray-50 min-h-screen pt-20">
         {/* 탭 네비게이션 */}
         <div className="bg-gray-50 border-b border-gray-100 sticky top-[64px] z-10">
 
@@ -258,13 +260,6 @@ const ConsumerReservations: React.FC = () => {
           )}
         </div>
       </div>
-
-      {/* 하단 네비게이션 */}
-      <BottomNavigation
-        activeTab="reservation"
-        onTabClick={navigate}
-        isAuthenticated={isAuthenticated}
-      />
     </div>
   );
 };
