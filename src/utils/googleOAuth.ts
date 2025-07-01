@@ -22,7 +22,7 @@ export const generateGoogleOAuthUrl = (
     scope: 'openid profile email',
     access_type: 'offline',
     prompt: 'consent',
-    state: `userType=${userType}&timestamp=${Date.now()}`, // 타임스탬프 추가
+    state: `userType=${userType}&timestamp=${Date.now()}`,
   });
 
   return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
@@ -54,7 +54,7 @@ export const extractUserTypeFromState = (
 };
 
 /**
- * 구글 로그인 팝업 열기 (COOP 문제 완전 해결)
+ * 구글 로그인 팝업 열기
  */
 export const openGoogleLoginPopup = (
   userType: 'CONSUMER' | 'MANAGER',
@@ -66,13 +66,182 @@ export const openGoogleLoginPopup = (
   const authUrl = generateGoogleOAuthUrl(userType);
   const sessionId = `oauth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
+  // 상태 변수들
+  let messageProcessed = false;
+  let pollInterval: NodeJS.Timeout;
+  let fastPollInterval: NodeJS.Timeout;
+  let timeoutHandle: NodeJS.Timeout;
+  let popup: Window | null = null;
+
+  // ✅ 통합 정리 함수
+  const cleanup = () => {
+    if (messageProcessed) return;
+
+    console.log('🧹 OAuth 정리 시작');
+    messageProcessed = true;
+
+    // 타이머들 정리
+    clearInterval(pollInterval);
+    clearInterval(fastPollInterval);
+    clearTimeout(timeoutHandle);
+
+    // 이벤트 리스너 제거
+    window.removeEventListener('storage', handleStorageChange);
+    window.removeEventListener('beforeunload', handlePageUnload);
+
+    // localStorage 정리
+    localStorage.removeItem(OAUTH_MESSAGE_KEY);
+    localStorage.removeItem(OAUTH_STATUS_KEY);
+
+    console.log('✅ OAuth 정리 완료');
+  };
+
+  // ✅ 메시지 처리 통합 함수
+  const processMessage = (messageData: any) => {
+    if (messageProcessed) return;
+
+    console.log('📨 OAuth 메시지 처리:', messageData);
+
+    cleanup();
+
+    // 팝업 닫기 (지연 처리)
+    setTimeout(() => {
+      try {
+        if (popup && typeof popup.close === 'function') {
+          popup.close();
+          console.log('🔒 팝업 닫기 완료');
+        }
+      } catch (e: any) {
+        console.log('🔒 팝업 닫기 실패 (COOP):', e.message);
+      }
+    }, 200);
+
+    // 콜백 실행
+    if (messageData.type === 'GOOGLE_AUTH_SUCCESS') {
+      console.log('✅ OAuth 성공 콜백 실행');
+      onSuccess(messageData.code, messageData.userType);
+    } else {
+      console.log('❌ OAuth 에러 콜백 실행');
+      onError(messageData.error || 'OAuth 인증에 실패했습니다.');
+    }
+  };
+
+  // ✅ localStorage 이벤트 리스너 (즉시 감지)
+  const handleStorageChange = (e: StorageEvent) => {
+    if (messageProcessed) return;
+
+    if (e.key === OAUTH_MESSAGE_KEY && e.newValue) {
+      try {
+        console.log('🔔 localStorage 이벤트 감지:', e.newValue);
+        const data = JSON.parse(e.newValue);
+
+        // 세션 ID 확인
+        const status = localStorage.getItem(OAUTH_STATUS_KEY);
+        if (status) {
+          const statusData = JSON.parse(status);
+          if (statusData.sessionId !== sessionId) {
+            console.log('⚠️ 세션 ID 불일치, 무시');
+            return;
+          }
+        }
+
+        processMessage(data);
+      } catch (error: any) {
+        console.error('❌ localStorage 이벤트 파싱 에러:', error);
+      }
+    }
+  };
+
+  // ✅ 빠른 폴링 (처음 30초간 500ms마다)
+  let fastPollCount = 0;
+  const maxFastPolls = 60; // 30초
+
+  const fastPollForMessage = () => {
+    if (messageProcessed) return;
+
+    fastPollCount++;
+
+    try {
+      const message = localStorage.getItem(OAUTH_MESSAGE_KEY);
+      if (message) {
+        console.log('🔍 빠른 폴링에서 메시지 발견:', message);
+        const data = JSON.parse(message);
+
+        // 세션 ID 확인
+        const status = localStorage.getItem(OAUTH_STATUS_KEY);
+        if (status) {
+          const statusData = JSON.parse(status);
+          if (statusData.sessionId !== sessionId) {
+            console.log('⚠️ 빠른 폴링: 세션 ID 불일치, 무시');
+            return;
+          }
+        }
+
+        processMessage(data);
+        return;
+      }
+    } catch (error: any) {
+      console.error('❌ 빠른 폴링 에러:', error);
+    }
+
+    // 빠른 폴링 종료
+    if (fastPollCount >= maxFastPolls) {
+      clearInterval(fastPollInterval);
+      console.log('⏱️ 빠른 폴링 종료, 느린 폴링으로 전환');
+    }
+  };
+
+  // ✅ 느린 폴링 백업 (3초마다)
+  let slowPollCount = 0;
+  const maxSlowPolls = 200; // 10분
+
+  const slowPollForMessage = () => {
+    if (messageProcessed) return;
+
+    slowPollCount++;
+    console.log(`🐌 느린 폴링 체크 ${slowPollCount}/${maxSlowPolls}`);
+
+    try {
+      const message = localStorage.getItem(OAUTH_MESSAGE_KEY);
+      if (message) {
+        console.log('🔍 느린 폴링에서 메시지 발견:', message);
+        const data = JSON.parse(message);
+
+        // 세션 ID 확인
+        const status = localStorage.getItem(OAUTH_STATUS_KEY);
+        if (status) {
+          const statusData = JSON.parse(status);
+          if (statusData.sessionId !== sessionId) {
+            console.log('⚠️ 느린 폴링: 세션 ID 불일치, 무시');
+            return;
+          }
+        }
+
+        processMessage(data);
+        return;
+      }
+    } catch (error: any) {
+      console.error('❌ 느린 폴링 에러:', error);
+    }
+  };
+
+  // ✅ 페이지 종료 처리
+  const handlePageUnload = () => {
+    console.log('🚪 페이지 종료, OAuth 정리');
+    cleanup();
+  };
+
   // 기존 상태 정리
   localStorage.removeItem(OAUTH_MESSAGE_KEY);
   localStorage.removeItem(OAUTH_STATUS_KEY);
   localStorage.setItem(
     OAUTH_STATUS_KEY,
-    JSON.stringify({ status: 'pending', sessionId }),
+    JSON.stringify({ status: 'pending', sessionId, startTime: Date.now() }),
   );
+
+  // 이벤트 리스너 등록
+  window.addEventListener('storage', handleStorageChange);
+  window.addEventListener('beforeunload', handlePageUnload);
 
   // 팝업 크기 및 위치 계산
   const width = 500;
@@ -80,87 +249,53 @@ export const openGoogleLoginPopup = (
   const left = window.screenX + (window.outerWidth - width) / 2;
   const top = window.screenY + (window.outerHeight - height) / 2;
 
-  const popup = window.open(
+  // 팝업 열기
+  popup = window.open(
     authUrl,
     'google-login',
     `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`,
   );
 
   if (!popup) {
+    cleanup();
     onError('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
     return;
   }
 
-  let messageProcessed = false;
-  let checkCount = 0;
-  const maxChecks = 360;
-  let messageInterval: NodeJS.Timeout;
+  console.log('🪟 팝업 열기 성공');
 
-  const checkMessage = () => {
-    if (messageProcessed) return;
+  // ✅ 빠른 폴링 시작 (500ms마다, 30초간)
+  fastPollInterval = setInterval(fastPollForMessage, 500);
 
-    checkCount++;
+  // ✅ 느린 폴링 시작 (3초마다, 30초 후부터)
+  setTimeout(() => {
+    if (!messageProcessed) {
+      pollInterval = setInterval(slowPollForMessage, 3000);
+    }
+  }, 30000);
 
-    try {
-      const message = localStorage.getItem(OAUTH_MESSAGE_KEY);
-      const status = localStorage.getItem(OAUTH_STATUS_KEY);
-
-      if (message) {
-        const data = JSON.parse(message);
-
-        if (status) {
-          const statusData = JSON.parse(status);
-          if (statusData.sessionId !== sessionId) {
-            return;
-          }
-        }
-
-        localStorage.removeItem(OAUTH_MESSAGE_KEY);
-        localStorage.removeItem(OAUTH_STATUS_KEY);
-        messageProcessed = true;
-        clearInterval(messageInterval);
-
-        setTimeout(() => {
-          try {
-            if (popup && typeof popup.close === 'function') {
-              popup.close();
-            }
-          } catch (e: any) {
-            // COOP 에러 무시
-          }
-        }, 100);
-
-        if (data.type === 'GOOGLE_AUTH_SUCCESS') {
-          onSuccess(data.code, data.userType);
-        } else if (data.type === 'GOOGLE_AUTH_ERROR') {
-          onError(data.error);
-        }
-        return;
-      }
-
-      if (checkCount >= maxChecks) {
-        localStorage.removeItem(OAUTH_MESSAGE_KEY);
-        localStorage.removeItem(OAUTH_STATUS_KEY);
-        messageProcessed = true;
-        clearInterval(messageInterval);
+  // ✅ 최종 타임아웃 (15분)
+  timeoutHandle = setTimeout(
+    () => {
+      if (!messageProcessed) {
+        console.log('⏰ OAuth 최종 타임아웃');
+        cleanup();
 
         try {
           if (popup && typeof popup.close === 'function') {
             popup.close();
           }
         } catch (e: any) {
-          // COOP 에러 무시
+          console.log('🔒 타임아웃 팝업 닫기 실패:', e.message);
         }
 
         onError('로그인 시간이 초과되었습니다. 다시 시도해주세요.');
       }
-    } catch (error: any) {
-      console.error('❌ OAuth 메시지 체크 에러:', error);
-    }
-  };
+    },
+    15 * 60 * 1000,
+  ); // 15분
 
-  // 500ms마다 메시지 확인
-  messageInterval = setInterval(checkMessage, 500);
+  console.log('⏱️ OAuth 타이머들 시작 완료');
 };
 
 /**
@@ -175,50 +310,83 @@ export const handleGoogleOAuthCallback = () => {
   let message;
 
   if (error) {
+    console.log('❌ OAuth 에러:', error);
     message = {
       type: 'GOOGLE_AUTH_ERROR',
       error: `OAuth 인증 실패: ${error}`,
+      timestamp: Date.now(),
     };
   } else if (!code) {
+    console.log('❌ 인증 코드 없음');
     message = {
       type: 'GOOGLE_AUTH_ERROR',
       error: '인증 코드를 받지 못했습니다.',
+      timestamp: Date.now(),
     };
   } else if (!userType) {
+    console.log('❌ 사용자 타입 없음');
     message = {
       type: 'GOOGLE_AUTH_ERROR',
       error: '사용자 타입 정보가 없습니다.',
+      timestamp: Date.now(),
     };
   } else {
-    console.log('✅ OAuth 성공');
+    console.log('✅ OAuth 성공, 코드:', code.substring(0, 10) + '...');
     message = {
       type: 'GOOGLE_AUTH_SUCCESS',
       code,
       userType,
+      timestamp: Date.now(),
     };
   }
 
-  // localStorage로 부모 창에 메시지 전달
-  localStorage.setItem(OAUTH_MESSAGE_KEY, JSON.stringify(message));
+  // ✅ 메시지를 localStorage에 저장 (여러 번 시도)
+  const saveMessage = (attempt: number = 1) => {
+    try {
+      const messageStr = JSON.stringify(message);
+      localStorage.setItem(OAUTH_MESSAGE_KEY, messageStr);
+      console.log(`💾 메시지 저장 성공 (${attempt}번째 시도):`, messageStr);
 
-  // 상태 업데이트
-  const currentStatus = localStorage.getItem(OAUTH_STATUS_KEY);
-  if (currentStatus) {
-    const statusData = JSON.parse(currentStatus);
-    statusData.status = 'completed';
-    localStorage.setItem(OAUTH_STATUS_KEY, JSON.stringify(statusData));
-  }
+      // 상태 업데이트
+      const currentStatus = localStorage.getItem(OAUTH_STATUS_KEY);
+      if (currentStatus) {
+        const statusData = JSON.parse(currentStatus);
+        statusData.status = 'completed';
+        statusData.endTime = Date.now();
+        localStorage.setItem(OAUTH_STATUS_KEY, JSON.stringify(statusData));
+      }
+    } catch (saveError: any) {
+      console.error(`❌ 메시지 저장 실패 (${attempt}번째 시도):`, saveError);
 
-  // 팝업 닫기 - 지연을 두고 시도
-  setTimeout(() => {
+      // 재시도 (최대 3번)
+      if (attempt < 3) {
+        setTimeout(() => saveMessage(attempt + 1), 100);
+      }
+    }
+  };
+
+  // 메시지 저장
+  saveMessage();
+
+  // ✅ 팝업 닫기 (여러 번 시도)
+  const closePopup = (attempt: number = 1) => {
     try {
       if (typeof window.close === 'function') {
         window.close();
+        console.log(`🔒 팝업 닫기 시도 ${attempt}번째 성공`);
       }
-    } catch (error: any) {
-      // COOP 에러 무시
+    } catch (closeError: any) {
+      console.log(`🔒 팝업 닫기 시도 ${attempt}번째 실패:`, closeError.message);
+
+      // 재시도 (최대 3번)
+      if (attempt < 3) {
+        setTimeout(() => closePopup(attempt + 1), 200);
+      }
     }
-  }, 200);
+  };
+
+  // 지연 후 팝업 닫기 시도
+  setTimeout(() => closePopup(), 300);
 };
 
 /**
@@ -245,4 +413,48 @@ export const validateGoogleOAuthConfig = (): {
 export const cleanupOAuthStorage = () => {
   localStorage.removeItem(OAUTH_MESSAGE_KEY);
   localStorage.removeItem(OAUTH_STATUS_KEY);
+  console.log('🧹 OAuth 스토리지 정리 완료');
+};
+
+/**
+ * OAuth 상태 조회 (디버깅용)
+ */
+export const getOAuthStatus = () => {
+  const message = localStorage.getItem(OAUTH_MESSAGE_KEY);
+  const status = localStorage.getItem(OAUTH_STATUS_KEY);
+
+  return {
+    message: message ? JSON.parse(message) : null,
+    status: status ? JSON.parse(status) : null,
+  };
+};
+
+/**
+ * OAuth 통계 조회 (디버깅용)
+ */
+export const getOAuthStats = () => {
+  const status = localStorage.getItem(OAUTH_STATUS_KEY);
+
+  if (!status) {
+    return { active: false };
+  }
+
+  try {
+    const statusData = JSON.parse(status);
+    const now = Date.now();
+    const elapsed = now - statusData.startTime;
+
+    return {
+      active: true,
+      sessionId: statusData.sessionId,
+      status: statusData.status,
+      elapsedSeconds: Math.floor(elapsed / 1000),
+      startTime: new Date(statusData.startTime).toLocaleTimeString(),
+      endTime: statusData.endTime
+        ? new Date(statusData.endTime).toLocaleTimeString()
+        : null,
+    };
+  } catch (error) {
+    return { active: false, error: 'Status parse error' };
+  }
 };

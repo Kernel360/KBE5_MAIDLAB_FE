@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft,
   User,
   Settings,
   FileText,
@@ -13,7 +12,8 @@ import {
   EyeOff,
 } from 'lucide-react';
 import { useManager, useToast, useAuth } from '@/hooks';
-import { LoadingSpinner } from '@/components/common';
+import { LoadingSpinner, ShareModal } from '@/components/common';
+import { Header } from '@/components/layout/Header/Header';
 import { ROUTES } from '@/constants';
 import type { ManagerMyPageResponse } from '@/types/manager';
 
@@ -57,6 +57,7 @@ const ManagerMyPage: React.FC = () => {
   });
   const [changingPassword, setChangingPassword] = useState(false);
   const [isGoogleUser, setIsGoogleUser] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -105,9 +106,8 @@ const ManagerMyPage: React.FC = () => {
     navigate(ROUTES.MANAGER.REVIEWS);
   };
 
-  // TODO: 친구초대 기능 추가
   const handleInviteFriend = () => {
-    showToast('친구 초대 기능을 준비 중입니다.', 'info');
+    setShowShareModal(true);
   };
 
   // TODO: 설정 페이지 추가
@@ -177,19 +177,15 @@ const ManagerMyPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-white">
-        <button
-          onClick={() => navigate(ROUTES.HOME)}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeft className="w-6 h-6" />
-        </button>
-        <h1 className="text-lg font-bold">마이페이지</h1>
-        <div className="w-10" />
-      </div>
+      <Header
+        variant="sub"
+        title="마이페이지"
+        backRoute={ROUTES.HOME}
+        showNotification={true}
+      />
 
       {/* Content */}
-      <div className="px-4 py-6">
+      <div className="px-4 py-6 pt-20">
         <div className="max-w-md mx-auto">
           <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
             {/* Profile Section */}
@@ -257,7 +253,7 @@ const ManagerMyPage: React.FC = () => {
               <div className="border-t border-gray-200">
                 <MenuItem
                   icon={<Share2 className="w-5 h-5" />}
-                  title="친구 조대하기"
+                  title="친구 초대하기"
                   onClick={handleInviteFriend}
                 />
               </div>
@@ -391,6 +387,15 @@ const ManagerMyPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* 공유 모달 */}
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        title="MaidLab 매니저 초대"
+        url={`${window.location.origin}/manager/register?ref=${profileData?.userId || 'unknown'}`}
+        text={`${profileData?.name || '매니저'}님이 MaidLab 매니저로 초대합니다!`}
+      />
     </div>
   );
 };

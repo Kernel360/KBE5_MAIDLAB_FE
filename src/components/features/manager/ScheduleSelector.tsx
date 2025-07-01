@@ -1,6 +1,7 @@
 import React from 'react';
 import { Plus, X } from 'lucide-react';
 import { WEEKDAY_LABELS } from '@/constants/service';
+import CustomSelect from './CustomSelect';
 
 export interface TimeSlot {
   day: string;
@@ -70,114 +71,33 @@ const ScheduleSelector: React.FC<ScheduleSelectorProps> = ({
             <div className="grid grid-cols-1 gap-3">
               {/* 요일 선택 */}
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">
-                  요일
-                </label>
-                <div className="relative">
-                  <select
-                    value={slot.day}
-                    onChange={(e) =>
-                      onUpdateTimeSlot(idx, 'day', e.target.value)
-                    }
-                    className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm font-medium text-gray-700 appearance-none cursor-pointer"
-                  >
-                    {Object.entries(WEEKDAY_LABELS).map(([key, label]) => (
-                      <option key={key} value={key}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                    <svg
-                      className="w-4 h-4 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </div>
-                </div>
+                <CustomSelect
+                  value={slot.day}
+                  onChange={(day) => onUpdateTimeSlot(idx, 'day', day)}
+                  options={Object.keys(WEEKDAY_LABELS)}
+                  optionLabels={WEEKDAY_LABELS}
+                  icon="calendar"
+                  label="요일"
+                  placeholder="요일 선택"
+                />
               </div>
 
               {/* 시간 선택 */}
               <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1.5">
-                    시작 시간
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={slot.startTime}
-                      onChange={(e) =>
-                        onUpdateTimeSlot(idx, 'startTime', e.target.value)
-                      }
-                      className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm font-medium text-gray-700 appearance-none cursor-pointer"
-                    >
-                      {timeSlots.map((time) => (
-                        <option key={time} value={time}>
-                          {time}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                      <svg
-                        className="w-4 h-4 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1.5">
-                    종료 시간
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={slot.endTime}
-                      onChange={(e) =>
-                        onUpdateTimeSlot(idx, 'endTime', e.target.value)
-                      }
-                      className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm font-medium text-gray-700 appearance-none cursor-pointer"
-                    >
-                      {timeSlots.map((time) => (
-                        <option key={time} value={time}>
-                          {time}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                      <svg
-                        className="w-4 h-4 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
+                <CustomSelect
+                  value={slot.startTime}
+                  onChange={(time) => onUpdateTimeSlot(idx, 'startTime', time)}
+                  options={timeSlots}
+                  label="시작 시간"
+                  placeholder="시작 시간"
+                />
+                <CustomSelect
+                  value={slot.endTime}
+                  onChange={(time) => onUpdateTimeSlot(idx, 'endTime', time)}
+                  options={timeSlots}
+                  label="종료 시간"
+                  placeholder="종료 시간"
+                />
               </div>
 
               {/* 시간 표시 요약 */}
