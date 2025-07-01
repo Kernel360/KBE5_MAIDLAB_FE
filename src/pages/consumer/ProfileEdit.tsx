@@ -212,15 +212,15 @@ const ProfileEdit: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pt-20">
       <Header
         variant="sub"
         title="프로필 수정"
         backRoute={ROUTES.CONSUMER.PROFILE}
-        showMenu={false}
+        showMenu={true}
       />
 
-      <div className="px-4 py-6">
+      <div className="px-4 py-0">
         <div className="max-w-md mx-auto">
           <div className="bg-white rounded-xl shadow-sm p-6 space-y-8">
             {/* 프로필 이미지 */}
