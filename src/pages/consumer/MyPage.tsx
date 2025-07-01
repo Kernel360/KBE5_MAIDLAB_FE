@@ -167,17 +167,17 @@ const MyPage: React.FC = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50 content-with-bottom-nav">
+      <div className="min-h-screen bg-gray-50 pt-20">
         {/* Header */}
         <Header
           variant="sub"
           title="마이페이지"
           backRoute={ROUTES.HOME}
-          showMenu={false}
+          showMenu={true}
         />
 
         {/* Content */}
-        <div className="px-4 pt-6 pb-3">
+        <div className="px-4 pb-6">
           <div className="max-w-md mx-auto">
             <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
               {/* Profile Section */}
@@ -388,11 +388,6 @@ const MyPage: React.FC = () => {
           </div>
         )}
       </div>
-      <BottomNavigation
-        activeTab="profile"
-        onTabClick={navigate}
-        isAuthenticated={!!userInfo}
-      />
     </>
   );
 };

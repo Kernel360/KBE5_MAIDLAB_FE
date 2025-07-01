@@ -101,10 +101,6 @@ const ConsumerMain: React.FC = () => {
     });
   };
 
-  const handleNavigation = (path: string) => {
-    navigate(path);
-  };
-
   const handleEventClick = (eventId: number) => {
     navigate(`${ROUTES.EVENTS}/${eventId}`);
   };

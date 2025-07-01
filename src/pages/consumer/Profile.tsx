@@ -117,14 +117,14 @@ const Profile: React.FC = () => {
                 <button
                   type="button"
                   disabled
-                  className={`flex-1 py-2 rounded-lg text-center font-medium transition-all ${formData.gender === 'MALE' ? 'bg-orange-50 text-orange-600' : 'text-gray-400'}`}
+                  className={`flex-1 py-2 rounded-lg text-center font-medium transition-all ${formData.gender === 'MALE' ? 'bg-gray-50 text-gray-900' : 'text-gray-400'}`}
                 >
                   남성
                 </button>
                 <button
                   type="button"
                   disabled
-                  className={`flex-1 py-2 rounded-lg text-center font-medium transition-all ${formData.gender === 'FEMALE' ? 'bg-orange-50 text-orange-600' : 'text-gray-400'}`}
+                  className={`flex-1 py-2 rounded-lg text-center font-medium transition-all ${formData.gender === 'FEMALE' ? 'bg-gray-50 text-gray-900' : 'text-gray-400'}`}
                 >
                   여성
                 </button>
