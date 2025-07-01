@@ -181,7 +181,7 @@ const ManagerMyPage: React.FC = () => {
         variant="sub"
         title="마이페이지"
         backRoute={ROUTES.HOME}
-        showNotification={true}
+        showMenu={true}
       />
 
       {/* Content */}

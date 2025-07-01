@@ -11,7 +11,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { Header } from '@/components';
-import { ManagerFooter } from '@/components/layout/BottomNavigation/BottomNavigation';
+
 import { ROUTES } from '@/constants';
 import { useAuth, useReservation, useManager } from '@/hooks';
 import { formatDate, formatTime } from '@/utils/date';
@@ -182,7 +182,7 @@ const ManagerHome: React.FC = () => {
         onNotificationClick={handleNotificationClick}
       />
 
-      <main className="px-4 py-6 pb-20">
+      <main className="px-4 py-6 pb-20 pt-20">
         <div className="max-w-md mx-auto space-y-6">
           {/* 매니저 프로필 섹션 */}
           <section className="bg-gradient-to-r from-orange-400 to-orange-500 rounded-2xl p-6 text-white">
@@ -544,8 +544,6 @@ const ManagerHome: React.FC = () => {
           )}
         </div>
       </main>
-
-      <ManagerFooter />
     </div>
   );
 };

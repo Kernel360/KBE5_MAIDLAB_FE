@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Header,
-  BottomNavigation,
   ServiceGrid,
   PromotionBanner,
   HeroSection,
@@ -21,10 +20,6 @@ const GuestHome: React.FC = () => {
     });
   };
 
-  const handleNavigation = (path: string) => {
-    navigate(path);
-  };
-
   const handleEventClick = (eventId: number) => {
     navigate(`${ROUTES.EVENTS}/${eventId}`);
   };
@@ -40,7 +35,7 @@ const GuestHome: React.FC = () => {
         onNotificationClick={handleNotificationClick}
       />
 
-      <main className="px-4 py-6 pb-20">
+      <main className="px-4 py-6 pb-20 pt-20">
         <div className="max-w-md mx-auto">
           <HeroSection
             onEventClick={handleEventClick}
@@ -58,13 +53,6 @@ const GuestHome: React.FC = () => {
           />
         </div>
       </main>
-
-      {/* 비로그인 상태이므로 isAuthenticated=false */}
-      <BottomNavigation
-        activeTab="home"
-        onTabClick={handleNavigation}
-        isAuthenticated={false}
-      />
     </div>
   );
 };
