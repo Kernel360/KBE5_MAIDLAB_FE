@@ -149,14 +149,12 @@ const showDuplicatePreventedToast = (
     message === lastToastMessage &&
     now - lastToastTime < TOAST_DUPLICATE_THRESHOLD
   ) {
-    console.log('Toast duplicate blocked:', message);
     return false;
   }
 
   lastToastMessage = message;
   lastToastTime = now;
 
-  console.log(`[${type.toUpperCase()}]`, message);
   return true;
 };
 
@@ -249,8 +247,6 @@ apiClient.interceptors.response.use(
 
 // ===== 🆕 인증 실패 처리 함수 =====
 const handleAuthFailure = () => {
-  console.log('🚨 handleAuthFailure 호출됨');
-
   // 토큰 정리
   tokenStorage.clearTokens();
   localStorage.removeItem('userType');
@@ -267,11 +263,9 @@ const handleAuthFailure = () => {
 
   // 🆕 전역 로그아웃 핸들러 호출 (여러 방법 시도)
   const globalLogout = getGlobalLogoutHandler();
-  console.log('🔍 전역 로그아웃 핸들러 상태:', !!globalLogout);
 
   if (globalLogout) {
     try {
-      console.log('✅ 전역 로그아웃 핸들러 실행');
       globalLogout();
       return; // 성공하면 여기서 종료
     } catch (error) {
@@ -280,7 +274,6 @@ const handleAuthFailure = () => {
   }
 
   // 🆕 전역 핸들러가 없거나 실패한 경우 강제 리다이렉트
-  console.log('🚨 전역 핸들러 없음 - 강제 리다이렉트 실행');
 
   // 🆕 즉시 페이지 이동 (replace 사용으로 뒤로가기 방지)
   const redirectPath = isAdminUser() ? '/admin/login' : '/login';
@@ -340,15 +333,6 @@ export const apiCall = async <T>(
 // ===== 개선된 에러 처리 함수 =====
 export const handleApiError = (error: unknown): string => {
   const apiError = error as ApiError;
-
-  console.log('🔍 Error analysis:', {
-    hasResponse: !!apiError.response,
-    status: apiError.response?.status,
-    hasRequest: !!apiError.request,
-    code: apiError.code,
-    message: apiError.message,
-    requestURL: apiError.config?.url,
-  });
 
   // 🆕 응답이 있는 경우 (HTTP 에러) 우선 처리
   if (apiError.response) {
@@ -410,7 +394,6 @@ export const handleApiError = (error: unknown): string => {
 
     if (apiError.code === 'ERR_NETWORK' && isApiEndpoint) {
       // 🆕 API 엔드포인트에서 ERR_NETWORK가 발생하면 대부분 401 에러
-      console.log('🚨 ERR_NETWORK on API endpoint - treating as auth error');
       return '세션이 만료되었습니다. 다시 로그인해주세요.';
     }
 

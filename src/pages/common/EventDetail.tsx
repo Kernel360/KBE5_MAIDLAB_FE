@@ -29,7 +29,6 @@ const EventDetail: React.FC = () => {
 
       try {
         const eventData = await fetchEventDetail(parseInt(id));
-        console.log('id:', id, 'eventData:', eventData);
         if (eventData) {
           setEvent(eventData);
         } else {

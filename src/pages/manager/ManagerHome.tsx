@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Calendar,
-  Clock,
-  MapPin,
-  User,
-  CheckCircle2,
-  AlertCircle,
-} from 'lucide-react';
+import { Calendar, Clock, User, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Header } from '@/components';
 import WeeklySettlementChart from '@/components/features/manager/WeeklySettlementChart';
 
@@ -45,22 +38,12 @@ const ManagerHome: React.FC = () => {
     (reservation) => reservation.status !== RESERVATION_STATUS.CANCELED,
   );
 
-  // 디버깅을 위한 로그 (개발 환경에서만)
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Manager 예약 데이터:', {
-      총예약수: reservations.length,
-      유효예약수: managerReservations.length,
-      예약목록: managerReservations.length > 0 ? managerReservations.slice(0, 2) : []
-    });
-  }
-
   // 오늘의 예약
   const todayReservations = managerReservations.filter(
     (reservation) => reservation.reservationDate === todayString,
   );
 
   // 다가오는 예약 (가장 가까운 예약 1건)
-  console.log('예약 데이터 샘플:', managerReservations[0]);
   const upcomingReservations = managerReservations
     .filter((reservation) => {
       // 날짜만 비교 (오늘 이후의 예약) 또는 오늘 예약 중 시간이 남은 것
@@ -85,29 +68,34 @@ const ManagerHome: React.FC = () => {
           reservation.startTime,
         );
         const isValidTime = reservationDateTime !== null;
-        const isFuture = reservationDateTime ? reservationDateTime >= now : false;
-        const isValidStatus = (
+        const isFuture = reservationDateTime
+          ? reservationDateTime >= now
+          : false;
+        const isValidStatus =
           reservation.status === RESERVATION_STATUS.MATCHED ||
           reservation.status === RESERVATION_STATUS.WORKING ||
           reservation.status === RESERVATION_STATUS.PENDING ||
-          reservation.status === RESERVATION_STATUS.APPROVED
-        );
-        
+          reservation.status === RESERVATION_STATUS.APPROVED;
+
         return isValidTime && isFuture && isValidStatus;
       }
 
       return false;
     })
     .sort((a, b) => {
-      const dateA = safeCreateDateTime(a.reservationDate.split(' ')[0], a.startTime);
-      const dateB = safeCreateDateTime(b.reservationDate.split(' ')[0], b.startTime);
-      
+      const dateA = safeCreateDateTime(
+        a.reservationDate.split(' ')[0],
+        a.startTime,
+      );
+      const dateB = safeCreateDateTime(
+        b.reservationDate.split(' ')[0],
+        b.startTime,
+      );
+
       if (!dateA || !dateB) return 0;
       return dateA.getTime() - dateB.getTime();
     })
     .slice(0, 1); // 가장 가까운 예약 1건만
-  
-  console.log('필터링된 다가오는 예약:', upcomingReservations);
 
   // 예약 상태별 색상
   const getStatusColor = (status: string) => {
@@ -143,10 +131,6 @@ const ManagerHome: React.FC = () => {
 
   const handleReservationClick = (reservationId: number) => {
     navigate(`${ROUTES.MANAGER.RESERVATIONS}/${reservationId}`);
-  };
-
-  const handleNotificationClick = () => {
-    console.log('알림 클릭');
   };
 
   useEffect(() => {
@@ -243,10 +227,7 @@ const ManagerHome: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header
-        showNotification={true}
-        onNotificationClick={handleNotificationClick}
-      />
+      <Header showNotification={true} />
 
       <main className="px-4 py-6 pb-20 pt-20">
         <div className="max-w-md mx-auto space-y-6">
@@ -420,12 +401,15 @@ const ManagerHome: React.FC = () => {
                     reservation.startTime,
                   );
                   const now = new Date();
-                  
+
                   let timeUntilText = '시간 미정';
-                  
+
                   if (reservationDateTime) {
-                    const timeDiff = reservationDateTime.getTime() - now.getTime();
-                    const daysUntil = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+                    const timeDiff =
+                      reservationDateTime.getTime() - now.getTime();
+                    const daysUntil = Math.ceil(
+                      timeDiff / (1000 * 60 * 60 * 24),
+                    );
                     const hoursUntil = Math.ceil(timeDiff / (1000 * 60 * 60));
 
                     if (daysUntil > 1) {
@@ -471,7 +455,8 @@ const ManagerHome: React.FC = () => {
                         <div className="flex items-center">
                           <Calendar className="w-4 h-4 mr-2 text-gray-400" />
                           <span>
-                            {formatDate(reservation.reservationDate) || '날짜 미정'}
+                            {formatDate(reservation.reservationDate) ||
+                              '날짜 미정'}
                           </span>
                         </div>
                         <div className="flex items-center">

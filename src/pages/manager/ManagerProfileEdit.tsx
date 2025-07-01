@@ -52,9 +52,7 @@ const ManagerProfileEdit: React.FC = () => {
   const [isRegionModalOpen, setIsRegionModalOpen] = useState(false);
 
   // profile 상태가 바뀔 때마다 추적
-  useEffect(() => {
-    console.log('profile 상태 변경:', profile);
-  }, [profile]);
+  useEffect(() => {}, [profile]);
 
   const timeSlots = [
     '06:00',
@@ -79,7 +77,6 @@ const ManagerProfileEdit: React.FC = () => {
   useEffect(() => {
     (async () => {
       const data = await fetchProfile();
-      console.log('fetchProfile로 받아온 데이터:', data);
       setProfile((prev) => {
         if (prev && prev.profileImage && data) {
           if (prev.profileImage !== data.profileImage) {
@@ -402,7 +399,6 @@ const ManagerProfileEdit: React.FC = () => {
         const { url } = await uploadToS3(file);
         setProfile((prev) => {
           const next = prev ? { ...prev, profileImage: url } : prev;
-          console.log('setProfile(이미지 업로드) 직후 next:', next);
           return next;
         });
         showToast('프로필 이미지가 업로드되었습니다.', 'success');
