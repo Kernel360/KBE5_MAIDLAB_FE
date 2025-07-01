@@ -1,22 +1,3 @@
-import {
-  Box,
-  Container,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  CircularProgress,
-  Chip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  ImageList,
-  ImageListItem,
-  Divider,
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAdmin } from '@/hooks';
@@ -24,28 +5,16 @@ import { ROUTES } from '@/constants';
 import { BOARD_TYPE_NAMES, BOARD_TYPE_COLORS } from '@/constants/admin';
 import type { BoardDetailResponse } from '@/types/board';
 
-const StyledContainer = styled(Container)(({ theme }) => ({
-  marginTop: theme.spacing(4),
-  marginBottom: theme.spacing(4),
-}));
-
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
-}));
-
-const StyledDivider = styled(Divider)(({ theme }) => ({
-  margin: theme.spacing(3, 0),
-}));
-
-const ImageContainer = styled(Box)({
-  width: '100%',
-  marginBottom: '16px',
-  '& img': {
-    width: '100%',
-    maxHeight: '400px',
-    objectFit: 'contain',
-  },
-});
+// Admin-friendly color scheme matching the admin layout
+const chipColors = {
+  primary: 'bg-blue-100 text-blue-800 border-blue-200',
+  secondary: 'bg-purple-100 text-purple-800 border-purple-200',
+  default: 'bg-gray-100 text-gray-800 border-gray-200',
+  success: 'bg-green-100 text-green-800 border-green-200',
+  error: 'bg-red-100 text-red-800 border-red-200',
+  warning: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+  info: 'bg-cyan-100 text-cyan-800 border-cyan-200',
+};
 
 const BoardDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -84,7 +53,7 @@ const BoardDetail = () => {
 
   // 목록으로 돌아가기
   const handleBack = () => {
-    navigate(ROUTES.ADMIN.BOARDS);
+    navigate(-1);
   };
 
   // 이미지 모달 열기
@@ -173,211 +142,249 @@ const BoardDetail = () => {
 
   if (loading) {
     return (
-      <StyledContainer>
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          minHeight="60vh"
-        >
-          <CircularProgress />
-        </Box>
-      </StyledContainer>
+      <div className="min-h-screen bg-gray-50">
+        <div className="flex justify-center items-center min-h-[60vh]">
+          <div className="bg-white p-8 rounded-2xl shadow-lg">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="w-12 h-12 border-4 border-gray-200 border-t-gray-500 rounded-full animate-spin"></div>
+              <p className="text-gray-600 font-medium">게시글을 불러오는 중...</p>
+            </div>
+          </div>
+        </div>
+      </div>
     );
   }
 
   if (!board) {
     return (
-      <StyledContainer>
-        <Typography variant="h6" color="error" align="center">
-          게시글을 찾을 수 없습니다.
-        </Typography>
-      </StyledContainer>
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-5xl mx-auto p-6">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+            <div className="text-center">
+              <svg className="mx-auto h-12 w-12 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.996-.833-2.767 0L3.132 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+              <h2 className="text-xl font-semibold text-red-600 mb-2">
+                게시글을 찾을 수 없습니다.
+              </h2>
+              <p className="text-red-500">요청하신 게시글이 존재하지 않거나 삭제되었습니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
     );
   }
 
   return (
-    <StyledContainer>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={3}
-      >
-        <Button startIcon={<ArrowBackIcon />} onClick={handleBack}>
-          목록으로
-        </Button>
-      </Box>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-5xl mx-auto p-6">
+        {/* Admin Header */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">게시글 상세</h1>
+            <p className="text-gray-600 mt-1">게시글 ID: {id}</p>
+          </div>
+          <button
+            onClick={handleBack}
+            className="flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            목록으로
+          </button>
+        </div>
 
-      <StyledPaper>
-        {/* 문의 유형 */}
-        <Box mb={2}>
-          <Chip
-            label={BOARD_TYPE_NAMES[board.boardType]}
-            color={BOARD_TYPE_COLORS[board.boardType]}
-            size="small"
-          />
-        </Box>
+        {/* Main Content Card */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="p-8">
+            {/* Board Type Badge */}
+            <div className="mb-6">
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${chipColors[BOARD_TYPE_COLORS[board.boardType]] || chipColors.default}`}>
+                {BOARD_TYPE_NAMES[board.boardType]}
+              </span>
+            </div>
 
-        {/* 제목과 작성자/시간 */}
-        <Box mb={2}>
-          <Typography variant="h5" component="h1" gutterBottom>
-            {board.title}
-          </Typography>
-          <Box display="flex" gap={2} alignItems="center">
-            <Box display="flex" alignItems="center" gap={1}>
-              <Typography variant="body2" color="text.secondary">
-                작성자:
-              </Typography>
-              <Typography variant="body2" fontWeight="medium">
-                {getAuthorInfo().name}
-              </Typography>
-              {getAuthorInfo().type && (
-                <Chip
-                  label={getAuthorInfo().type}
-                  color={getAuthorInfo().color}
-                  size="small"
-                  variant="outlined"
-                  sx={{ height: '20px', fontSize: '0.7rem' }}
-                />
+            {/* Title and Meta Information */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                {board.title}
+              </h2>
+              <div className="bg-gray-50 rounded-lg p-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-center">
+                    <span className="text-gray-500 font-medium w-20">작성자:</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-gray-900">
+                        {getAuthorInfo().name}
+                      </span>
+                      {getAuthorInfo().type && (
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${chipColors[getAuthorInfo().color]}`}>
+                          {getAuthorInfo().type}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="text-gray-500 font-medium w-20">작성일:</span>
+                    <span className="text-gray-900">
+                      {board.createdAt ? formatDate(board.createdAt) : '날짜 정보 없음'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Content Section */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2">
+                문의 내용
+              </h3>
+              <div className="bg-gray-50 rounded-lg p-6">
+                <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
+                  {board.content}
+                </p>
+              </div>
+            </div>
+
+            {/* Attached Images */}
+            {board.images && board.images.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2">
+                  첨부 이미지 ({board.images.length}개)
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {board.images.map((image, index) => (
+                    <div
+                      key={index}
+                      className="group cursor-pointer rounded-lg overflow-hidden border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-200 bg-white"
+                      onClick={() => handleImageClick(image.imagePath)}
+                    >
+                      <div className="aspect-video bg-gray-50 flex items-center justify-center overflow-hidden">
+                        <img
+                          src={image.imagePath}
+                          alt={image.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                        />
+                      </div>
+                      <div className="p-3">
+                        <p className="text-sm text-gray-600 truncate">{image.name}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Admin Answer Section */}
+            <div className="border-t border-gray-200 pt-8">
+              {board.answer && !isEditing ? (
+                // Existing Answer Display
+                <>
+                  <div className="flex justify-between items-start mb-6">
+                    <h3 className="text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">
+                      관리자 답변
+                    </h3>
+                    <button
+                      onClick={() =>
+                        navigate(
+                          `${ROUTES.ADMIN.BOARD_EDIT.replace(':id', id || '')}`,
+                        )
+                      }
+                      className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded-lg transition-colors"
+                    >
+                      답변 수정
+                    </button>
+                  </div>
+                  <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
+                    <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
+                      {board.answer.content}
+                    </p>
+                  </div>
+                </>
+              ) : (
+                // Answer Input Form
+                <>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2">
+                    {isEditing ? '답변 수정' : '답변 작성'}
+                  </h3>
+                  <div className="space-y-4">
+                    <textarea
+                      value={answer}
+                      onChange={(e) => setAnswer(e.target.value)}
+                      placeholder="고객님께 전달할 답변을 입력해주세요..."
+                      disabled={submitting}
+                      rows={8}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    />
+                    <div className="flex gap-3">
+                      <button
+                        onClick={handleSubmitAnswer}
+                        disabled={!answer.trim() || submitting}
+                        className="px-6 py-2 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors flex items-center"
+                      >
+                        {submitting ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            처리중...
+                          </>
+                        ) : isEditing ? (
+                          '답변 수정'
+                        ) : (
+                          '답변 등록'
+                        )}
+                      </button>
+                      {isEditing && (
+                        <button
+                          onClick={handleCancelEdit}
+                          className="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg transition-colors"
+                        >
+                          취소
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </>
               )}
-            </Box>
-            <Typography variant="body2" color="text.secondary">
-              •
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {board.createdAt ? formatDate(board.createdAt) : '날짜 정보 없음'}
-            </Typography>
-          </Box>
-        </Box>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <StyledDivider />
-
-        {/* 내용 */}
-        <Typography variant="body1" whiteSpace="pre-wrap">
-          {board.content}
-        </Typography>
-
-        {/* 이미지가 있는 경우 표시 */}
-        {board.images && board.images.length > 0 && (
-          <>
-            <StyledDivider />
-            <Box>
-              <Typography variant="subtitle1" gutterBottom>
-                첨부 이미지
-              </Typography>
-              <ImageList cols={3} gap={8}>
-                {board.images.map((image, index) => (
-                  <ImageListItem
-                    key={index}
-                    sx={{ cursor: 'pointer' }}
-                    onClick={() => handleImageClick(image.imagePath)}
-                  >
-                    <ImageContainer>
-                      <img src={image.imagePath} alt={image.name} />
-                    </ImageContainer>
-                  </ImageListItem>
-                ))}
-              </ImageList>
-            </Box>
-          </>
-        )}
-
-        <StyledDivider />
-
-        {/* 답변 섹션 */}
-        <Box>
-          <Typography variant="h6" gutterBottom>
-            답변
-          </Typography>
-
-          {board.answer && !isEditing ? (
-            // 답변이 있고 수정 모드가 아닌 경우
-            <>
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                mb={2}
+      {/* Image Modal */}
+      {selectedImage && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
+            <div className="flex justify-between items-center p-6 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">이미지 확대보기</h3>
+              <button
+                onClick={handleCloseImage}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                <Box />
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  size="small"
-                  onClick={() =>
-                    navigate(
-                      `${ROUTES.ADMIN.BOARD_EDIT.replace(':id', id || '')}`,
-                    )
-                  }
-                >
-                  수정
-                </Button>
-              </Box>
-              <Typography variant="body1" whiteSpace="pre-wrap">
-                {board.answer.content}
-              </Typography>
-            </>
-          ) : (
-            // 답변이 없거나 수정 모드인 경우
-            <Box>
-              <TextField
-                fullWidth
-                multiline
-                rows={6}
-                value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
-                placeholder="답변을 입력하세요..."
-                disabled={submitting}
-                sx={{ mb: 2 }}
+                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6 overflow-auto max-h-[calc(90vh-140px)]">
+              <img
+                src={selectedImage}
+                alt="확대된 이미지"
+                className="w-full h-auto rounded-lg"
               />
-              <Box display="flex" gap={1}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleSubmitAnswer}
-                  disabled={!answer.trim() || submitting}
-                >
-                  {submitting ? (
-                    <CircularProgress size={24} color="inherit" />
-                  ) : isEditing ? (
-                    '수정'
-                  ) : (
-                    '등록'
-                  )}
-                </Button>
-                {isEditing && (
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={handleCancelEdit}
-                  >
-                    취소
-                  </Button>
-                )}
-              </Box>
-            </Box>
-          )}
-        </Box>
-      </StyledPaper>
-
-      {/* 이미지 모달 */}
-      <Dialog open={!!selectedImage} onClose={handleCloseImage} maxWidth="lg">
-        <DialogTitle>이미지 보기</DialogTitle>
-        <DialogContent>
-          {selectedImage && (
-            <img
-              src={selectedImage}
-              alt="확대된 이미지"
-              style={{ width: '100%', height: 'auto' }}
-            />
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseImage}>닫기</Button>
-        </DialogActions>
-      </Dialog>
-    </StyledContainer>
+            </div>
+            <div className="flex justify-end p-6 border-t border-gray-200 bg-gray-50">
+              <button
+                onClick={handleCloseImage}
+                className="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors"
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

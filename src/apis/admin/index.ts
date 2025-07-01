@@ -6,7 +6,6 @@ import type {
   ReservationDetailResponse,
 } from '@/types/reservation';
 import type { MatchingResponse } from '@/types/matching';
-import type { ConsumerProfileResponse } from '@/types/consumer';
 import type { BoardResponse, BoardDetailResponse } from '@/types/board';
 import type {
   AdminLoginRequest,
@@ -19,6 +18,7 @@ import type {
   ManagerStatusParams,
   SettlementDetailInfo,
   ManagerChangeRequest,
+  ConsumerProfileDetail,
 } from '@/types/admin';
 import { API_ENDPOINTS } from '@/constants/api';
 
@@ -96,8 +96,8 @@ export const adminApi = {
   getManagersByStatus: async (
     params: ManagerStatusParams,
   ): Promise<ApiResponse<ManagerListResponse>> => {
-    const { page = 0, size = 10, status } = params;
-    const queryString = buildQueryString({ page, size, status });
+    const { page = 0, size = 10, status , sortByRating, isDescending} = params;
+    const queryString = buildQueryString({ page, size, status, sortByRating, isDescending });
 
     // 특별히 이 API만 전체 응답이 필요한 경우
     try {
@@ -128,8 +128,8 @@ export const adminApi = {
   /**
    * 소비자 상세 조회
    */
-  getConsumer: async (consumerId: number): Promise<ConsumerProfileResponse> => {
-    return apiCall<ConsumerProfileResponse>(
+  getConsumer: async (consumerId: number): Promise<ConsumerProfileDetail> => {
+    return apiCall<ConsumerProfileDetail>(
       'get',
       API_ENDPOINTS.ADMIN.CONSUMER.DETAIL(consumerId),
     );
@@ -159,6 +159,39 @@ export const adminApi = {
     return apiCall<ReservationDetailResponse>(
       'get',
       API_ENDPOINTS.ADMIN.RESERVATION.DETAIL(reservationId),
+    );
+  },
+
+  /**
+   * 수요자별 예약 조회
+   */
+
+    getConsumerReservations: async (
+    consumerId: number, 
+    params: AdminPageParams = {}
+  ): Promise<ReservationListResponse[]> => {
+    const { page = 0, size = 10} = params;
+    const queryString = buildQueryString({ page, size })
+    return apiCall<ReservationListResponse[]>(
+      'get',
+      `${API_ENDPOINTS.ADMIN.RESERVATION.CONSUMER(consumerId)}${queryString}`,
+    );
+  },
+
+
+  /**
+   * 수요자별 예약 조회
+   */
+
+    getManagerReservations: async (
+    managerId: number, 
+    params: AdminPageParams = {}
+  ): Promise<ReservationListResponse[]> => {
+    const { page = 0, size = 10} = params;
+    const queryString = buildQueryString({ page, size })
+    return apiCall<ReservationListResponse[]>(
+      'get',
+      `${API_ENDPOINTS.ADMIN.RESERVATION.MANAGER(managerId)}${queryString}`,
     );
   },
 
@@ -372,8 +405,76 @@ export const adminApi = {
       'get',
       `${API_ENDPOINTS.ADMIN.BOARD.GETWITHOUTANSWERCOUNT}`,
     )
-  }
+  },
 
+  /**
+   * 소비자별 총 예약 건수 조회
+   */
+  getTotalReservationCount: async (consumerId: number): Promise<number> => {
+    return apiCall<number>(
+      'get',
+      `/api/admin/reservations/reservationcount/${consumerId}`,
+    );
+  },
 
+  /**
+   * 소비자별 리뷰 작성률 조회
+   */
+  getReviewPercent: async (consumerId: number): Promise<number> => {
+    return apiCall<number>(
+      'get',
+      `/api/admin/reservations/reviewedpercent/${consumerId}`,
+    );
+  },
+
+  /**
+   * 소비자별 총 결제 금액 조회
+   */
+  getTotalPaidMoney: async (consumerId: number): Promise<number> => {
+    return apiCall<number>(
+      'get',
+      `/api/admin/reservations/totalpaidmoney/${consumerId}`,
+    );
+  },
+
+  /**
+   * 매니저별 총 매칭 건수 조회
+   */
+  getMatchedCount: async (managerId: number): Promise<number> => {
+    return apiCall<number>(
+      'get',
+      `/api/admin/reservations/matchedcount/${managerId}`,
+    );
+  },
+
+  /**
+   * 매니저별 총 수익 금액 조회
+   */
+  getManagerSettlementSum: async (managerId: number): Promise<number> => {
+    return apiCall<number>(
+      'get',
+      `/api/admin/reservations/manager/settlementsum/${managerId}`,
+    );
+  },
+
+  /**
+   * 매니저별 리뷰 작성률 조회
+   */
+  getManagerReviewPercent: async (managerId: number): Promise<number> => {
+    return apiCall<number>(
+      'get',
+      `/api/admin/reservations/managerreviewedpercent/${managerId}`,
+    );
+  },
+
+  /**
+   * 관리자 로그 조회 (최근 활동)
+   */
+  getAdminLogs: async (lines: number = 50): Promise<string[]> => {
+    return apiCall<string[]>(
+      'get',
+      `api/admin/logs/tail?lines=${lines}`,
+    );
+  },
 
 };

@@ -1,51 +1,10 @@
-import {
-  Box,
-  Container,
-  Paper,
-  Typography,
-  Button,
-  CircularProgress,
-  Stack,
-  Divider,
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useEvent } from '@/hooks';
 import { ROUTES } from '@/constants';
 import { formatDate } from '@/utils';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import EditIcon from '@mui/icons-material/Edit';
+import { LoadingSpinner } from '@/components/common';
 import type { EventDetailResponse } from '@/types/event';
-
-const StyledContainer = styled(Container)(({ theme }) => ({
-  marginTop: theme.spacing(4),
-  marginBottom: theme.spacing(4),
-}));
-
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
-}));
-
-const ImageContainer = styled(Box)({
-  width: '100%',
-  marginBottom: '16px',
-  '& img': {
-    width: '100%',
-    maxHeight: '400px',
-    objectFit: 'contain',
-  },
-});
-
-const ContentSection = styled(Box)(({ theme }) => ({
-  marginTop: theme.spacing(3),
-  marginBottom: theme.spacing(3),
-  whiteSpace: 'pre-wrap',
-}));
-
-const StyledDivider = styled(Divider)(({ theme }) => ({
-  margin: theme.spacing(3, 0),
-}));
 
 const EventDetail = () => {
   const navigate = useNavigate();
@@ -81,109 +40,104 @@ const EventDetail = () => {
 
   if (loading) {
     return (
-      <StyledContainer>
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          minHeight="50vh"
-        >
-          <CircularProgress />
-        </Box>
-      </StyledContainer>
+      <div className="container mx-auto mt-8 px-4">
+        <div className="flex justify-center items-center min-h-96">
+          <LoadingSpinner />
+        </div>
+      </div>
     );
   }
 
   if (!event) {
     return (
-      <StyledContainer>
-        <Typography variant="h6" align="center">
-          이벤트를 찾을 수 없습니다.
-        </Typography>
-      </StyledContainer>
+      <div className="container mx-auto mt-8 px-4">
+        <div className="text-center">
+          <h2 className="text-lg font-semibold text-gray-900">이벤트를 찾을 수 없습니다.</h2>
+        </div>
+      </div>
     );
   }
 
   return (
-    <StyledContainer>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={3}
-      >
-        <Button
-          startIcon={<ArrowBackIcon />}
+    <div className="container mx-auto mt-8 mb-8 px-4">
+      <div className="flex justify-between items-center mb-6">
+        <button
           onClick={() => navigate(ROUTES.ADMIN.EVENTS)}
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
         >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
           목록으로
-        </Button>
-        <Button
-          variant="contained"
-          startIcon={<EditIcon />}
+        </button>
+        <button
           onClick={handleEdit}
-          sx={{
-            backgroundColor: '#FF7F50',
-            '&:hover': { backgroundColor: '#FF6347' },
-          }}
+          className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors"
         >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
           수정
-        </Button>
-      </Box>
+        </button>
+      </div>
 
-      <StyledPaper>
-        <Typography variant="h5" component="h1" gutterBottom>
+      <div className="bg-white rounded-lg shadow p-6">
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">
           {event.title}
-        </Typography>
+        </h1>
 
-        <StyledDivider />
+        <hr className="my-6 border-gray-200" />
 
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-          <Typography variant="body2" color="text.secondary">
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <span className="text-sm text-gray-500">
             생성일: {formatDate(event.createdAt)}
-          </Typography>
+          </span>
           {event.updatedAt && (
-            <Typography variant="body2" color="text.secondary">
+            <span className="text-sm text-gray-500">
               수정일: {formatDate(event.updatedAt)}
-            </Typography>
+            </span>
           )}
-        </Stack>
+        </div>
 
-        <StyledDivider />
+        <hr className="my-6 border-gray-200" />
 
         {event.mainImageUrl && (
-          <Box mb={3}>
-            <Typography variant="subtitle1" gutterBottom>
-              메인 이미지
-            </Typography>
-            <ImageContainer>
-              <img src={event.mainImageUrl} alt="이벤트 메인 이미지" />
-            </ImageContainer>
-          </Box>
+          <div className="mb-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">메인 이미지</h3>
+            <div className="w-full mb-4">
+              <img 
+                src={event.mainImageUrl} 
+                alt="이벤트 메인 이미지"
+                className="w-full max-h-96 object-contain rounded-lg"
+              />
+            </div>
+          </div>
         )}
 
         {event.imageUrl && (
-          <Box mb={3}>
-            <Typography variant="subtitle1" gutterBottom>
-              상세 이미지
-            </Typography>
-            <ImageContainer>
-              <img src={event.imageUrl} alt="이벤트 상세 이미지" />
-            </ImageContainer>
-          </Box>
+          <div className="mb-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">상세 이미지</h3>
+            <div className="w-full mb-4">
+              <img 
+                src={event.imageUrl} 
+                alt="이벤트 상세 이미지"
+                className="w-full max-h-96 object-contain rounded-lg"
+              />
+            </div>
+          </div>
         )}
 
-        {(event.mainImageUrl || event.imageUrl) && <StyledDivider />}
+        {(event.mainImageUrl || event.imageUrl) && (
+          <hr className="my-6 border-gray-200" />
+        )}
 
-        <Box>
-          <ContentSection>
-            <Typography variant="body1">
-              {event.content || '이벤트 내용이 없습니다.'}
-            </Typography>
-          </ContentSection>
-        </Box>
-      </StyledPaper>
-    </StyledContainer>
+        <div className="mt-6 mb-6">
+          <div className="whitespace-pre-wrap text-gray-900">
+            {event.content || '이벤트 내용이 없습니다.'}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
