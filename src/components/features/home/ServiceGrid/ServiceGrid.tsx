@@ -1,61 +1,33 @@
 import React from 'react';
-import { Home, Wind, Plus, User } from 'lucide-react';
-import { SERVICE_TYPES } from '@/constants';
+import { ArrowRight, Sparkles } from 'lucide-react';
 
 interface ServiceGridProps {
-  onServiceClick: (serviceType: string) => void;
+  onServiceClick: () => void;
 }
 
 export const ServiceGrid: React.FC<ServiceGridProps> = ({ onServiceClick }) => {
-  const services = [
-    {
-      id: SERVICE_TYPES.GENERAL_CLEANING,
-      icon: Home,
-      label: '가사',
-      color: 'text-orange-500',
-    },
-    {
-      id: 'aircon',
-      icon: Wind,
-      label: '에어컨',
-      color: 'text-orange-500',
-    },
-    {
-      id: 'cleaning',
-      icon: Plus,
-      label: '청소',
-      color: 'text-orange-500',
-    },
-    {
-      id: SERVICE_TYPES.PET_CARE,
-      icon: User,
-      label: '돌봄',
-      color: 'text-orange-500',
-    },
-  ];
-
   return (
     <section className="mb-8">
-      <h2 className="text-lg font-bold text-gray-900 mb-4 pl-">서비스</h2>
-      <div className="grid grid-cols-4 gap-4">
-        {services.map(({ id, icon: Icon, label, color }) => (
+      <div className="bg-white rounded-2xl p-6 border border-gray-100">
+        <div className="text-center">
+          <div className="w-20 h-20 bg-orange-200 rounded-full flex items-center justify-center mb-4 mx-auto">
+            <Sparkles className="w-10 h-10 text-orange-600" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">
+            전문 가사도우미 서비스
+          </h3>
+          <p className="text-gray-600 mb-6 leading-relaxed">
+            청소, 가사, 돌봄 등 다양한 서비스를<br />
+            믿을 수 있는 전문가와 함께하세요
+          </p>
           <button
-            key={id}
-            onClick={() => onServiceClick(id)}
-            className="flex flex-col items-center group"
+            onClick={onServiceClick}
+            className="w-full bg-orange-400 text-white font-semibold py-4 px-6 rounded-xl hover:bg-orange-500 transition-all duration-200 flex items-center justify-center gap-2"
           >
-            <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-2 group-hover:bg-orange-200 transition-colors">
-              {label === '청소' ? (
-                <div className="w-8 h-8 bg-orange-500 rounded flex items-center justify-center">
-                  <Icon className="w-5 h-5 text-white" />
-                </div>
-              ) : (
-                <Icon className={`w-8 h-8 ${color}`} />
-              )}
-            </div>
-            <span className="text-sm text-gray-700 font-medium">{label}</span>
+            서비스 시작하기
+            <ArrowRight className="w-5 h-5" />
           </button>
-        ))}
+        </div>
       </div>
     </section>
   );
