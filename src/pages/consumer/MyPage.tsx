@@ -18,6 +18,7 @@ import { ROUTES } from '@/constants';
 import { useAuth } from '@/hooks/useAuth';
 import { Header } from '@/components/layout/Header/Header';
 import PasswordChangeModal from '@/components/common/PasswordChangeModal/PasswordChangeModal';
+import { ShareModal } from '@/components/common';
 
 interface MenuItemProps {
   icon: React.ReactNode;
@@ -46,6 +47,7 @@ const MyPage: React.FC = () => {
   const [userInfo, setUserInfo] = useState<ConsumerMyPageResponse | null>(null);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   useEffect(() => {
     const loadUserInfo = async () => {
@@ -82,7 +84,7 @@ const MyPage: React.FC = () => {
   };
 
   const handleInviteFriends = () => {
-    showToast('친구 초대하기 기능은 준비 중입니다.', 'info');
+    setShowShareModal(true);
   };
 
   const handleSettings = () => {
@@ -230,6 +232,14 @@ const MyPage: React.FC = () => {
           onClose={() => setShowPasswordModal(false)}
           onSubmit={handlePasswordSubmit}
           loading={changingPassword}
+        />
+
+        <ShareModal
+          isOpen={showShareModal}
+          onClose={() => setShowShareModal(false)}
+          title="MaidLab 친구 초대"
+          url="https://www.maidlab.site"
+          text={`${userInfo?.name || '사용자'}님이 MaidLab에 초대합니다!`}
         />
       </div>
     </>
