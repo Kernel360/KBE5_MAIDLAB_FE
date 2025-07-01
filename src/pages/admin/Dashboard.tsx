@@ -1,12 +1,3 @@
-import {
-  Box,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Divider,
-  CircularProgress,
-} from '@mui/material';
 import { useAdmin } from '@/hooks';
 import { useEffect, useState } from 'react';
 import { ROUTES } from '@/constants';
@@ -134,13 +125,18 @@ const Dashboard = () => {
       try {
         setLogsLoading(true);
         setLogsError(null);
-        const logs = await adminApi.getAdminLogs(50);
+        const logs: any = await adminApi.getAdminLogs(50);
+        console.log('Admin logs API response:', typeof logs, 'isArray:', Array.isArray(logs), 'length:', logs?.length);
         
-        // API 응답이 배열인지 확인하고, 아니면 빈 배열로 설정
+        // API 응답 처리: 배열이면 그대로 사용, 문자열이면 줄바꿈으로 분리
         if (Array.isArray(logs)) {
-          setRecentLogs(logs);
+          setRecentLogs(logs as string[]);
+        } else if (typeof logs === 'string') {
+          // 문자열인 경우 줄바꿈으로 분리하여 배열로 변환
+          const logLines: string[] = logs.split('\n').filter((line: string) => line.trim() !== '');
+          setRecentLogs(logLines);
         } else {
-          console.warn('API response is not an array:', logs);
+          console.warn('API response is neither array nor string:', logs);
           setRecentLogs([]);
         }
       } catch (error) {
@@ -156,103 +152,101 @@ const Dashboard = () => {
     fetchRecentLogs();
   }, []);
   return (
-    <Box>
-      <Grid container spacing={3}>
+    <div className="p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {stats.map((stat) => (
-          <Grid item xs={12} sm={6} md={3} key={stat.label}>
-            <Card
-            onClick={() => handleStatClick(stat.path)}>
-              <CardContent>
-                <Typography variant="subtitle2" color="text.secondary">
-                  {stat.label}
-                </Typography>
-                <Typography variant="h5" sx={{ fontWeight: 600 }}>
-                  {stat.value}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
+          <div
+            key={stat.label}
+            onClick={() => handleStatClick(stat.path)}
+            className="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow duration-200"
+          >
+            <div className="text-sm text-gray-500 mb-2">
+              {stat.label}
+            </div>
+            <div className="text-2xl font-semibold text-gray-900">
+              {stat.value}
+            </div>
+          </div>
         ))}
-      </Grid>
+      </div>
 
-      <Box mt={5}>
-        <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+      <div className="mt-8">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
           최근 활동
-        </Typography>
-        <Card>
-          <CardContent>
+        </h2>
+        <div className="bg-white rounded-lg shadow-md">
+          <div className="p-6">
             {logsLoading ? (
-              <Box display="flex" justifyContent="center" alignItems="center" py={4}>
-                <CircularProgress size={24} />
-                <Typography variant="body2" color="text.secondary" ml={2}>
+              <div className="flex justify-center items-center py-8">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                <span className="ml-3 text-sm text-gray-500">
                   로그를 불러오는 중...
-                </Typography>
-              </Box>
+                </span>
+              </div>
             ) : logsError ? (
-              <Box py={4} textAlign="center">
-                <Typography variant="body2" color="error">
+              <div className="text-center py-8">
+                <span className="text-sm text-red-600">
                   {logsError}
-                </Typography>
-              </Box>
+                </span>
+              </div>
             ) : !Array.isArray(recentLogs) || recentLogs.length === 0 ? (
-              <Box py={4} textAlign="center">
-                <Typography variant="body2" color="text.secondary">
+              <div className="text-center py-8">
+                <span className="text-sm text-gray-500">
                   최근 활동이 없습니다.
-                </Typography>
-              </Box>
+                </span>
+              </div>
             ) : (
-              recentLogs.slice(0, 10).map((logLine, idx) => {
-                const parsedLog = parseLogLine(logLine);
-                const activityType = categorizeActivity(parsedLog.message);
-                const formattedTime = parsedLog.timestamp.toLocaleString('ko-KR', {
-                  month: '2-digit',
-                  day: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                });
-                
-                return (
-                  <Box key={idx}>
-                    <Box
-                      display="flex"
-                      justifyContent="space-between"
-                      alignItems="flex-start"
-                      py={1}
-                    >
-                      <Box flex={1}>
-                        <Typography variant="body2" component="div">
-                          <Box component="span" 
-                               sx={{ 
-                                 color: parsedLog.level === 'ERROR' ? 'error.main' : 
-                                        parsedLog.level === 'WARN' ? 'warning.main' : 
-                                        'primary.main',
-                                 fontWeight: 500,
-                                 mr: 1
-                               }}>
-                            [{activityType}]
-                          </Box>
-                          <Box component="span" sx={{ wordBreak: 'break-word' }}>
-                            {parsedLog.message.length > 80 
-                              ? `${parsedLog.message.substring(0, 80)}...` 
-                              : parsedLog.message}
-                          </Box>
-                        </Typography>
-                      </Box>
-                      <Typography variant="caption" color="text.secondary" sx={{ ml: 2, flexShrink: 0 }}>
+              recentLogs
+                .slice(0, 20) // 더 많은 로그를 가져와서 필터링 후에도 충분한 항목 확보
+                .map(logLine => {
+                  const parsedLog = parseLogLine(logLine);
+                  const activityType = categorizeActivity(parsedLog.message);
+                  return { ...parsedLog, activityType };
+                })
+                .filter(log => log.activityType !== '시스템') // 시스템 로그 제거
+                .slice(0, 10) // 필터링 후 10개로 제한
+                .map((parsedLog, idx) => {
+                  const formattedTime = parsedLog.timestamp.toLocaleString('ko-KR', {
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  });
+                  
+                  return (
+                  <div key={idx}>
+                    <div className="flex justify-between items-start py-2">
+                      <div className="flex-1">
+                        <div className="text-sm">
+                          <span 
+                            className={`font-medium mr-2 ${
+                              parsedLog.level === 'ERROR' ? 'text-red-600' : 
+                              parsedLog.level === 'WARN' ? 'text-yellow-600' : 
+                              'text-blue-600'
+                            }`}
+                          >
+                            [{parsedLog.activityType}]
+                          </span>
+                          <span className="break-words text-gray-700">
+                            {parsedLog.message}
+                          </span>
+                        </div>
+                      </div>
+                      <span className="text-xs text-gray-500 ml-4 flex-shrink-0">
                         {formattedTime}
-                      </Typography>
-                    </Box>
+                      </span>
+                    </div>
                     {idx < Math.min(recentLogs.length, 10) - 1 && (
-                      <Divider sx={{ my: 0.5 }} />
+                      <hr className="my-2 border-gray-200" />
                     )}
-                  </Box>
+                  </div>
                 );
               })
             )}
-          </CardContent>
-        </Card>
-      </Box>
-    </Box>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
