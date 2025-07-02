@@ -4,7 +4,6 @@ import {
   User,
   Settings,
   ChevronRight,
-  Ticket,
   Coins,
   Heart,
   Ban,
@@ -59,16 +58,8 @@ const MyPage: React.FC = () => {
     loadUserInfo();
   }, [fetchMypage]);
 
-  const handleBack = () => {
-    navigate(ROUTES.HOME);
-  };
-
   const handleProfileEdit = () => {
     navigate(ROUTES.CONSUMER.PROFILE);
-  };
-
-  const handlePromotions = () => {
-    showToast('프로모션 코드/쿠폰 기능은 준비 중입니다.', 'info');
   };
 
   const handlePoints = () => {
@@ -171,13 +162,6 @@ const MyPage: React.FC = () => {
               <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
                 <div className="border-t border-gray-200">
                   <MenuItem
-                    icon={<Ticket className="w-5 h-5" />}
-                    title="프로모션 코드/쿠폰"
-                    onClick={handlePromotions}
-                  />
-                </div>
-                <div className="border-t border-gray-200">
-                  <MenuItem
                     icon={<Coins className="w-5 h-5" />}
                     title="포인트"
                     onClick={handlePoints}
@@ -217,7 +201,7 @@ const MyPage: React.FC = () => {
                 <div className="border-t border-gray-200">
                   <MenuItem
                     icon={<Settings className="w-5 h-5" />}
-                    title="설정"
+                    title="알림 설정"
                     onClick={handleSettings}
                   />
                 </div>
