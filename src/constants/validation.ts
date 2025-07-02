@@ -80,7 +80,7 @@ export const NUMBER_LIMITS = {
 export const FILE_LIMITS = {
   IMAGE: {
     MAX_SIZE: 5 * 1024 * 1024, // 5MB
-    ALLOWED_TYPES: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'],
+    ALLOWED_TYPES: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
     MAX_COUNT: 10,
   },
   DOCUMENT: {
@@ -94,7 +94,7 @@ export const FILE_LIMITS = {
   },
   PROFILE_IMAGE: {
     MAX_SIZE: 2 * 1024 * 1024, // 2MB
-    ALLOWED_TYPES: ['image/jpeg', 'image/jpg', 'image/png'],
+    ALLOWED_TYPES: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
     MAX_COUNT: 1,
   },
 } as const;

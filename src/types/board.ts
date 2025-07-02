@@ -1,4 +1,5 @@
 import type { BoardType } from '@/constants/board';
+import type { PaginationResponse } from './api';
 
 /**
  * 이미지 정보
@@ -110,3 +111,8 @@ export interface BoardStats {
 export interface BoardWithId extends BoardResponse {
   boardId: number;
 }
+
+/**
+ * 게시글 목록 응답 (페이지네이션)
+ */
+export interface BoardListResponse extends PaginationResponse<BoardResponse> {}
