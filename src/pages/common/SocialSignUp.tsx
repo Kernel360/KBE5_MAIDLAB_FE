@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth, useForm, useToast } from '@/hooks';
 import { ROUTES } from '@/constants';
+import { validateBirthDate } from '@/constants/validation';
 import type { SocialSignUpRequest } from '@/types/auth';
 import { Header } from '@/components/layout/Header/Header';
 
@@ -46,7 +47,7 @@ const SocialSignUp: React.FC = () => {
         gender: 'MALE',
       },
       validationSchema: {
-        birth: (value) => value.length === 10, // YYYY-MM-DD
+        birth: (value) => validateBirthDate(value).isValid,
       },
       onSubmit: async (formData) => {
         if (!tempToken || !userType) {
@@ -80,6 +81,12 @@ const SocialSignUp: React.FC = () => {
     }
 
     setValue('birth', formatted);
+  };
+
+  const getBirthErrorMessage = () => {
+    if (!errors.birth || !touched.birth) return '';
+    const validation = validateBirthDate(values.birth);
+    return validation.error || '올바른 생년월일을 입력해주세요.';
   };
 
   if (isValidating) {
@@ -169,7 +176,7 @@ const SocialSignUp: React.FC = () => {
               />
               {errors.birth && touched.birth && (
                 <p className="text-red-500 text-sm">
-                  올바른 생년월일을 입력해주세요.
+                  {getBirthErrorMessage()}
                 </p>
               )}
             </div>

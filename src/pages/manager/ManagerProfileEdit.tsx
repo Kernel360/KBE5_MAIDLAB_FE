@@ -6,6 +6,7 @@ import { LoadingSpinner } from '@/components/common';
 import { Header } from '@/components/layout/Header/Header';
 import RegionSelectionModal from '@/components/features/manager/RegionSelectionModal';
 import ScheduleSelector from '@/components/features/manager/ScheduleSelector';
+import { validateBirthDate } from '@/constants/validation';
 
 import {
   SERVICE_TYPES,
@@ -102,17 +103,6 @@ const ManagerProfileEdit: React.FC = () => {
     setProfile((prev) => (prev ? { ...prev, birth: value } : prev));
   };
 
-  // 날짜 유효성 검사 함수 (YYYY-MM-DD)
-  function isValidDate(str: string) {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(str)) return false;
-    const [year, month, day] = str.split('-').map(Number);
-    const date = new Date(year, month - 1, day);
-    return (
-      date.getFullYear() === year &&
-      date.getMonth() === month - 1 &&
-      date.getDate() === day
-    );
-  }
 
   const validate = () => {
     const newErrors = {
@@ -139,10 +129,11 @@ const ManagerProfileEdit: React.FC = () => {
     // 생년월일 검증
     if (!profile?.birth || profile.birth.trim() === '') {
       newErrors.birth = '생년월일을 입력해주세요.';
-    } else if (!/^\d{4}-\d{2}-\d{2}$/.test(profile.birth)) {
-      newErrors.birth = '올바른 생년월일을 입력해주세요.';
-    } else if (!isValidDate(profile.birth)) {
-      newErrors.birth = '올바른 생년월일이 아닙니다.';
+    } else {
+      const birthValidation = validateBirthDate(profile.birth);
+      if (!birthValidation.isValid) {
+        newErrors.birth = birthValidation.error || '올바른 생년월일을 입력해주세요.';
+      }
     }
 
     // 서비스 검증
