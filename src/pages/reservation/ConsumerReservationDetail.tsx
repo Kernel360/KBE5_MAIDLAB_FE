@@ -130,12 +130,12 @@ const ConsumerReservationDetail: React.FC = () => {
       {/* 헤더 */}
       <Header
         variant="sub"
-        title="예약 상세 페이지"
+        title="예약 상세"
         backRoute={ROUTES.CONSUMER.RESERVATIONS}
         showMenu={true}
       />
 
-      <div className="max-w-md mx-auto">
+      <div className="max-w-md mx-auto pt-20">
         {/* 상태 카드 */}
         <div className="mx-4 mt-4 bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="p-6">
@@ -207,8 +207,8 @@ const ConsumerReservationDetail: React.FC = () => {
             <h3 className="text-lg font-semibold text-gray-900 mb-4">담당 도우미</h3>
             <div className="flex items-center space-x-4 mb-4">
               <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center overflow-hidden">
-                {reservation.managerProfileImageUrl ? (
-                  <img src={reservation.managerProfileImageUrl} alt={reservation.managerName} className="w-16 h-16 object-cover rounded-full" />
+                {reservation.managerProfileImage ? (
+                  <img src={reservation.managerProfileImage} alt={reservation.managerName} className="w-16 h-16 object-cover rounded-full" />
                 ) : (
                   <User className="w-8 h-8 text-white" />
                 )}
@@ -219,7 +219,7 @@ const ConsumerReservationDetail: React.FC = () => {
                 </div>
                 <div className="flex items-center space-x-1 mb-2">
                   <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                  <span className="text-sm font-medium text-gray-700">{reservation.managerAverageRate?.toFixed(1) || '0.0'}</span>
+                  <span className="text-sm font-medium text-gray-700">{reservation.managerRate? parseFloat(reservation.managerRate).toFixed(1) : '0.0'}</span>
                 </div>
               </div>
             </div>
