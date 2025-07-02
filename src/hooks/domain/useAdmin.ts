@@ -465,10 +465,21 @@ export const useAdmin = () => {
       },
       [],
     ),
-    getBoardWithoutAnswerCount: useCallback(
+    getRefundBoardCount: useCallback(
       async () => {
         try {
-          const result = await adminApi.getBoardWithoutAnswerCount();
+          const result = await adminApi.getRefundBoardCount();
+          return { success: true, data: result };
+        } catch (error: any) {
+          return { success: false, error: error.message };
+        }
+      },
+      [],
+    ),
+    getCounselBoardCount: useCallback(
+      async () => {
+        try {
+          const result = await adminApi.getCounselBoardCount();
           return { success: true, data: result };
         } catch (error: any) {
           return { success: false, error: error.message };

@@ -404,10 +404,16 @@ export const adminApi = {
       `${API_ENDPOINTS.EVENT.GETCOUNT}`,
     )
   },
-  getBoardWithoutAnswerCount: async (): Promise<string> => {
+  getRefundBoardCount: async (): Promise<string> => {
     return apiCall<string>(
       'get',
-      `${API_ENDPOINTS.ADMIN.BOARD.GETWITHOUTANSWERCOUNT}`,
+      `${API_ENDPOINTS.ADMIN.BOARD.REFUND_COUNT}`,
+    )
+  },
+  getCounselBoardCount: async (): Promise<string> => {
+    return apiCall<string>(
+      'get',
+      `${API_ENDPOINTS.ADMIN.BOARD.COUNSEL_COUNT}`,
     )
   },
 

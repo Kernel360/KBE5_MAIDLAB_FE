@@ -171,7 +171,8 @@ export const API_ENDPOINTS = {
       CONSULTATION: '/api/admin/board/consultation',
       REFUND: '/api/admin/board/refund',
       UPDATE_ANSWER: (id: number) => `/api/admin/board/answer/${id}`,
-      GETWITHOUTANSWERCOUNT: '/api/admin/board/boardcount'
+      REFUND_COUNT: '/api/admin/board/refundboardcount',
+      COUNSEL_COUNT: '/api/admin/board/counselboardcount'
     },
   },
 } as const;
