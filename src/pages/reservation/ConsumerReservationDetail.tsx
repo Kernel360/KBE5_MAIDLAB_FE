@@ -333,7 +333,7 @@ const ConsumerReservationDetail: React.FC = () => {
           {/* 관리자 문의 버튼 */}
           <button
             className="flex-1 py-4 bg-gray-200 text-gray-800 font-semibold rounded-2xl hover:bg-gray-400 transition-colors shadow"
-            onClick={() => navigate(ROUTES.BOARD.CREATE)}
+            onClick={() => navigate(ROUTES.BOARD.LIST)}
           >
             관리자 문의
           </button>
