@@ -14,6 +14,7 @@ interface ManagerReservationCardProps {
   onDetailClick: () => void;
   onCheckIn?: () => void;
   onCheckOut?: () => void;
+  getStatusLabel?: (status: string, reservationDate?: string) => string;
 }
 
 export const ManagerReservationCard: React.FC<ManagerReservationCardProps> = ({
@@ -22,6 +23,7 @@ export const ManagerReservationCard: React.FC<ManagerReservationCardProps> = ({
   onDetailClick,
   onCheckIn,
   onCheckOut,
+  getStatusLabel,
 }) => {
   // 오늘 날짜인지 확인
   const isToday = (dateString: string) => {
@@ -81,7 +83,7 @@ export const ManagerReservationCard: React.FC<ManagerReservationCardProps> = ({
               ${getStatusColor(reservation.status)}
             `}
           >
-            {RESERVATION_STATUS_LABELS[reservation.status]}
+            {getStatusLabel ? getStatusLabel(reservation.status, reservation.reservationDate) : RESERVATION_STATUS_LABELS[reservation.status]}
           </span>
         </div>
       </div>
