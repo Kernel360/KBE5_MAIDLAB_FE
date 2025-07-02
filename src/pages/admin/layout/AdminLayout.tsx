@@ -74,7 +74,7 @@ const menuItems = [
     path: '/admin/consumers',
     subItems: [
       { text: '수요자 목록', path: '/admin/consumers' },
-      { text: '환불문의', path: '/admin/boards/consumer' },
+      { text: '수요자 문의 목록', path: '/admin/boards/consumer' },
     ]
   },
   { 
@@ -83,7 +83,7 @@ const menuItems = [
     path: '/admin/managers',
     subItems: [
       { text: '매니저 목록', path: '/admin/managers' },
-      { text: '상담문의', path: '/admin/boards/manager' },
+      { text: '매니저 문의 목록', path: '/admin/boards/manager' },
     ]
   },
   { text: '예약 관리', icon: <CalendarIcon />, path: '/admin/reservations' },

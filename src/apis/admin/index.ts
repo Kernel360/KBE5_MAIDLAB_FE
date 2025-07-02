@@ -6,7 +6,7 @@ import type {
   ReservationDetailResponse,
 } from '@/types/reservation';
 import type { MatchingResponse } from '@/types/matching';
-import type { BoardResponse, BoardDetailResponse } from '@/types/board';
+import type { BoardResponse, BoardDetailResponse, BoardListResponse } from '@/types/board';
 import type {
   AdminLoginRequest,
   AdminPageParams,
@@ -285,18 +285,22 @@ export const adminApi = {
   /**
    * 상담 게시판 조회
    */
-  getConsultationBoards: async (): Promise<BoardResponse[]> => {
-    return apiCall<BoardResponse[]>(
+  getConsultationBoards: async (params: AdminPageParams = {}): Promise<BoardListResponse> => {
+    const { page = 0, size = 10 } = params;
+    const queryString = buildQueryString({ page, size });
+    return apiCall<BoardListResponse>(
       'get',
-      API_ENDPOINTS.ADMIN.BOARD.CONSULTATION,
+      `${API_ENDPOINTS.ADMIN.BOARD.CONSULTATION}${queryString}`,
     );
   },
 
   /**
    * 환불 게시판 조회
    */
-  getRefundBoards: async (): Promise<BoardResponse[]> => {
-    return apiCall<BoardResponse[]>('get', API_ENDPOINTS.ADMIN.BOARD.REFUND);
+  getRefundBoards: async (params: AdminPageParams = {}): Promise<BoardListResponse> => {
+    const { page = 0, size = 10 } = params;
+    const queryString = buildQueryString({ page, size });
+    return apiCall<BoardListResponse>('get', `${API_ENDPOINTS.ADMIN.BOARD.REFUND}${queryString}`);
   },
 
   /**
@@ -400,10 +404,16 @@ export const adminApi = {
       `${API_ENDPOINTS.EVENT.GETCOUNT}`,
     )
   },
-  getBoardWithoutAnswerCount: async (): Promise<string> => {
+  getRefundBoardCount: async (): Promise<string> => {
     return apiCall<string>(
       'get',
-      `${API_ENDPOINTS.ADMIN.BOARD.GETWITHOUTANSWERCOUNT}`,
+      `${API_ENDPOINTS.ADMIN.BOARD.REFUND_COUNT}`,
+    )
+  },
+  getCounselBoardCount: async (): Promise<string> => {
+    return apiCall<string>(
+      'get',
+      `${API_ENDPOINTS.ADMIN.BOARD.COUNSEL_COUNT}`,
     )
   },
 

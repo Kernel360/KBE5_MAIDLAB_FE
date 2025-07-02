@@ -7,6 +7,7 @@ import { adminApi } from '@/apis/admin';
 const Dashboard = () => {
   const { dashboard } = useAdmin();
   const [stats, setStats] = useState<any[]>([]);
+  const [statsLoading, setStatsLoading] = useState(true);
   const [recentLogs, setRecentLogs] = useState<string[]>([]);
   const [logsLoading, setLogsLoading] = useState(true);
   const [logsError, setLogsError] = useState<string | null>(null);
@@ -76,12 +77,34 @@ const Dashboard = () => {
   
   useEffect(() => {
     const fetchStats = async () => {
-      const ManagerCount = (await dashboard.getManagerCount()).data ?? 0;
-      const NewManagerCount = (await dashboard.getNewManagerCount()).data ?? 0;
-      const ConsumerCount = (await dashboard.getConsumerCount()).data ?? 0;
-      const TodayReservation = (await dashboard.getTodayReservationCount()).data ?? 0;
-      const EventCount = (await dashboard.getEventCount()).data ?? 0;
-      const BoardWithoutAnswerCount = (await dashboard.getBoardWithoutAnswerCount()).data ?? 0;
+      try {
+        setStatsLoading(true);
+        // Run all API calls in parallel for faster loading
+        const [
+          managerCountResult,
+          newManagerCountResult,
+          consumerCountResult,
+          todayReservationResult,
+          eventCountResult,
+          refundBoardCountResult,
+          counselBoardCountResult
+        ] = await Promise.all([
+          dashboard.getManagerCount(),
+          dashboard.getNewManagerCount(),
+          dashboard.getConsumerCount(),
+          dashboard.getTodayReservationCount(),
+          dashboard.getEventCount(),
+          dashboard.getRefundBoardCount(),
+          dashboard.getCounselBoardCount()
+        ]);
+
+        const ManagerCount = managerCountResult.data ?? 0;
+        const NewManagerCount = newManagerCountResult.data ?? 0;
+        const ConsumerCount = consumerCountResult.data ?? 0;
+        const TodayReservation = todayReservationResult.data ?? 0;
+        const EventCount = eventCountResult.data ?? 0;
+        const RefundBoardCount = refundBoardCountResult.data ?? 0;
+        const CounselBoardCount = counselBoardCountResult.data ?? 0;
       setStats([
         { 
           label: '전체 회원 수', 
@@ -114,11 +137,32 @@ const Dashboard = () => {
           path: ROUTES.ADMIN.EVENTS
         },
         { 
-          label: '미답변 문의', 
-          value: BoardWithoutAnswerCount,
+          label: '미답변 환불문의', 
+          value: RefundBoardCount,
+          path: ROUTES.ADMIN.CONSUMER_BOARDS
+        },
+        { 
+          label: '미답변 상담문의', 
+          value: CounselBoardCount,
           path: ROUTES.ADMIN.MANAGER_BOARDS
         },
       ]);
+      } catch (error) {
+        console.error('Failed to fetch dashboard stats:', error);
+        // Set default values on error
+        setStats([
+          { label: '전체 회원 수', value: '-', path: ROUTES.ADMIN.CONSUMERS },
+          { label: '현재 활동중인 매니저 수', value: '-', path: ROUTES.ADMIN.MANAGERS },
+          { label: '승인 대기중인 매니저 수', value: '-', path: ROUTES.ADMIN.MANAGERS },
+          { label: '소비자 수', value: '-', path: ROUTES.ADMIN.CONSUMERS },
+          { label: '오늘 예약', value: '-', path: ROUTES.ADMIN.RESERVATIONS },
+          { label: '진행중 이벤트', value: '-', path: ROUTES.ADMIN.EVENTS },
+          { label: '미답변 환불문의', value: '-', path: ROUTES.ADMIN.CONSUMER_BOARDS },
+          { label: '미답변 상담문의', value: '-', path: ROUTES.ADMIN.MANAGER_BOARDS },
+        ]);
+      } finally {
+        setStatsLoading(false);
+      }
     };
 
     const fetchRecentLogs = async () => {
@@ -148,26 +192,38 @@ const Dashboard = () => {
       }
     };
   
-    fetchStats();
-    fetchRecentLogs();
+    // Run stats and logs fetch in parallel
+    Promise.all([fetchStats(), fetchRecentLogs()]);
   }, []);
   return (
     <div className="p-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {stats.map((stat) => (
-          <div
-            key={stat.label}
-            onClick={() => handleStatClick(stat.path)}
-            className="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow duration-200"
-          >
-            <div className="text-sm text-gray-500 mb-2">
-              {stat.label}
+        {statsLoading ? (
+          // Show loading skeleton cards
+          Array.from({ length: 8 }).map((_, index) => (
+            <div key={index} className="bg-white rounded-lg shadow-md p-6">
+              <div className="text-sm text-gray-300 mb-2 bg-gray-200 h-4 rounded animate-pulse">
+              </div>
+              <div className="text-2xl font-semibold bg-gray-200 h-8 rounded animate-pulse">
+              </div>
             </div>
-            <div className="text-2xl font-semibold text-gray-900">
-              {stat.value}
+          ))
+        ) : (
+          stats.map((stat) => (
+            <div
+              key={stat.label}
+              onClick={() => handleStatClick(stat.path)}
+              className="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow duration-200"
+            >
+              <div className="text-sm text-gray-500 mb-2">
+                {stat.label}
+              </div>
+              <div className="text-2xl font-semibold text-gray-900">
+                {stat.value}
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       <div className="mt-8">

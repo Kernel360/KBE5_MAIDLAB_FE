@@ -126,7 +126,7 @@ export const validateFileType = (
 export const validateImageFile = (
   file: File,
 ): { isValid: boolean; error?: string } => {
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
   const maxSize = 5 * 1024 * 1024; // 5MB
 
   if (!validateFileType(file, allowedTypes)) {
