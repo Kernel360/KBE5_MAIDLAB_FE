@@ -62,9 +62,9 @@ const WeeklySettlementChart: React.FC<WeeklySettlementChartProps> = ({
 
   if (weeklySettlements.length === 0) {
     return (
-      <div className="bg-gray-50 rounded-lg p-8 text-center">
-        <div className="text-gray-400 mb-2">📊</div>
-        <p className="text-gray-500">정산 데이터를 불러오는 중...</p>
+      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-8 text-center">
+        <div className="text-gray-400 dark:text-gray-300 mb-2">📊</div>
+        <p className="text-gray-500 dark:text-gray-400">정산 데이터를 불러오는 중...</p>
       </div>
     );
   }
@@ -72,7 +72,7 @@ const WeeklySettlementChart: React.FC<WeeklySettlementChartProps> = ({
   return (
     <div className="space-y-4">
       {/* 그래프 */}
-      <div className="bg-white rounded-lg p-4 border border-gray-100">
+      <div className="bg-white dark:bg-gray-700 rounded-lg p-4 border border-gray-100 dark:border-gray-600">
         <div className="relative h-48">
           <svg
             width="100%"
@@ -134,7 +134,7 @@ const WeeklySettlementChart: React.FC<WeeklySettlementChartProps> = ({
                       x={padding - 8}
                       y={graphHeight - ratio * (graphHeight - padding) + 4}
                       textAnchor="end"
-                      className="text-xs fill-gray-500"
+                      className="text-xs fill-gray-500 dark:fill-gray-400"
                     >
                       {maxAmount > 0
                         ? Math.round((maxAmount * ratio) / 10000) + '만'
@@ -221,7 +221,7 @@ const WeeklySettlementChart: React.FC<WeeklySettlementChartProps> = ({
                         x={point.x}
                         y={graphHeight + 20}
                         textAnchor="middle"
-                        className="text-xs fill-gray-600 font-medium"
+                        className="text-xs fill-gray-600 dark:fill-gray-300 font-medium"
                       >
                         {point.week.week}주차
                       </text>
@@ -235,7 +235,7 @@ const WeeklySettlementChart: React.FC<WeeklySettlementChartProps> = ({
           {/* 툴팁 */}
           {hoveredPoint && (
             <div
-              className="fixed z-50 bg-gray-100 text-black text-xs rounded-lg px-3 py-2 shadow-lg border border-gray-200"
+              className="fixed z-50 bg-gray-100 dark:bg-gray-700 text-black dark:text-white text-xs rounded-lg px-3 py-2 shadow-lg border border-gray-200 dark:border-gray-600"
               style={{
                 left: hoveredPoint.x,
                 top: hoveredPoint.y - 10,
@@ -247,11 +247,11 @@ const WeeklySettlementChart: React.FC<WeeklySettlementChartProps> = ({
               <div className="text-orange-600 font-medium">
                 {formatPrice(hoveredPoint.week.totalAmount)}
               </div>
-              <div className="text-gray-600 text-xs">
+              <div className="text-gray-600 dark:text-gray-300 text-xs">
                 {hoveredPoint.week.settlementsCount}건
               </div>
               {/* 모바일 닫기 힌트 */}
-              <div className="text-gray-500 text-xs mt-1 block md:hidden">
+              <div className="text-gray-500 dark:text-gray-400 text-xs mt-1 block md:hidden">
                 탭하여 닫기
               </div>
             </div>
@@ -261,16 +261,16 @@ const WeeklySettlementChart: React.FC<WeeklySettlementChartProps> = ({
 
       {/* 요약 정보 */}
       <div className="grid grid-cols-3 gap-4 text-center">
-        <div className="bg-white rounded-lg p-3">
-          <p className="text-xs text-gray-500 mb-1">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-3">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
             이번주 정산 ({currentWeek}주차)
           </p>
-          <p className="text-lg font-bold text-gray-900">
+          <p className="text-lg font-bold text-gray-900 dark:text-white">
             {formatPrice(currentWeekData?.totalAmount || 0)}
           </p>
         </div>
-        <div className="bg-white rounded-lg p-3">
-          <p className="text-xs text-gray-500 mb-1">총 정산금액</p>
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-3">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">총 정산금액</p>
           <p className="text-lg font-bold text-blue-500">
             {formatPrice(
               weeklySettlements.reduce(
@@ -280,8 +280,8 @@ const WeeklySettlementChart: React.FC<WeeklySettlementChartProps> = ({
             )}
           </p>
         </div>
-        <div className="bg-white rounded-lg p-3">
-          <p className="text-xs text-gray-500 mb-1">주평균</p>
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-3">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">주평균</p>
           <p className="text-lg font-bold text-green-500">
             {formatPrice(
               Math.round(

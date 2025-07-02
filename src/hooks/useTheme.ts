@@ -6,6 +6,7 @@ import {
   resolveTheme,
   createSystemThemeListener,
   sanitizeTheme,
+  getNextTheme,
 } from '@/utils/theme';
 import type { ThemeContextType, ThemeProviderProps } from '@/types/hooks/theme';
 
@@ -13,17 +14,25 @@ import type { ThemeContextType, ThemeProviderProps } from '@/types/hooks/theme';
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 // ===== DOM에 테마 적용 =====
-const applyThemeToDOM = (): void => {
+const applyThemeToDOM = (theme: ResolvedTheme): void => {
   const root = document.documentElement;
+  
+  console.log('Applying theme to DOM:', theme);
 
-  // 현재는 라이트모드만 지원하므로 고정값
-  root.className = 'light';
-  root.setAttribute('data-theme', 'light');
+  // 기존 테마 클래스 제거
+  root.classList.remove('light', 'dark');
+  
+  // 새 테마 클래스 추가
+  root.classList.add(theme);
+  root.setAttribute('data-theme', theme);
+  
+  console.log('DOM classes after theme change:', root.className);
 
   // 메타 태그 업데이트 (PWA 지원)
   const metaThemeColor = document.querySelector('meta[name="theme-color"]');
   if (metaThemeColor) {
-    metaThemeColor.setAttribute('content', '#ffffff');
+    const themeColor = theme === 'dark' ? '#1f2937' : '#ffffff';
+    metaThemeColor.setAttribute('content', themeColor);
   }
 };
 
@@ -41,7 +50,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     return sanitizeTheme(savedTheme) || defaultTheme;
   });
 
-  const resolvedTheme = resolveTheme(theme); // 현재는 항상 'light'
+  const resolvedTheme = resolveTheme(theme);
 
   // 테마 설정 함수
   const setTheme = (newTheme: typeof theme) => {
@@ -69,7 +78,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
 
   // DOM에 테마 적용
   useEffect(() => {
-    applyThemeToDOM();
+    applyThemeToDOM(resolvedTheme);
   }, [resolvedTheme]);
 
   // localStorage 변경 감지 (다른 탭에서 테마 변경시 동기화)
@@ -98,7 +107,8 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   }, [theme, storageKey]);
 
   const toggleTheme = () => {
-    setTheme(theme === 'light' ? 'system' : 'light');
+    const nextTheme = getNextTheme(theme);
+    setTheme(nextTheme);
   };
 
   const resetTheme = () => {
@@ -146,8 +156,9 @@ export const useThemeToggle = () => {
   const { theme, setTheme } = useTheme();
 
   const toggleTheme = () => {
-    // 현재 라이트모드만 지원: light ↔ system 토글
-    setTheme(theme === 'light' ? 'system' : 'light');
+    // light → dark → system → light 순환
+    const nextTheme = getNextTheme(theme);
+    setTheme(nextTheme);
   };
 
   return toggleTheme;
