@@ -56,7 +56,7 @@ function parsePet(pet: string) {
 const ConsumerReservationDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { fetchReservationDetail, cancelReservation } = useReservation();
+  const { fetchReservationDetail, cancelReservation, payReservation } = useReservation();
   const { isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -87,6 +87,12 @@ const ConsumerReservationDetail: React.FC = () => {
       alert('예약이 취소되었습니다.');
       navigate(-1);
     }
+  };
+
+  // 결제 핸들러
+  const handlePayment = async () => {
+    if (!reservation) return;
+    await payReservation(Number(id));
   };
 
   if (loading) {
@@ -321,6 +327,15 @@ const ConsumerReservationDetail: React.FC = () => {
 
         {/* 하단 버튼 */}
         <div className="mx-4 mt-4 pb-28 flex flex-row gap-3">
+          {/* MATCHED 상태일 때 결제하기 버튼 */}
+          {reservation.status === RESERVATION_STATUS.MATCHED && (
+            <button
+              className="flex-1 py-4 bg-blue-500 text-white font-semibold rounded-2xl hover:bg-blue-600 transition-colors shadow-lg"
+              onClick={handlePayment}
+            >
+              결제하기
+            </button>
+          )}
           {/* 예약 취소 버튼: 예약 가능 상태일 때만 노출 */}
           {([RESERVATION_STATUS.PENDING, RESERVATION_STATUS.MATCHED, RESERVATION_STATUS.APPROVED] as string[]).includes(reservation.status) && (
             <button
