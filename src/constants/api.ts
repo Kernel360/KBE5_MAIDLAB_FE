@@ -80,6 +80,8 @@ export const API_ENDPOINTS = {
     REVIEWS: '/api/manager/myReviews',
   },
   CONSUMER: {
+    POINT:'/api/point',
+    POINT_RECORD:'/api/point/record',
     PROFILE: '/api/consumers/profile',
     MYPAGE: '/api/consumers/mypage',
     LIKES: '/api/consumers/likes',

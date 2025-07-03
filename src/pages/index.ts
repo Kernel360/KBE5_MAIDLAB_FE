@@ -47,6 +47,9 @@ export { default as LikedManagerList } from './consumer/LikedManagerList';
 // 수요자의 블랙리스트 매니저 조회
 export { default as BlackListManagerList } from './consumer/BlackListManagerList';
 
+// 소비자 포인트 페이지
+export { default as PointsPage } from './consumer/PointsPage';
+
 /**
  * manager
  */

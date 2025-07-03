@@ -63,7 +63,7 @@ const MyPage: React.FC = () => {
   };
 
   const handlePoints = () => {
-    showToast('포인트 기능은 준비 중입니다.', 'info');
+    navigate(ROUTES.CONSUMER.POINTS);
   };
 
   const handleLikedManagers = () => {
