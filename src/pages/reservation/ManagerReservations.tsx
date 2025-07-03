@@ -23,10 +23,10 @@ import {
   Inbox
 } from 'lucide-react';
 const FILTERS = [
-  { label: '오늘', value: 'TODAY', icon: Calendar, color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-200' },
-  { label: '예정', value: 'PAID', icon: Clock, color: 'text-orange-600', bgColor: 'bg-orange-50', borderColor: 'border-orange-200' },
-  { label: '진행중', value: 'WORKING', icon: Activity, color: 'text-purple-600', bgColor: 'bg-purple-50', borderColor: 'border-purple-200' },
-  { label: '완료', value: 'COMPLETED', icon: CheckCircle, color: 'text-green-600', bgColor: 'bg-green-50', borderColor: 'border-green-200' },
+  { label: '오늘 일정', value: 'TODAY', icon: Calendar, color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-200', description: '오늘 예약된 모든 일정' },
+  { label: '다가오는 예정', value: 'PAID', icon: Clock, color: 'text-orange-600', bgColor: 'bg-orange-50', borderColor: 'border-orange-200', description: '결제 완료 및 미결제 된 향후 일정' },
+  { label: '진행중', value: 'WORKING', icon: Activity, color: 'text-purple-600', bgColor: 'bg-purple-50', borderColor: 'border-purple-200', description: '현재 작업중인 일정' },
+  { label: '완료', value: 'COMPLETED', icon: CheckCircle, color: 'text-green-600', bgColor: 'bg-green-50', borderColor: 'border-green-200', description: '완료된 일정' },
 ];
 
 // 매니저 예약 페이지 전용 상태 레이블
@@ -224,8 +224,11 @@ const ManagerReservationsAndMatching: React.FC = () => {
       </button>
       
       {filterOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden">
-          <div className="p-1">
+        <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden">
+          <div className="p-2">
+            <div className="text-xs text-gray-500 font-medium px-3 py-2 border-b border-gray-100 mb-1">
+              일정 필터
+            </div>
             {FILTERS.map((f, index) => {
               const FilterIcon = f.icon;
               return (
@@ -237,7 +240,7 @@ const ManagerReservationsAndMatching: React.FC = () => {
                     pagination.goToFirst();
                   }}
                   className={`
-                    w-full flex items-center gap-3 px-3 py-2 rounded-md transition-all duration-200
+                    w-full flex items-start gap-3 px-3 py-3 rounded-md transition-all duration-200 text-left
                     ${filter === f.value 
                       ? `${f.bgColor} ${f.color} font-semibold` 
                       : 'text-gray-700 hover:bg-gray-50'
@@ -245,9 +248,12 @@ const ManagerReservationsAndMatching: React.FC = () => {
                     ${index > 0 ? 'mt-1' : ''}
                   `}
                 >
-                  <FilterIcon className="w-4 h-4" />
-                  <span className="text-sm">{f.label}</span>
-                  {filter === f.value && <CheckCircle className="w-4 h-4 ml-auto" />}
+                  <FilterIcon className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium">{f.label}</div>
+                    <div className="text-xs text-gray-500 mt-0.5">{f.description}</div>
+                  </div>
+                  {filter === f.value && <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />}
                 </button>
               );
             })}
@@ -262,7 +268,7 @@ const ManagerReservationsAndMatching: React.FC = () => {
       <div className="sticky top-0 z-20 bg-white">
       <Header
         variant="sub"
-        title="일정 관리"
+        title="예약 내역"
         backRoute={ROUTES.HOME}
         showMenu={true}
       />
@@ -272,7 +278,7 @@ const ManagerReservationsAndMatching: React.FC = () => {
         <div className="bg-white shadow-sm border-b border-gray-200 sticky top-[65px] z-10">
           <div className="max-w-md mx-auto px-4 py-4">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-gray-800">예약 관리</h2>
+              <h2 className="text-lg font-bold text-gray-800">일정 관리</h2>
               {tab === 'schedule' && filterDropdown}
             </div>
             
@@ -316,7 +322,7 @@ const ManagerReservationsAndMatching: React.FC = () => {
                     px-2 py-0.5 rounded-full text-xs font-semibold
                     ${tab === 'request' ? 'bg-orange-100 text-orange-600' : 'bg-gray-200 text-gray-500'}
                   `}>
-                    {matchings.length}
+                    {matchings.length >= 10 ? '10+' : matchings.length}
                   </span>
                 )}
               </button>
@@ -339,30 +345,41 @@ const ManagerReservationsAndMatching: React.FC = () => {
                   )}
                 </div>
                 <h3 className="text-xl font-bold text-gray-800 mb-2">
-                  {filter === 'TODAY' && '오늘 예약이 없습니다'}
-                  {filter === 'PAID' && '예정된 예약이 없습니다'}
+                  {filter === 'TODAY' && '오늘 예약 일정이 없습니다'}
+                  {filter === 'PAID' && '다가오는 예정 일정이 없습니다'}
                   {filter === 'WORKING' && '진행중인 작업이 없습니다'}
                   {filter === 'COMPLETED' && '완료된 작업이 없습니다'}
                 </h3>
                 <p className="text-gray-500 text-center leading-relaxed mb-8">
-                  {filter === 'TODAY' && '오늘은 예약된 일정이 없어요.\n다른 날짜의 예약을 확인해보세요.'}
-                  {filter === 'PAID' && '아직 예정된 예약이 없어요.\n새로운 예약 요청을 기다려보세요.'}
-                  {filter === 'WORKING' && '현재 진행중인 작업이 없어요.\n완료된 작업이나 예정된 일정을 확인해보세요.'}
+                  {filter === 'TODAY' && '오늘은 예약된 일정이 없어요.\n내일 이후 예약을 "다가오는 예정"에서 확인하세요.'}
+                  {filter === 'PAID' && '결제 완료된 향후 예약이 없어요.\n새로운 예약 요청을 확인해보세요.'}
+                  {filter === 'WORKING' && '현재 진행중인 작업이 없어요.\n오늘 일정이나 예정된 일정을 확인해보세요.'}
                   {filter === 'COMPLETED' && '완료된 작업이 없어요.\n작업을 완료하면 여기에 표시됩니다.'}
                 </p>
-                <div className="flex gap-3">
-                  {filter !== 'TODAY' && (
-                    <button
-                      onClick={() => { setFilter('TODAY'); pagination.goToFirst(); }}
-                      className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors font-medium text-sm"
-                    >
-                      <Calendar className="w-4 h-4" />
-                      오늘 일정 보기
-                    </button>
-                  )}
+                <div className="flex flex-col gap-3">
+                  <div className="flex gap-3">
+                    {filter !== 'TODAY' && (
+                      <button
+                        onClick={() => { setFilter('TODAY'); pagination.goToFirst(); }}
+                        className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors font-medium text-sm"
+                      >
+                        <Calendar className="w-4 h-4" />
+                        오늘 일정 확인
+                      </button>
+                    )}
+                    {filter === 'TODAY' && (
+                      <button
+                        onClick={() => { setFilter('PAID'); pagination.goToFirst(); }}
+                        className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors font-medium text-sm"
+                      >
+                        <Clock className="w-4 h-4" />
+                        다가오는 예정 확인
+                      </button>
+                    )}
+                  </div>
                   <button
                     onClick={() => setTab('request')}
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium text-sm"
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium text-sm"
                   >
                     <Inbox className="w-4 h-4" />
                     예약 요청 확인
@@ -412,17 +429,17 @@ const ManagerReservationsAndMatching: React.FC = () => {
                   고객으로부터 새로운 예약 요청이 들어오면{'\n'}
                   여기에서 확인하고 승인하실 수 있어요.
                 </p>
-                <div className="flex gap-3">
+                <div className="flex flex-col gap-3">
                   <button
                     onClick={() => setTab('schedule')}
-                    className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors font-medium text-sm"
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors font-medium text-sm"
                   >
                     <Calendar className="w-4 h-4" />
                     예약 일정 보기
                   </button>
                   <button
                     onClick={() => window.location.reload()}
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium text-sm"
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium text-sm"
                   >
                     <Activity className="w-4 h-4" />
                     새로고침
