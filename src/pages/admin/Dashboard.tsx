@@ -11,6 +11,9 @@ const Dashboard = () => {
   const [recentLogs, setRecentLogs] = useState<string[]>([]);
   const [logsLoading, setLogsLoading] = useState(true);
   const [logsError, setLogsError] = useState<string | null>(null);
+  const [socket, setSocket] = useState<WebSocket | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [heartbeatInterval, setHeartbeatInterval] = useState<NodeJS.Timeout | null>(null);
   const navigate = useNavigate();
 
   const handleStatClick = (path: string) => {
@@ -20,28 +23,32 @@ const Dashboard = () => {
   // 로그 라인을 파싱하여 활동 정보로 변환
   const parseLogLine = (logLine: string) => {
     try {
-      // 로그 형식이 정해지지 않았으므로 기본적인 파싱 시도
-      // 예: "2024-01-01 12:00:00 [INFO] 사용자 가입: user123"
-      const timestampMatch = logLine.match(/(\d{4}-\d{2}-\d{2}[\s\T]\d{2}:\d{2}:\d{2})/);
+      // 로그 형식: "2025-07-03 14:51:34.354 [http-nio-8080-exec-2] INFO k.maidlab.service.PaymentService - Payment processed"
+      const timestampMatch = logLine.match(/(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})/);
       const timestamp = timestampMatch ? timestampMatch[1] : new Date().toISOString().slice(0, 19);
       
       // 로그 레벨 추출
-      const levelMatch = logLine.match(/\[(INFO|WARN|ERROR|DEBUG)\]/);
+      const levelMatch = logLine.match(/(INFO|WARN|ERROR|DEBUG)\s+/);
       const level = levelMatch ? levelMatch[1] : 'INFO';
       
-      // 메시지 부분 추출 (타임스탬프와 레벨 이후)
+      // 클래스명과 " - " 이후의 메시지만 추출
       let message = logLine;
-      if (timestampMatch) {
-        message = logLine.substring(timestampMatch.index! + timestampMatch[0].length).trim();
-      }
-      if (levelMatch) {
-        message = message.replace(/\[(INFO|WARN|ERROR|DEBUG)\]/, '').trim();
+      const messageMatch = logLine.match(/[A-Za-z0-9.]+\s+-\s+(.+)$/);
+      if (messageMatch) {
+        message = messageMatch[1];
+      } else {
+        // Fallback: remove timestamp, thread info, level, and class name
+        message = logLine
+          .replace(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}\s+/, '') // Remove timestamp with milliseconds
+          .replace(/\[[\w-]+\]\s+/, '') // Remove thread info
+          .replace(/(INFO|WARN|ERROR|DEBUG)\s+/, '') // Remove log level
+          .replace(/^[A-Za-z0-9.]+\s+-\s+/, ''); // Remove class name
       }
       
       return {
         timestamp: new Date(timestamp),
         level,
-        message: message || logLine,
+        message: message.trim() || logLine,
         rawLog: logLine
       };
     } catch (error) {
@@ -55,25 +62,175 @@ const Dashboard = () => {
     }
   };
 
-  // 로그를 활동 유형별로 분류
-  const categorizeActivity = (message: string) => {
-    const msg = message.toLowerCase();
-    if (msg.includes('user') || msg.includes('사용자') || msg.includes('가입') || msg.includes('signup')) {
-      return '회원가입';
-    } else if (msg.includes('reservation') || msg.includes('예약') || msg.includes('booking')) {
-      return '예약';
-    } else if (msg.includes('settlement') || msg.includes('정산') || msg.includes('payment')) {
-      return '정산';
-    } else if (msg.includes('board') || msg.includes('문의') || msg.includes('inquiry')) {
-      return '문의';
-    } else if (msg.includes('manager') || msg.includes('매니저')) {
-      return '매니저';
-    } else if (msg.includes('error') || msg.includes('에러') || msg.includes('오류')) {
-      return '오류';
-    } else {
-      return '시스템';
+  // 로그를 활동 유형별로 분류 (클래스명 기반)
+  const categorizeActivity = (logLine: string) => {
+    const classMatch = logLine.match(/\b(\w+ServiceImpl)\b/i);
+    if (classMatch) {
+      const className = classMatch[1].toLowerCase();
+      if (className.includes('consumer')){
+        return '수요자';
+      } else if (className.includes('manager')) {
+        return '매니저';
+      } else if (className.includes('auth')){
+        return '인증';
+      } else if (className.includes('reservation') || className.includes('booking')) {
+        return '예약';
+      } else if (className.includes('payment') || className.includes('settlement')) {
+        return '정산';
+      } else if (className.includes('board') || className.includes('inquiry')) {
+        return '문의';
+      } else if (className.includes('matching')) {
+        return '매칭';
+      } else if (className.includes('notification')) {
+        return '알림';
+      } else if (className.includes('review')) {
+        return '리뷰';
+      } else {
+        return '서비스';
+      }
     }
-  }; 
+    return '기타';
+  };
+
+  const connectWebSocket = () => {
+    try {
+      const newSocket = new WebSocket('ws://localhost:8080/admin/logs/stream');
+      
+      newSocket.onopen = () => {
+        console.log('WebSocket connected');
+        setIsConnected(true);
+        setLogsError(null);
+        
+        // Request initial logs
+        try {
+          newSocket.send(JSON.stringify({ 
+            type: 'getInitialLogs', 
+            filter: 'service',
+            limit: 50 
+          }));
+        } catch (error) {
+          console.error('Failed to send initial request:', error);
+        }
+        
+        // Start heartbeat
+        const interval = setInterval(() => {
+          if (newSocket.readyState === WebSocket.OPEN) {
+            try {
+              newSocket.send(JSON.stringify({ type: 'ping', timestamp: Date.now() }));
+            } catch (error) {
+              console.error('Failed to send heartbeat:', error);
+              clearInterval(interval);
+            }
+          } else {
+            clearInterval(interval);
+          }
+        }, 30000); // Send ping every 30 seconds
+        
+        setHeartbeatInterval(interval);
+      };
+      
+      newSocket.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          let logContent = '';
+          
+          if (Array.isArray(data)) {
+            // Handle array of JSON strings
+            logContent = data.map(item => {
+              try {
+                const parsedItem = JSON.parse(item);
+                return parsedItem.content || parsedItem.message || item;
+              } catch {
+                return item;
+              }
+            }).join('\n');
+          } else if (typeof data === 'string') {
+            logContent = data;
+          } else if (data.content) {
+            logContent = data.content;
+          } else if (data.message) {
+            logContent = data.message;
+          } else if (data.logs) {
+            logContent = Array.isArray(data.logs) ? data.logs.join('\n') : data.logs;
+          } else {
+            logContent = JSON.stringify(data);
+          }
+          
+          // Clean up escape characters
+          logContent = logContent.replace(/\\r\\n/g, '\n').replace(/\\n/g, '\n');
+          
+          const logLines = logContent.split('\n').filter((line: string) => line.trim() !== '');
+          
+          // Filter for ServiceImpl logs only
+          const serviceLogs = logLines.filter((line: string) => {
+            const classMatch = line.match(/\b\w+ServiceImpl\b/i);
+            return classMatch;
+          });
+          
+          if (serviceLogs.length > 0) {
+            setRecentLogs(prev => {
+              const newLogs = [...serviceLogs].reverse();
+              const uniqueLogs = newLogs.filter(newLog => 
+                !prev.some(existingLog => existingLog.trim() === newLog.trim())
+              );
+              return [...uniqueLogs, ...prev].slice(0, 50);
+            });
+          }
+        } catch (error) {
+          // Handle plain text
+          const logLines = event.data.split('\n').filter((line: string) => line.trim() !== '');
+          const serviceLogs = logLines.filter((line: string) => {
+            const classMatch = line.match(/\b\w+ServiceImpl\b/i);
+            return classMatch;
+          });
+          
+          if (serviceLogs.length > 0) {
+            setRecentLogs(prev => {
+              const newLogs = [...serviceLogs].reverse();
+              const uniqueLogs = newLogs.filter(newLog => 
+                !prev.some(existingLog => existingLog.trim() === newLog.trim())
+              );
+              return [...uniqueLogs, ...prev].slice(0, 50);
+            });
+          }
+        }
+      };
+      
+      newSocket.onclose = () => {
+        setIsConnected(false);
+        
+        // Clear heartbeat interval
+        if (heartbeatInterval) {
+          clearInterval(heartbeatInterval);
+          setHeartbeatInterval(null);
+        }
+      };
+      
+      newSocket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        setIsConnected(false);
+      };
+      
+      setSocket(newSocket);
+    } catch (error) {
+      console.error('Failed to create WebSocket:', error);
+      setIsConnected(false);
+    }
+  };
+
+  const disconnectWebSocket = () => {
+    if (socket) {
+      socket.close();
+      setSocket(null);
+      setIsConnected(false);
+    }
+    
+    // Clear heartbeat interval
+    if (heartbeatInterval) {
+      clearInterval(heartbeatInterval);
+      setHeartbeatInterval(null);
+    }
+  };
   
   useEffect(() => {
     const fetchStats = async () => {
@@ -172,17 +329,20 @@ const Dashboard = () => {
         const logs: any = await adminApi.getAdminLogs(50);
         console.log('Admin logs API response:', typeof logs, 'isArray:', Array.isArray(logs), 'length:', logs?.length);
         
-        // API 응답 처리: 배열이면 그대로 사용, 문자열이면 줄바꿈으로 분리
+        // API 응답 처리: ServiceImpl 로그만 필터링
+        let logLines: string[] = [];
         if (Array.isArray(logs)) {
-          setRecentLogs(logs as string[]);
+          logLines = logs as string[];
         } else if (typeof logs === 'string') {
-          // 문자열인 경우 줄바꿈으로 분리하여 배열로 변환
-          const logLines: string[] = logs.split('\n').filter((line: string) => line.trim() !== '');
-          setRecentLogs(logLines);
-        } else {
-          console.warn('API response is neither array nor string:', logs);
-          setRecentLogs([]);
+          logLines = logs.split('\n').filter((line: string) => line.trim() !== '');
         }
+        
+        // ServiceImpl 로그만 필터링
+        const serviceImplLogs = logLines.filter((line: string) => {
+          return line.match(/\b\w+ServiceImpl\b/i);
+        });
+        
+        setRecentLogs(serviceImplLogs);
       } catch (error) {
         console.error('Failed to fetch admin logs:', error);
         setLogsError('로그를 불러오는데 실패했습니다.');
@@ -194,6 +354,15 @@ const Dashboard = () => {
   
     // Run stats and logs fetch in parallel
     Promise.all([fetchStats(), fetchRecentLogs()]);
+  }, []);
+
+  // WebSocket connection
+  useEffect(() => {
+    connectWebSocket();
+    
+    return () => {
+      disconnectWebSocket();
+    };
   }, []);
   return (
     <div className="p-6">
@@ -227,9 +396,17 @@ const Dashboard = () => {
       </div>
 
       <div className="mt-8">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          최근 활동
-        </h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold text-gray-900">
+            최근 활동
+          </h2>
+          <div className="flex items-center space-x-2">
+            <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+            <span className="text-sm text-gray-600">
+              {isConnected ? 'WebSocket 연결됨' : 'WebSocket 연결 끊김'}
+            </span>
+          </div>
+        </div>
         <div className="bg-white rounded-lg shadow-md">
           <div className="p-6">
             {logsLoading ? (
@@ -253,10 +430,17 @@ const Dashboard = () => {
               </div>
             ) : (
               recentLogs
+                .slice() // Create copy
+                .sort((a, b) => {
+                  // Extract timestamp from log line for proper sorting
+                  const timeA = parseLogLine(a).timestamp.getTime();
+                  const timeB = parseLogLine(b).timestamp.getTime();
+                  return timeB - timeA; // Newest first
+                })
                 .slice(0, 20) // 더 많은 로그를 가져와서 필터링 후에도 충분한 항목 확보
                 .map(logLine => {
                   const parsedLog = parseLogLine(logLine);
-                  const activityType = categorizeActivity(parsedLog.message);
+                  const activityType = categorizeActivity(logLine);
                   return { ...parsedLog, activityType };
                 })
                 .filter(log => log.activityType !== '시스템') // 시스템 로그 제거
