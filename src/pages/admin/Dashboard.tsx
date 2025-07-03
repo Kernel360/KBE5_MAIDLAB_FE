@@ -62,24 +62,34 @@ const Dashboard = () => {
     }
   };
 
-  // 로그를 활동 유형별로 분류
-  const categorizeActivity = (message: string) => {
-    const msg = message.toLowerCase();
-    if (msg.includes('user') || msg.includes('사용자') || msg.includes('가입') || msg.includes('signup')) {
-      return '회원가입';
-    } else if (msg.includes('reservation') || msg.includes('예약') || msg.includes('booking')) {
-      return '예약';
-    } else if (msg.includes('settlement') || msg.includes('정산') || msg.includes('payment')) {
-      return '정산';
-    } else if (msg.includes('board') || msg.includes('문의') || msg.includes('inquiry')) {
-      return '문의';
-    } else if (msg.includes('manager') || msg.includes('매니저')) {
-      return '매니저';
-    } else if (msg.includes('error') || msg.includes('에러') || msg.includes('오류')) {
-      return '오류';
-    } else {
-      return '시스템';
+  // 로그를 활동 유형별로 분류 (클래스명 기반)
+  const categorizeActivity = (logLine: string) => {
+    const classMatch = logLine.match(/\b(\w+ServiceImpl)\b/i);
+    if (classMatch) {
+      const className = classMatch[1].toLowerCase();
+      if (className.includes('consumer')){
+        return '수요자';
+      } else if (className.includes('manager')) {
+        return '매니저';
+      } else if (className.includes('auth')){
+        return '인증';
+      } else if (className.includes('reservation') || className.includes('booking')) {
+        return '예약';
+      } else if (className.includes('payment') || className.includes('settlement')) {
+        return '정산';
+      } else if (className.includes('board') || className.includes('inquiry')) {
+        return '문의';
+      } else if (className.includes('matching')) {
+        return '매칭';
+      } else if (className.includes('notification')) {
+        return '알림';
+      } else if (className.includes('review')) {
+        return '리뷰';
+      } else {
+        return '서비스';
+      }
     }
+    return '기타';
   };
 
   const connectWebSocket = () => {
@@ -430,7 +440,7 @@ const Dashboard = () => {
                 .slice(0, 20) // 더 많은 로그를 가져와서 필터링 후에도 충분한 항목 확보
                 .map(logLine => {
                   const parsedLog = parseLogLine(logLine);
-                  const activityType = categorizeActivity(parsedLog.message);
+                  const activityType = categorizeActivity(logLine);
                   return { ...parsedLog, activityType };
                 })
                 .filter(log => log.activityType !== '시스템') // 시스템 로그 제거
