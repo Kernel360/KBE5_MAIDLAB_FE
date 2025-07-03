@@ -13,7 +13,7 @@ import { ROUTES } from '@/constants';
 import { Header } from '@/components';
 
 const SETTLEMENT_STATUS_LABELS: Record<string, string> = {
-  PENDING: '대기중',
+  PENDING: '정산 대기중',
   APPROVED: '승인완료', 
   REJECTED: '거절됨',
 };

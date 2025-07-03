@@ -59,7 +59,7 @@ const getStatusInfo = (status: string) => {
     case 'PENDING':
       return { 
         icon: Clock, 
-        label: '대기중',
+        label: '정산 대기중',
         bg: 'bg-amber-50',
         text: 'text-amber-700',
         border: 'border-amber-200'
