@@ -23,7 +23,7 @@ const getServiceTypeInfo = (serviceType: string) => {
       return { 
         label: '일반청소', 
         icon: Home, 
-        gradient: 'from-blue-500 to-cyan-500'
+        gradient: 'from-orange-500 to-orange-500'
       };
     case 'BABYSITTER':
       return { 
