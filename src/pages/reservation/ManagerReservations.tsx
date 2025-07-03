@@ -13,8 +13,8 @@ import {CheckInOutModal,ConfirmModal,MatchingCard,TabHeader} from '@/components'
 import { ROUTES } from '@/constants/route';
 import { Header } from '@/components';
 const FILTERS = [
-  { label: '예정', value: 'PAID' },
   { label: '오늘', value: 'TODAY' },
+  { label: '예정', value: 'PAID' },
   { label: '진행중', value: 'WORKING' },
   { label: '완료', value: 'COMPLETED' },
 ];
@@ -48,7 +48,7 @@ const ManagerReservationsAndMatching: React.FC = () => {
       const diffTime = resDate.getTime() - today.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       
-      if (diffDays === 0) return '업무를 준비하세요!';
+      if (diffDays === 0) return '업무를 시작하세요!';
       if (diffDays === 1) return '내일 예정';
       if (diffDays > 0) return `D-${diffDays}`;
       if (diffDays < 0) return `D+${Math.abs(diffDays)}`;
@@ -58,7 +58,7 @@ const ManagerReservationsAndMatching: React.FC = () => {
   };
   const [tab, setTab] = useState<'schedule' | 'request'>('schedule');
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'PAID' | 'TODAY' | 'WORKING' | 'COMPLETED'>('PAID');
+  const [filter, setFilter] = useState<'PAID' | 'TODAY' | 'WORKING' | 'COMPLETED'>('TODAY');
   const [filterOpen, setFilterOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [modal, setModal] = useState<{ type: 'success' | 'fail' | null, info?: any }>({ type: null });
