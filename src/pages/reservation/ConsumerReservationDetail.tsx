@@ -124,7 +124,7 @@ const ConsumerReservationDetail: React.FC = () => {
   const serviceType = reservation.serviceType as keyof typeof SERVICE_TYPE_LABELS;
   const serviceInfo = SERVICE_ICONS[serviceType] || SERVICE_ICONS.GENERAL_CLEANING;
   const ServiceIcon = serviceInfo.icon;
-
+  
   const additionalOptions = parseAdditionalOptions(reservation.serviceAdd || '');
   const petLabel = parsePet(reservation.pet || '');
   const roomSizeLabel = reservation ? formatRoomSize(reservation.roomSize) : '-';
@@ -213,11 +213,18 @@ const ConsumerReservationDetail: React.FC = () => {
             <h3 className="text-lg font-semibold text-gray-900 mb-4">담당 도우미</h3>
             <div className="flex items-center space-x-4 mb-4">
               <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center overflow-hidden">
-                {reservation.managerProfileImage ? (
-                  <img src={reservation.managerProfileImage} alt={reservation.managerName} className="w-16 h-16 object-cover rounded-full" />
-                ) : (
-                  <User className="w-8 h-8 text-white" />
-                )}
+                {reservation.managerProfileImageUrl ? (
+                  <img 
+                    src={reservation.managerProfileImageUrl} 
+                    alt={reservation.managerName} 
+                    className="w-16 h-16 object-cover rounded-full" 
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                    }}
+                  />
+                ) : null}
+                <User className={`w-8 h-8 text-white ${reservation.managerProfileImageUrl ? 'hidden' : ''}`} />
               </div>
               <div className="flex-1">
                 <div className="flex items-center space-x-2 mb-1">
@@ -229,21 +236,19 @@ const ConsumerReservationDetail: React.FC = () => {
                 </div>
               </div>
             </div>
-            <div className="flex space-x-3">
-              <button
-                onClick={() => setShowPhoneNumber(!showPhoneNumber)}
-                className="flex-1 flex items-center justify-center space-x-2 py-3 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors"
-              >
-                <Phone className="w-5 h-5" />
-                <span>{showPhoneNumber ? phoneNumber : '연락처 보기'}</span>
-              </button>
-              <button
-                className="flex-1 flex items-center justify-center space-x-2 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
-                disabled
-              >
-                <MessageCircle className="w-5 h-5" />
-                <span>메시지</span>
-              </button>
+            <div className="bg-gray-50 rounded-xl p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Phone className="w-5 h-5 text-gray-600" />
+                  <span className="text-sm font-medium text-gray-700">연락처</span>
+                </div>
+                <button
+                  onClick={() => setShowPhoneNumber(!showPhoneNumber)}
+                  className="flex items-center space-x-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium"
+                >
+                  <span>{showPhoneNumber ? phoneNumber : '연락처 보기'}</span>
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -337,7 +342,7 @@ const ConsumerReservationDetail: React.FC = () => {
             </button>
           )}
           {/* 예약 취소 버튼: 예약 가능 상태일 때만 노출 */}
-          {([RESERVATION_STATUS.PENDING, RESERVATION_STATUS.MATCHED, RESERVATION_STATUS.APPROVED] as string[]).includes(reservation.status) && (
+          {([RESERVATION_STATUS.PENDING, RESERVATION_STATUS.MATCHED, RESERVATION_STATUS.PAID, RESERVATION_STATUS.APPROVED] as string[]).includes(reservation.status) && (
             <button
               className = "flex-1 py-4 bg-red-500 text-white font-semibold rounded-2xl hover:bg-red-600 transition-colors shadow-lg"
               onClick={handleCancel}

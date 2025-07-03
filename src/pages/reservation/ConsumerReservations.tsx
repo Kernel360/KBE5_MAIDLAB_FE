@@ -74,11 +74,11 @@ const ConsumerReservations: React.FC = () => {
   >([]);
   const { getStatusBadgeStyle } = useReservationStatus();
 
-  const { currentPage, totalPages, goToPage, startIndex, endIndex } =
-    usePagination({
-      totalItems: filteredReservations.length,
-      itemsPerPage: 5,
-    });
+  const pagination = usePagination({
+    totalItems: filteredReservations.length,
+    itemsPerPage: 5,
+    initialPage: 0,
+  });
 
   // 각 탭별 개수 계산
   const getTabCount = (tabKey: TabType): number => {
@@ -97,6 +97,7 @@ const ConsumerReservations: React.FC = () => {
       setFilteredReservations(filterFn(reservations));
     }
   }, [reservations, activeTab]);
+
 
   const handleReservationClick = (reservationId: number) => {
     navigate(ROUTES.CONSUMER.RESERVATION_DETAIL.replace(':id', String(reservationId)));
@@ -120,7 +121,7 @@ const ConsumerReservations: React.FC = () => {
     await payReservation(reservationId);
   };
 
-  const currentReservations = filteredReservations.slice(startIndex, endIndex);
+  const currentReservations = filteredReservations.slice(pagination.startIndex, pagination.endIndex);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -145,7 +146,10 @@ const ConsumerReservations: React.FC = () => {
               return (
                 <button
                   key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
+                  onClick={() => {
+                    setActiveTab(tab.key);
+                    pagination.goToFirst();
+                  }}
                   className={`
                     flex-1 flex flex-col items-center justify-center py-4 px-2 relative
                     ${isActive 
@@ -216,17 +220,17 @@ const ConsumerReservations: React.FC = () => {
               </div>
 
               {/* 페이지네이션 */}
-              {totalPages > 1 && (
+              {pagination.totalPages > 1 && (
                 <div className="flex justify-center items-center mt-8 gap-2">
-                  {Array.from({ length: totalPages }, (_, i) => (
+                  {Array.from({ length: pagination.totalPages }, (_, i) => (
                     <button
                       key={i}
-                      onClick={() => goToPage(i)}
+                      onClick={() => pagination.goToPage(i)}
                       className={`
-                        w-8 h-8 rounded-lg text-sm font-medium transition-colors
-                        ${currentPage === i
-                          ? 'bg-orange-500 text-white'
-                          : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+                        w-10 h-10 rounded-xl font-semibold text-sm transition-all duration-200
+                        ${pagination.currentPage === i
+                          ? 'bg-orange-500 text-white shadow-md scale-110'
+                          : 'bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-500 hover:scale-105'
                         }
                       `}
                     >
