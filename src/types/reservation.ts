@@ -67,6 +67,12 @@ export interface ReservationDetailResponse {
   consumerProfileImage: string;
   managerPhoneNumber: string;
   consumerPhoneNumber: string;
+
+  managerUuId: string;
+  managerProfileImageUrl: string;
+  managerAverageRate: number;
+  managerRegion: string[];
+  
 }
 
 /**
