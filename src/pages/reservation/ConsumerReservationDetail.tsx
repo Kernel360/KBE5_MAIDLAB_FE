@@ -342,7 +342,7 @@ const ConsumerReservationDetail: React.FC = () => {
             </button>
           )}
           {/* 예약 취소 버튼: 예약 가능 상태일 때만 노출 */}
-          {([RESERVATION_STATUS.PENDING, RESERVATION_STATUS.MATCHED, RESERVATION_STATUS.APPROVED] as string[]).includes(reservation.status) && (
+          {([RESERVATION_STATUS.PENDING, RESERVATION_STATUS.MATCHED, RESERVATION_STATUS.PAID, RESERVATION_STATUS.APPROVED] as string[]).includes(reservation.status) && (
             <button
               className = "flex-1 py-4 bg-red-500 text-white font-semibold rounded-2xl hover:bg-red-600 transition-colors shadow-lg"
               onClick={handleCancel}
