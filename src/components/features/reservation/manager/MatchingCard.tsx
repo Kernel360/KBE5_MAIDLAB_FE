@@ -46,7 +46,7 @@ export const MatchingCard: React.FC<MatchingCardProps> = ({ matching, onAccept, 
           </div>
           <div className="text-right">
             <div className="text-xs text-gray-500 mb-1">예상 수익</div>
-            <div className="text-xl font-bold text-orange-500">
+            <div className="text-xl font-bold text-green-700">
               {formatPrice(expectedEarning.toString())}
             </div>
           </div>
@@ -58,8 +58,8 @@ export const MatchingCard: React.FC<MatchingCardProps> = ({ matching, onAccept, 
         <div className="grid gap-3">
           {/* Date & Time */}
           <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-            <div className="flex items-center justify-center w-8 h-8 bg-orange-100 rounded-lg">
-              <Calendar className="w-4 h-4 text-orange-600" />
+            <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg">
+              <Calendar className="w-5 h-5 text-blue-500" />
             </div>
             <div className="flex-1">
               <div className="text-xs text-gray-500 font-medium mb-1">일정</div>
@@ -76,7 +76,7 @@ export const MatchingCard: React.FC<MatchingCardProps> = ({ matching, onAccept, 
           {/* Location */}
           <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
             <div className="flex items-center justify-center w-8 h-8 bg-orange-100 rounded-lg">
-              <MapPin className="w-4 h-4 text-orange-600" />
+              <MapPin className="w-5 h-5 text-orange-600" />
             </div>
             <div className="flex-1">
               <div className="text-xs text-gray-500 font-medium mb-1">위치</div>
@@ -94,8 +94,8 @@ export const MatchingCard: React.FC<MatchingCardProps> = ({ matching, onAccept, 
           {/* Room Size & Pet Info */}
           <div className="grid grid-cols-2 gap-3">
             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-              <div className="flex items-center justify-center w-8 h-8 bg-orange-100 rounded-lg">
-                <Home className="w-4 h-4 text-orange-600" />
+              <div className="flex items-center justify-center w-8 h-8 bg-green-100 rounded-lg">
+                <Home className="w-5 h-5 text-green-600" />
               </div>
               <div className="flex-1">
                 <div className="text-xs text-gray-500 font-medium mb-1">방크기</div>
@@ -106,8 +106,8 @@ export const MatchingCard: React.FC<MatchingCardProps> = ({ matching, onAccept, 
             </div>
             
             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-              <div className="flex items-center justify-center w-8 h-8 bg-orange-100 rounded-lg">
-                <Heart className="w-4 h-4 text-orange-600" />
+              <div className="flex items-center justify-center w-8 h-8 bg-red-100 rounded-lg">
+                <Heart className="w-5 h-5 text-red-600" />
               </div>
               <div className="flex-1">
                 <div className="text-xs text-gray-500 font-medium mb-1">반려동물</div>
@@ -139,7 +139,7 @@ export const MatchingCard: React.FC<MatchingCardProps> = ({ matching, onAccept, 
             </div>
             <div className="border-t border-gray-200 mt-2 pt-2 flex justify-between items-center">
               <span className="font-bold text-gray-900">실제 수령액</span>
-              <span className="font-bold text-orange-500 text-lg">{formatPrice(expectedEarning.toString())}</span>
+              <span className="font-bold text-green-700 text-lg">{formatPrice(expectedEarning.toString())}</span>
             </div>
           </div>
         </div>
