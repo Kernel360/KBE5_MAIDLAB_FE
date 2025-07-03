@@ -5,20 +5,16 @@ import { ReservationCard } from '@/components';
 import {
   ROUTES,
   RESERVATION_STATUS,
-  PAGINATION_DEFAULTS,
-  INFO_MESSAGES,
 } from '@/constants';
 import { useNavigate } from 'react-router-dom';
 import type { ReservationListResponse } from '@/types/reservation';
 import { Header } from '@/components';
-import { useAuth } from '@/hooks/useAuth';
 import { useReservationStatus } from '@/hooks/useReservationStatus';
 import { 
   Clock, 
   Calendar, 
   Coffee, 
   Check,
-  AlertTriangle,
   CalendarDays
 } from 'lucide-react';
 
@@ -76,7 +72,6 @@ const ConsumerReservations: React.FC = () => {
   const [filteredReservations, setFilteredReservations] = useState<
     ReservationListResponse[]
   >([]);
-  const { isAuthenticated } = useAuth();
   const { getStatusBadgeStyle } = useReservationStatus();
 
   const { currentPage, totalPages, goToPage, startIndex, endIndex } =

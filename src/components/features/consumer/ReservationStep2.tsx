@@ -158,7 +158,12 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
 
   // 매니저 선택 관련 함수들
   const handleManagerToggle = () => {
-    setForm(prev => ({ ...prev, chooseManager: !prev.chooseManager }));
+    setForm(prev => ({ 
+      ...prev, 
+      chooseManager: !prev.chooseManager,
+      // 토글을 비활성화할 때 기존 매니저 선택 정보도 초기화
+      ...(!prev.chooseManager ? {} : { managerUuId: '', managerInfo: undefined })
+    }));
     if (!form.chooseManager) {
       handleManagerSelect();
     }
@@ -977,7 +982,7 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
       />
 
       {/* 진행 단계 표시 */}
-      <div className="bg-gray-50 px-10 py-6">
+      <div className="bg-gray-50 px-10 py-6 pt-20">
         <div className="max-w-md mx-auto">
           <div className="flex items-center justify-center mb-6">
             {STEPS.map((step, index) => (
@@ -1045,13 +1050,40 @@ const ReservationStep2: React.FC<Props> = ({ initialData, onBack, onSubmit }) =>
 
       {/* 매니저 선택 모달 */}
       {showManagerModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowManagerModal(false);
+              // 매니저가 선택되지 않았다면 토글을 비활성화하고 매니저 정보 초기화
+              if (!form.managerUuId) {
+                setForm(prev => ({ 
+                  ...prev, 
+                  chooseManager: false,
+                  managerUuId: '',
+                  managerInfo: undefined
+                }));
+              }
+            }
+          }}
+        >
           <div className="bg-white rounded-2xl w-full max-w-md max-h-[80vh] overflow-hidden">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-bold text-gray-800">매니저 선택</h3>
                 <button
-                  onClick={() => setShowManagerModal(false)}
+                  onClick={() => {
+                    setShowManagerModal(false);
+                    // 매니저가 선택되지 않았다면 토글을 비활성화하고 매니저 정보 초기화
+                    if (!form.managerUuId) {
+                      setForm(prev => ({ 
+                        ...prev, 
+                        chooseManager: false,
+                        managerUuId: '',
+                        managerInfo: undefined
+                      }));
+                    }
+                  }}
                   className="text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

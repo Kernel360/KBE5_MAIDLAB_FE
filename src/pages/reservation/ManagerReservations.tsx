@@ -21,6 +21,12 @@ const FILTERS = [
 
 const PAGE_SIZE = 5;
 
+// 매니저 예약 페이지 전용 상태 레이블
+const MANAGER_STATUS_LABELS = {
+  [RESERVATION_STATUS.MATCHED]: '결제 대기중',
+  [RESERVATION_STATUS.PAID]: '예정',
+};
+
 const ManagerReservationsAndMatching: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -33,6 +39,23 @@ const ManagerReservationsAndMatching: React.FC = () => {
   } = useReservation();
   const { fetchMatchings, matchings } = useMatching();
   const { getStatusBadgeStyle } = useReservationStatus();
+  
+  // 매니저 페이지 전용 상태 레이블 함수
+  const getManagerStatusLabel = (status: string, reservationDate?: string) => {
+    if (status === RESERVATION_STATUS.PAID && reservationDate) {
+      const today = new Date();
+      const resDate = new Date(reservationDate);
+      const diffTime = resDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === 0) return '업무를 준비하세요!';
+      if (diffDays === 1) return '내일 예정';
+      if (diffDays > 0) return `D-${diffDays}`;
+      if (diffDays < 0) return `D+${Math.abs(diffDays)}`;
+    }
+    
+    return MANAGER_STATUS_LABELS[status as keyof typeof MANAGER_STATUS_LABELS] || status;
+  };
   const [tab, setTab] = useState<'schedule' | 'request'>('schedule');
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'PAID' | 'TODAY' | 'WORKING' | 'COMPLETED'>('PAID');
@@ -74,21 +97,22 @@ const ManagerReservationsAndMatching: React.FC = () => {
     filteredReservations = reservations.filter(r => {
       const dateOnly = getDateOnly(r.reservationDate);
       return (
-        (r.status === RESERVATION_STATUS.PAID && dateOnly > todayStr) ||
-        (dateOnly === todayStr && ([RESERVATION_STATUS.PAID] as string[]).includes(r.status))
+        ((r.status === RESERVATION_STATUS.PAID || r.status === RESERVATION_STATUS.MATCHED) && dateOnly > todayStr) ||
+        (dateOnly === todayStr && ([RESERVATION_STATUS.PAID, RESERVATION_STATUS.MATCHED] as string[]).includes(r.status))
       );
     });
   } else if (filter === 'TODAY') {
     filteredReservations = reservations
       .filter(r =>
-        ([RESERVATION_STATUS.PAID, RESERVATION_STATUS.WORKING, RESERVATION_STATUS.COMPLETED] as string[]).includes(r.status) &&
+        ([RESERVATION_STATUS.PAID, RESERVATION_STATUS.MATCHED, RESERVATION_STATUS.WORKING, RESERVATION_STATUS.COMPLETED] as string[]).includes(r.status) &&
         (getDateOnly(r.reservationDate) === todayStr)
       )
       .sort((a, b) => {
         const order = {
-          [RESERVATION_STATUS.PAID]: 0,
-          [RESERVATION_STATUS.WORKING]: 1,
-          [RESERVATION_STATUS.COMPLETED]: 2,
+          [RESERVATION_STATUS.MATCHED]: 0,
+          [RESERVATION_STATUS.PAID]: 1,
+          [RESERVATION_STATUS.WORKING]: 2,
+          [RESERVATION_STATUS.COMPLETED]: 3,
         };
         return (order[a.status as keyof typeof order] ?? 99) - (order[b.status as keyof typeof order] ?? 99);
       });
@@ -137,6 +161,7 @@ const ManagerReservationsAndMatching: React.FC = () => {
       key={reservation.reservationId}
       reservation={reservation}
       getStatusBadgeStyle={getStatusBadgeStyle}
+      getStatusLabel={getManagerStatusLabel}
       onDetailClick={() => navigate(ROUTES.MANAGER.RESERVATION_DETAIL.replace(':id', String(reservation.reservationId)))}
       onCheckIn={() => handleCheckInOutClick(reservation, true)}
       onCheckOut={async () => {
