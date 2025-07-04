@@ -253,7 +253,7 @@ const ConsumerDetail = () => {
         <div className="lg:col-span-2">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-2">
-              최근 예약 기록 (최근 5건)
+              최근 예약 기록 (최대 5건 조회)
             </h3>
             
             {recentReservations.length > 0 ? (

@@ -9,17 +9,31 @@ import { SERVICE_TYPE_LABELS, SERVICE_TYPES } from '@/constants/service';
 import { RESERVATION_STATUS } from '@/constants/status';
 import { ManagerReservationCard } from '@/components';
 import { useToast } from '@/hooks/useToast';
-import {CheckInOutModal,ConfirmModal,MatchingCard,TabHeader} from '@/components'
+import {CheckInOutModal,ConfirmModal,MatchingCard} from '@/components'
 import { ROUTES } from '@/constants/route';
 import { Header } from '@/components';
+import { usePagination } from '@/hooks/usePagination';
+import { 
+  Calendar, 
+  Clock, 
+  Activity, 
+  CheckCircle, 
+  ChevronDown, 
+  Filter,
+  Inbox
+} from 'lucide-react';
 const FILTERS = [
-  { label: '예정', value: 'PAID' },
-  { label: '오늘', value: 'TODAY' },
-  { label: '진행중', value: 'WORKING' },
-  { label: '완료', value: 'COMPLETED' },
+  { label: '오늘 일정', value: 'TODAY', icon: Calendar, color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-200', description: '오늘 예약된 모든 일정' },
+  { label: '다가오는 예정', value: 'PAID', icon: Clock, color: 'text-orange-600', bgColor: 'bg-orange-50', borderColor: 'border-orange-200', description: '결제 완료 및 미결제 된 향후 일정' },
+  { label: '진행중', value: 'WORKING', icon: Activity, color: 'text-purple-600', bgColor: 'bg-purple-50', borderColor: 'border-purple-200', description: '현재 작업중인 일정' },
+  { label: '완료', value: 'COMPLETED', icon: CheckCircle, color: 'text-green-600', bgColor: 'bg-green-50', borderColor: 'border-green-200', description: '완료된 일정' },
 ];
 
-const PAGE_SIZE = 5;
+// 매니저 예약 페이지 전용 상태 레이블
+const MANAGER_STATUS_LABELS = {
+  [RESERVATION_STATUS.MATCHED]: '결제 대기중',
+  [RESERVATION_STATUS.PAID]: '예정',
+};
 
 const ManagerReservationsAndMatching: React.FC = () => {
   const navigate = useNavigate();
@@ -33,11 +47,27 @@ const ManagerReservationsAndMatching: React.FC = () => {
   } = useReservation();
   const { fetchMatchings, matchings } = useMatching();
   const { getStatusBadgeStyle } = useReservationStatus();
+  
+  // 매니저 페이지 전용 상태 레이블 함수
+  const getManagerStatusLabel = (status: string, reservationDate?: string) => {
+    if (status === RESERVATION_STATUS.PAID && reservationDate) {
+      const today = new Date();
+      const resDate = new Date(reservationDate);
+      const diffTime = resDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === 0) return '업무를 시작하세요!';
+      if (diffDays === 1) return '내일 예정';
+      if (diffDays > 0) return `D-${diffDays}`;
+      if (diffDays < 0) return `D+${Math.abs(diffDays)}`;
+    }
+    
+    return MANAGER_STATUS_LABELS[status as keyof typeof MANAGER_STATUS_LABELS] || status;
+  };
   const [tab, setTab] = useState<'schedule' | 'request'>('schedule');
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'PAID' | 'TODAY' | 'WORKING' | 'COMPLETED'>('PAID');
+  const [filter, setFilter] = useState<'PAID' | 'TODAY' | 'WORKING' | 'COMPLETED'>('TODAY');
   const [filterOpen, setFilterOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const [modal, setModal] = useState<{ type: 'success' | 'fail' | null, info?: any }>({ type: null });
   const [checkInOutModal, setCheckInOutModal] = useState<{
     isOpen: boolean;
@@ -54,7 +84,6 @@ const ManagerReservationsAndMatching: React.FC = () => {
     isOpen: false,
     isCheckIn: true,
   });
-
   useEffect(() => {
     setLoading(true);
     Promise.all([fetchReservations(), fetchMatchings()]).finally(() => setLoading(false));
@@ -74,21 +103,22 @@ const ManagerReservationsAndMatching: React.FC = () => {
     filteredReservations = reservations.filter(r => {
       const dateOnly = getDateOnly(r.reservationDate);
       return (
-        (r.status === RESERVATION_STATUS.PAID && dateOnly > todayStr) ||
-        (dateOnly === todayStr && ([RESERVATION_STATUS.PAID] as string[]).includes(r.status))
+        ((r.status === RESERVATION_STATUS.PAID || r.status === RESERVATION_STATUS.MATCHED) && dateOnly > todayStr) ||
+        (dateOnly === todayStr && ([RESERVATION_STATUS.PAID, RESERVATION_STATUS.MATCHED] as string[]).includes(r.status))
       );
     });
   } else if (filter === 'TODAY') {
     filteredReservations = reservations
       .filter(r =>
-        ([RESERVATION_STATUS.PAID, RESERVATION_STATUS.WORKING, RESERVATION_STATUS.COMPLETED] as string[]).includes(r.status) &&
+        ([RESERVATION_STATUS.PAID, RESERVATION_STATUS.MATCHED, RESERVATION_STATUS.WORKING, RESERVATION_STATUS.COMPLETED] as string[]).includes(r.status) &&
         (getDateOnly(r.reservationDate) === todayStr)
       )
       .sort((a, b) => {
         const order = {
-          [RESERVATION_STATUS.PAID]: 0,
-          [RESERVATION_STATUS.WORKING]: 1,
-          [RESERVATION_STATUS.COMPLETED]: 2,
+          [RESERVATION_STATUS.WORKING]: 0,
+          [RESERVATION_STATUS.PAID]: 1,
+          [RESERVATION_STATUS.MATCHED]: 2,
+          [RESERVATION_STATUS.COMPLETED]: 3,
         };
         return (order[a.status as keyof typeof order] ?? 99) - (order[b.status as keyof typeof order] ?? 99);
       });
@@ -97,8 +127,13 @@ const ManagerReservationsAndMatching: React.FC = () => {
   } else if (filter === 'COMPLETED') {
     filteredReservations = reservations.filter(r => r.status === RESERVATION_STATUS.COMPLETED);
   }
-  const totalPages = Math.ceil(filteredReservations.length / PAGE_SIZE);
-  const paginatedReservations = filteredReservations.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const pagination = usePagination({
+    totalItems: filteredReservations.length,
+    itemsPerPage: 5,
+    initialPage: 0,
+  });
+  
+  const paginatedReservations = filteredReservations.slice(pagination.startIndex, pagination.endIndex);
 
   // 체크인/아웃 핸들러
   const handleCheckInOutClick = (reservation: ReservationListResponse, isCheckIn: boolean) => {
@@ -131,12 +166,14 @@ const ManagerReservationsAndMatching: React.FC = () => {
     setConfirmModal({ isOpen: false, isCheckIn: true });
   };
 
+
   // 예약 일정 카드 UI
   const renderReservationCard = (reservation: any) => (
     <ManagerReservationCard
       key={reservation.reservationId}
       reservation={reservation}
       getStatusBadgeStyle={getStatusBadgeStyle}
+      getStatusLabel={getManagerStatusLabel}
       onDetailClick={() => navigate(ROUTES.MANAGER.RESERVATION_DETAIL.replace(':id', String(reservation.reservationId)))}
       onCheckIn={() => handleCheckInOutClick(reservation, true)}
       onCheckOut={async () => {
@@ -168,76 +205,204 @@ const ManagerReservationsAndMatching: React.FC = () => {
   );
 
   // 필터 드롭다운 UI
+  const currentFilter = FILTERS.find((f) => f.value === filter);
+  const CurrentIcon = currentFilter?.icon || Filter;
+  
   const filterDropdown = (
-    <div className="relative inline-block text-left">
+    <div className="relative">
       <button
         onClick={() => setFilterOpen((v) => !v)}
-        className="flex items-center gap-1 px-4 py-2 border border-gray-300 rounded-full font-semibold text-gray-700 bg-white hover:bg-gray-100"
+        className={`
+          flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200
+          ${currentFilter ? `${currentFilter.bgColor} ${currentFilter.borderColor} ${currentFilter.color} border` : 'bg-gray-100 border border-gray-200 text-gray-700'}
+          hover:shadow-sm
+        `}
       >
-        {FILTERS.find((f) => f.value === filter)?.label}
-        <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+        <CurrentIcon className="w-5 h-5" />
+        <span className="text-sm font-medium">{currentFilter?.label}</span>
+        <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${filterOpen ? 'rotate-180' : ''}`} />
       </button>
+      
       {filterOpen && (
-        <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-          {FILTERS.map((f) => (
-            <button
-              key={f.value}
-              onClick={() => { setFilter(f.value as 'PAID' | 'TODAY' | 'WORKING' | 'COMPLETED'); setFilterOpen(false); setCurrentPage(1); }}
-              className={`block w-full px-4 py-2 text-left text-gray-700 hover:bg-orange-50 ${filter === f.value ? 'font-bold text-orange-500' : ''}`}
-            >
-              {f.label}
-            </button>
-          ))}
+        <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden">
+          <div className="p-2">
+            <div className="text-xs text-gray-500 font-medium px-3 py-2 border-b border-gray-100 mb-1">
+              일정 필터
+            </div>
+            {FILTERS.map((f, index) => {
+              const FilterIcon = f.icon;
+              return (
+                <button
+                  key={f.value}
+                  onClick={() => { 
+                    setFilter(f.value as 'PAID' | 'TODAY' | 'WORKING' | 'COMPLETED'); 
+                    setFilterOpen(false); 
+                    pagination.goToFirst();
+                  }}
+                  className={`
+                    w-full flex items-start gap-3 px-3 py-3 rounded-md transition-all duration-200 text-left
+                    ${filter === f.value 
+                      ? `${f.bgColor} ${f.color} font-semibold` 
+                      : 'text-gray-700 hover:bg-gray-50'
+                    }
+                    ${index > 0 ? 'mt-1' : ''}
+                  `}
+                >
+                  <FilterIcon className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium">{f.label}</div>
+                    <div className="text-xs text-gray-500 mt-0.5">{f.description}</div>
+                  </div>
+                  {filter === f.value && <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />}
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
   );
 
-  // 모달 UI
-  const now = new Date();
   return (
     <div className="min-h-screen bg-gray-50 flex-col">
       <div className="sticky top-0 z-20 bg-white">
       <Header
         variant="sub"
-        title="예약 관리"
+        title="예약 내역"
         backRoute={ROUTES.HOME}
         showMenu={true}
       />
       </div>
       <div className="max-w-md mx-auto bg-gray-50 min-h-screen p-0 pb-20 relative pt-20">
         {/* 탭 헤더 */}
-        <TabHeader
-          tab={tab}
-          setTab={setTab}
-          filter={filter}
-          setFilter={setFilter}
-          filterDropdown={filterDropdown}
-          filterOpen={filterOpen}
-          setFilterOpen={setFilterOpen}
-        />
+        <div className="bg-white shadow-sm border-b border-gray-200 sticky top-[65px] z-10">
+          <div className="max-w-md mx-auto px-4 py-4">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-gray-800">일정 관리</h2>
+              {tab === 'schedule' && filterDropdown}
+            </div>
+            
+            <div className="flex bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setTab('schedule')}
+                className={`
+                  flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-md transition-all duration-200 font-medium text-sm
+                  ${tab === 'schedule' 
+                    ? 'bg-white text-orange-600 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-800'
+                  }
+                `}
+              >
+                <Calendar className="w-4 h-4" />
+                <span>일정 내역</span>
+                {filteredReservations.length > 0 && (
+                  <span className={`
+                    px-2 py-0.5 rounded-full text-xs font-semibold
+                    ${tab === 'schedule' ? 'bg-orange-100 text-orange-600' : 'bg-gray-200 text-gray-500'}
+                  `}>
+                    {filteredReservations.length}
+                  </span>
+                )}
+              </button>
+              
+              <button
+                onClick={() => setTab('request')}
+                className={`
+                  flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-md transition-all duration-200 font-medium text-sm
+                  ${tab === 'request' 
+                    ? 'bg-white text-orange-600 shadow-sm' 
+                    : 'text-gray-600 hover:text-gray-800'
+                  }
+                `}
+              >
+                <Inbox className="w-4 h-4" />
+                <span>고객 예약 요청</span>
+                {matchings.length > 0 && (
+                  <span className={`
+                    px-2 py-0.5 rounded-full text-xs font-semibold
+                    ${tab === 'request' ? 'bg-orange-100 text-orange-600' : 'bg-gray-200 text-gray-500'}
+                  `}>
+                    {matchings.length >= 10 ? '10+' : matchings.length}
+                  </span>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
         {/* 예약 일정 탭 */}
         {tab === 'schedule' && (
-          <div className="px-2 pt-4">
+          <div className="px-4 pt-6">
             {loading ? (
-              <div className="text-center py-8 text-gray-400">로딩중...</div>
+              <div className="flex flex-col items-center justify-center py-16">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-200 border-t-orange-500 mb-4"></div>
+                <p className="text-gray-500 font-medium">로딩중...</p>
+              </div>
             ) : paginatedReservations.length === 0 ? (
-              <div className="text-center py-8 text-gray-400">예약 일정이 없습니다.</div>
+              <div className="flex flex-col items-center justify-center py-16 px-6">
+                <div className="bg-gradient-to-br from-orange-100 to-orange-50 rounded-full p-6 mb-6">
+                  {currentFilter?.icon && (
+                    <currentFilter.icon className={`w-12 h-12 ${currentFilter.color}`} />
+                  )}
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">
+                  {filter === 'TODAY' && '오늘 예약 일정이 없습니다'}
+                  {filter === 'PAID' && '다가오는 예정 일정이 없습니다'}
+                  {filter === 'WORKING' && '진행중인 작업이 없습니다'}
+                  {filter === 'COMPLETED' && '완료된 작업이 없습니다'}
+                </h3>
+                <p className="text-gray-500 text-center leading-relaxed mb-8">
+                  {filter === 'TODAY' && '오늘은 예약된 일정이 없어요.\n내일 이후 예약을 "다가오는 예정"에서 확인하세요.'}
+                  {filter === 'PAID' && '결제 완료된 향후 예약이 없어요.\n새로운 예약 요청을 확인해보세요.'}
+                  {filter === 'WORKING' && '현재 진행중인 작업이 없어요.\n오늘 일정이나 예정된 일정을 확인해보세요.'}
+                  {filter === 'COMPLETED' && '완료된 작업이 없어요.\n작업을 완료하면 여기에 표시됩니다.'}
+                </p>
+                <div className="flex flex-col gap-3">
+                  <div className="flex gap-3">
+                    {filter !== 'TODAY' && (
+                      <button
+                        onClick={() => { setFilter('TODAY'); pagination.goToFirst(); }}
+                        className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors font-medium text-sm"
+                      >
+                        <Calendar className="w-4 h-4" />
+                        오늘 일정 확인
+                      </button>
+                    )}
+                    {filter === 'TODAY' && (
+                      <button
+                        onClick={() => { setFilter('PAID'); pagination.goToFirst(); }}
+                        className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors font-medium text-sm"
+                      >
+                        <Clock className="w-4 h-4" />
+                        다가오는 예정 확인
+                      </button>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => setTab('request')}
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium text-sm"
+                  >
+                    <Inbox className="w-4 h-4" />
+                    예약 요청 확인
+                  </button>
+                </div>
+              </div>
             ) : (
               paginatedReservations.map(renderReservationCard)
             )}
             {/* 페이지네이션 */}
-            {totalPages > 1 && (
-              <div className="flex justify-center mt-6 space-x-2">
-                {Array.from({ length: totalPages }, (_, i) => (
+            {pagination.totalPages > 1 && (
+              <div className="flex justify-center items-center mt-8 gap-2">
+                {Array.from({ length: pagination.totalPages }, (_, i) => (
                   <button
                     key={i}
-                    onClick={() => setCurrentPage(i + 1)}
-                    className={`px-3 py-1 rounded ${
-                      currentPage === i + 1
-                        ? 'bg-orange-500 text-white'
-                        : 'bg-white text-gray-600 hover:bg-gray-100'
-                    }`}
+                    onClick={() => pagination.goToPage(i)}
+                    className={`
+                      w-10 h-10 rounded-xl font-semibold text-sm transition-all duration-200
+                      ${pagination.currentPage === i
+                        ? 'bg-orange-500 text-white shadow-md scale-110'
+                        : 'bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-500 hover:scale-105'
+                      }
+                    `}
                   >
                     {i + 1}
                   </button>
@@ -248,11 +413,39 @@ const ManagerReservationsAndMatching: React.FC = () => {
         )}
         {/* 예약 요청 탭 */}
         {tab === 'request' && (
-          <div className="px-2 pt-4">
+          <div className="px-4 pt-6">
             {loading ? (
-              <div className="text-center py-8 text-gray-400">로딩중...</div>
+              <div className="flex flex-col items-center justify-center py-16">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-200 border-t-orange-500 mb-4"></div>
+                <p className="text-gray-500 font-medium">로딩중...</p>
+              </div>
             ) : matchings.length === 0 ? (
-              <div className="text-center py-8 text-gray-400">예약 요청이 없습니다.</div>
+              <div className="flex flex-col items-center justify-center py-16 px-6">
+                <div className="bg-gradient-to-br from-blue-100 to-blue-50 rounded-full p-6 mb-6">
+                  <Inbox className="w-12 h-12 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">새로운 예약 요청이 없습니다</h3>
+                <p className="text-gray-500 text-center leading-relaxed mb-8">
+                  고객으로부터 새로운 예약 요청이 들어오면{'\n'}
+                  여기에서 확인하고 승인하실 수 있어요.
+                </p>
+                <div className="flex flex-col gap-3">
+                  <button
+                    onClick={() => setTab('schedule')}
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors font-medium text-sm"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    예약 일정 보기
+                  </button>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium text-sm"
+                  >
+                    <Activity className="w-4 h-4" />
+                    새로고침
+                  </button>
+                </div>
+              </div>
             ) : (
               matchings.map(renderMatchingCard)
             )}
@@ -279,6 +472,11 @@ const ManagerReservationsAndMatching: React.FC = () => {
           onConfirm={handleModalConfirm}
           isCheckIn={checkInOutModal.isCheckIn}
           reservationInfo={checkInOutModal.reservationInfo}
+        />
+        <ConfirmModal
+          isOpen={confirmModal.isOpen}
+          onClose={handleConfirmModalClose}
+          isCheck={confirmModal.isCheckIn}
         />
       </div>
     </div>

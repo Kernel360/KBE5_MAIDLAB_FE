@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import { useAuth, useForm, useToast } from '@/hooks';
 import { ROUTES } from '@/constants';
+import { validateBirthDate } from '@/constants/validation';
 import type { SignUpRequest } from '@/types/auth';
 import { Header } from '@/components/layout/Header/Header';
 
@@ -48,7 +49,7 @@ const SignUp: React.FC = () => {
         password: (value) =>
           /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{8,20}$/.test(value),
         name: (value) => value.length >= 2 && value.length <= 20,
-        birth: (value) => value.length === 10, // YYYY-MM-DD
+        birth: (value) => validateBirthDate(value).isValid,
       },
 
       onSubmit: async (formData) => {
@@ -116,6 +117,12 @@ const SignUp: React.FC = () => {
     }
 
     setValue('birth', formatted);
+  };
+
+  const getBirthErrorMessage = () => {
+    if (!errors.birth || !touched.birth) return '';
+    const validation = validateBirthDate(values.birth);
+    return validation.error || '올바른 생년월일을 입력해주세요.';
   };
 
   const getPasswordStrength = () => {
@@ -358,7 +365,7 @@ const SignUp: React.FC = () => {
               />
               {errors.birth && touched.birth && (
                 <p className="text-red-500 text-sm">
-                  올바른 생년월일을 입력해주세요.
+                  {getBirthErrorMessage()}
                 </p>
               )}
             </div>
