@@ -18,6 +18,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Header } from '@/components/layout/Header/Header';
 import PasswordChangeModal from '@/components/common/PasswordChangeModal/PasswordChangeModal';
 import { ShareModal } from '@/components/common';
+import { usePoint } from '@/hooks/domain/usePoint';
 
 interface MenuItemProps {
   icon: React.ReactNode;
@@ -47,6 +48,7 @@ const MyPage: React.FC = () => {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const { point: apiPoint, fetchPoint, loading: pointLoading } = usePoint();
 
   useEffect(() => {
     const loadUserInfo = async () => {
@@ -57,6 +59,10 @@ const MyPage: React.FC = () => {
     };
     loadUserInfo();
   }, [fetchMypage]);
+
+  useEffect(() => {
+    fetchPoint();
+  }, [fetchPoint]);
 
   const handleProfileEdit = () => {
     navigate(ROUTES.CONSUMER.PROFILE);
@@ -143,10 +149,14 @@ const MyPage: React.FC = () => {
 
                 <div className="flex items-center justify-center gap-2 mb-6">
                   <span className="text-gray-600">포인트:</span>
-                  {userInfo?.point !== undefined && (
+                  {pointLoading ? (
+                    <span className="text-gray-400">로딩 중...</span>
+                  ) : apiPoint !== null ? (
                     <span className="text-[#FF6B00] font-medium">
-                      {userInfo.point}P
+                      {apiPoint.toLocaleString()}P
                     </span>
+                  ) : (
+                    <span className="text-gray-400">-</span>
                   )}
                 </div>
 
