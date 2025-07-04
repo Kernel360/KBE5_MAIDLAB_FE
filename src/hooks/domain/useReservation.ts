@@ -92,28 +92,37 @@ export const useReservation = () => {
         throw new Error('서비스 종류가 선택되지 않았습니다.');
       }
 
-        const formattedData: ReservationCreateRequest = {
-          serviceDetailTypeId: reservationData.serviceDetailTypeId,
-          address: reservationData.address,
-          addressDetail: reservationData.addressDetail,
-          managerUuId: reservationData.managerUuId,
-          housingType: reservationData.housingType,
-          lifeCleaningRoomIdx: reservationData.lifeCleaningRoomIdx,
-          housingInformation: reservationData.housingInformation,
-          reservationDate: toISODateTime(reservationData.reservationDate, reservationData.startTime),
-          startTime: toISODateTime(reservationData.reservationDate, reservationData.startTime),
-          endTime: toISODateTime(reservationData.reservationDate, reservationData.endTime),
-          serviceOptions: reservationData.serviceOptions,
-          pet: reservationData.pet,
-          specialRequest: reservationData.specialRequest,
-          totalPrice: reservationData.totalPrice,
-        };
-        const result = await callApi(() => reservationApi.create(formattedData), {
-          showSuccessToast: false,
-          errorMessage: '예약에 실패했습니다.',
-        });
-  
-        if (result.success) {
+      const formattedData: ReservationCreateRequest = {
+        serviceDetailTypeId: reservationData.serviceDetailTypeId,
+        address: reservationData.address,
+        addressDetail: reservationData.addressDetail,
+        managerUuId: reservationData.managerUuId,
+        housingType: reservationData.housingType,
+        lifeCleaningRoomIdx: reservationData.lifeCleaningRoomIdx,
+        housingInformation: reservationData.housingInformation,
+        reservationDate: toISODateTime(
+          reservationData.reservationDate,
+          reservationData.startTime,
+        ),
+        startTime: toISODateTime(
+          reservationData.reservationDate,
+          reservationData.startTime,
+        ),
+        endTime: toISODateTime(
+          reservationData.reservationDate,
+          reservationData.endTime,
+        ),
+        serviceOptions: reservationData.serviceOptions,
+        pet: reservationData.pet,
+        specialRequest: reservationData.specialRequest,
+        totalPrice: reservationData.totalPrice,
+      };
+      const result = await callApi(() => reservationApi.create(formattedData), {
+        showSuccessToast: false,
+        errorMessage: '예약에 실패했습니다.',
+      });
+
+      if (result.success) {
         await fetchReservations(true); // 강제 새로고침
       }
 
@@ -157,7 +166,9 @@ export const useReservation = () => {
       );
 
       if (result.success) {
-        updateLocalReservation(reservationId, { status: 'PAID' });
+        updateLocalReservation(reservationId, {
+          status: 'PAID',
+        });
       }
 
       return result;
@@ -201,7 +212,9 @@ export const useReservation = () => {
       );
 
       if (result.success) {
-        updateLocalReservation(reservationId, { status: 'WORKING' });
+        updateLocalReservation(reservationId, {
+          status: 'WORKING',
+        });
       }
 
       return result;
@@ -221,7 +234,9 @@ export const useReservation = () => {
       );
 
       if (result.success) {
-        updateLocalReservation(reservationId, { status: 'COMPLETED' });
+        updateLocalReservation(reservationId, {
+          status: 'COMPLETED',
+        });
       }
 
       return result;
@@ -238,7 +253,9 @@ export const useReservation = () => {
       });
 
       if (result.success && data.reservationId) {
-        updateLocalReservation(data.reservationId, { isExistReview: true });
+        updateLocalReservation(data.reservationId, {
+          isExistReview: true,
+        });
       }
 
       return result;
