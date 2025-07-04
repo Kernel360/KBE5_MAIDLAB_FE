@@ -8,6 +8,8 @@ import type {
   CheckInOutRequest,
   ReviewRegisterRequest,
   WeeklySettlementResponse,
+  PagingParams,
+  PageResponse,
 } from '@/types/reservation';
 import { API_ENDPOINTS } from '@/constants/api';
 
@@ -27,12 +29,33 @@ export const reservationApi = {
   },
 
   /**
-   * 전체 예약 조회
+   * 전체 예약 조회 (기존 - 하위 호환성)
    */
   getAllReservations: async (): Promise<ReservationListResponse[]> => {
     return apiCall<ReservationListResponse[]>(
       'get',
       API_ENDPOINTS.RESERVATION.LIST,
+    );
+  },
+
+  /**
+   * 페이징된 예약 조회 (새로운 API)
+   */
+  getReservationsPaginated: async (
+    params: PagingParams = {},
+  ): Promise<PageResponse<ReservationListResponse>> => {
+    const defaultParams = {
+      page: 0,
+      size: 5,
+      sortBy: 'reservationDate',
+      sortOrder: 'DESC',
+      ...params,
+    };
+
+    const queryString = buildQueryString(defaultParams);
+    return apiCall<PageResponse<ReservationListResponse>>(
+      'get',
+      `/api/reservations/consumer${queryString}`,
     );
   },
 
@@ -62,11 +85,7 @@ export const reservationApi = {
    * 예약 결제
    */
   payment: async (data: PaymentRequestBody): Promise<string> => {
-    return apiCall<string>(
-      'post',
-      API_ENDPOINTS.RESERVATION.PAYMENT(),
-      data,
-    );
+    return apiCall<string>('post', API_ENDPOINTS.RESERVATION.PAYMENT(), data);
   },
 
   /**
@@ -114,14 +133,8 @@ export const reservationApi = {
   /**
    * 리뷰 등록
    */
-  registerReview: async (
-    data: ReviewRegisterRequest,
-  ): Promise<string> => {
-    return apiCall<string>(
-      'post',
-      API_ENDPOINTS.RESERVATION.REVIEW(),
-      data,
-    );
+  registerReview: async (data: ReviewRegisterRequest): Promise<string> => {
+    return apiCall<string>('post', API_ENDPOINTS.RESERVATION.REVIEW(), data);
   },
 
   /**
@@ -136,5 +149,4 @@ export const reservationApi = {
       `${API_ENDPOINTS.RESERVATION.SETTLEMENTS}${queryString}`,
     );
   },
-
 };

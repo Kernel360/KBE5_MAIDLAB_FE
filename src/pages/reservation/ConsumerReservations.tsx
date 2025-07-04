@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useReservationPagination } from '@/hooks/domain/useReservationPagination';
 import { useReservation } from '@/hooks/domain/useReservation';
-import { usePagination } from '@/hooks/usePagination';
 import { ReservationCard } from '@/components';
 import {
   ROUTES,
   RESERVATION_STATUS,
 } from '@/constants';
 import { useNavigate } from 'react-router-dom';
-import type { ReservationListResponse } from '@/types/reservation';
+import type { PagingParams } from '@/types/reservation';
+import type { ReservationStatus } from '@/constants/status';
 import { Header } from '@/components';
 import { useReservationStatus } from '@/hooks/useReservationStatus';
 import { 
@@ -15,7 +16,10 @@ import {
   Calendar, 
   Coffee, 
   Check,
-  CalendarDays
+  CalendarDays,
+  ChevronDown,
+  SortAsc,
+  SortDesc
 } from 'lucide-react';
 
 type TabType = '전체' | '요청 대기중' | '예정' | '진행중' | '완료';
@@ -53,51 +57,99 @@ const TABS = [
   },
 ];
 
-const RESERVATION_FILTERS = {
-  전체: (reservations: ReservationListResponse[]) => reservations,
-  '요청 대기중': (reservations: ReservationListResponse[]) =>
-    reservations.filter((r) => r.status === RESERVATION_STATUS.PENDING),
-  예정: (reservations: ReservationListResponse[]) =>
-    reservations.filter((r) => r.status === RESERVATION_STATUS.MATCHED || r.status === RESERVATION_STATUS.PAID),
-  진행중: (reservations: ReservationListResponse[]) =>
-    reservations.filter((r) => r.status === RESERVATION_STATUS.WORKING),
-  완료: (reservations: ReservationListResponse[]) =>
-    reservations.filter((r) => r.status === RESERVATION_STATUS.COMPLETED),
+// 탭에서 서버 상태로 매핑
+const TAB_TO_STATUS_MAP: Record<TabType, ReservationStatus | undefined> = {
+  '전체': undefined,
+  '요청 대기중': RESERVATION_STATUS.PENDING,
+  '예정': RESERVATION_STATUS.MATCHED, // 백엔드에서 MATCHED, PAID 두 상태 모두 처리
+  '진행중': RESERVATION_STATUS.WORKING,
+  '완료': RESERVATION_STATUS.COMPLETED,
 } as const;
+
+// 정렬 옵션
+const SORT_OPTIONS = [
+  { key: 'createdAt', label: '생성순', icon: Calendar },
+  { key: 'reservationDate', label: '예약일순', icon: Clock },
+  { key: 'totalPrice', label: '금액순', icon: Coffee },
+] as const;
 
 const ConsumerReservations: React.FC = () => {
   const navigate = useNavigate();
-  const { reservations, loading, fetchReservations, payReservation } = useReservation();
+  const { 
+    data: paginatedData, 
+    params, 
+    loading, 
+    error,
+    changeStatus, 
+    changePage, 
+    changeSort,
+    fetchReservations 
+  } = useReservationPagination();
+  
+  const { payReservation } = useReservation();
+  
   const [activeTab, setActiveTab] = useState<TabType>('전체');
-  const [filteredReservations, setFilteredReservations] = useState<
-    ReservationListResponse[]
-  >([]);
+  const [showSortOptions, setShowSortOptions] = useState(false);
   const { getStatusBadgeStyle } = useReservationStatus();
 
-  const pagination = usePagination({
-    totalItems: filteredReservations.length,
-    itemsPerPage: 5,
-    initialPage: 0,
-  });
+  // 현재 데이터
+  const currentReservations = paginatedData?.content || [];
+  const totalPages = paginatedData?.totalPages || 0;
+  const currentPage = paginatedData?.number || 0;
+  const totalElements = paginatedData?.totalElements || 0;
 
-  // 각 탭별 개수 계산
-  const getTabCount = (tabKey: TabType): number => {
-    if (!reservations) return 0;
-    const filterFn = RESERVATION_FILTERS[tabKey];
-    return filterFn(reservations).length;
-  };
-
+  // 초기 데이터 로드
   useEffect(() => {
     fetchReservations();
   }, [fetchReservations]);
 
-  useEffect(() => {
-    if (reservations) {
-      const filterFn = RESERVATION_FILTERS[activeTab];
-      setFilteredReservations(filterFn(reservations));
-    }
-  }, [reservations, activeTab]);
+  // 탭 변경 핸들러
+  const handleTabChange = useCallback(async (tab: TabType) => {
+    setActiveTab(tab);
+    const status = TAB_TO_STATUS_MAP[tab];
+    await changeStatus(status);
+  }, [changeStatus]);
 
+  // 페이지 변경 핸들러
+  const handlePageChange = useCallback(async (page: number) => {
+    await changePage(page);
+  }, [changePage]);
+
+  // 정렬 변경 핸들러
+  const handleSortChange = useCallback(async (sortBy: PagingParams['sortBy']) => {
+    const newOrder = params.sortBy === sortBy && params.sortOrder === 'DESC' ? 'ASC' : 'DESC';
+    await changeSort(sortBy, newOrder);
+    setShowSortOptions(false);
+  }, [params.sortBy, params.sortOrder, changeSort]);
+
+  // 결제 핸들러
+  const handlePayment = useCallback(async (reservationId: number) => {
+    const result = await payReservation(reservationId);
+    
+    if (result.success) {
+      // 결제 성공 시 현재 페이지 새로고침
+      await fetchReservations();
+    }
+  }, [payReservation, fetchReservations]);
+
+  // 로딩 스켈레톤 컴포넌트
+  const SkeletonCard = () => (
+    <div className="bg-white rounded-xl p-4 border border-gray-100 animate-pulse mb-4">
+      <div className="flex justify-between items-start mb-3">
+        <div className="h-6 bg-gray-200 rounded-full w-16"></div>
+        <div className="h-4 bg-gray-200 rounded w-20"></div>
+      </div>
+      <div className="space-y-2">
+        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+        <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+      </div>
+    </div>
+  );
+
+  // 현재 정렬 옵션 찾기
+  const currentSortOption = SORT_OPTIONS.find(option => option.key === params.sortBy) || SORT_OPTIONS[0];
+  const SortIcon = currentSortOption.icon;
 
   const handleReservationClick = (reservationId: number) => {
     navigate(ROUTES.CONSUMER.RESERVATION_DETAIL.replace(':id', String(reservationId)));
@@ -118,117 +170,166 @@ const ConsumerReservations: React.FC = () => {
     event: React.MouseEvent,
   ) => {
     event.stopPropagation();
-    await payReservation(reservationId);
+    await handlePayment(reservationId);
   };
-
-  const currentReservations = filteredReservations.slice(pagination.startIndex, pagination.endIndex);
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 헤더 */}
       <Header
         variant="sub"
         title="예약 내역"
         backRoute={ROUTES.HOME}
         showMenu={true}
       />
-
-      <div className="max-w-md mx-auto bg-gray-50 min-h-screen pt-20">
+      <div className="max-w-md mx-auto bg-gray-50 min-h-screen p-0 pb-20 relative pt-20">
         {/* 탭 네비게이션 */}
-        <div className="bg-gray-50 border-b border-gray-100 sticky top-[64px] z-10">
-
-          <div className="flex">
-            {TABS.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.key;
-              const count = getTabCount(tab.key);
-              
-              return (
+        <div className="bg-white shadow-sm border-b border-gray-200 sticky top-[65px] z-10">
+          <div className="px-4 py-3">
+            {/* 정렬 옵션 */}
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-lg font-semibold text-gray-900">예약 내역</h3>
+              <div className="relative">
                 <button
-                  key={tab.key}
-                  onClick={() => {
-                    setActiveTab(tab.key);
-                    pagination.goToFirst();
-                  }}
-                  className={`
-                    flex-1 flex flex-col items-center justify-center py-4 px-2 relative
-                    ${isActive 
-                      ? 'text-orange-600 bg-orange-50' 
-                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                    }
-                    transition-all duration-200
-                  `}
+                  onClick={() => setShowSortOptions(!showSortOptions)}
+                  className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
                 >
-                  <div className="flex items-center justify-center mb-1">
-                    <Icon className={`w-5 h-5 ${isActive ? 'text-orange-600' : 'text-gray-400'}`} />
-                    {count > 0 && (
-                      <span className={`
-                        ml-1 px-1.5 py-0.5 text-xs font-medium rounded-full min-w-[18px] text-center
-                        ${isActive 
-                          ? 'bg-orange-600 text-white' 
-                          : 'bg-gray-400 text-white'
-                        }
-                      `}>
-                        {count}
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-xs font-medium">{tab.label}</span>
-                  
-                  {/* 활성 탭 인디케이터 */}
-                  {isActive && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-600"></div>
-                  )}
+                  <SortIcon className="w-4 h-4 text-gray-600" />
+                  <span className="text-sm text-gray-600">{currentSortOption.label}</span>
+                  {params.sortOrder === 'DESC' ? 
+                    <SortDesc className="w-4 h-4 text-gray-600" /> : 
+                    <SortAsc className="w-4 h-4 text-gray-600" />
+                  }
+                  <ChevronDown className="w-4 h-4 text-gray-600" />
                 </button>
-              );
-            })}
+                
+                {showSortOptions && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                    {SORT_OPTIONS.map((option) => {
+                      const OptionIcon = option.icon;
+                      const isActive = params.sortBy === option.key;
+                      return (
+                        <button
+                          key={option.key}
+                          onClick={() => handleSortChange(option.key as PagingParams['sortBy'])}
+                          className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
+                            isActive ? 'bg-orange-50 text-orange-600' : 'text-gray-700'
+                          }`}
+                        >
+                          <OptionIcon className="w-4 h-4" />
+                          <span className="text-sm">{option.label}</span>
+                          {isActive && (
+                            params.sortOrder === 'DESC' ? 
+                              <SortDesc className="w-4 h-4 ml-auto" /> : 
+                              <SortAsc className="w-4 h-4 ml-auto" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
+              {TABS.map((tab) => {
+                const IconComponent = tab.icon;
+                const isActive = activeTab === tab.key;
+                
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => handleTabChange(tab.key)}
+                    className={`
+                      flex-1 flex flex-col items-center justify-center py-3 px-2 rounded-md transition-all duration-200
+                      ${isActive 
+                        ? 'bg-white shadow-sm text-orange-500 font-semibold' 
+                        : 'text-gray-600 hover:text-gray-800'
+                      }
+                    `}
+                  >
+                    <IconComponent className={`w-5 h-5 mb-1 ${isActive ? 'text-orange-500' : tab.color}`} />
+                    <span className="text-xs">{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
         {/* 컨텐츠 영역 */}
-        <div className="p-4 pb-24">
+        <div className="px-4 pt-6">
+          {/* 데이터 정보 */}
+          {!loading && paginatedData && (
+            <div className="mb-4 text-sm text-gray-500 text-center">
+              전체 {totalElements}건 중 {Math.min((currentPage + 1) * 5, totalElements)}건 표시
+            </div>
+          )}
+          
           {loading ? (
             <div className="space-y-4">
-              {/* 로딩 스켈레톤 */}
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white rounded-xl p-4 border border-gray-100 animate-pulse">
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="h-6 bg-gray-200 rounded-full w-16"></div>
-                    <div className="h-4 bg-gray-200 rounded w-20"></div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-                  </div>
-                </div>
+              {Array.from({ length: 3 }, (_, i) => (
+                <SkeletonCard key={i} />
               ))}
             </div>
-          ) : currentReservations.length > 0 ? (
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center py-16 px-6">
+              <div className="bg-red-100 rounded-full p-6 mb-6">
+                <CalendarDays className="w-12 h-12 text-red-500" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">데이터를 불러올 수 없어요</h3>
+              <p className="text-gray-500 text-center leading-relaxed mb-8">
+                {error}
+              </p>
+              <button
+                onClick={() => fetchReservations()}
+                className="flex items-center gap-2 px-6 py-3 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors font-medium"
+              >
+                다시 시도
+              </button>
+            </div>
+          ) : currentReservations.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 px-6">
+              <div className="bg-gradient-to-br from-orange-100 to-orange-50 rounded-full p-6 mb-6">
+                <CalendarDays className="w-12 h-12 text-orange-500" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">예약 내역이 없습니다</h3>
+              <p className="text-gray-500 text-center leading-relaxed mb-8">
+                {activeTab === '전체' ? '아직 예약한 서비스가 없어요.\n첫 번째 예약을 만들어보세요!' : `${activeTab} 예약이 없어요.`}
+              </p>
+              <button
+                onClick={() => navigate(ROUTES.HOME)}
+                className="flex items-center gap-2 px-6 py-3 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors font-medium"
+              >
+                <Calendar className="w-5 h-5" />
+                예약하러 가기
+              </button>
+            </div>
+          ) : (
             <>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {currentReservations.map((reservation) => (
                   <ReservationCard
                     key={reservation.reservationId}
                     reservation={reservation}
-                    getStatusBadgeStyle={(status, reservationDate) => getStatusBadgeStyle(status, reservationDate)}
-                    onReviewClick={handleReviewClick}
-                    onDetailClick={handleReservationClick}
+                    onDetailClick={() => handleReservationClick(reservation.reservationId)}
                     onPaymentClick={handlePaymentClick}
+                    onReviewClick={handleReviewClick}
+                    getStatusBadgeStyle={getStatusBadgeStyle}
                   />
                 ))}
               </div>
 
               {/* 페이지네이션 */}
-              {pagination.totalPages > 1 && (
+              {totalPages > 1 && (
                 <div className="flex justify-center items-center mt-8 gap-2">
-                  {Array.from({ length: pagination.totalPages }, (_, i) => (
+                  {Array.from({ length: totalPages }, (_, i) => (
                     <button
                       key={i}
-                      onClick={() => pagination.goToPage(i)}
+                      onClick={() => handlePageChange(i)}
+                      disabled={loading}
                       className={`
-                        w-10 h-10 rounded-xl font-semibold text-sm transition-all duration-200
-                        ${pagination.currentPage === i
+                        w-10 h-10 rounded-xl font-semibold text-sm transition-all duration-200 disabled:opacity-50
+                        ${currentPage === i
                           ? 'bg-orange-500 text-white shadow-md scale-110'
                           : 'bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-500 hover:scale-105'
                         }
@@ -240,22 +341,6 @@ const ConsumerReservations: React.FC = () => {
                 </div>
               )}
             </>
-          ) : (
-            /* 빈 상태 */
-            <div className="text-center py-16">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CalendarDays className="w-8 h-8 text-gray-400" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                {activeTab === '전체' ? '예약 내역이 없습니다' : `${activeTab} 예약이 없습니다`}
-              </h3>
-              <p className="text-gray-500 text-sm">
-                {activeTab === '전체' 
-                  ? '첫 예약을 진행해보세요' 
-                  : '다른 탭에서 예약을 확인해보세요'
-                }
-              </p>
-            </div>
           )}
         </div>
       </div>
