@@ -96,7 +96,7 @@ export const useReservation = () => {
         serviceDetailTypeId: reservationData.serviceDetailTypeId,
         address: reservationData.address,
         addressDetail: reservationData.addressDetail,
-        managerUuId: reservationData.managerUuId,
+        managerUuid: reservationData.managerUuid,
         housingType: reservationData.housingType,
         lifeCleaningRoomIdx: reservationData.lifeCleaningRoomIdx,
         housingInformation: reservationData.housingInformation,
@@ -117,11 +117,11 @@ export const useReservation = () => {
         specialRequest: reservationData.specialRequest,
         totalPrice: reservationData.totalPrice,
       };
+
       const result = await callApi(() => reservationApi.create(formattedData), {
         showSuccessToast: false,
         errorMessage: '예약에 실패했습니다.',
       });
-
       if (result.success) {
         await fetchReservations(true); // 강제 새로고침
       }

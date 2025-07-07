@@ -10,7 +10,11 @@ import { SERVICE_TYPE_LABELS, SERVICE_TYPES } from '@/constants/service';
 import { RESERVATION_STATUS } from '@/constants/status';
 import { ManagerReservationCard } from '@/components';
 import { useToast } from '@/hooks/useToast';
-import { CheckInOutModal, ConfirmModal, MatchingCard } from '@/components';
+import { 
+  CheckInOutModal, 
+  ConfirmModal, 
+  MatchingCard, 
+  } from '@/components';
 import { ROUTES } from '@/constants/route';
 import { Header } from '@/components';
 import {
@@ -145,6 +149,7 @@ const ManagerReservationsAndMatching: React.FC = () => {
   useEffect(() => {
     setMatchingLoading(true);
     fetchMatchings().finally(() => setMatchingLoading(false));
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -153,9 +158,6 @@ const ManagerReservationsAndMatching: React.FC = () => {
     const newOrder = sortOrder === 'DESC' ? 'ASC' : 'DESC';
     changeSort(sortBy, newOrder);
   }, [changeSort, sortBy, sortOrder]);
-
-  // 서버사이드 페이징으로 변경하여 클라이언트 필터링 로직 제거
-  // 모든 필터링과 페이징은 서버에서 처리됨
 
   // 체크인/아웃 핸들러
   const handleCheckInOutClick = (
@@ -242,19 +244,23 @@ const ManagerReservationsAndMatching: React.FC = () => {
         const result = await respondToReservation(matching.reservationId, {
           status: true,
         });
+
         if (result.success) {
           setModal({ type: 'success', info: matching });
           refresh(); // 서버사이드 페이징이므로 새로고침 필요
         }
+
       }}
       onReject={async () => {
         const result = await respondToReservation(matching.reservationId, {
           status: false,
         });
+
         if (result.success) {
           setModal({ type: 'fail' });
           refresh(); // 서버사이드 페이징이므로 새로고침 필요
         }
+
       }}
     />
   );

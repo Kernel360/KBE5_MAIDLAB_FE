@@ -276,11 +276,14 @@ export class ToastManager {
 
   private logToastCreated(toast: Toast): void {
     if (process.env.NODE_ENV === 'development') {
+      console.debug('Toast created:', toast);
+      this.stats.totalShown++;
     }
   }
 
   private logDuplicateBlocked(message: string, type: ToastType): void {
     if (process.env.NODE_ENV === 'development') {
+      console.debug('Duplicate toast blocked:', { message, type });
       this.stats.duplicatesBlocked++;
     }
   }

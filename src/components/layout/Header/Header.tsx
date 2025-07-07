@@ -11,6 +11,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { APP_INFO, ROUTES } from '@/constants';
 import { useAuth, useToast } from '@/hooks';
+import { ThemeToggle } from '@/components/common/ThemeToggle';
 
 interface HeaderProps {
   variant?: 'main' | 'sub';
@@ -81,29 +82,29 @@ export const Header: React.FC<HeaderProps> = ({
   if (variant === 'sub') {
     if (hideBackButton) {
       return (
-        <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-[18px] border-b bg-white">
+        <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-[18px] border-b bg-white dark:bg-gray-900 dark:border-gray-700 transition-colors">
           <div className="w-10" />
-          <h1 className="text-lg font-bold text-center w-full">{title}</h1>
+          <h1 className="text-lg font-bold text-center w-full text-gray-900 dark:text-white">{title}</h1>
           <div className="w-10" />
         </header>
       );
     }
     return (
-      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 p-3 border-b bg-white">
+      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 p-3 border-b bg-white dark:bg-gray-900 dark:border-gray-700 transition-colors">
         <button
           onClick={handleBackClick}
           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
         >
-          <ArrowLeft className="w-6 h-6" />
+          <ArrowLeft className="w-6 h-6 text-gray-900 dark:text-white" />
         </button>
-        <h1 className="text-lg font-bold">{title}</h1>
+        <h1 className="text-lg font-bold text-gray-900 dark:text-white">{title}</h1>
         <div className="flex items-center gap-2">
           {showNotification && (
             <button
               onClick={handleNotificationClick}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors relative"
             >
-              <Bell className="w-5 h-5 text-gray-600" />
+              <Bell className="w-5 h-5 text-gray-600 dark:text-white" />
             </button>
           )}
           {showMenu && (
@@ -113,14 +114,14 @@ export const Header: React.FC<HeaderProps> = ({
                 className={`p-2 rounded-full transition-colors ${menuOpen ? 'bg-orange-500' : 'hover:bg-gray-100'}`}
               >
                 <Menu
-                  className={`w-6 h-6 ${menuOpen ? 'text-white' : 'text-gray-700'}`}
+                  className={`w-6 h-6 ${menuOpen ? 'text-white' : 'text-gray-700 dark:text-white'}`}
                 />
               </button>
               {menuOpen && (
-                <div className="absolute right-0 top-full mt-4 w-48 bg-white border rounded-lg shadow-md z-50 flex flex-col py-2">
+                <div className="absolute right-0 top-full mt-4 w-48 bg-white dark:bg-gray-800 border dark:border-gray-600 rounded-lg shadow-md z-50 flex flex-col py-2">
                   <button
                     onClick={handleLogoClick}
-                    className="w-full px-4 pt-3 pb-5 flex items-center justify-center gap-2 text-center font-bold text-black text-lg hover:bg-gray-50 border-b border-gray-100"
+                    className="w-full px-4 pt-3 pb-5 flex items-center justify-center gap-2 text-center font-bold text-black dark:text-white text-lg hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-600"
                     style={{ letterSpacing: '2px' }}
                   >
                     <span className="w-7 h-7 bg-orange-500 rounded-full flex items-center justify-center">
@@ -138,16 +139,16 @@ export const Header: React.FC<HeaderProps> = ({
                               : ROUTES.CONSUMER.RESERVATIONS,
                           )
                         }
-                        className="flex items-center px-4 py-2 hover:bg-gray-100 gap-2"
+                        className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 gap-2 text-gray-700 dark:text-gray-200"
                       >
-                        <CalendarDays className="w-5 h-5 text-gray-600" />
+                        <CalendarDays className="w-5 h-5 text-gray-600 dark:text-white" />
                         <span>예약</span>
                       </button>
                       <button
                         onClick={() => handleMenuClick(ROUTES.BOARD.LIST)}
-                        className="flex items-center px-4 py-2 hover:bg-gray-100 gap-2"
+                        className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 gap-2 text-gray-700 dark:text-gray-200"
                       >
-                        <HelpCircle className="w-5 h-5 text-gray-600" />
+                        <HelpCircle className="w-5 h-5 text-gray-600 dark:text-white" />
                         <span>문의</span>
                       </button>
                       <button
@@ -158,16 +159,16 @@ export const Header: React.FC<HeaderProps> = ({
                               : ROUTES.CONSUMER.MYPAGE,
                           )
                         }
-                        className="flex items-center px-4 py-2 hover:bg-gray-100 gap-2"
+                        className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 gap-2 text-gray-700 dark:text-gray-200"
                       >
-                        <User className="w-5 h-5 text-gray-600" />
+                        <User className="w-5 h-5 text-gray-600 dark:text-white" />
                         <span>마이페이지</span>
                       </button>
                       <button
                         onClick={() => handleMenuClick(logout)}
-                        className="flex items-center px-4 py-2 hover:bg-gray-100 gap-2"
+                        className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 gap-2 text-gray-700 dark:text-gray-200"
                       >
-                        <LogOut className="w-5 h-5 text-gray-600" />
+                        <LogOut className="w-5 h-5 text-gray-600 dark:text-white" />
                         <span>로그아웃</span>
                       </button>
                     </>
@@ -180,6 +181,15 @@ export const Header: React.FC<HeaderProps> = ({
                       <span>로그인</span>
                     </button>
                   )}
+                  
+                  {/* 테마 토글 스위치 - 모든 사용자 */}
+                  <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-600 flex justify-center">
+                    <ThemeToggle 
+                      variant="switch" 
+                      size="sm" 
+                      showLabel={false}
+                    />
+                  </div>
                 </div>
               )}
             </div>
@@ -191,7 +201,7 @@ export const Header: React.FC<HeaderProps> = ({
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white px-4 p-3 flex items-center justify-between shadow-sm">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 px-4 p-3 flex items-center justify-between shadow-sm transition-colors">
       <button
         onClick={handleLogoClick}
         className="flex items-center gap-3 hover:opacity-80 transition-opacity"
@@ -199,7 +209,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
           <span className="text-white font-bold text-lg">M</span>
         </div>
-        <h1 className="text-xl font-bold text-gray-900">{title}</h1>
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white">{title}</h1>
       </button>
 
       <div className="flex items-center gap-2 relative" ref={menuRef}>
@@ -208,7 +218,7 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={handleNotificationClick}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors relative"
           >
-            <Bell className="w-6 h-6 text-gray-600" />
+            <Bell className="w-6 h-6 text-gray-600 dark:text-white" />
           </button>
         )}
 
@@ -219,15 +229,15 @@ export const Header: React.FC<HeaderProps> = ({
               className={`p-2 rounded-full transition-colors ${menuOpen ? 'bg-orange-500' : 'hover:bg-gray-100'}`}
             >
               <Menu
-                className={`w-6 h-6 ${menuOpen ? 'text-white' : 'text-gray-700'}`}
+                className={`w-6 h-6 ${menuOpen ? 'text-white' : 'text-gray-700 dark:text-white'}`}
               />
             </button>
 
             {menuOpen && (
-              <div className="absolute right-0 top-full mt-4 w-48 bg-white border rounded-lg shadow-md z-50 flex flex-col py-2">
+              <div className="absolute right-0 top-full mt-4 w-48 bg-white dark:bg-gray-800 border dark:border-gray-600 rounded-lg shadow-md z-50 flex flex-col py-2">
                 <button
                   onClick={handleLogoClick}
-                  className="w-full px-4 pt-3 pb-5 flex items-center justify-center gap-2 text-center font-bold text-black text-lg hover:bg-gray-50 border-b border-gray-100"
+                  className="w-full px-4 pt-3 pb-5 flex items-center justify-center gap-2 text-center font-bold text-black dark:text-white text-lg hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-600"
                   style={{ letterSpacing: '2px' }}
                 >
                   <span className="w-7 h-7 bg-orange-500 rounded-full flex items-center justify-center">
@@ -277,6 +287,15 @@ export const Header: React.FC<HeaderProps> = ({
                       <LogOut className="w-5 h-5 text-gray-600" />
                       <span>로그아웃</span>
                     </button>
+                    
+                    {/* 테마 토글 스위치 - 로그인 사용자 */}
+                    <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-600 flex justify-center">
+                      <ThemeToggle 
+                        variant="switch" 
+                        size="sm" 
+                        showLabel={false}
+                      />
+                    </div>
                   </>
                 )}
               </div>
@@ -290,14 +309,14 @@ export const Header: React.FC<HeaderProps> = ({
               className={`p-2 rounded-full transition-colors ${menuOpen ? 'bg-orange-500' : 'hover:bg-gray-100'}`}
             >
               <Menu
-                className={`w-6 h-6 ${menuOpen ? 'text-white' : 'text-gray-700'}`}
+                className={`w-6 h-6 ${menuOpen ? 'text-white' : 'text-gray-700 dark:text-white'}`}
               />
             </button>
             {menuOpen && (
-              <div className="absolute right-0 top-full mt-4 w-48 bg-white border rounded-lg shadow-md z-50 flex flex-col py-2">
+              <div className="absolute right-0 top-full mt-4 w-48 bg-white dark:bg-gray-800 border dark:border-gray-600 rounded-lg shadow-md z-50 flex flex-col py-2">
                 <button
                   onClick={handleLogoClick}
-                  className="w-full px-4 pt-3 pb-5 flex items-center justify-center gap-2 text-center font-bold text-black text-lg hover:bg-gray-50 border-b border-gray-100"
+                  className="w-full px-4 pt-3 pb-5 flex items-center justify-center gap-2 text-center font-bold text-black dark:text-white text-lg hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-600"
                   style={{ letterSpacing: '2px' }}
                 >
                   <span className="w-7 h-7 bg-orange-500 rounded-full flex items-center justify-center">

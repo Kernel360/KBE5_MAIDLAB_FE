@@ -1,10 +1,12 @@
 import { apiClient } from '@/apis';
 import { API_ENDPOINTS } from '@/constants/api';
+import { S3_CONFIG } from '@/config/constants';
+import type { PresignedUrlResponse } from '@/types/utils';
 
-interface PresignedUrlResponse {
-  key: string;
-  url: string; // presigned URL
-}
+/**
+ * S3 Presigned URL 응답 타입
+ * @see {@link PresignedUrlResponse} from '@/types/utils'
+ */
 
 /**
  * 단일 파일을 S3에 업로드하고 CloudFront URL 반환
@@ -39,7 +41,7 @@ export const uploadToS3 = async (
     }
 
     // 3. CloudFront를 통한 최종 파일 URL 반환 (CDN 최적화)
-    const fileUrl = `https://d1llec2m3tvk5i.cloudfront.net/${key}`;
+    const fileUrl = `${S3_CONFIG.CLOUDFRONT_DOMAIN}/${key}`;
 
     return {
       key,
@@ -85,7 +87,7 @@ export const uploadMultipleFilesToS3 = async (
       }
 
       // CloudFront를 통한 최종 파일 URL
-      const fileUrl = `https://d1llec2m3tvk5i.cloudfront.net/${presigned.key}`;
+      const fileUrl = `${S3_CONFIG.CLOUDFRONT_DOMAIN}/${presigned.key}`;
       uploadResults.push({
         key: presigned.key,
         url: fileUrl,
@@ -116,33 +118,7 @@ export const getPresignedUrls = async (
   }
 };
 
-/**
- * 다중 파일 업로드 (uploadMultipleFilesToS3의 간소화된 래퍼 함수)
- */
-export const uploadFiles = async (
-  files: File[],
-): Promise<{ key: string; url: string }[]> => {
-  try {
-    // uploadMultipleFilesToS3 함수를 재사용하여 중복 코드 제거
-    return await uploadMultipleFilesToS3(files);
-  } catch (error) {
-    console.error('Error uploading files:', error);
-    throw error;
-  }
-};
 
-/**
- * 단일 파일 업로드 후 URL만 반환 (간소화된 버전)
- */
-export const uploadSingleFile = async (file: File): Promise<string> => {
-  try {
-    const result = await uploadToS3(file);
-    return result.url; // URL만 반환
-  } catch (error) {
-    console.error('Error uploading single file:', error);
-    throw error;
-  }
-};
 
 /**
  * 다중 파일 업로드 후 파일 키(이름)만 반환하는 함수
@@ -155,4 +131,11 @@ export const uploadFilesGetNames = async (files: File[]): Promise<string[]> => {
     console.error('Error uploading files:', error);
     throw error;
   }
+};
+
+// Convenience aliases for backward compatibility
+export const uploadFiles = uploadMultipleFilesToS3;
+export const uploadSingleFile = async (file: File): Promise<string> => {
+  const result = await uploadToS3(file);
+  return result.url;
 };

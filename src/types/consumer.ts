@@ -163,7 +163,6 @@ export interface PointHistoryResponse {
   history: PointHistory[];
 }
 
-
 /**
  * 리뷰 등록 폼의 상태 타입
  */
@@ -184,3 +183,10 @@ export interface ProfileData {
   detailAddress: string;
   profileImage: string | undefined;
 }
+export interface PointRecordResponseDto {
+  amount: number;
+  pointType: string;
+  description: string;
+  createdAt: string;
+}
+

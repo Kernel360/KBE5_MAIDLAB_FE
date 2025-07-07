@@ -18,6 +18,7 @@ export const ROUTES = {
     REVIEW_REGISTER: '/consumers/reservations/:id/review',
     LIKED_MANAGERS: '/consumer/likes',
     BLACKLIST: '/consumer/blacklist',
+    POINTS: '/consumer/points',
   },
 
   // 매니저 페이지

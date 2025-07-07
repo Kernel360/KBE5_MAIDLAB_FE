@@ -1,14 +1,15 @@
 // ===== 기본 테마 설정 =====
 export const THEME_TYPES = {
   LIGHT: 'light',
+  DARK: 'dark',
   SYSTEM: 'system',
 } as const;
 
-export type Theme = 'light' | 'system';
-export type ResolvedTheme = 'light'; // 현재는 라이트모드만 지원
+export type Theme = 'light' | 'dark' | 'system';
+export type ResolvedTheme = 'light' | 'dark';
 
 export const DEFAULT_THEME: Theme = 'light';
-export const SUPPORTED_THEMES: Theme[] = ['light', 'system'];
+export const SUPPORTED_THEMES: Theme[] = ['light', 'dark', 'system'];
 
 // ===== 테마 관련 설정 =====
 export const THEME_STORAGE_KEY = 'theme';

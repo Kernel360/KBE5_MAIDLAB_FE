@@ -10,40 +10,27 @@ import {
 // ===== 에러 처리 =====
 export const handleThemeError = (operation: string, error: unknown): void => {
   console.error(`Theme ${operation} error:`, error);
-
-  // 필요시 에러 리포팅 서비스로 전송
-  // errorReportingService.report({
-  //   type: 'theme_error',
-  //   operation,
-  //   error: error instanceof Error ? error.message : String(error),
-  //   timestamp: Date.now(),
-  // });
 };
 
 // ===== 시스템 테마 감지 =====
 export const getSystemTheme = (): ResolvedTheme => {
-  // 현재는 다크모드 미지원이므로 항상 light 반환
-  // 나중에 다크모드 지원시:
-  // if (typeof window === 'undefined') return 'light';
-  // try {
-  //   return window.matchMedia(SYSTEM_THEME_QUERY).matches ? 'dark' : 'light';
-  // } catch (error) {
-  //   handleThemeError('system_detection', error);
-  //   return 'light';
-  // }
-  return 'light';
+  if (typeof window === 'undefined') return 'light';
+
+  try {
+    return window.matchMedia(SYSTEM_THEME_QUERY).matches ? 'dark' : 'light';
+  } catch (error) {
+    handleThemeError('system_detection', error);
+    return 'light';
+  }
 };
 
 export const resolveTheme = (theme: Theme): ResolvedTheme => {
-  // 현재는 system이든 light든 모두 light로 해석
-  // 나중에 다크모드 지원시:
-  // try {
-  //   return theme === 'system' ? getSystemTheme() : (theme as ResolvedTheme);
-  // } catch (error) {
-  //   handleThemeError('theme_resolution', error);
-  //   return 'light';
-  // }
-  return 'light';
+  try {
+    return theme === 'system' ? getSystemTheme() : (theme as ResolvedTheme);
+  } catch (error) {
+    handleThemeError('theme_resolution', error);
+    return 'light';
+  }
 };
 
 // ===== 시스템 테마 변경 감지 =====
@@ -64,8 +51,6 @@ export const createSystemThemeListener = (
     const handler = () => {
       try {
         // 시스템이 다크모드로 변경되어도 현재는 라이트모드 유지
-        if (process.env.NODE_ENV === 'development') {
-        }
         callback();
       } catch (error) {
         handleThemeError('system_theme_change', error);
@@ -120,19 +105,16 @@ export const isLightTheme = (theme: ResolvedTheme): boolean => {
   return theme === 'light';
 };
 
-// 다크모드 지원 준비
 export const isDarkTheme = (theme: ResolvedTheme): boolean => {
-  // 현재는 항상 false, 나중에 다크모드 지원시 활성화
-  return false; // theme === 'dark';
+  return theme === 'dark';
 };
 
 // ===== 테마 표시명 =====
 export const getThemeDisplayName = (theme: Theme): string => {
   const displayNames: Record<Theme, string> = {
     light: '라이트 모드',
+    dark: '다크 모드',
     system: '시스템 설정',
-    // 다크모드 준비
-    // dark: '다크 모드',
   };
 
   return displayNames[theme] || theme;
@@ -142,9 +124,8 @@ export const getThemeDisplayName = (theme: Theme): string => {
 export const getThemeIcon = (theme: Theme): string => {
   const iconNames: Record<Theme, string> = {
     light: '☀️',
+    dark: '🌙',
     system: '💻',
-    // 다크모드 준비
-    // dark: '🌙',
   };
 
   return iconNames[theme] || '🎨';
@@ -154,9 +135,8 @@ export const getThemeIcon = (theme: Theme): string => {
 export const getThemeDescription = (theme: Theme): string => {
   const descriptions: Record<Theme, string> = {
     light: '밝은 화면으로 표시됩니다',
+    dark: '어두운 화면으로 표시됩니다',
     system: '시스템 설정을 따라갑니다',
-    // 다크모드 준비
-    // dark: '어두운 화면으로 표시됩니다',
   };
 
   return descriptions[theme] || '';
@@ -164,9 +144,8 @@ export const getThemeDescription = (theme: Theme): string => {
 
 // ===== 테마 유틸리티 =====
 export const getNextTheme = (currentTheme: Theme): Theme => {
-  // 현재: light ↔ system 토글
-  // 다크모드 지원시: light → dark → system → light
-  const themeOrder: Theme[] = ['light', 'system'];
+  // light → dark → system → light 순환
+  const themeOrder: Theme[] = ['light', 'dark', 'system'];
   const currentIndex = themeOrder.indexOf(currentTheme);
   const nextIndex = (currentIndex + 1) % themeOrder.length;
 
@@ -174,7 +153,7 @@ export const getNextTheme = (currentTheme: Theme): Theme => {
 };
 
 export const getPreviousTheme = (currentTheme: Theme): Theme => {
-  const themeOrder: Theme[] = ['light', 'system'];
+  const themeOrder: Theme[] = ['light', 'dark', 'system'];
   const currentIndex = themeOrder.indexOf(currentTheme);
   const previousIndex =
     currentIndex === 0 ? themeOrder.length - 1 : currentIndex - 1;

@@ -4,6 +4,7 @@ import {
   NUMBER_LIMITS,
   validateBirthDate as validateBirth,
 } from '@/constants/validation';
+import { BUSINESS_CONFIG } from '@/config/constants';
 
 /**
  * 휴대폰 번호 유효성 검사
@@ -115,7 +116,7 @@ export const validateFileSize = (file: File, maxSize: number): boolean => {
  */
 export const validateFileType = (
   file: File,
-  allowedTypes: string[],
+  allowedTypes: readonly string[],
 ): boolean => {
   return allowedTypes.includes(file.type);
 };
@@ -126,15 +127,21 @@ export const validateFileType = (
 export const validateImageFile = (
   file: File,
 ): { isValid: boolean; error?: string } => {
-  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-  const maxSize = 5 * 1024 * 1024; // 5MB
+  const allowedTypes = [...BUSINESS_CONFIG.SUPPORTED_IMAGE_TYPES];
+  const maxSize = BUSINESS_CONFIG.MAX_FILE_SIZE_MB * 1024 * 1024;
 
   if (!validateFileType(file, allowedTypes)) {
-    return { isValid: false, error: 'JPG, PNG, GIF 파일만 업로드 가능합니다.' };
+    return { 
+      isValid: false, 
+      error: 'JPEG, PNG, WebP 파일만 업로드 가능합니다.' 
+    };
   }
 
   if (!validateFileSize(file, maxSize)) {
-    return { isValid: false, error: '파일 크기는 5MB 이하여야 합니다.' };
+    return { 
+      isValid: false, 
+      error: `파일 크기는 ${BUSINESS_CONFIG.MAX_FILE_SIZE_MB}MB 이하여야 합니다.` 
+    };
   }
 
   return { isValid: true };
@@ -146,12 +153,8 @@ export const validateImageFile = (
 export const validateDocumentFile = (
   file: File,
 ): { isValid: boolean; error?: string } => {
-  const allowedTypes = [
-    'application/pdf',
-    'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  ];
-  const maxSize = 10 * 1024 * 1024; // 10MB
+  const allowedTypes = [...BUSINESS_CONFIG.SUPPORTED_DOCUMENT_TYPES];
+  const maxSize = BUSINESS_CONFIG.MAX_FILE_SIZE_MB * 1024 * 1024;
 
   if (!validateFileType(file, allowedTypes)) {
     return {
@@ -161,7 +164,10 @@ export const validateDocumentFile = (
   }
 
   if (!validateFileSize(file, maxSize)) {
-    return { isValid: false, error: '파일 크기는 10MB 이하여야 합니다.' };
+    return { 
+      isValid: false, 
+      error: `파일 크기는 ${BUSINESS_CONFIG.MAX_FILE_SIZE_MB}MB 이하여야 합니다.` 
+    };
   }
 
   return { isValid: true };
