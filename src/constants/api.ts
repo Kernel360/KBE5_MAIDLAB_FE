@@ -90,6 +90,7 @@ export const API_ENDPOINTS = {
   RESERVATION: {
     CREATE: '/api/reservations/register',
     LIST: '/api/reservations',
+    MANAGER: '/api/reservations/manager',
     DETAIL: (id: number) => `/api/reservations/${id}`,
     CANCEL: (id: number) => `/api/reservations/${id}/cancel`,
     PRICE_CHECK: '/api/reservations/price',

@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { ReservationListResponse } from '@/types/reservation';
 import { useReservation } from '@/hooks/domain/useReservation';
 import { useMatching } from '@/hooks/domain/useMatching';
+import { useManagerReservationPagination } from '@/hooks/domain/useManagerReservationPagination';
 import { formatDateTime } from '@/utils';
 import { useReservationStatus } from '@/hooks/domain/useReservationStatus';
 import { SERVICE_TYPE_LABELS, SERVICE_TYPES } from '@/constants/service';
@@ -12,7 +13,6 @@ import { useToast } from '@/hooks/useToast';
 import {CheckInOutModal,ConfirmModal,MatchingCard} from '@/components'
 import { ROUTES } from '@/constants/route';
 import { Header } from '@/components';
-import { usePagination } from '@/hooks/usePagination';
 import { 
   Calendar, 
   Clock, 
@@ -20,7 +20,9 @@ import {
   CheckCircle, 
   ChevronDown, 
   Filter,
-  Inbox
+  Inbox,
+  SortAsc,
+  SortDesc
 } from 'lucide-react';
 const FILTERS = [
   { label: '오늘 일정', value: 'TODAY', icon: Calendar, color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-200', description: '오늘 예약된 모든 일정' },
@@ -28,6 +30,7 @@ const FILTERS = [
   { label: '진행중', value: 'WORKING', icon: Activity, color: 'text-purple-600', bgColor: 'bg-purple-50', borderColor: 'border-purple-200', description: '현재 작업중인 일정' },
   { label: '완료', value: 'COMPLETED', icon: CheckCircle, color: 'text-green-600', bgColor: 'bg-green-50', borderColor: 'border-green-200', description: '완료된 일정' },
 ];
+
 
 // 매니저 예약 페이지 전용 상태 레이블
 const MANAGER_STATUS_LABELS = {
@@ -39,14 +42,30 @@ const ManagerReservationsAndMatching: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const {
-    fetchReservations,
     checkIn,
     checkOut,
     respondToReservation,
-    reservations,
   } = useReservation();
   const { fetchMatchings, matchings } = useMatching();
   const { getStatusBadgeStyle } = useReservationStatus();
+  
+  // 서버사이드 페이징 훅 사용
+  const {
+    reservations,
+    loading,
+    currentPage,
+    totalPages,
+    status: filter,
+    sortBy,
+    sortOrder,
+    changePage,
+    changeStatus,
+    changeSort,
+    refresh,
+  } = useManagerReservationPagination({
+    initialStatus: 'TODAY',
+    pageSize: 5,
+  });
   
   // 매니저 페이지 전용 상태 레이블 함수
   const getManagerStatusLabel = (status: string, reservationDate?: string) => {
@@ -65,8 +84,7 @@ const ManagerReservationsAndMatching: React.FC = () => {
     return MANAGER_STATUS_LABELS[status as keyof typeof MANAGER_STATUS_LABELS] || status;
   };
   const [tab, setTab] = useState<'schedule' | 'request'>('schedule');
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'PAID' | 'TODAY' | 'WORKING' | 'COMPLETED'>('TODAY');
+  const [matchingLoading, setMatchingLoading] = useState(true);
   const [filterOpen, setFilterOpen] = useState(false);
   const [modal, setModal] = useState<{ type: 'success' | 'fail' | null, info?: any }>({ type: null });
   const [checkInOutModal, setCheckInOutModal] = useState<{
@@ -85,55 +103,19 @@ const ManagerReservationsAndMatching: React.FC = () => {
     isCheckIn: true,
   });
   useEffect(() => {
-    setLoading(true);
-    Promise.all([fetchReservations(), fetchMatchings()]).finally(() => setLoading(false));
+    setMatchingLoading(true);
+    fetchMatchings().finally(() => setMatchingLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // 날짜만 추출
-  const getDateOnly = (dateStr: string) => {
-    if (!dateStr) return '';
-    return dateStr.split('T')[0].split(' ')[0];
-  };
+  // 정렬 방향 토글 핸들러
+  const handleSortOrderToggle = useCallback(() => {
+    const newOrder = sortOrder === 'DESC' ? 'ASC' : 'DESC';
+    changeSort(sortBy, newOrder);
+  }, [changeSort, sortBy, sortOrder]);
 
-  // 예약 일정 필터링
-  const todayStr = new Date().toISOString().slice(0, 10);
-  let filteredReservations: ReservationListResponse[] = [];
-  if (filter === 'PAID') {
-    filteredReservations = reservations.filter(r => {
-      const dateOnly = getDateOnly(r.reservationDate);
-      return (
-        ((r.status === RESERVATION_STATUS.PAID || r.status === RESERVATION_STATUS.MATCHED) && dateOnly > todayStr) ||
-        (dateOnly === todayStr && ([RESERVATION_STATUS.PAID, RESERVATION_STATUS.MATCHED] as string[]).includes(r.status))
-      );
-    });
-  } else if (filter === 'TODAY') {
-    filteredReservations = reservations
-      .filter(r =>
-        ([RESERVATION_STATUS.PAID, RESERVATION_STATUS.MATCHED, RESERVATION_STATUS.WORKING, RESERVATION_STATUS.COMPLETED] as string[]).includes(r.status) &&
-        (getDateOnly(r.reservationDate) === todayStr)
-      )
-      .sort((a, b) => {
-        const order = {
-          [RESERVATION_STATUS.WORKING]: 0,
-          [RESERVATION_STATUS.PAID]: 1,
-          [RESERVATION_STATUS.MATCHED]: 2,
-          [RESERVATION_STATUS.COMPLETED]: 3,
-        };
-        return (order[a.status as keyof typeof order] ?? 99) - (order[b.status as keyof typeof order] ?? 99);
-      });
-  } else if (filter === 'WORKING') {
-    filteredReservations = reservations.filter(r => r.status === RESERVATION_STATUS.WORKING);
-  } else if (filter === 'COMPLETED') {
-    filteredReservations = reservations.filter(r => r.status === RESERVATION_STATUS.COMPLETED);
-  }
-  const pagination = usePagination({
-    totalItems: filteredReservations.length,
-    itemsPerPage: 5,
-    initialPage: 0,
-  });
-  
-  const paginatedReservations = filteredReservations.slice(pagination.startIndex, pagination.endIndex);
+  // 서버사이드 페이징으로 변경하여 클라이언트 필터링 로직 제거
+  // 모든 필터링과 페이징은 서버에서 처리됨
 
   // 체크인/아웃 핸들러
   const handleCheckInOutClick = (reservation: ReservationListResponse, isCheckIn: boolean) => {
@@ -156,7 +138,7 @@ const ManagerReservationsAndMatching: React.FC = () => {
       await action(checkInOutModal.reservationId, { checkTime: new Date().toISOString() });
       setCheckInOutModal({ ...checkInOutModal, isOpen: false });
       setConfirmModal({ isOpen: true, isCheckIn: checkInOutModal.isCheckIn });
-      fetchReservations(true);
+      refresh(); // 서버사이드 페이징이므로 새로고침 필요
     } catch (error) {
       showToast('작업 처리 중 오류가 발생했습니다.', 'error');
     }
@@ -179,6 +161,8 @@ const ManagerReservationsAndMatching: React.FC = () => {
       onCheckOut={async () => {
         const result = await checkOut(reservation.reservationId, { checkTime: new Date().toISOString() });
         if (result.success) {
+          // 서버사이드 페이징이므로 새로고침 필요
+          refresh();
           // 상태 업데이트를 위한 짧은 지연 후 네비게이션
           setTimeout(() => {
             navigate(ROUTES.MANAGER.REVIEW_REGISTER.replace(':id', String(reservation.reservationId)));
@@ -195,11 +179,17 @@ const ManagerReservationsAndMatching: React.FC = () => {
       matching={matching}
       onAccept={async () => {
         const result = await respondToReservation(matching.reservationId, { status: true });
-        if (result.success) setModal({ type: 'success', info: matching });
+        if (result.success) {
+          setModal({ type: 'success', info: matching });
+          refresh(); // 서버사이드 페이징이므로 새로고침 필요
+        }
       }}
       onReject={async () => {
         const result = await respondToReservation(matching.reservationId, { status: false });
-        if (result.success) setModal({ type: 'fail' });
+        if (result.success) {
+          setModal({ type: 'fail' });
+          refresh(); // 서버사이드 페이징이므로 새로고침 필요
+        }
       }}
     />
   );
@@ -235,9 +225,8 @@ const ManagerReservationsAndMatching: React.FC = () => {
                 <button
                   key={f.value}
                   onClick={() => { 
-                    setFilter(f.value as 'PAID' | 'TODAY' | 'WORKING' | 'COMPLETED'); 
-                    setFilterOpen(false); 
-                    pagination.goToFirst();
+                    changeStatus(f.value as 'PAID' | 'TODAY' | 'WORKING' | 'COMPLETED'); 
+                    setFilterOpen(false);
                   }}
                   className={`
                     w-full flex items-start gap-3 px-3 py-3 rounded-md transition-all duration-200 text-left
@@ -279,7 +268,23 @@ const ManagerReservationsAndMatching: React.FC = () => {
           <div className="max-w-md mx-auto px-4 py-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-gray-800">일정 관리</h2>
-              {tab === 'schedule' && filterDropdown}
+              {tab === 'schedule' && (
+                <div className="flex items-center gap-2">
+                  {/* 정렬 방향 토글 버튼 */}
+                  <button
+                    onClick={handleSortOrderToggle}
+                    className="flex items-center gap-1 px-3 py-2 bg-orange-100 rounded-lg hover:bg-orange-200 transition-colors"
+                    title={sortOrder === 'DESC' ? '내림차순' : '오름차순'}
+                  >
+                    {sortOrder === 'DESC' ? (
+                      <SortDesc className="w-4 h-4 text-orange-600" />
+                    ) : (
+                      <SortAsc className="w-4 h-4 text-orange-600" />
+                    )}
+                  </button>
+                  {filterDropdown}
+                </div>
+              )}
             </div>
             
             <div className="flex bg-gray-100 rounded-lg p-1">
@@ -295,12 +300,12 @@ const ManagerReservationsAndMatching: React.FC = () => {
               >
                 <Calendar className="w-4 h-4" />
                 <span>일정 내역</span>
-                {filteredReservations.length > 0 && (
+                {reservations.length > 0 && (
                   <span className={`
                     px-2 py-0.5 rounded-full text-xs font-semibold
                     ${tab === 'schedule' ? 'bg-orange-100 text-orange-600' : 'bg-gray-200 text-gray-500'}
                   `}>
-                    {filteredReservations.length}
+                    {reservations.length}
                   </span>
                 )}
               </button>
@@ -337,7 +342,7 @@ const ManagerReservationsAndMatching: React.FC = () => {
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-200 border-t-orange-500 mb-4"></div>
                 <p className="text-gray-500 font-medium">로딩중...</p>
               </div>
-            ) : paginatedReservations.length === 0 ? (
+            ) : reservations.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 px-6">
                 <div className="bg-gradient-to-br from-orange-100 to-orange-50 rounded-full p-6 mb-6">
                   {currentFilter?.icon && (
@@ -360,7 +365,7 @@ const ManagerReservationsAndMatching: React.FC = () => {
                   <div className="flex gap-3">
                     {filter !== 'TODAY' && (
                       <button
-                        onClick={() => { setFilter('TODAY'); pagination.goToFirst(); }}
+                        onClick={() => { changeStatus('TODAY'); }}
                         className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors font-medium text-sm"
                       >
                         <Calendar className="w-4 h-4" />
@@ -369,7 +374,7 @@ const ManagerReservationsAndMatching: React.FC = () => {
                     )}
                     {filter === 'TODAY' && (
                       <button
-                        onClick={() => { setFilter('PAID'); pagination.goToFirst(); }}
+                        onClick={() => { changeStatus('PAID'); }}
                         className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors font-medium text-sm"
                       >
                         <Clock className="w-4 h-4" />
@@ -387,18 +392,18 @@ const ManagerReservationsAndMatching: React.FC = () => {
                 </div>
               </div>
             ) : (
-              paginatedReservations.map(renderReservationCard)
+              reservations.map(renderReservationCard)
             )}
             {/* 페이지네이션 */}
-            {pagination.totalPages > 1 && (
+            {totalPages > 1 && (
               <div className="flex justify-center items-center mt-8 gap-2">
-                {Array.from({ length: pagination.totalPages }, (_, i) => (
+                {Array.from({ length: totalPages }, (_, i) => (
                   <button
                     key={i}
-                    onClick={() => pagination.goToPage(i)}
+                    onClick={() => changePage(i)}
                     className={`
                       w-10 h-10 rounded-xl font-semibold text-sm transition-all duration-200
-                      ${pagination.currentPage === i
+                      ${currentPage === i
                         ? 'bg-orange-500 text-white shadow-md scale-110'
                         : 'bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-500 hover:scale-105'
                       }
@@ -414,7 +419,7 @@ const ManagerReservationsAndMatching: React.FC = () => {
         {/* 예약 요청 탭 */}
         {tab === 'request' && (
           <div className="px-4 pt-6">
-            {loading ? (
+            {matchingLoading ? (
               <div className="flex flex-col items-center justify-center py-16">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-200 border-t-orange-500 mb-4"></div>
                 <p className="text-gray-500 font-medium">로딩중...</p>

@@ -60,6 +60,26 @@ export const reservationApi = {
   },
 
   /**
+   * 매니저 페이징된 예약 조회 (새로운 API)
+   */
+  getManagerReservationsPaginated: async (
+    params: PagingParams = {},
+  ): Promise<PageResponse<ReservationListResponse>> => {
+    const defaultParams = {
+      page: 0,
+      size: 5,
+      sortOrder: 'DESC',
+      ...params,
+    };
+
+    const queryString = buildQueryString(defaultParams);
+    return apiCall<PageResponse<ReservationListResponse>>(
+      'get',
+      `${API_ENDPOINTS.RESERVATION.MANAGER}${queryString}`,
+    );
+  },
+
+  /**
    * 예약 상세 조회
    */
   getReservationDetail: async (
