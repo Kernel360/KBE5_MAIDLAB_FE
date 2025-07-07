@@ -56,13 +56,13 @@ export interface TabItem {
 /**
  * 테이블 컬럼
  */
-export interface TableColumn<T = any> {
-  key: keyof T | string;
+export interface TableColumn<T, K extends keyof T = keyof T> {
+  key: K;
   title: string;
   width?: string | number;
   align?: 'left' | 'center' | 'right';
   sortable?: boolean;
-  render?: (value: any, record: T, index: number) => React.ReactNode;
+  render?: (value: T[K], record: T, index: number) => React.ReactNode;
 }
 
 /**
@@ -77,7 +77,7 @@ export interface FilterOption {
 /**
  * 검색 조건
  */
-export interface SearchCondition {
+export interface SearchCondition<T = unknown> {
   field: string;
   operator:
     | 'eq'
@@ -89,7 +89,7 @@ export interface SearchCondition {
     | 'like'
     | 'in'
     | 'between';
-  value: any;
+  value: T;
 }
 
 /**
@@ -189,7 +189,7 @@ export interface FormFieldConfig {
     max?: number;
     minLength?: number;
     maxLength?: number;
-    custom?: (value: any) => boolean | string;
+    custom?: (value: unknown) => boolean | string;
   };
 }
 
@@ -261,16 +261,16 @@ export interface InfiniteScrollState<T> {
 /**
  * 드래그 앤 드롭 아이템
  */
-export interface DragDropItem {
+export interface DragDropItem<T = unknown> {
   id: string;
   type: string;
-  data: any;
+  data: T;
 }
 
 /**
  * 키-값 쌍
  */
-export interface KeyValue<T = any> {
+export interface KeyValue<T = unknown> {
   key: string;
   value: T;
 }
@@ -282,4 +282,80 @@ export interface TimeSlot {
   day: string;
   startTime: string;
   endTime: string;
+}
+
+// ===== 공통 유틸리티 타입들 =====
+
+/**
+ * API 요청 타입 생성 유틸리티
+ */
+export type ApiRequest<T> = T;
+
+/**
+ * 생성 요청 타입 (ID, 생성일, 수정일 제외)
+ */
+export type CreateRequest<T> = Omit<T, 'id' | 'createdAt' | 'updatedAt'>;
+
+/**
+ * 수정 요청 타입 (선택적 필드들)
+ */
+export type UpdateRequest<T> = Partial<CreateRequest<T>>;
+
+/**
+ * API 리스트 응답 타입
+ */
+export interface ListResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+/**
+ * API 응답 래퍼 타입
+ */
+export interface ApiResponse<T> {
+  data: T;
+  message: string;
+  code: string;
+  success: boolean;
+}
+
+/**
+ * 에러 응답 타입
+ */
+export interface ErrorResponse {
+  code: string;
+  message: string;
+  details?: Record<string, unknown>;
+}
+
+/**
+ * 페이지네이션 정보
+ */
+export interface PaginationInfo {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
+
+/**
+ * 정렬 옵션
+ */
+export interface SortOption<T = string> {
+  field: T;
+  direction: 'ASC' | 'DESC';
+}
+
+/**
+ * 필터 옵션
+ */
+export interface FilterOptions<T = Record<string, unknown>> {
+  search?: string;
+  filters?: T;
+  sort?: SortOption[];
+  pagination?: Pick<PaginationInfo, 'page' | 'limit'>;
 }

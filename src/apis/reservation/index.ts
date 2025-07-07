@@ -62,11 +62,7 @@ export const reservationApi = {
    * 예약 결제
    */
   payment: async (data: PaymentRequestBody): Promise<string> => {
-    return apiCall<string>(
-      'post',
-      API_ENDPOINTS.RESERVATION.PAYMENT(),
-      data,
-    );
+    return apiCall<string>('post', API_ENDPOINTS.RESERVATION.PAYMENT(), data);
   },
 
   /**
@@ -114,14 +110,8 @@ export const reservationApi = {
   /**
    * 리뷰 등록
    */
-  registerReview: async (
-    data: ReviewRegisterRequest,
-  ): Promise<string> => {
-    return apiCall<string>(
-      'post',
-      API_ENDPOINTS.RESERVATION.REVIEW(),
-      data,
-    );
+  registerReview: async (data: ReviewRegisterRequest): Promise<string> => {
+    return apiCall<string>('post', API_ENDPOINTS.RESERVATION.REVIEW(), data);
   },
 
   /**
@@ -136,5 +126,4 @@ export const reservationApi = {
       `${API_ENDPOINTS.RESERVATION.SETTLEMENTS}${queryString}`,
     );
   },
-
 };

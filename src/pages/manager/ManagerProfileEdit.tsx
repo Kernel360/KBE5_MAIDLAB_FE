@@ -103,7 +103,6 @@ const ManagerProfileEdit: React.FC = () => {
     setProfile((prev) => (prev ? { ...prev, birth: value } : prev));
   };
 
-
   const validate = () => {
     const newErrors = {
       name: '',
@@ -132,7 +131,8 @@ const ManagerProfileEdit: React.FC = () => {
     } else {
       const birthValidation = validateBirthDate(profile.birth);
       if (!birthValidation.isValid) {
-        newErrors.birth = birthValidation.error || '올바른 생년월일을 입력해주세요.';
+        newErrors.birth =
+          birthValidation.error || '올바른 생년월일을 입력해주세요.';
       }
     }
 

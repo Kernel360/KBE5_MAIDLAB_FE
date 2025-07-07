@@ -67,17 +67,24 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
 };
 
 /**
- * 랜덤 ID 생성
+ * 암호학적으로 안전한 랜덤 ID 생성
  */
 export const generateId = (length: number = 8): string => {
-  const chars =
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let result = '';
-
-  for (let i = 0; i < length; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  // crypto.randomUUID()가 지원되는 경우 사용 (더 안전)
+  if (crypto.randomUUID && length === 36) {
+    return crypto.randomUUID();
   }
 
+  // 커스텀 길이를 위한 crypto.getRandomValues() 사용
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const array = new Uint8Array(length);
+  crypto.getRandomValues(array);
+  
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars[array[i] % chars.length];
+  }
+  
   return result;
 };
 
@@ -106,10 +113,48 @@ export const groupBy = <T>(array: T[], key: keyof T): Record<string, T[]> => {
 };
 
 /**
- * 간단한 깊은 복사 (JSON 방식)
+ * 구조화된 깊은 복사 (함수, Date, Map, Set 등도 지원)
  */
 export const deepClone = <T>(obj: T): T => {
-  return JSON.parse(JSON.stringify(obj));
+  // primitives
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+
+  // Date
+  if (obj instanceof Date) {
+    return new Date(obj.getTime()) as T;
+  }
+
+  // Array
+  if (Array.isArray(obj)) {
+    return obj.map((item) => deepClone(item)) as T;
+  }
+
+  // Set
+  if (obj instanceof Set) {
+    const newSet = new Set();
+    obj.forEach((item) => newSet.add(deepClone(item)));
+    return newSet as T;
+  }
+
+  // Map
+  if (obj instanceof Map) {
+    const newMap = new Map();
+    obj.forEach((value, key) => newMap.set(deepClone(key), deepClone(value)));
+    return newMap as T;
+  }
+
+  // Object
+  if (typeof obj === 'object') {
+    const cloned = {} as T;
+    Object.keys(obj).forEach((key) => {
+      (cloned as any)[key] = deepClone((obj as any)[key]);
+    });
+    return cloned;
+  }
+
+  return obj;
 };
 
 /**

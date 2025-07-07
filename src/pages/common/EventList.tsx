@@ -49,7 +49,6 @@ const EventList: React.FC = () => {
   // 현재 페이지에 표시할 이벤트들
   const currentEvents = filteredEvents.slice(startIndex, endIndex);
 
-
   // 이벤트 상세로 이동
   const handleEventClick = (eventId: number) => {
     navigate(`/events/${eventId}`);
@@ -199,7 +198,6 @@ const EventList: React.FC = () => {
               </button>
             </div>
           )}
-
         </div>
       </main>
     </div>

@@ -1,0 +1,175 @@
+/* 다크모드 테스트 스타일 */
+
+/* 기본 다크모드 설정 */
+.dark {
+  /* 배경색을 강제로 어둡게 설정 */
+  background-color: #111827 !important;
+  color: #f9fafb !important;
+}
+
+.dark * {
+  /* 모든 요소에 다크모드 색상 강제 적용 */
+  border-color: #374151 !important;
+}
+
+.dark body {
+  background-color: #111827 !important;
+  color: #f9fafb !important;
+}
+
+.dark header {
+  background-color: #1f2937 !important;
+  color: #f9fafb !important;
+}
+
+/* 페이지 콘텐츠 영역 다크모드 */
+.dark .bg-white {
+  background-color: #1f2937 !important;
+}
+
+.dark .bg-gray-50 {
+  background-color: #111827 !important;
+}
+
+.dark .bg-gray-100 {
+  background-color: #1f2937 !important;
+}
+
+.dark .bg-gray-200 {
+  background-color: #374151 !important;
+}
+
+/* 텍스트 색상 */
+.dark .text-gray-900 {
+  color: #f9fafb !important;
+}
+
+.dark .text-gray-800 {
+  color: #f3f4f6 !important;
+}
+
+.dark .text-gray-700 {
+  color: #d1d5db !important;
+}
+
+.dark .text-gray-600 {
+  color: #d1d5db !important;
+}
+
+.dark .text-gray-500 {
+  color: #9ca3af !important;
+}
+
+.dark .text-black {
+  color: #f9fafb !important;
+}
+
+/* 아이콘 색상 - 모든 아이콘을 흰색으로 */
+.dark svg {
+  color: #f9fafb !important;
+  fill: currentColor !important;
+}
+
+.dark .text-gray-600 svg,
+.dark .text-gray-700 svg,
+.dark .text-gray-500 svg {
+  color: #f9fafb !important;
+}
+
+/* 보더 색상 */
+.dark .border-gray-200 {
+  border-color: #374151 !important;
+}
+
+.dark .border-gray-100 {
+  border-color: #374151 !important;
+}
+
+.dark .border-gray-300 {
+  border-color: #4b5563 !important;
+}
+
+/* 카드 및 컨테이너 */
+.dark .shadow-sm,
+.dark .shadow,
+.dark .shadow-md {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2) !important;
+}
+
+/* 입력 필드 */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: #374151 !important;
+  color: #f9fafb !important;
+  border-color: #4b5563 !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #9ca3af !important;
+}
+
+/* 버튼 호버 효과 */
+.dark .hover\:bg-gray-100:hover {
+  background-color: #374151 !important;
+}
+
+.dark .hover\:bg-gray-50:hover {
+  background-color: #374151 !important;
+}
+
+/* 메인 콘텐츠 영역 */
+.dark main,
+.dark .main-content,
+.dark .app-container {
+  background-color: #111827 !important;
+  color: #f9fafb !important;
+}
+
+/* 모든 페이지 래퍼 */
+.dark div[class*="bg-"] {
+  background-color: #1f2937 !important;
+}
+
+.dark div[class*="bg-gray-50"] {
+  background-color: #111827 !important;
+}
+
+.dark div[class*="bg-white"] {
+  background-color: #1f2937 !important;
+}
+
+/* 펜직한 전체 적용 */
+.dark * {
+  /* 배경색이 흰색인 모든 요소를 어둡게 */
+  background-color: #1f2937 !important;
+}
+
+.dark *[class*="bg-gray-50"],
+.dark *[class*="bg-gray-100"] {
+  background-color: #111827 !important;
+}
+
+.dark *[class*="bg-white"] {
+  background-color: #1f2937 !important;
+}
+
+/* 전체 페이지 영역 */
+.dark body,
+.dark html,
+.dark #root,
+.dark .App {
+  background-color: #111827 !important;
+  color: #f9fafb !important;
+}
+
+/* 디폴트 컴포넌트 스타일링 */
+.dark div,
+.dark section,
+.dark article,
+.dark aside,
+.dark nav {
+  background-color: #1f2937 !important;
+  color: #f9fafb !important;
+}

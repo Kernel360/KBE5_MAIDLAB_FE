@@ -149,6 +149,30 @@ export interface OAuthState {
 }
 
 /**
+ * 사용자 정보
+ */
+export interface UserInfo {
+  id: string;
+  name: string;
+  email: string;
+  permissions?: string[];
+  [key: string]: unknown;
+}
+
+/**
+ * JWT 페이로드
+ */
+export interface JWTPayload {
+  exp?: number;
+  iat?: number;
+  sub?: string;
+  userId?: string;
+  userType?: string;
+  permissions?: string[];
+  [key: string]: unknown;
+}
+
+/**
  * 세션 정보
  */
 export interface SessionInfo {

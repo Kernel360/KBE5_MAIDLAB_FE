@@ -89,8 +89,8 @@ const ManagerBoard = () => {
 
   // 답변 상태 배지 색상
   const getStatusBadgeColor = (answered: boolean) => {
-    return answered 
-      ? 'bg-green-100 text-green-800' 
+    return answered
+      ? 'bg-green-100 text-green-800'
       : 'bg-yellow-100 text-yellow-800';
   };
 
@@ -140,7 +140,9 @@ const ManagerBoard = () => {
                   className="hover:bg-gray-50 cursor-pointer transition-colors duration-200"
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTypeBadgeColor(board.boardType)}`}>
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTypeBadgeColor(board.boardType)}`}
+                    >
                       {BOARD_TYPE_NAMES[board.boardType]}
                     </span>
                   </td>
@@ -151,10 +153,14 @@ const ManagerBoard = () => {
                     {board.managerName || '익명'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {board.createdAt.split('T')[0] + ' ' + board.createdAt.split('T')[1].split('.')[0]}
+                    {board.createdAt.split('T')[0] +
+                      ' ' +
+                      board.createdAt.split('T')[1].split('.')[0]}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(board.answered)}`}>
+                    <span
+                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(board.answered)}`}
+                    >
                       {board.answered ? '답변 완료' : '답변 대기'}
                     </span>
                   </td>
@@ -162,7 +168,10 @@ const ManagerBoard = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
+                <td
+                  colSpan={5}
+                  className="px-6 py-12 text-center text-gray-500"
+                >
                   매니저 상담 문의가 없습니다.
                 </td>
               </tr>
