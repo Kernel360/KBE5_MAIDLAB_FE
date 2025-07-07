@@ -155,10 +155,30 @@ export const tokenStorage = {
     }
   },
 
+  // 리프레시 토큰 저장
+  setRefreshToken: (token: string): void => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, token);
+    } catch (error) {
+      console.error('Failed to save refresh token:', error);
+    }
+  },
+
+  // 리프레시 토큰 가져오기
+  getRefreshToken: (): string | null => {
+    try {
+      return localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
+    } catch (error) {
+      console.error('Failed to get refresh token:', error);
+      return null;
+    }
+  },
+
   // 모든 토큰 삭제
   clearTokens: (): void => {
     try {
       localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
+      localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
     } catch (error) {
       console.error('Failed to clear tokens:', error);
     }
