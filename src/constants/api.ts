@@ -55,8 +55,7 @@ export const HTTP_STATUS = {
 
 // ===== API 기본 설정 =====
 export const API_CONFIG = {
-  BASE_URL:
-    import.meta.env.VITE_API_BASE_URL,
+  BASE_URL: import.meta.env.VITE_API_BASE_URL,
   TIMEOUT: 10000,
   RETRY_COUNT: 3,
   RETRY_DELAY: 1000,
@@ -137,12 +136,12 @@ export const API_ENDPOINTS = {
       REJECT: (id: number) => `/api/admin/manager/${id}/reject`,
       STATUS: '/api/admin/manager/status',
       GETCOUNT: '/api/admin/manager/managercount',
-      NEWMANAGERCOUNT: '/api/admin/manager/newmanagercount'
+      NEWMANAGERCOUNT: '/api/admin/manager/newmanagercount',
     },
     CONSUMER: {
       LIST: '/api/admin/consumer',
       DETAIL: (id: number) => `/api/admin/consumer/${id}`,
-      GETCOUNT: '/api/admin/consumer/consumercount'
+      GETCOUNT: '/api/admin/consumer/consumercount',
     },
     RESERVATION: {
       LIST: '/api/admin/reservations',
@@ -156,10 +155,8 @@ export const API_ENDPOINTS = {
       SETTLEMENT_REJECT: (id: number) =>
         `/api/admin/reservations/settlement/${id}/reject`,
       GETTODAYCOUNT: '/api/admin/reservations/todayreservation',
-      CONSUMER: (id: number) => 
-        `/api/admin/reservations/consumer/${id}`,
-      MANAGER: (id: number) =>
-        `/api/admin/reservations/manager/${id}`
+      CONSUMER: (id: number) => `/api/admin/reservations/consumer/${id}`,
+      MANAGER: (id: number) => `/api/admin/reservations/manager/${id}`,
     },
     MATCHING: {
       LIST: '/api/admin/matching',
@@ -172,7 +169,7 @@ export const API_ENDPOINTS = {
       CONSULTATION: '/api/admin/board/consultation',
       REFUND: '/api/admin/board/refund',
       UPDATE_ANSWER: (id: number) => `/api/admin/board/answer/${id}`,
-      GETWITHOUTANSWERCOUNT: '/api/admin/board/boardcount'
+      GETWITHOUTANSWERCOUNT: '/api/admin/board/boardcount',
     },
   },
 } as const;

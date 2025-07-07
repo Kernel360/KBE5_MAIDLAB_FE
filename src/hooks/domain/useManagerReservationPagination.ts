@@ -23,11 +23,14 @@ export const useManagerReservationPagination = ({
   initialSortOrder = 'DESC',
 }: UseManagerReservationPaginationParams = {}) => {
   const [currentPage, setCurrentPage] = useState(initialPage);
-  const [status, setStatus] = useState<'TODAY' | 'PAID' | 'WORKING' | 'COMPLETED'>(initialStatus);
+  const [status, setStatus] = useState<
+    'TODAY' | 'PAID' | 'WORKING' | 'COMPLETED'
+  >(initialStatus);
   const [sortBy, setSortBy] = useState(initialSortBy);
   const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>(initialSortOrder);
-  const [data, setData] = useState<PageResponse<ReservationListResponse> | null>(null);
-  
+  const [data, setData] =
+    useState<PageResponse<ReservationListResponse> | null>(null);
+
   const { callApi, loading } = useApiCall();
 
   // API 호출 함수
@@ -62,12 +65,9 @@ export const useManagerReservationPagination = ({
   );
 
   // 페이지 변경
-  const changePage = useCallback(
-    (newPage: number) => {
-      setCurrentPage(newPage);
-    },
-    [],
-  );
+  const changePage = useCallback((newPage: number) => {
+    setCurrentPage(newPage);
+  }, []);
 
   // 상태 변경
   const changeStatus = useCallback(
@@ -108,21 +108,21 @@ export const useManagerReservationPagination = ({
     data,
     reservations: data?.content || [],
     loading,
-    
+
     // 페이지네이션 정보
     currentPage,
     totalPages: data?.totalPages || 0,
     totalElements: data?.totalElements || 0,
     isFirst: data?.first || true,
     isLast: data?.last || true,
-    
+
     // 현재 상태
     status,
-    
+
     // 정렬 정보
     sortBy,
     sortOrder,
-    
+
     // 액션
     changePage,
     changeStatus,

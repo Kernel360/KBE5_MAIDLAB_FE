@@ -8,7 +8,12 @@ export interface PagingParams {
   status?: ReservationStatus;
   page?: number;
   size?: number;
-  sortBy?: 'createdAt' | 'reservationDate' | 'totalPrice' | 'completedAt' | 'startTime';
+  sortBy?:
+    | 'createdAt'
+    | 'reservationDate'
+    | 'totalPrice'
+    | 'completedAt'
+    | 'startTime';
   sortOrder?: 'ASC' | 'DESC';
 }
 
@@ -98,7 +103,6 @@ export interface ReservationDetailResponse {
   managerProfileImageUrl: string;
   managerAverageRate: number;
   managerRegion: string[];
-  
 }
 
 /**
@@ -129,7 +133,7 @@ export interface ReviewRegisterRequest {
   reservationId: number;
   rating: number;
   comment: string;
-  keywords : string[];
+  keywords: string[];
   likes?: boolean;
 }
 
