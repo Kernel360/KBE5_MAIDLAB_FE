@@ -1,4 +1,8 @@
 import type { ManagerVerificationStatus } from '@/constants/status';
+import type { UserType } from '@/constants/user';
+
+// Re-export UserType for backward compatibility
+export type { UserType };
 
 export interface TabPanelProps {
   children?: React.ReactNode;
@@ -7,8 +11,6 @@ export interface TabPanelProps {
 }
 
 export type ManagerStatusFilter = ManagerVerificationStatus | 'ALL';
-
-export type UserType = 'consumer' | 'manager';
 
 export interface LocationState {
   previousTab?: number;

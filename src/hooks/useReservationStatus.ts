@@ -1,5 +1,8 @@
 import { useState } from 'react';
-import { RESERVATION_STATUS, RESERVATION_STATUS_COLORS } from '@/constants/status';
+import {
+  RESERVATION_STATUS,
+  RESERVATION_STATUS_COLORS,
+} from '@/constants/status';
 import type { ReservationListResponse } from '@/types/reservation';
 
 export type ReservationTab = 'scheduled' | 'today' | 'completed';
@@ -52,7 +55,10 @@ export const useReservationStatus = () => {
       }
       return 'bg-orange-100 text-orange-700 border border-orange-300';
     }
-    const color = RESERVATION_STATUS_COLORS[status as keyof typeof RESERVATION_STATUS_COLORS] || '#ccc';
+    const color =
+      RESERVATION_STATUS_COLORS[
+        status as keyof typeof RESERVATION_STATUS_COLORS
+      ] || '#ccc';
     return `bg-[${color}] text-white`;
   };
 

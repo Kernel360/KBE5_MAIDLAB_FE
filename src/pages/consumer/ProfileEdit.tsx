@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Upload, User } from 'lucide-react';
+import { Upload, User } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
 import { useConsumer } from '@/hooks/domain/useConsumer';
+import { validateBirthDate } from '@/constants/validation';
 import type {
   ConsumerProfileUpdateRequest,
   ProfileData,
@@ -144,6 +145,12 @@ const ProfileEdit: React.FC = () => {
     }
     if (!formData.birth.trim()) {
       newErrors.birth = '생년월일을 입력해주세요.';
+    } else {
+      const birthValidation = validateBirthDate(formData.birth);
+      if (!birthValidation.isValid) {
+        newErrors.birth =
+          birthValidation.error || '올바른 생년월일을 입력해주세요.';
+      }
     }
     if (!formData.address.trim()) {
       newErrors.address = '주소를 입력해주세요.';
@@ -270,7 +277,7 @@ const ProfileEdit: React.FC = () => {
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={e => handleInputChange('name', e.target.value)}
+                  onChange={(e) => handleInputChange('name', e.target.value)}
                   className="w-full p-3 border text-center border-gray-300 rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                 />
                 {errors.name && (

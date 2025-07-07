@@ -11,7 +11,7 @@ import { Header } from '@/components/layout/Header/Header';
 export default function BoardList() {
   const navigate = useNavigate();
   const { boards, loading: isLoading, fetchBoards } = useBoard();
-  
+
   useEffect(() => {
     fetchBoards();
   }, [fetchBoards]);
@@ -63,13 +63,15 @@ export default function BoardList() {
                 </button>
               </div>
               <div className="space-y-4">
-                {boards.slice(startIndex, endIndex).map((board: BoardResponse) => (
-                  <BoardItem
-                    key={board.boardId}
-                    board={board}
-                    index={board.boardId}
-                  />
-                ))}
+                {boards
+                  .slice(startIndex, endIndex)
+                  .map((board: BoardResponse) => (
+                    <BoardItem
+                      key={board.boardId}
+                      board={board}
+                      index={board.boardId}
+                    />
+                  ))}
               </div>
               {/* 페이지네이션 UI */}
               <div className="flex justify-center items-center gap-2 mt-8">

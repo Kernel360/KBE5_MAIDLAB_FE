@@ -1,4 +1,6 @@
 import { env } from './env';
+import { OAUTH_CONFIG } from '@/config/constants';
+import type { PopupConfig } from '@/types/utils';
 
 /**
  * localStorage 기반 메시지 시스템 (COOP 우회)
@@ -54,220 +56,237 @@ export const extractUserTypeFromState = (
 };
 
 /**
+ * OAuth 팝업 설정 타입
+ * @see {@link PopupConfig} from '@/types/utils'
+ */
+
+const DEFAULT_POPUP_CONFIG: PopupConfig = {
+  width: OAUTH_CONFIG.POPUP_WIDTH,
+  height: OAUTH_CONFIG.POPUP_HEIGHT,
+  timeout: OAUTH_CONFIG.TIMEOUT_MS,
+  fastPollInterval: OAUTH_CONFIG.FAST_POLL_INTERVAL,
+  slowPollInterval: OAUTH_CONFIG.SLOW_POLL_INTERVAL,
+  fastPollDuration: OAUTH_CONFIG.FAST_POLL_DURATION,
+};
+
+/**
  * 구글 로그인 팝업 열기
  */
 export const openGoogleLoginPopup = (
   userType: 'CONSUMER' | 'MANAGER',
   onSuccess: (code: string, userType: 'CONSUMER' | 'MANAGER') => void,
   onError: (error: string) => void,
+  config: Partial<PopupConfig> = {},
 ): void => {
+  const popupConfig = { ...DEFAULT_POPUP_CONFIG, ...config };
   const authUrl = generateGoogleOAuthUrl(userType);
   const sessionId = `oauth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-  // 상태 변수들
-  let messageProcessed = false;
-  let pollInterval: NodeJS.Timeout;
-  let fastPollInterval: NodeJS.Timeout;
-  let timeoutHandle: NodeJS.Timeout;
-  let popup: Window | null = null;
+  const popupManager = new GoogleOAuthPopupManager(
+    sessionId,
+    popupConfig,
+    onSuccess,
+    onError,
+  );
 
-  // ✅ 통합 정리 함수
-  const cleanup = () => {
-    if (messageProcessed) return;
+  popupManager.openPopup(authUrl);
+};
 
-    messageProcessed = true;
+/**
+ * Google OAuth 팝업 관리 클래스
+ */
+class GoogleOAuthPopupManager {
+  private messageProcessed = false;
+  private pollInterval?: NodeJS.Timeout;
+  private fastPollInterval?: NodeJS.Timeout;
+  private timeoutHandle?: NodeJS.Timeout;
+  private popup: Window | null = null;
+  private fastPollCount = 0;
+
+  constructor(
+    private sessionId: string,
+    private config: PopupConfig,
+    private onSuccess: (code: string, userType: 'CONSUMER' | 'MANAGER') => void,
+    private onError: (error: string) => void,
+  ) {
+    this.setupEventListeners();
+  }
+
+  openPopup(authUrl: string): void {
+    this.prepareOAuthSession();
+    this.popup = this.createPopupWindow(authUrl);
+
+    if (!this.popup) {
+      this.cleanup();
+      this.onError('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
+      return;
+    }
+
+    this.startPolling();
+    this.setupTimeout();
+  }
+
+  private createPopupWindow(authUrl: string): Window | null {
+    const { width, height } = this.config;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2;
+
+    return window.open(
+      authUrl,
+      'google-login',
+      `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`,
+    );
+  }
+
+  private prepareOAuthSession(): void {
+    localStorage.removeItem(OAUTH_MESSAGE_KEY);
+    localStorage.removeItem(OAUTH_STATUS_KEY);
+    localStorage.setItem(
+      OAUTH_STATUS_KEY,
+      JSON.stringify({
+        status: 'pending',
+        sessionId: this.sessionId,
+        startTime: Date.now(),
+      }),
+    );
+  }
+
+  private setupEventListeners(): void {
+    window.addEventListener('storage', this.handleStorageChange.bind(this));
+    window.addEventListener('beforeunload', this.cleanup.bind(this));
+  }
+
+  private handleStorageChange(e: StorageEvent): void {
+    if (this.messageProcessed || e.key !== OAUTH_MESSAGE_KEY || !e.newValue) {
+      return;
+    }
+
+    try {
+      const data = JSON.parse(e.newValue);
+      if (this.isValidSession()) {
+        this.processMessage(data);
+      }
+    } catch (error) {
+      console.error('❌ localStorage 이벤트 파싱 에러:', error);
+    }
+  }
+
+  private isValidSession(): boolean {
+    const status = localStorage.getItem(OAUTH_STATUS_KEY);
+    if (!status) return false;
+
+    try {
+      const statusData = JSON.parse(status);
+      return statusData.sessionId === this.sessionId;
+    } catch {
+      return false;
+    }
+  }
+
+  private startPolling(): void {
+    // 빠른 폴링 시작
+    this.fastPollInterval = setInterval(
+      this.fastPollForMessage.bind(this),
+      this.config.fastPollInterval,
+    );
+
+    // 느린 폴링 시작 (빠른 폴링 종료 후)
+    setTimeout(() => {
+      if (!this.messageProcessed) {
+        this.pollInterval = setInterval(
+          this.slowPollForMessage.bind(this),
+          this.config.slowPollInterval,
+        );
+      }
+    }, this.config.fastPollDuration);
+  }
+
+  private fastPollForMessage(): void {
+    if (this.messageProcessed) return;
+
+    this.fastPollCount++;
+    this.checkForMessage();
+
+    // 빠른 폴링 종료 조건
+    if (this.fastPollCount >= this.config.fastPollDuration / this.config.fastPollInterval) {
+      if (this.fastPollInterval) {
+        clearInterval(this.fastPollInterval);
+      }
+    }
+  }
+
+  private slowPollForMessage(): void {
+    if (this.messageProcessed) return;
+    this.checkForMessage();
+  }
+
+  private checkForMessage(): void {
+    try {
+      const message = localStorage.getItem(OAUTH_MESSAGE_KEY);
+      if (message && this.isValidSession()) {
+        const data = JSON.parse(message);
+        this.processMessage(data);
+      }
+    } catch (error) {
+      console.error('❌ 메시지 체크 에러:', error);
+    }
+  }
+
+  private processMessage(messageData: any): void {
+    if (this.messageProcessed) return;
+
+    this.cleanup();
+    this.closePopup();
+
+    // 콜백 실행
+    if (messageData.type === 'GOOGLE_AUTH_SUCCESS') {
+      this.onSuccess(messageData.code, messageData.userType);
+    } else {
+      this.onError(messageData.error || 'OAuth 인증에 실패했습니다.');
+    }
+  }
+
+  private closePopup(): void {
+    setTimeout(() => {
+      try {
+        if (this.popup && typeof this.popup.close === 'function') {
+          this.popup.close();
+        }
+      } catch (e) {
+        // 팝업 닫기 실패 무시
+      }
+    }, 200);
+  }
+
+  private setupTimeout(): void {
+    this.timeoutHandle = setTimeout(() => {
+      if (!this.messageProcessed) {
+        this.cleanup();
+        this.closePopup();
+        this.onError('로그인 시간이 초과되었습니다. 다시 시도해주세요.');
+      }
+    }, this.config.timeout);
+  }
+
+  private cleanup(): void {
+    if (this.messageProcessed) return;
+
+    this.messageProcessed = true;
 
     // 타이머들 정리
-    clearInterval(pollInterval);
-    clearInterval(fastPollInterval);
-    clearTimeout(timeoutHandle);
+    if (this.pollInterval) clearInterval(this.pollInterval);
+    if (this.fastPollInterval) clearInterval(this.fastPollInterval);
+    if (this.timeoutHandle) clearTimeout(this.timeoutHandle);
 
     // 이벤트 리스너 제거
-    window.removeEventListener('storage', handleStorageChange);
-    window.removeEventListener('beforeunload', handlePageUnload);
+    window.removeEventListener('storage', this.handleStorageChange.bind(this));
+    window.removeEventListener('beforeunload', this.cleanup.bind(this));
 
     // localStorage 정리
     localStorage.removeItem(OAUTH_MESSAGE_KEY);
     localStorage.removeItem(OAUTH_STATUS_KEY);
-  };
-
-  // ✅ 메시지 처리 통합 함수
-  const processMessage = (messageData: any) => {
-    if (messageProcessed) return;
-
-    cleanup();
-
-    // 팝업 닫기 (지연 처리)
-    setTimeout(() => {
-      try {
-        if (popup && typeof popup.close === 'function') {
-          popup.close();
-        }
-      } catch (e: any) {}
-    }, 200);
-
-    // 콜백 실행
-    if (messageData.type === 'GOOGLE_AUTH_SUCCESS') {
-      onSuccess(messageData.code, messageData.userType);
-    } else {
-      onError(messageData.error || 'OAuth 인증에 실패했습니다.');
-    }
-  };
-
-  // ✅ localStorage 이벤트 리스너 (즉시 감지)
-  const handleStorageChange = (e: StorageEvent) => {
-    if (messageProcessed) return;
-
-    if (e.key === OAUTH_MESSAGE_KEY && e.newValue) {
-      try {
-        const data = JSON.parse(e.newValue);
-
-        // 세션 ID 확인
-        const status = localStorage.getItem(OAUTH_STATUS_KEY);
-        if (status) {
-          const statusData = JSON.parse(status);
-          if (statusData.sessionId !== sessionId) {
-            return;
-          }
-        }
-
-        processMessage(data);
-      } catch (error: any) {
-        console.error('❌ localStorage 이벤트 파싱 에러:', error);
-      }
-    }
-  };
-
-  // ✅ 빠른 폴링 (처음 30초간 500ms마다)
-  let fastPollCount = 0;
-  const maxFastPolls = 60; // 30초
-
-  const fastPollForMessage = () => {
-    if (messageProcessed) return;
-
-    fastPollCount++;
-
-    try {
-      const message = localStorage.getItem(OAUTH_MESSAGE_KEY);
-      if (message) {
-        const data = JSON.parse(message);
-
-        // 세션 ID 확인
-        const status = localStorage.getItem(OAUTH_STATUS_KEY);
-        if (status) {
-          const statusData = JSON.parse(status);
-          if (statusData.sessionId !== sessionId) {
-            return;
-          }
-        }
-
-        processMessage(data);
-        return;
-      }
-    } catch (error: any) {
-      console.error('❌ 빠른 폴링 에러:', error);
-    }
-
-    // 빠른 폴링 종료
-    if (fastPollCount >= maxFastPolls) {
-      clearInterval(fastPollInterval);
-    }
-  };
-
-  // ✅ 느린 폴링 백업 (3초마다)
-  let slowPollCount = 0;
-
-  const slowPollForMessage = () => {
-    if (messageProcessed) return;
-
-    slowPollCount++;
-
-    try {
-      const message = localStorage.getItem(OAUTH_MESSAGE_KEY);
-      if (message) {
-        const data = JSON.parse(message);
-
-        // 세션 ID 확인
-        const status = localStorage.getItem(OAUTH_STATUS_KEY);
-        if (status) {
-          const statusData = JSON.parse(status);
-          if (statusData.sessionId !== sessionId) {
-            return;
-          }
-        }
-
-        processMessage(data);
-        return;
-      }
-    } catch (error: any) {
-      console.error('❌ 느린 폴링 에러:', error);
-    }
-  };
-
-  // ✅ 페이지 종료 처리
-  const handlePageUnload = () => {
-    cleanup();
-  };
-
-  // 기존 상태 정리
-  localStorage.removeItem(OAUTH_MESSAGE_KEY);
-  localStorage.removeItem(OAUTH_STATUS_KEY);
-  localStorage.setItem(
-    OAUTH_STATUS_KEY,
-    JSON.stringify({ status: 'pending', sessionId, startTime: Date.now() }),
-  );
-
-  // 이벤트 리스너 등록
-  window.addEventListener('storage', handleStorageChange);
-  window.addEventListener('beforeunload', handlePageUnload);
-
-  // 팝업 크기 및 위치 계산
-  const width = 500;
-  const height = 600;
-  const left = window.screenX + (window.outerWidth - width) / 2;
-  const top = window.screenY + (window.outerHeight - height) / 2;
-
-  // 팝업 열기
-  popup = window.open(
-    authUrl,
-    'google-login',
-    `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`,
-  );
-
-  if (!popup) {
-    cleanup();
-    onError('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.');
-    return;
   }
-
-  // ✅ 빠른 폴링 시작 (500ms마다, 30초간)
-  fastPollInterval = setInterval(fastPollForMessage, 500);
-
-  // ✅ 느린 폴링 시작 (3초마다, 30초 후부터)
-  setTimeout(() => {
-    if (!messageProcessed) {
-      pollInterval = setInterval(slowPollForMessage, 3000);
-    }
-  }, 30000);
-
-  // ✅ 최종 타임아웃 (15분)
-  timeoutHandle = setTimeout(
-    () => {
-      if (!messageProcessed) {
-        cleanup();
-
-        try {
-          if (popup && typeof popup.close === 'function') {
-            popup.close();
-          }
-        } catch (e: any) {}
-
-        onError('로그인 시간이 초과되었습니다. 다시 시도해주세요.');
-      }
-    },
-    15 * 60 * 1000,
-  ); // 15분
-};
+}
 
 /**
  * 구글 로그인 콜백 처리 (GoogleCallback 페이지에서 사용)

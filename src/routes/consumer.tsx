@@ -12,6 +12,7 @@ import {
   ConsumerReviewRegister,
   LikedManagerList,
   BlackListManagerList,
+  PointsPage,
 } from '@/pages';
 import GoogleMap from '@/pages/reservation/GoogleMap';
 import { Status, Wrapper } from '@googlemaps/react-wrapper';
@@ -116,6 +117,14 @@ export const ConsumerRoutes = () => (
       element={
         <ProtectedRoute requiredUserType="CONSUMER">
           <BlackListManagerList />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path={ROUTES.CONSUMER.POINTS}
+      element={
+        <ProtectedRoute requiredUserType="CONSUMER">
+          <PointsPage />
         </ProtectedRoute>
       }
     />

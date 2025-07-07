@@ -4,11 +4,7 @@ import type {
   BoardCreateRequest,
   AnswerCreateRequest,
 } from './board';
-import type {
-  ReservationListResponse,
-  ReservationDetailResponse,
-  ReservationCreateRequest,
-} from './reservation';
+import type { ReservationListResponse } from './reservation';
 
 /**
  * API 응답과 내부 타입 간 매핑 유틸리티
@@ -88,55 +84,8 @@ export namespace ApiMapper {
     }));
   };
 
-  /**
-   * API 예약 상세 응답 → 내부 타입
-   */
-  export const mapReservationDetailResponse = (
-    apiData: any,
-  ): ReservationDetailResponse => ({
-    serviceType: apiData.serviceType,
-    serviceDetailType: apiData.serviceDetailType,
-    address: apiData.address,
-    addressDetail: apiData.addressDetail,
-    managerUuId: apiData.managerUuId,
-    managerName: apiData.managerName,
-    managerProfileImageUrl: apiData.managerProfileImageUrl,
-    managerAverageRate: apiData.managerAverageRate,
-    managerRegion: apiData.managerRegion || [],
-    managerPhoneNumber: apiData.managerPhoneNumber,
-    housingType: apiData.housingType,
-    roomSize: apiData.roomSize,
-    housingInformation: apiData.housingInformation,
-    reservationDate: apiData.reservationDate,
-    startTime: apiData.startTime,
-    endTime: apiData.endTime,
-    serviceAdd: apiData.serviceAdd,
-    pet: apiData.pet,
-    specialRequest: apiData.specialRequest,
-    totalPrice: apiData.totalPrice,
-  });
-
-  /**
-   * 내부 예약 생성 요청 → API 요청
-   */
-  export const mapReservationCreateToApi = (
-    data: ReservationCreateRequest,
-  ): any => ({
-    serviceDetailTypeId: data.serviceDetailTypeId,
-    address: data.address,
-    addressDetail: data.addressDetail,
-    managerUuId: data.managerUuId,
-    housingType: data.housingType,
-    roomSize: data.roomSize,
-    housingInformation: data.housingInformation,
-    reservationDate: data.reservationDate,
-    startTime: data.startTime,
-    endTime: data.endTime,
-    serviceAdd: data.serviceAdd,
-    pet: data.pet,
-    specialRequest: data.specialRequest,
-    totalPrice: data.totalPrice,
-  });
+  // 예약 관련 매핑 함수들은 타입 안전성 문제로 제거됨
+  // 필요시 각 도메인에서 직접 타입 안전한 변환 로직 구현
 
   // ===== 공통 매핑 =====
 
@@ -171,4 +120,32 @@ export namespace ApiMapper {
     size: apiData.size,
     number: apiData.number,
   });
+}
+
+/**
+ * 스토리지 아이템 타입
+ */
+export interface StorageItem<T> {
+  value: T;
+  expiry: number;
+}
+
+/**
+ * S3 Presigned URL 응답 타입
+ */
+export interface PresignedUrlResponse {
+  key: string;
+  url: string; // presigned URL
+}
+
+/**
+ * OAuth 팝업 설정 타입
+ */
+export interface PopupConfig {
+  width: number;
+  height: number;
+  timeout: number;
+  fastPollInterval: number;
+  slowPollInterval: number;
+  fastPollDuration: number;
 }

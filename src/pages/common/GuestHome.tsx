@@ -1,11 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Header,
-  ServiceGrid,
-  PromotionBanner,
-  HeroSection,
-} from '@/components';
+import { Header, ServiceGrid, HeroSection } from '@/components';
 import { ROUTES } from '@/constants';
 import { useEvent } from '@/hooks';
 

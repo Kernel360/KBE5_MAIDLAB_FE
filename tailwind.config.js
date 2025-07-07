@@ -49,5 +49,5 @@ export default {
     },
   },
   plugins: [],
-  darkMode: false,
+  darkMode: 'class', // 클래스 기반 다크모드 활성화
 };

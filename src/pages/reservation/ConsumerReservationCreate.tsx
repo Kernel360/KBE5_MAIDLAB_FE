@@ -15,7 +15,7 @@ const ConsumerReservationCreate: React.FC = () => {
   useEffect(() => {
     if (location.state && (location.state as any).step === 2) {
       const { address, lat, lng } = location.state as any;
-      setFormData(prev => ({ ...prev, address, lat, lng }));
+      setFormData((prev) => ({ ...prev, address, lat, lng }));
       setStep(2);
       // state 초기화(뒤로가기 시 중복 방지)
       if (window.history.replaceState) {

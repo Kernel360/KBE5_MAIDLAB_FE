@@ -3,6 +3,10 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 다크모드 테스트 스타일 */
+@import './dark-theme.css';
+@import './force-dark.css';
+
 /* 기본 폰트 및 앱 설정 */
 @layer base {
   html {
@@ -22,6 +26,16 @@
     -moz-osx-font-smoothing: grayscale;
     /* 모바일에서 스크롤 바운스 방지 */
     overscroll-behavior: none;
+    @apply bg-white text-gray-900 transition-colors duration-300;
+  }
+  
+  /* 다크모드 기본 스타일 */
+  .dark body {
+    @apply bg-gray-900 text-white;
+  }
+  
+  .dark {
+    color-scheme: dark;
   }
 }
 
@@ -38,6 +52,11 @@
 
   .btn-secondary {
     @apply bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-3 px-6 rounded-lg transition-colors duration-200 focus:ring-gray-500;
+  }
+  
+  /* 다크모드 버튼 스타일 */
+  .dark .btn-secondary {
+    @apply bg-gray-700 hover:bg-gray-600 text-gray-200;
   }
 
   .btn-outline {
@@ -60,6 +79,11 @@
   .input-field {
     @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200;
   }
+  
+  /* 다크모드 입력 필드 */
+  .dark .input-field {
+    @apply bg-gray-800 border-gray-600 text-white placeholder-gray-400;
+  }
 
   .input-error {
     @apply border-red-500 focus:ring-red-500;
@@ -68,6 +92,11 @@
   /* ✅ 카드 스타일 - App.css에서 통합 */
   .card {
     @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6;
+  }
+  
+  /* 다크모드 카드 */
+  .dark .card {
+    @apply bg-gray-800 border-gray-700;
   }
 
   .card-header {
@@ -85,6 +114,11 @@
   /* ✅ 앱 레이아웃 - App.css에서 이동 */
   .app-container {
     @apply min-h-screen bg-gray-50;
+  }
+  
+  /* 다크모드 앱 컸테이너 */
+  .dark .app-container {
+    @apply bg-gray-900;
   }
 
   .main-content {
