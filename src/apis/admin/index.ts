@@ -96,8 +96,14 @@ export const adminApi = {
   getManagersByStatus: async (
     params: ManagerStatusParams,
   ): Promise<ApiResponse<ManagerListResponse>> => {
-    const { page = 0, size = 10, status , sortByRating, isDescending} = params;
-    const queryString = buildQueryString({ page, size, status, sortByRating, isDescending });
+    const { page = 0, size = 10, status, sortByRating, isDescending } = params;
+    const queryString = buildQueryString({
+      page,
+      size,
+      status,
+      sortByRating,
+      isDescending,
+    });
 
     // 특별히 이 API만 전체 응답이 필요한 경우
     try {
@@ -166,29 +172,28 @@ export const adminApi = {
    * 수요자별 예약 조회
    */
 
-    getConsumerReservations: async (
-    consumerId: number, 
-    params: AdminPageParams = {}
+  getConsumerReservations: async (
+    consumerId: number,
+    params: AdminPageParams = {},
   ): Promise<ReservationListResponse[]> => {
-    const { page = 0, size = 10} = params;
-    const queryString = buildQueryString({ page, size })
+    const { page = 0, size = 10 } = params;
+    const queryString = buildQueryString({ page, size });
     return apiCall<ReservationListResponse[]>(
       'get',
       `${API_ENDPOINTS.ADMIN.RESERVATION.CONSUMER(consumerId)}${queryString}`,
     );
   },
 
-
   /**
    * 수요자별 예약 조회
    */
 
-    getManagerReservations: async (
-    managerId: number, 
-    params: AdminPageParams = {}
+  getManagerReservations: async (
+    managerId: number,
+    params: AdminPageParams = {},
   ): Promise<ReservationListResponse[]> => {
-    const { page = 0, size = 10} = params;
-    const queryString = buildQueryString({ page, size })
+    const { page = 0, size = 10 } = params;
+    const queryString = buildQueryString({ page, size });
     return apiCall<ReservationListResponse[]>(
       'get',
       `${API_ENDPOINTS.ADMIN.RESERVATION.MANAGER(managerId)}${queryString}`,
@@ -370,41 +375,32 @@ export const adminApi = {
   },
   //대시보드용 조회 api들
   getManagerCount: async (): Promise<string> => {
-    return apiCall<string>(
-      'get',
-      `${API_ENDPOINTS.ADMIN.MANAGER.GETCOUNT}`,
-    )
+    return apiCall<string>('get', `${API_ENDPOINTS.ADMIN.MANAGER.GETCOUNT}`);
   },
   getNewManagerCount: async (): Promise<string> => {
     return apiCall<string>(
       'get',
       `${API_ENDPOINTS.ADMIN.MANAGER.NEWMANAGERCOUNT}`,
-    )
+    );
   },
-  
+
   getConsumerCount: async (): Promise<string> => {
-    return apiCall<string>(
-      'get',
-      `${API_ENDPOINTS.ADMIN.CONSUMER.GETCOUNT}`,
-    )
-  },  
+    return apiCall<string>('get', `${API_ENDPOINTS.ADMIN.CONSUMER.GETCOUNT}`);
+  },
   getTodayReservationCount: async (): Promise<string> => {
     return apiCall<string>(
       'get',
       `${API_ENDPOINTS.ADMIN.RESERVATION.GETTODAYCOUNT}`,
-    )
+    );
   },
   getEventCount: async (): Promise<string> => {
-    return apiCall<string>(
-      'get',
-      `${API_ENDPOINTS.EVENT.GETCOUNT}`,
-    )
+    return apiCall<string>('get', `${API_ENDPOINTS.EVENT.GETCOUNT}`);
   },
   getBoardWithoutAnswerCount: async (): Promise<string> => {
     return apiCall<string>(
       'get',
       `${API_ENDPOINTS.ADMIN.BOARD.GETWITHOUTANSWERCOUNT}`,
-    )
+    );
   },
 
   /**
@@ -471,10 +467,6 @@ export const adminApi = {
    * 관리자 로그 조회 (최근 활동)
    */
   getAdminLogs: async (lines: number = 50): Promise<string[]> => {
-    return apiCall<string[]>(
-      'get',
-      `api/admin/logs/tail?lines=${lines}`,
-    );
+    return apiCall<string[]>('get', `api/admin/logs/tail?lines=${lines}`);
   },
-
 };

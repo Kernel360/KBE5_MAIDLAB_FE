@@ -168,7 +168,10 @@ const EventEdit = () => {
       URL.revokeObjectURL(mainImagePreview);
     }
     setMainImagePreview(eventData?.mainImageUrl || '');
-    setFormData(prev => ({ ...prev, mainImageUrl: eventData?.mainImageUrl || '' }));
+    setFormData((prev) => ({
+      ...prev,
+      mainImageUrl: eventData?.mainImageUrl || '',
+    }));
   }, [mainImageUpload, mainImagePreview, eventData]);
 
   const handleRemoveDetailImage = useCallback(() => {
@@ -177,7 +180,7 @@ const EventEdit = () => {
       URL.revokeObjectURL(imagePreview);
     }
     setImagePreview(eventData?.imageUrl || '');
-    setFormData(prev => ({ ...prev, imageUrl: eventData?.imageUrl || '' }));
+    setFormData((prev) => ({ ...prev, imageUrl: eventData?.imageUrl || '' }));
   }, [imageUpload, imagePreview, eventData]);
 
   // 컴포넌트 언마운트 시 URL.createObjectURL로 생성한 URL 해제
@@ -281,15 +284,29 @@ const EventEdit = () => {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">이벤트 수정</h1>
-              <p className="text-gray-600">기존 이벤트 정보를 수정하여 업데이트하세요.</p>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                이벤트 수정
+              </h1>
+              <p className="text-gray-600">
+                기존 이벤트 정보를 수정하여 업데이트하세요.
+              </p>
             </div>
             <button
               onClick={() => navigate(ROUTES.ADMIN.EVENTS)}
               className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-white rounded-lg transition-all duration-200"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
               </svg>
               목록으로
             </button>
@@ -299,17 +316,23 @@ const EventEdit = () => {
         {/* Main Form */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
           <form onSubmit={handleSubmit} className="divide-y divide-gray-200">
-            
             {/* Basic Information Section */}
             <div className="p-8">
               <div className="mb-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-1">기본 정보</h2>
-                <p className="text-sm text-gray-500">이벤트의 기본 정보를 수정해주세요.</p>
+                <h2 className="text-lg font-semibold text-gray-900 mb-1">
+                  기본 정보
+                </h2>
+                <p className="text-sm text-gray-500">
+                  이벤트의 기본 정보를 수정해주세요.
+                </p>
               </div>
-              
+
               <div className="grid grid-cols-1 gap-6">
                 <div>
-                  <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-3">
+                  <label
+                    htmlFor="title"
+                    className="block text-sm font-medium text-gray-700 mb-3"
+                  >
                     이벤트 제목 <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -329,8 +352,12 @@ const EventEdit = () => {
             {/* Image Upload Section */}
             <div className="p-8">
               <div className="mb-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-1">이미지 업로드</h2>
-                <p className="text-sm text-gray-500">새로운 이미지를 업로드하거나 기존 이미지를 유지할 수 있습니다.</p>
+                <h2 className="text-lg font-semibold text-gray-900 mb-1">
+                  이미지 업로드
+                </h2>
+                <p className="text-sm text-gray-500">
+                  새로운 이미지를 업로드하거나 기존 이미지를 유지할 수 있습니다.
+                </p>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -338,12 +365,25 @@ const EventEdit = () => {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-3">
-                      메인 이미지 <span className="text-gray-400">(변경하려면 새 파일 선택)</span>
+                      메인 이미지{' '}
+                      <span className="text-gray-400">
+                        (변경하려면 새 파일 선택)
+                      </span>
                     </label>
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-orange-400 transition-colors">
                       <div className="text-center">
-                        <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                          <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                        <svg
+                          className="mx-auto h-12 w-12 text-gray-400 mb-4"
+                          stroke="currentColor"
+                          fill="none"
+                          viewBox="0 0 48 48"
+                        >
+                          <path
+                            d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
                         </svg>
                         <input
                           type="file"
@@ -352,24 +392,30 @@ const EventEdit = () => {
                           className="hidden"
                           id="mainImage"
                         />
-                        <label 
+                        <label
                           htmlFor="mainImage"
                           className="cursor-pointer inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-orange-700 bg-orange-100 hover:bg-orange-200 transition-colors"
                         >
                           파일 선택
                         </label>
-                        <p className="mt-2 text-xs text-gray-500">PNG, JPG, GIF 최대 10MB</p>
+                        <p className="mt-2 text-xs text-gray-500">
+                          PNG, JPG, GIF 최대 10MB
+                        </p>
                       </div>
                     </div>
                   </div>
-                  
+
                   {mainImagePreview && (
                     <div className="mt-4">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <p className="text-sm font-medium text-gray-700">현재 이미지</p>
+                          <p className="text-sm font-medium text-gray-700">
+                            현재 이미지
+                          </p>
                           {mainImagePreview !== eventData?.mainImageUrl && (
-                            <span className="text-xs text-orange-600 font-medium">수정됨</span>
+                            <span className="text-xs text-orange-600 font-medium">
+                              수정됨
+                            </span>
                           )}
                         </div>
                         {mainImagePreview !== eventData?.mainImageUrl && (
@@ -379,14 +425,24 @@ const EventEdit = () => {
                             className="flex items-center justify-center w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors"
                             title="이미지 제거"
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M6 18L18 6M6 6l12 12"
+                              />
                             </svg>
                           </button>
                         )}
                       </div>
-                      <img 
-                        src={mainImagePreview} 
+                      <img
+                        src={mainImagePreview}
                         alt="메인 이미지 미리보기"
                         className="w-full max-h-64 object-contain rounded-lg border border-gray-200 bg-gray-50"
                       />
@@ -398,12 +454,23 @@ const EventEdit = () => {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-3">
-                      상세 이미지 <span className="text-gray-400">(선택사항)</span>
+                      상세 이미지{' '}
+                      <span className="text-gray-400">(선택사항)</span>
                     </label>
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-orange-400 transition-colors">
                       <div className="text-center">
-                        <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                          <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                        <svg
+                          className="mx-auto h-12 w-12 text-gray-400 mb-4"
+                          stroke="currentColor"
+                          fill="none"
+                          viewBox="0 0 48 48"
+                        >
+                          <path
+                            d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
                         </svg>
                         <input
                           type="file"
@@ -412,24 +479,30 @@ const EventEdit = () => {
                           className="hidden"
                           id="detailImage"
                         />
-                        <label 
+                        <label
                           htmlFor="detailImage"
                           className="cursor-pointer inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-orange-700 bg-orange-100 hover:bg-orange-200 transition-colors"
                         >
                           파일 선택
                         </label>
-                        <p className="mt-2 text-xs text-gray-500">PNG, JPG, GIF 최대 10MB</p>
+                        <p className="mt-2 text-xs text-gray-500">
+                          PNG, JPG, GIF 최대 10MB
+                        </p>
                       </div>
                     </div>
                   </div>
-                  
+
                   {imagePreview && (
                     <div className="mt-4">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <p className="text-sm font-medium text-gray-700">현재 이미지</p>
+                          <p className="text-sm font-medium text-gray-700">
+                            현재 이미지
+                          </p>
                           {imagePreview !== eventData?.imageUrl && (
-                            <span className="text-xs text-orange-600 font-medium">수정됨</span>
+                            <span className="text-xs text-orange-600 font-medium">
+                              수정됨
+                            </span>
                           )}
                         </div>
                         {imagePreview !== eventData?.imageUrl && (
@@ -439,14 +512,24 @@ const EventEdit = () => {
                             className="flex items-center justify-center w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors"
                             title="이미지 제거"
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M6 18L18 6M6 6l12 12"
+                              />
                             </svg>
                           </button>
                         )}
                       </div>
-                      <img 
-                        src={imagePreview} 
+                      <img
+                        src={imagePreview}
                         alt="상세 이미지 미리보기"
                         className="w-full max-h-64 object-contain rounded-lg border border-gray-200 bg-gray-50"
                       />
@@ -459,12 +542,19 @@ const EventEdit = () => {
             {/* Content Section */}
             <div className="p-8">
               <div className="mb-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-1">이벤트 내용</h2>
-                <p className="text-sm text-gray-500">이벤트에 대한 상세 내용을 수정해주세요.</p>
+                <h2 className="text-lg font-semibold text-gray-900 mb-1">
+                  이벤트 내용
+                </h2>
+                <p className="text-sm text-gray-500">
+                  이벤트에 대한 상세 내용을 수정해주세요.
+                </p>
               </div>
-              
+
               <div>
-                <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-3">
+                <label
+                  htmlFor="content"
+                  className="block text-sm font-medium text-gray-700 mb-3"
+                >
                   내용 <span className="text-red-500">*</span>
                 </label>
                 <textarea
@@ -477,7 +567,9 @@ const EventEdit = () => {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors text-gray-900 placeholder-gray-400 resize-none"
                   placeholder="이벤트에 대한 상세한 설명을 입력해주세요..."
                 />
-                <p className="mt-2 text-xs text-gray-500">최대 1000자까지 입력 가능합니다.</p>
+                <p className="mt-2 text-xs text-gray-500">
+                  최대 1000자까지 입력 가능합니다.
+                </p>
               </div>
             </div>
 
@@ -503,8 +595,18 @@ const EventEdit = () => {
                     </>
                   ) : (
                     <>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        />
                       </svg>
                       <span>이벤트 수정</span>
                     </>

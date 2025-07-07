@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useReservation } from '@/hooks/domain/useReservation';
-import { useAuth } from '@/hooks/useAuth';
-import { managerApi } from '@/apis/manager';
 import { ROUTES } from '@/constants';
 import { LENGTH_LIMITS } from '@/constants/validation';
 import { ArrowLeft, Star, Sparkles, Edit3, X } from 'lucide-react';
@@ -12,15 +10,75 @@ import type { ReviewFormData } from '@/types/consumer';
 // 매니저용 키워드 템플릿 데이터
 const MANAGER_REVIEW_KEYWORDS = {
   positive: [
-    { category: '고객 태도', keywords: ['친절함', '예의 바름', '배려심 있음', '감사 표현', '존중해줌', '협조적임'] },
-    { category: '업무 환경', keywords: ['집 정리됨', '접근 용이', '작업 공간 확보', '필요한 도구 준비', '깨끗한 환경', '안전한 환경'] },
-    { category: '소통 & 요청', keywords: ['요청 명확함', '사전 안내 좋음', '유연한 일정', '합리적 요청', '추가 요청 없음', '이해도 높음'] }
+    {
+      category: '고객 태도',
+      keywords: [
+        '친절함',
+        '예의 바름',
+        '배려심 있음',
+        '감사 표현',
+        '존중해줌',
+        '협조적임',
+      ],
+    },
+    {
+      category: '업무 환경',
+      keywords: [
+        '집 정리됨',
+        '접근 용이',
+        '작업 공간 확보',
+        '필요한 도구 준비',
+        '깨끗한 환경',
+        '안전한 환경',
+      ],
+    },
+    {
+      category: '소통 & 요청',
+      keywords: [
+        '요청 명확함',
+        '사전 안내 좋음',
+        '유연한 일정',
+        '합리적 요청',
+        '추가 요청 없음',
+        '이해도 높음',
+      ],
+    },
   ],
   negative: [
-    { category: '고객 태도 문제', keywords: ['무례함', '불친절함', '과도한 요구', '갑질', '무시하는 태도', '협조 안 함'] },
-    { category: '업무 환경 문제', keywords: ['집 너무 더러움', '정리 안됨', '도구 미준비', '접근 어려움', '위험한 환경', '작업 방해'] },
-    { category: '소통 & 요청 문제', keywords: ['요청 불명확', '사전 안내 부족', '예약과 다름', '무리한 요청', '추가 업무 강요', '시간 미준수'] }
-  ]
+    {
+      category: '고객 태도 문제',
+      keywords: [
+        '무례함',
+        '불친절함',
+        '과도한 요구',
+        '갑질',
+        '무시하는 태도',
+        '협조 안 함',
+      ],
+    },
+    {
+      category: '업무 환경 문제',
+      keywords: [
+        '집 너무 더러움',
+        '정리 안됨',
+        '도구 미준비',
+        '접근 어려움',
+        '위험한 환경',
+        '작업 방해',
+      ],
+    },
+    {
+      category: '소통 & 요청 문제',
+      keywords: [
+        '요청 불명확',
+        '사전 안내 부족',
+        '예약과 다름',
+        '무리한 요청',
+        '추가 업무 강요',
+        '시간 미준수',
+      ],
+    },
+  ],
 };
 
 // 별점 컴포넌트
@@ -29,15 +87,21 @@ const RatingSection: React.FC<{
   onChange: (rating: number) => void;
 }> = ({ rating, onChange }) => {
   const [hoverRating, setHoverRating] = useState(0);
-  
+
   const getRatingText = (rating: number) => {
     switch (rating) {
-      case 1: return '매우 불만';
-      case 2: return '불만족';
-      case 3: return '보통';
-      case 4: return '만족';
-      case 5: return '매우 만족';
-      default: return '';
+      case 1:
+        return '매우 불만';
+      case 2:
+        return '불만족';
+      case 3:
+        return '보통';
+      case 4:
+        return '만족';
+      case 5:
+        return '매우 만족';
+      default:
+        return '';
     }
   };
 
@@ -47,8 +111,10 @@ const RatingSection: React.FC<{
         <h2 className="text-xl font-bold text-gray-900 mb-2">
           고객은 어떠셨나요?
         </h2>
-        <p className="text-gray-500 mb-8">업무 진행이 원활했는지 평가해주세요</p>
-        
+        <p className="text-gray-500 mb-8">
+          업무 진행이 원활했는지 평가해주세요
+        </p>
+
         <div className="flex justify-center items-center gap-3 mb-6">
           {[1, 2, 3, 4, 5].map((star) => (
             <button
@@ -69,7 +135,7 @@ const RatingSection: React.FC<{
             </button>
           ))}
         </div>
-        
+
         <div className="bg-gray-50 rounded-xl p-4 inline-block">
           <div className="text-3xl font-bold text-gray-900 mb-1">
             {rating}.0
@@ -90,7 +156,10 @@ const ManagerKeywordSelection: React.FC<{
   onKeywordToggle: (keyword: string) => void;
   onKeywordRemove: (keyword: string) => void;
 }> = ({ rating, selectedKeywords, onKeywordToggle, onKeywordRemove }) => {
-  const keywordData = rating >= 4 ? MANAGER_REVIEW_KEYWORDS.positive : MANAGER_REVIEW_KEYWORDS.negative;
+  const keywordData =
+    rating >= 4
+      ? MANAGER_REVIEW_KEYWORDS.positive
+      : MANAGER_REVIEW_KEYWORDS.negative;
   const maxKeywords = 6;
   const isMaxReached = selectedKeywords.length >= maxKeywords;
 
@@ -99,9 +168,13 @@ const ManagerKeywordSelection: React.FC<{
       <div className="flex items-center gap-2 mb-4">
         <Sparkles className="w-5 h-5 text-blue-500" />
         <h3 className="text-lg font-semibold text-gray-900">키워드 선택</h3>
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-          rating >= 4 ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'
-        }`}>
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-medium ${
+            rating >= 4
+              ? 'bg-green-100 text-green-700'
+              : 'bg-orange-100 text-orange-700'
+          }`}
+        >
           {rating >= 4 ? '긍정 키워드' : '개선 키워드'}
         </span>
         <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
@@ -109,26 +182,27 @@ const ManagerKeywordSelection: React.FC<{
         </span>
       </div>
       <p className="text-gray-500 text-sm mb-6">
-        {rating >= 4 
-          ? '만족스러웠던 점들을 키워드로 선택해보세요' 
-          : '아쉬웠던 점들을 키워드로 선택해보세요'
-        }
+        {rating >= 4
+          ? '만족스러웠던 점들을 키워드로 선택해보세요'
+          : '아쉬웠던 점들을 키워드로 선택해보세요'}
         {isMaxReached && (
           <span className="block text-orange-600 font-medium mt-1">
             최대 {maxKeywords}개까지 선택 가능합니다
           </span>
         )}
       </p>
-      
+
       <div className="space-y-4">
         {keywordData.map((group) => (
           <div key={group.category}>
-            <h4 className="text-sm font-medium text-gray-700 mb-2">{group.category}</h4>
+            <h4 className="text-sm font-medium text-gray-700 mb-2">
+              {group.category}
+            </h4>
             <div className="flex flex-wrap gap-2">
               {group.keywords.map((keyword) => {
                 const isSelected = selectedKeywords.includes(keyword);
                 const isDisabled = !isSelected && isMaxReached;
-                
+
                 return (
                   <button
                     key={keyword}
@@ -150,12 +224,21 @@ const ManagerKeywordSelection: React.FC<{
 
       {selectedKeywords.length > 0 && (
         <div className="mt-6 p-4 bg-orange-50 rounded-xl">
-          <h4 className="text-sm font-medium text-orange-800 mb-2">선택된 키워드 ({selectedKeywords.length}/{maxKeywords}개)</h4>
+          <h4 className="text-sm font-medium text-orange-800 mb-2">
+            선택된 키워드 ({selectedKeywords.length}/{maxKeywords}개)
+          </h4>
           <div className="flex flex-wrap gap-2">
             {selectedKeywords.map((keyword) => (
-              <div key={keyword} className="relative inline-flex items-center px-3 py-1.5 bg-orange-200 text-orange-800 text-xs rounded-full pr-8">
+              <div
+                key={keyword}
+                className="relative inline-flex items-center px-3 py-1.5 bg-orange-200 text-orange-800 text-xs rounded-full pr-8"
+              >
                 <span>{keyword}</span>
-                <button type="button" onClick={() => onKeywordRemove(keyword)} className="absolute right-1 top-1/2 -translate-y-1/2 w-4 h-4 bg-orange-300 hover:bg-orange-400 rounded-full flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1">
+                <button
+                  type="button"
+                  onClick={() => onKeywordRemove(keyword)}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 w-4 h-4 bg-orange-300 hover:bg-orange-400 rounded-full flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1"
+                >
                   <X className="w-2.5 h-2.5 text-orange-700" />
                 </button>
               </div>
@@ -175,7 +258,7 @@ const ReviewTextArea: React.FC<{
 }> = ({ comment, onChange, isOptional }) => {
   const remainingChars = LENGTH_LIMITS.REVIEW_COMMENT.MAX - comment.length;
   const isValid = comment.length <= LENGTH_LIMITS.REVIEW_COMMENT.MAX;
-  
+
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
       <div className="flex items-center gap-2 mb-4">
@@ -187,24 +270,24 @@ const ReviewTextArea: React.FC<{
           </span>
         )}
       </div>
-      
+
       <textarea
         value={comment}
         onChange={(e) => onChange(e.target.value)}
         className={`w-full h-32 p-4 border-2 rounded-xl resize-none text-base transition-all focus:outline-none ${
-          isValid 
-            ? 'border-gray-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100' 
-            : comment.length > 0 
-              ? 'border-red-300 focus:border-red-400 focus:ring-4 focus:ring-red-100' 
+          isValid
+            ? 'border-gray-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100'
+            : comment.length > 0
+              ? 'border-red-300 focus:border-red-400 focus:ring-4 focus:ring-red-100'
               : 'border-gray-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100'
         }`}
         placeholder={
-          isOptional 
+          isOptional
             ? `키워드 외에 추가로 하고 싶은 말이 있다면 작성해주세요.\n(선택사항)`
             : `고객과의 업무는 어떠셨나요? 솔직한 후기를 남겨주세요.\n(업무 환경, 고객 태도, 요청사항 등)`
         }
       />
-      
+
       <div className="flex justify-between items-center mt-3">
         <div>
           {!isValid && comment.length > 0 && (
@@ -213,9 +296,11 @@ const ReviewTextArea: React.FC<{
             </span>
           )}
         </div>
-        <span className={`text-sm font-medium ${
-          remainingChars < 50 ? 'text-orange-500' : 'text-gray-500'
-        }`}>
+        <span
+          className={`text-sm font-medium ${
+            remainingChars < 50 ? 'text-orange-500' : 'text-gray-500'
+          }`}
+        >
           {comment.length} / {LENGTH_LIMITS.REVIEW_COMMENT.MAX}
         </span>
       </div>
@@ -236,24 +321,24 @@ const ManagerReviewRegister: React.FC = () => {
     preference: 'NONE', // 매니저 리뷰에서는 사용하지 않지만 타입 맞추기 위해 유지
   });
 
-
   const handleKeywordToggle = (keyword: string) => {
-    setSelectedKeywords(prev => 
-      prev.includes(keyword) 
-        ? prev.filter(k => k !== keyword)
-        : prev.length < 6 
-          ? [...prev, keyword]
-          : prev // 최대 6개까지만 허용
+    setSelectedKeywords(
+      (prev) =>
+        prev.includes(keyword)
+          ? prev.filter((k) => k !== keyword)
+          : prev.length < 6
+            ? [...prev, keyword]
+            : prev, // 최대 6개까지만 허용
     );
   };
 
   const handleKeywordRemove = (keyword: string) => {
-    setSelectedKeywords(prev => prev.filter(k => k !== keyword));
+    setSelectedKeywords((prev) => prev.filter((k) => k !== keyword));
   };
 
   // 키워드가 선택되었으면 comment는 선택사항
   const hasSelectedKeywords = selectedKeywords.length > 0;
-  
+
   // 폼 유효성: 키워드가 있거나 코멘트가 있어야 함
   const isFormValid = hasSelectedKeywords || formData.comment.length > 0;
 
@@ -270,9 +355,10 @@ const ManagerReviewRegister: React.FC = () => {
       return;
     }
 
-
     if (formData.comment.length > LENGTH_LIMITS.REVIEW_COMMENT.MAX) {
-      alert(`리뷰는 ${LENGTH_LIMITS.REVIEW_COMMENT.MAX}자 이하로 작성해주세요.`);
+      alert(
+        `리뷰는 ${LENGTH_LIMITS.REVIEW_COMMENT.MAX}자 이하로 작성해주세요.`,
+      );
       return;
     }
 
@@ -296,7 +382,6 @@ const ManagerReviewRegister: React.FC = () => {
       setIsSubmitting(false);
     }
   };
-
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -324,7 +409,9 @@ const ManagerReviewRegister: React.FC = () => {
             {/* 별점 섹션 */}
             <RatingSection
               rating={formData.rating}
-              onChange={(rating) => setFormData((prev) => ({ ...prev, rating }))}
+              onChange={(rating) =>
+                setFormData((prev) => ({ ...prev, rating }))
+              }
             />
 
             {/* 키워드 선택 */}
@@ -338,7 +425,9 @@ const ManagerReviewRegister: React.FC = () => {
             {/* 직접 리뷰 작성 */}
             <ReviewTextArea
               comment={formData.comment}
-              onChange={(comment) => setFormData((prev) => ({ ...prev, comment }))}
+              onChange={(comment) =>
+                setFormData((prev) => ({ ...prev, comment }))
+              }
               isOptional={hasSelectedKeywords}
             />
 

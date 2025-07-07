@@ -8,7 +8,7 @@ export interface ReservationCreateRequest {
   serviceDetailTypeId: number;
   address: string;
   addressDetail: string;
-  managerUuId: string;
+  managerUuid: string;
   housingType: string;
   lifeCleaningRoomIdx?: number;
   housingInformation: string;
@@ -155,7 +155,7 @@ export interface ReservationFormData {
   startTime: string;
   endTime: string;
   pet: PetType;
-  managerUuId?: string;
+  managerUuid?: string;
   chooseManager: boolean; // 직접 선택 여부
   // 생활청소 평수 인덱스
   lifeCleaningRoomIdx?: number;

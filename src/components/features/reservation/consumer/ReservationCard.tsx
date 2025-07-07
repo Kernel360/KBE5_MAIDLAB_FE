@@ -41,19 +41,22 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
     }
   };
 
-  const showReviewButton = !reservation.isExistReview && reservation.status === 'COMPLETED';
+  const showReviewButton =
+    !reservation.isExistReview && reservation.status === 'COMPLETED';
   const showPaymentButton = reservation.status === 'MATCHED';
 
   return (
-    <div 
-      className="bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden"
-    >
+    <div className="bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden">
       {/* 헤더 */}
       <div className="p-4 pb-3 border-b border-gray-50">
         <div className="flex items-center justify-between">
           <div className="flex-1">
             <h3 className="font-semibold text-gray-900 text-base mb-1">
-              {SERVICE_TYPE_LABELS[reservation.serviceType as keyof typeof SERVICE_TYPES]}
+              {
+                SERVICE_TYPE_LABELS[
+                  reservation.serviceType as keyof typeof SERVICE_TYPES
+                ]
+              }
             </h3>
             <p className="text-sm text-gray-500">
               {reservation.detailServiceType}
@@ -104,7 +107,9 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
       <div className="px-4 pb-4 flex gap-2">
         <button
           className="flex-1 flex items-center justify-center text-sm text-gray-500 bg-gray-50 rounded-xl px-3 py-2 hover:bg-gray-100 transition"
-          onClick={() => onDetailClick && onDetailClick(reservation.reservationId)}
+          onClick={() =>
+            onDetailClick && onDetailClick(reservation.reservationId)
+          }
         >
           <span>자세히 보기</span>
           <ChevronRight className="w-4 h-4 ml-1" />

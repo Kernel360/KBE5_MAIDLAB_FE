@@ -113,7 +113,9 @@ const BoardEdit = () => {
           <div className="bg-white p-8 rounded-2xl shadow-lg">
             <div className="flex flex-col items-center space-y-4">
               <div className="w-12 h-12 border-4 border-gray-200 border-t-gray-500 rounded-full animate-spin"></div>
-              <p className="text-gray-600 font-medium">게시글을 불러오는 중...</p>
+              <p className="text-gray-600 font-medium">
+                게시글을 불러오는 중...
+              </p>
             </div>
           </div>
         </div>
@@ -127,13 +129,25 @@ const BoardEdit = () => {
         <div className="max-w-5xl mx-auto p-6">
           <div className="bg-red-50 border border-red-200 rounded-lg p-6">
             <div className="text-center">
-              <svg className="mx-auto h-12 w-12 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.996-.833-2.767 0L3.132 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              <svg
+                className="mx-auto h-12 w-12 text-red-500 mb-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.996-.833-2.767 0L3.132 16.5c-.77.833.192 2.5 1.732 2.5z"
+                />
               </svg>
               <h2 className="text-xl font-semibold text-red-600 mb-2">
                 게시글을 찾을 수 없습니다.
               </h2>
-              <p className="text-red-500">요청하신 게시글이 존재하지 않거나 삭제되었습니다.</p>
+              <p className="text-red-500">
+                요청하신 게시글이 존재하지 않거나 삭제되었습니다.
+              </p>
             </div>
           </div>
         </div>
@@ -154,8 +168,18 @@ const BoardEdit = () => {
             onClick={handleCancel}
             className="flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition-colors"
           >
-            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <svg
+              className="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             돌아가기
           </button>
@@ -166,7 +190,9 @@ const BoardEdit = () => {
           <div className="p-8">
             {/* Board Type Badge */}
             <div className="mb-6">
-              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${chipColors[BOARD_TYPE_COLORS[board.boardType]] || chipColors.default}`}>
+              <span
+                className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${chipColors[BOARD_TYPE_COLORS[board.boardType]] || chipColors.default}`}
+              >
                 {BOARD_TYPE_NAMES[board.boardType]}
               </span>
             </div>
@@ -179,22 +205,30 @@ const BoardEdit = () => {
               <div className="bg-gray-50 rounded-lg p-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div className="flex items-center">
-                    <span className="text-gray-500 font-medium w-20">작성자:</span>
+                    <span className="text-gray-500 font-medium w-20">
+                      작성자:
+                    </span>
                     <div className="flex items-center gap-2">
                       <span className="font-medium text-gray-900">
                         {getAuthorInfo().name}
                       </span>
                       {getAuthorInfo().type && (
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${chipColors[getAuthorInfo().color]}`}>
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${chipColors[getAuthorInfo().color]}`}
+                        >
                           {getAuthorInfo().type}
                         </span>
                       )}
                     </div>
                   </div>
                   <div className="flex items-center">
-                    <span className="text-gray-500 font-medium w-20">작성일:</span>
+                    <span className="text-gray-500 font-medium w-20">
+                      작성일:
+                    </span>
                     <span className="text-gray-900">
-                      {board.createdAt ? formatDate(board.createdAt) : '날짜 정보 없음'}
+                      {board.createdAt
+                        ? formatDate(board.createdAt)
+                        : '날짜 정보 없음'}
                     </span>
                   </div>
                 </div>
@@ -233,7 +267,9 @@ const BoardEdit = () => {
                         />
                       </div>
                       <div className="p-3">
-                        <p className="text-sm text-gray-600 truncate">{image.name}</p>
+                        <p className="text-sm text-gray-600 truncate">
+                          {image.name}
+                        </p>
                       </div>
                     </div>
                   ))}

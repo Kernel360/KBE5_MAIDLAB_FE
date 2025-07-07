@@ -96,7 +96,7 @@ export const useReservation = () => {
         serviceDetailTypeId: reservationData.serviceDetailTypeId,
         address: reservationData.address,
         addressDetail: reservationData.addressDetail,
-        managerUuId: reservationData.managerUuId,
+        managerUuid: reservationData.managerUuid,
         housingType: reservationData.housingType,
         lifeCleaningRoomIdx: reservationData.lifeCleaningRoomIdx,
         housingInformation: reservationData.housingInformation,

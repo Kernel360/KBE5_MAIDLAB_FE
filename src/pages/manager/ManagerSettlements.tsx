@@ -14,7 +14,7 @@ import { Header } from '@/components';
 
 const SETTLEMENT_STATUS_LABELS: Record<string, string> = {
   PENDING: '대기중',
-  APPROVED: '승인완료', 
+  APPROVED: '승인완료',
   REJECTED: '거절됨',
 };
 
@@ -37,7 +37,8 @@ const ManagerSettlements: React.FC = () => {
   const [currentWeek, setCurrentWeek] = useState<Date>(getMonday(new Date()));
   const [settlements, setSettlements] = useState<SettlementResponse[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedStatusFilter, setSelectedStatusFilter] = useState<string>('ALL');
+  const [selectedStatusFilter, setSelectedStatusFilter] =
+    useState<string>('ALL');
 
   const fetchData = async (week: Date) => {
     setLoading(true);
@@ -67,15 +68,23 @@ const ManagerSettlements: React.FC = () => {
   };
 
   // 상태별 통계 계산 (REJECTED 건은 정산 금액에서 제외)
-  const totalPlatformFee = settlements.reduce((sum, s) => sum + s.platformFee, 0);
-  const approvedSettlements = settlements.filter(s => s.status === 'APPROVED');
-  const pendingSettlements = settlements.filter(s => s.status === 'PENDING');
-  const rejectedSettlements = settlements.filter(s => s.status === 'REJECTED');
-  
+  const totalPlatformFee = settlements.reduce(
+    (sum, s) => sum + s.platformFee,
+    0,
+  );
+  const approvedSettlements = settlements.filter(
+    (s) => s.status === 'APPROVED',
+  );
+  const pendingSettlements = settlements.filter((s) => s.status === 'PENDING');
+  const rejectedSettlements = settlements.filter(
+    (s) => s.status === 'REJECTED',
+  );
+
   // 실제 정산 금액 계산 (REJECTED 건 제외)
-  const actualSettlementAmount = approvedSettlements.reduce((sum, s) => sum + s.amount, 0) + 
-                                pendingSettlements.reduce((sum, s) => sum + s.amount, 0);
-  
+  const actualSettlementAmount =
+    approvedSettlements.reduce((sum, s) => sum + s.amount, 0) +
+    pendingSettlements.reduce((sum, s) => sum + s.amount, 0);
+
   const statusStats = {
     APPROVED: {
       count: approvedSettlements.length,
@@ -88,13 +97,14 @@ const ManagerSettlements: React.FC = () => {
     REJECTED: {
       count: rejectedSettlements.length,
       amount: rejectedSettlements.reduce((sum, s) => sum + s.amount, 0),
-    }
+    },
   };
 
   // 필터링된 정산 내역
-  const filteredSettlements = selectedStatusFilter === 'ALL' 
-    ? settlements 
-    : settlements.filter(s => s.status === selectedStatusFilter);
+  const filteredSettlements =
+    selectedStatusFilter === 'ALL'
+      ? settlements
+      : settlements.filter((s) => s.status === selectedStatusFilter);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -104,10 +114,9 @@ const ManagerSettlements: React.FC = () => {
         backRoute={ROUTES.HOME}
         showMenu={true}
       />
-      
+
       <div className="px-4 py-6 pb-20 pt-20">
         <div className="max-w-md mx-auto space-y-6">
-          
           <WeekSelector
             currentWeek={currentWeek}
             onPrevWeek={handlePrevWeek}
@@ -134,7 +143,7 @@ const ManagerSettlements: React.FC = () => {
             {loading ? (
               <LoadingSkeleton count={3} />
             ) : filteredSettlements.length === 0 ? (
-              <EmptyState 
+              <EmptyState
                 selectedFilter={selectedStatusFilter}
                 settlementStatusLabels={SETTLEMENT_STATUS_LABELS}
               />

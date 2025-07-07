@@ -9,6 +9,7 @@ import {
   getNextTheme,
 } from '@/utils/theme';
 import type { ThemeContextType, ThemeProviderProps } from '@/types/hooks/theme';
+import type { ResolvedTheme } from '@/constants/theme';
 
 // ===== 테마 컨텍스트 생성 =====
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -123,7 +124,6 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     isSystemMode: theme === 'system',
     toggleTheme,
     resetTheme,
-    isSupported: true,
   };
 
   return React.createElement(ThemeContext.Provider, { value }, children);

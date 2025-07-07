@@ -9,7 +9,12 @@ import { SERVICE_TYPE_LABELS, SERVICE_TYPES } from '@/constants/service';
 import { RESERVATION_STATUS } from '@/constants/status';
 import { ManagerReservationCard } from '@/components';
 import { useToast } from '@/hooks/useToast';
-import {CheckInOutModal,ConfirmModal,MatchingCard,TabHeader} from '@/components'
+import {
+  CheckInOutModal,
+  ConfirmModal,
+  MatchingCard,
+  TabHeader,
+} from '@/components';
 import { ROUTES } from '@/constants/route';
 import { Header } from '@/components';
 const FILTERS = [
@@ -35,29 +40,43 @@ const ManagerReservationsAndMatching: React.FC = () => {
   const { getStatusBadgeStyle } = useReservationStatus();
   const [tab, setTab] = useState<'schedule' | 'request'>('schedule');
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'PAID' | 'TODAY' | 'WORKING' | 'COMPLETED'>('PAID');
+  const [filter, setFilter] = useState<
+    'PAID' | 'TODAY' | 'WORKING' | 'COMPLETED'
+  >('PAID');
   const [filterOpen, setFilterOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [modal, setModal] = useState<{ type: 'success' | 'fail' | null, info?: any }>({ type: null });
+  const [modal, setModal] = useState<{
+    type: 'success' | 'fail' | null;
+    info?: any;
+  }>({ type: null });
   const [checkInOutModal, setCheckInOutModal] = useState<{
     isOpen: boolean;
     isCheckIn: boolean;
     reservationId: number | null;
-    reservationInfo: { serviceType: string; detailServiceType: string; time: string };
+    reservationInfo: {
+      serviceType: string;
+      detailServiceType: string;
+      time: string;
+    };
   }>({
     isOpen: false,
     isCheckIn: true,
     reservationId: null,
     reservationInfo: { serviceType: '', detailServiceType: '', time: '' },
   });
-  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; isCheckIn: boolean }>({
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    isCheckIn: boolean;
+  }>({
     isOpen: false,
     isCheckIn: true,
   });
 
   useEffect(() => {
     setLoading(true);
-    Promise.all([fetchReservations(), fetchMatchings()]).finally(() => setLoading(false));
+    Promise.all([fetchReservations(), fetchMatchings()]).finally(() =>
+      setLoading(false),
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -71,18 +90,25 @@ const ManagerReservationsAndMatching: React.FC = () => {
   const todayStr = new Date().toISOString().slice(0, 10);
   let filteredReservations: ReservationListResponse[] = [];
   if (filter === 'PAID') {
-    filteredReservations = reservations.filter(r => {
+    filteredReservations = reservations.filter((r) => {
       const dateOnly = getDateOnly(r.reservationDate);
       return (
         (r.status === RESERVATION_STATUS.PAID && dateOnly > todayStr) ||
-        (dateOnly === todayStr && ([RESERVATION_STATUS.PAID] as string[]).includes(r.status))
+        (dateOnly === todayStr &&
+          ([RESERVATION_STATUS.PAID] as string[]).includes(r.status))
       );
     });
   } else if (filter === 'TODAY') {
     filteredReservations = reservations
-      .filter(r =>
-        ([RESERVATION_STATUS.PAID, RESERVATION_STATUS.WORKING, RESERVATION_STATUS.COMPLETED] as string[]).includes(r.status) &&
-        (getDateOnly(r.reservationDate) === todayStr)
+      .filter(
+        (r) =>
+          (
+            [
+              RESERVATION_STATUS.PAID,
+              RESERVATION_STATUS.WORKING,
+              RESERVATION_STATUS.COMPLETED,
+            ] as string[]
+          ).includes(r.status) && getDateOnly(r.reservationDate) === todayStr,
       )
       .sort((a, b) => {
         const order = {
@@ -90,24 +116,40 @@ const ManagerReservationsAndMatching: React.FC = () => {
           [RESERVATION_STATUS.WORKING]: 1,
           [RESERVATION_STATUS.COMPLETED]: 2,
         };
-        return (order[a.status as keyof typeof order] ?? 99) - (order[b.status as keyof typeof order] ?? 99);
+        return (
+          (order[a.status as keyof typeof order] ?? 99) -
+          (order[b.status as keyof typeof order] ?? 99)
+        );
       });
   } else if (filter === 'WORKING') {
-    filteredReservations = reservations.filter(r => r.status === RESERVATION_STATUS.WORKING);
+    filteredReservations = reservations.filter(
+      (r) => r.status === RESERVATION_STATUS.WORKING,
+    );
   } else if (filter === 'COMPLETED') {
-    filteredReservations = reservations.filter(r => r.status === RESERVATION_STATUS.COMPLETED);
+    filteredReservations = reservations.filter(
+      (r) => r.status === RESERVATION_STATUS.COMPLETED,
+    );
   }
   const totalPages = Math.ceil(filteredReservations.length / PAGE_SIZE);
-  const paginatedReservations = filteredReservations.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const paginatedReservations = filteredReservations.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
 
   // 체크인/아웃 핸들러
-  const handleCheckInOutClick = (reservation: ReservationListResponse, isCheckIn: boolean) => {
+  const handleCheckInOutClick = (
+    reservation: ReservationListResponse,
+    isCheckIn: boolean,
+  ) => {
     setCheckInOutModal({
       isOpen: true,
       isCheckIn,
       reservationId: reservation.reservationId,
       reservationInfo: {
-        serviceType: SERVICE_TYPE_LABELS[reservation.serviceType as keyof typeof SERVICE_TYPES] ?? reservation.serviceType,
+        serviceType:
+          SERVICE_TYPE_LABELS[
+            reservation.serviceType as keyof typeof SERVICE_TYPES
+          ] ?? reservation.serviceType,
         detailServiceType: reservation.detailServiceType,
         time: `${formatDateTime(reservation.reservationDate)} ${reservation.startTime} ~ ${reservation.endTime}`,
       },
@@ -118,7 +160,9 @@ const ManagerReservationsAndMatching: React.FC = () => {
     if (!checkInOutModal.reservationId) return;
     try {
       const action = checkInOutModal.isCheckIn ? checkIn : checkOut;
-      await action(checkInOutModal.reservationId, { checkTime: new Date().toISOString() });
+      await action(checkInOutModal.reservationId, {
+        checkTime: new Date().toISOString(),
+      });
       setCheckInOutModal({ ...checkInOutModal, isOpen: false });
       setConfirmModal({ isOpen: true, isCheckIn: checkInOutModal.isCheckIn });
       fetchReservations(true);
@@ -127,24 +171,34 @@ const ManagerReservationsAndMatching: React.FC = () => {
     }
   };
 
-  const handleConfirmModalClose = () => {
-    setConfirmModal({ isOpen: false, isCheckIn: true });
-  };
-
   // 예약 일정 카드 UI
   const renderReservationCard = (reservation: any) => (
     <ManagerReservationCard
       key={reservation.reservationId}
       reservation={reservation}
       getStatusBadgeStyle={getStatusBadgeStyle}
-      onDetailClick={() => navigate(ROUTES.MANAGER.RESERVATION_DETAIL.replace(':id', String(reservation.reservationId)))}
+      onDetailClick={() =>
+        navigate(
+          ROUTES.MANAGER.RESERVATION_DETAIL.replace(
+            ':id',
+            String(reservation.reservationId),
+          ),
+        )
+      }
       onCheckIn={() => handleCheckInOutClick(reservation, true)}
       onCheckOut={async () => {
-        const result = await checkOut(reservation.reservationId, { checkTime: new Date().toISOString() });
+        const result = await checkOut(reservation.reservationId, {
+          checkTime: new Date().toISOString(),
+        });
         if (result.success) {
           // 상태 업데이트를 위한 짧은 지연 후 네비게이션
           setTimeout(() => {
-            navigate(ROUTES.MANAGER.REVIEW_REGISTER.replace(':id', String(reservation.reservationId)));
+            navigate(
+              ROUTES.MANAGER.REVIEW_REGISTER.replace(
+                ':id',
+                String(reservation.reservationId),
+              ),
+            );
           }, 100);
         }
       }}
@@ -157,11 +211,15 @@ const ManagerReservationsAndMatching: React.FC = () => {
       key={matching.reservationId}
       matching={matching}
       onAccept={async () => {
-        const result = await respondToReservation(matching.reservationId, { status: true });
+        const result = await respondToReservation(matching.reservationId, {
+          status: true,
+        });
         if (result.success) setModal({ type: 'success', info: matching });
       }}
       onReject={async () => {
-        const result = await respondToReservation(matching.reservationId, { status: false });
+        const result = await respondToReservation(matching.reservationId, {
+          status: false,
+        });
         if (result.success) setModal({ type: 'fail' });
       }}
     />
@@ -175,14 +233,32 @@ const ManagerReservationsAndMatching: React.FC = () => {
         className="flex items-center gap-1 px-4 py-2 border border-gray-300 rounded-full font-semibold text-gray-700 bg-white hover:bg-gray-100"
       >
         {FILTERS.find((f) => f.value === filter)?.label}
-        <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+        <svg
+          className="w-4 h-4 ml-1"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
       </button>
       {filterOpen && (
         <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
           {FILTERS.map((f) => (
             <button
               key={f.value}
-              onClick={() => { setFilter(f.value as 'PAID' | 'TODAY' | 'WORKING' | 'COMPLETED'); setFilterOpen(false); setCurrentPage(1); }}
+              onClick={() => {
+                setFilter(
+                  f.value as 'PAID' | 'TODAY' | 'WORKING' | 'COMPLETED',
+                );
+                setFilterOpen(false);
+                setCurrentPage(1);
+              }}
               className={`block w-full px-4 py-2 text-left text-gray-700 hover:bg-orange-50 ${filter === f.value ? 'font-bold text-orange-500' : ''}`}
             >
               {f.label}
@@ -194,16 +270,16 @@ const ManagerReservationsAndMatching: React.FC = () => {
   );
 
   // 모달 UI
-  const now = new Date();
+
   return (
     <div className="min-h-screen bg-gray-50 flex-col">
       <div className="sticky top-0 z-20 bg-white">
-      <Header
-        variant="sub"
-        title="예약 관리"
-        backRoute={ROUTES.HOME}
-        showMenu={true}
-      />
+        <Header
+          variant="sub"
+          title="예약 관리"
+          backRoute={ROUTES.HOME}
+          showMenu={true}
+        />
       </div>
       <div className="max-w-md mx-auto bg-gray-50 min-h-screen p-0 pb-20 relative pt-20">
         {/* 탭 헤더 */}
@@ -222,7 +298,9 @@ const ManagerReservationsAndMatching: React.FC = () => {
             {loading ? (
               <div className="text-center py-8 text-gray-400">로딩중...</div>
             ) : paginatedReservations.length === 0 ? (
-              <div className="text-center py-8 text-gray-400">예약 일정이 없습니다.</div>
+              <div className="text-center py-8 text-gray-400">
+                예약 일정이 없습니다.
+              </div>
             ) : (
               paginatedReservations.map(renderReservationCard)
             )}
@@ -252,7 +330,9 @@ const ManagerReservationsAndMatching: React.FC = () => {
             {loading ? (
               <div className="text-center py-8 text-gray-400">로딩중...</div>
             ) : matchings.length === 0 ? (
-              <div className="text-center py-8 text-gray-400">예약 요청이 없습니다.</div>
+              <div className="text-center py-8 text-gray-400">
+                예약 요청이 없습니다.
+              </div>
             ) : (
               matchings.map(renderMatchingCard)
             )}
@@ -275,7 +355,9 @@ const ManagerReservationsAndMatching: React.FC = () => {
         )}
         <CheckInOutModal
           isOpen={checkInOutModal.isOpen}
-          onClose={() => setCheckInOutModal({ ...checkInOutModal, isOpen: false })}
+          onClose={() =>
+            setCheckInOutModal({ ...checkInOutModal, isOpen: false })
+          }
           onConfirm={handleModalConfirm}
           isCheckIn={checkInOutModal.isCheckIn}
           reservationInfo={checkInOutModal.reservationInfo}
