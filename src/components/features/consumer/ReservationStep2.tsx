@@ -167,7 +167,12 @@ const ReservationStep2: React.FC<Props> = ({
 
   // 매니저 선택 관련 함수들
   const handleManagerToggle = () => {
-    setForm((prev) => ({ ...prev, chooseManager: !prev.chooseManager }));
+    setForm(prev => ({ 
+      ...prev, 
+      chooseManager: !prev.chooseManager,
+      // 토글을 비활성화할 때 기존 매니저 선택 정보도 초기화
+      ...(!prev.chooseManager ? {} : { managerUuid: '', managerInfo: undefined })
+    }));
     if (!form.chooseManager) {
       handleManagerSelect();
     }
@@ -199,6 +204,35 @@ const ReservationStep2: React.FC<Props> = ({
     } catch (error) {
       showToast('매니저 조회 중 오류가 발생했습니다.', 'error');
     }
+  };
+
+  // 주소에서 구/시 단위 추출 (백엔드 로직과 동일)
+  const extractGuFromAddress = (address: string): string | null => {
+    const addressParts = address.split(' ');
+    
+    if (address.startsWith('서')) {
+      // 서울시인 경우 "구" 단위 추출
+      const gu = addressParts.find(part => part.endsWith('구'));
+      return gu || null;
+    } else {
+      // 서울시가 아닌 경우 "시" 단위 추출
+      const si = addressParts.find(part => part.endsWith('시'));
+      return si || null;
+    }
+  };
+
+  // 주소 유효성 검사
+  const validateAddress = (address: string): boolean => {
+    const extracted = extractGuFromAddress(address);
+    if (!extracted) {
+      if (address.startsWith('서')) {
+        showToast('서울시 주소의 경우 "구" 단위가 포함되어야 합니다. (예: 강남구, 동대문구)', 'error');
+      } else {
+        showToast('주소에 "시" 단위가 포함되어야 합니다. (예: 부산시, 대구시)', 'error');
+      }
+      return false;
+    }
+    return true;
   };
 
   // 주소에서 구/시 단위 추출 (백엔드 로직과 동일)
@@ -734,7 +768,6 @@ const ReservationStep2: React.FC<Props> = ({
                 날짜와 시간, 매니저를 선택해주세요
               </p>
             </div>
-
             {/* 날짜 선택 카드 */}
             <div className="bg-white border-2 border-gray-100 rounded-2xl p-6 transition-all hover:border-orange-200 hover:shadow-lg">
               <div className="flex items-center gap-3 mb-4">
@@ -786,7 +819,6 @@ const ReservationStep2: React.FC<Props> = ({
                   시작 시간
                 </h3>
               </div>
-
               <div className="grid grid-cols-4 gap-3 mb-4">
                 {Array.from({ length: 32 }).map((_, i) => {
                   const hour = 6 + Math.floor(i / 2);
@@ -881,7 +913,7 @@ const ReservationStep2: React.FC<Props> = ({
                     />
                   </button>
                 </div>
-
+                
                 {form.chooseManager && (
                   <button
                     onClick={handleManagerSelect}
@@ -890,7 +922,7 @@ const ReservationStep2: React.FC<Props> = ({
                     매니저 목록 보기
                   </button>
                 )}
-
+                
                 {!form.chooseManager && (
                   <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4">
                     <div className="flex items-center gap-2 text-blue-700">
@@ -1202,7 +1234,7 @@ const ReservationStep2: React.FC<Props> = ({
       />
 
       {/* 진행 단계 표시 */}
-      <div className="bg-gray-50 px-10 py-6">
+      <div className="bg-gray-50 px-10 py-6 pt-20">
         <div className="max-w-md mx-auto">
           <div className="flex items-center justify-center mb-6">
             {STEPS.map((step, index) => (
@@ -1270,13 +1302,40 @@ const ReservationStep2: React.FC<Props> = ({
 
       {/* 매니저 선택 모달 */}
       {showManagerModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowManagerModal(false);
+              // 매니저가 선택되지 않았다면 토글을 비활성화하고 매니저 정보 초기화
+              if (!form.managerUuId) {
+                setForm(prev => ({ 
+                  ...prev, 
+                  chooseManager: false,
+                  managerUuId: '',
+                  managerInfo: undefined
+                }));
+              }
+            }
+          }}
+        >
           <div className="bg-white rounded-2xl w-full max-w-md max-h-[80vh] overflow-hidden">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-bold text-gray-800">매니저 선택</h3>
                 <button
-                  onClick={() => setShowManagerModal(false)}
+                  onClick={() => {
+                    setShowManagerModal(false);
+                    // 매니저가 선택되지 않았다면 토글을 비활성화하고 매니저 정보 초기화
+                    if (!form.managerUuId) {
+                      setForm(prev => ({ 
+                        ...prev, 
+                        chooseManager: false,
+                        managerUuId: '',
+                        managerInfo: undefined
+                      }));
+                    }
+                  }}
                   className="text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   <svg

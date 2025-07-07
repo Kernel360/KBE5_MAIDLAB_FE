@@ -22,7 +22,6 @@ import {
   formatPhoneNumber,
 } from '@/utils/format';
 import type { ReservationDetailResponse } from '@/types/reservation';
-
 import {
   MessageCircle,
   Phone,
@@ -130,6 +129,12 @@ const ConsumerReservationDetail: React.FC = () => {
     }
   };
 
+  // 결제 핸들러
+  const handlePayment = async () => {
+    if (!reservation) return;
+    await payReservation(Number(id));
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex justify-center items-center">
@@ -166,7 +171,6 @@ const ConsumerReservationDetail: React.FC = () => {
   const serviceInfo =
     SERVICE_ICONS[serviceType] || SERVICE_ICONS.GENERAL_CLEANING;
   const ServiceIcon = serviceInfo.icon;
-
   const additionalOptions = parseAdditionalOptions(
     reservation.serviceAdd || '',
   );
@@ -188,12 +192,12 @@ const ConsumerReservationDetail: React.FC = () => {
       {/* 헤더 */}
       <Header
         variant="sub"
-        title="예약 상세 페이지"
+        title="예약 상세"
         backRoute={ROUTES.CONSUMER.RESERVATIONS}
         showMenu={true}
       />
 
-      <div className="max-w-md mx-auto">
+      <div className="max-w-md mx-auto pt-20">
         {/* 상태 카드 */}
         <div className="mx-4 mt-4 bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="p-6">
@@ -292,10 +296,13 @@ const ConsumerReservationDetail: React.FC = () => {
                     src={reservation.managerProfileImage}
                     alt={reservation.managerName}
                     className="w-16 h-16 object-cover rounded-full"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                    }}
                   />
-                ) : (
-                  <User className="w-8 h-8 text-white" />
-                )}
+                ) : null}
+                <User className={`w-8 h-8 text-white ${reservation.managerProfileImage ? 'hidden' : ''}`} />
               </div>
               <div className="flex-1">
                 <div className="flex items-center space-x-2 mb-1">
@@ -307,27 +314,25 @@ const ConsumerReservationDetail: React.FC = () => {
                   <Star className="w-4 h-4 text-yellow-500 fill-current" />
                   <span className="text-sm font-medium text-gray-700">
                     {reservation.managerRate
-                      ? Number(reservation.managerRate).toFixed(1)
+                      ? parseFloat(reservation.managerRate).toFixed(1)
                       : '0.0'}
                   </span>
                 </div>
               </div>
             </div>
-            <div className="flex space-x-3">
-              <button
-                onClick={() => setShowPhoneNumber(!showPhoneNumber)}
-                className="flex-1 flex items-center justify-center space-x-2 py-3 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors"
-              >
-                <Phone className="w-5 h-5" />
-                <span>{showPhoneNumber ? phoneNumber : '연락처 보기'}</span>
-              </button>
-              <button
-                className="flex-1 flex items-center justify-center space-x-2 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
-                disabled
-              >
-                <MessageCircle className="w-5 h-5" />
-                <span>메시지</span>
-              </button>
+            <div className="bg-gray-50 rounded-xl p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Phone className="w-5 h-5 text-gray-600" />
+                  <span className="text-sm font-medium text-gray-700">연락처</span>
+                </div>
+                <button
+                  onClick={() => setShowPhoneNumber(!showPhoneNumber)}
+                  className="flex items-center space-x-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium"
+                >
+                  <span>{showPhoneNumber ? phoneNumber : '연락처 보기'}</span>
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -441,11 +446,21 @@ const ConsumerReservationDetail: React.FC = () => {
 
         {/* 하단 버튼 */}
         <div className="mx-4 mt-4 pb-28 flex flex-row gap-3">
+          {/* MATCHED 상태일 때 결제하기 버튼 */}
+          {reservation.status === RESERVATION_STATUS.MATCHED && (
+            <button
+              className="flex-1 py-4 bg-blue-500 text-white font-semibold rounded-2xl hover:bg-blue-600 transition-colors shadow-lg"
+              onClick={handlePayment}
+            >
+              결제하기
+            </button>
+          )}
           {/* 예약 취소 버튼: 예약 가능 상태일 때만 노출 */}
           {(
             [
               RESERVATION_STATUS.PENDING,
               RESERVATION_STATUS.MATCHED,
+              RESERVATION_STATUS.PAID,
               RESERVATION_STATUS.APPROVED,
             ] as string[]
           ).includes(reservation.status) && (
@@ -459,7 +474,7 @@ const ConsumerReservationDetail: React.FC = () => {
           {/* 관리자 문의 버튼 */}
           <button
             className="flex-1 py-4 bg-gray-200 text-gray-800 font-semibold rounded-2xl hover:bg-gray-400 transition-colors shadow"
-            onClick={() => navigate(ROUTES.BOARD.CREATE)}
+            onClick={() => navigate(ROUTES.BOARD.LIST)}
           >
             관리자 문의
           </button>

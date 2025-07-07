@@ -330,24 +330,24 @@ export const useAdmin = () => {
     ),
 
     // 상담 게시판 조회
-    fetchConsultationBoards: useCallback(async () => {
+    fetchConsultationBoards: useCallback(async (params?: AdminPageParams) => {
       try {
-        const data = await adminApi.getConsultationBoards();
+        const data = await adminApi.getConsultationBoards(params);
         return data;
       } catch (error: any) {
         showToast(error.message || '상담 게시판 조회에 실패했습니다.', 'error');
-        return [];
+        return null;
       }
     }, [showToast]),
 
     // 환불 게시판 조회
-    fetchRefundBoards: useCallback(async () => {
+    fetchRefundBoards: useCallback(async (params?: AdminPageParams) => {
       try {
-        const data = await adminApi.getRefundBoards();
+        const data = await adminApi.getRefundBoards(params);
         return data;
       } catch (error: any) {
         showToast(error.message || '환불 게시판 조회에 실패했습니다.', 'error');
-        return [];
+        return null;
       }
     }, [showToast]),
 
@@ -465,10 +465,21 @@ export const useAdmin = () => {
       },
       [],
     ),
-    getBoardWithoutAnswerCount: useCallback(
+    getRefundBoardCount: useCallback(
       async () => {
         try {
-          const result = await adminApi.getBoardWithoutAnswerCount();
+          const result = await adminApi.getRefundBoardCount();
+          return { success: true, data: result };
+        } catch (error: any) {
+          return { success: false, error: error.message };
+        }
+      },
+      [],
+    ),
+    getCounselBoardCount: useCallback(
+      async () => {
+        try {
+          const result = await adminApi.getCounselBoardCount();
           return { success: true, data: result };
         } catch (error: any) {
           return { success: false, error: error.message };

@@ -13,8 +13,8 @@ import { ROUTES } from '@/constants';
 import { Header } from '@/components';
 
 const SETTLEMENT_STATUS_LABELS: Record<string, string> = {
-  PENDING: '대기중',
-  APPROVED: '승인완료',
+  PENDING: '정산 대기중',
+  APPROVED: '승인완료', 
   REJECTED: '거절됨',
 };
 
@@ -114,7 +114,7 @@ const ManagerSettlements: React.FC = () => {
         backRoute={ROUTES.HOME}
         showMenu={true}
       />
-
+      
       <div className="px-4 py-6 pb-20 pt-20">
         <div className="max-w-md mx-auto space-y-6">
           <WeekSelector

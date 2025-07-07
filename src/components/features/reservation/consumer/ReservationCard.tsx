@@ -52,14 +52,10 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex-1">
             <h3 className="font-semibold text-gray-900 text-base mb-1">
-              {
-                SERVICE_TYPE_LABELS[
-                  reservation.serviceType as keyof typeof SERVICE_TYPES
-                ]
-              }
+              {reservation.detailServiceType}
             </h3>
             <p className="text-sm text-gray-500">
-              {reservation.detailServiceType}
+              {SERVICE_TYPE_LABELS[reservation.serviceType as keyof typeof SERVICE_TYPES]}
             </p>
           </div>
           <span
