@@ -16,6 +16,14 @@ export const config = {
   // 지역화 설정
   defaultLocale: import.meta.env.VITE_DEFAULT_LOCALE,
   defaultTimezone: import.meta.env.VITE_DEFAULT_TIMEZONE,
+
+  // 소셜 로그인 설정
+  googleClientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+  googleClientSecret: import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
+  googleRedirectUri: import.meta.env.VITE_GOOGLE_REDIRECT_URI,
+
+  // 구글맵 설정
+  googleMapApiKey: import.meta.env.VITE_GOOGLEMAP_API_KEY,
 } as const;
 
 // 환경 변수 유효성 검사
