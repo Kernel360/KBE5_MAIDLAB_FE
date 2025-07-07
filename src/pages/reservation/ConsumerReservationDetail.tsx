@@ -22,6 +22,7 @@ import {
   formatPhoneNumber,
 } from '@/utils/format';
 import type { ReservationDetailResponse } from '@/types/reservation';
+import { useAuth } from '@/hooks/useAuth';
 import {
   MessageCircle,
   Phone,
@@ -92,7 +93,9 @@ function parsePet(pet: string) {
 const ConsumerReservationDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { fetchReservationDetail, cancelReservation } = useReservation();
+  const { fetchReservationDetail, cancelReservation, payReservation } =
+    useReservation();
+  const { isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reservation, setReservation] =
@@ -171,6 +174,7 @@ const ConsumerReservationDetail: React.FC = () => {
   const serviceInfo =
     SERVICE_ICONS[serviceType] || SERVICE_ICONS.GENERAL_CLEANING;
   const ServiceIcon = serviceInfo.icon;
+
   const additionalOptions = parseAdditionalOptions(
     reservation.serviceAdd || '',
   );
@@ -291,18 +295,22 @@ const ConsumerReservationDetail: React.FC = () => {
             </h3>
             <div className="flex items-center space-x-4 mb-4">
               <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center overflow-hidden">
-                {reservation.managerProfileImage ? (
+                {reservation.managerProfileImageUrl ? (
                   <img
-                    src={reservation.managerProfileImage}
+                    src={reservation.managerProfileImageUrl}
                     alt={reservation.managerName}
                     className="w-16 h-16 object-cover rounded-full"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
-                      e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                      e.currentTarget.nextElementSibling?.classList.remove(
+                        'hidden',
+                      );
                     }}
                   />
                 ) : null}
-                <User className={`w-8 h-8 text-white ${reservation.managerProfileImage ? 'hidden' : ''}`} />
+                <User
+                  className={`w-8 h-8 text-white ${reservation.managerProfileImageUrl ? 'hidden' : ''}`}
+                />
               </div>
               <div className="flex-1">
                 <div className="flex items-center space-x-2 mb-1">
@@ -324,7 +332,9 @@ const ConsumerReservationDetail: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Phone className="w-5 h-5 text-gray-600" />
-                  <span className="text-sm font-medium text-gray-700">연락처</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    연락처
+                  </span>
                 </div>
                 <button
                   onClick={() => setShowPhoneNumber(!showPhoneNumber)}
