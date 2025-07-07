@@ -117,13 +117,12 @@ export const useReservation = () => {
         specialRequest: reservationData.specialRequest,
         totalPrice: reservationData.totalPrice,
       };
-      
+
       const result = await callApi(() => reservationApi.create(formattedData), {
         showSuccessToast: false,
         errorMessage: '예약에 실패했습니다.',
       });
-  
-        if (result.success) {
+      if (result.success) {
         await fetchReservations(true); // 강제 새로고침
       }
 
@@ -167,7 +166,9 @@ export const useReservation = () => {
       );
 
       if (result.success) {
-        updateLocalReservation(reservationId, { status: 'PAID' });
+        updateLocalReservation(reservationId, {
+          status: 'PAID',
+        });
       }
 
       return result;
@@ -211,7 +212,9 @@ export const useReservation = () => {
       );
 
       if (result.success) {
-        updateLocalReservation(reservationId, { status: 'WORKING' });
+        updateLocalReservation(reservationId, {
+          status: 'WORKING',
+        });
       }
 
       return result;
@@ -231,7 +234,9 @@ export const useReservation = () => {
       );
 
       if (result.success) {
-        updateLocalReservation(reservationId, { status: 'COMPLETED' });
+        updateLocalReservation(reservationId, {
+          status: 'COMPLETED',
+        });
       }
 
       return result;
@@ -248,7 +253,9 @@ export const useReservation = () => {
       });
 
       if (result.success && data.reservationId) {
-        updateLocalReservation(data.reservationId, { isExistReview: true });
+        updateLocalReservation(data.reservationId, {
+          isExistReview: true,
+        });
       }
 
       return result;
