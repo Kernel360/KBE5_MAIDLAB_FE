@@ -326,11 +326,20 @@ export const Header: React.FC<HeaderProps> = ({
                 </button>
                 <button
                   onClick={() => handleMenuClick(ROUTES.LOGIN)}
-                  className="flex items-center px-4 py-2 hover:bg-gray-100 gap-2"
+                  className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 gap-2 text-gray-700 dark:text-gray-200"
                 >
-                  <User className="w-5 h-5 text-gray-600" />
+                  <User className="w-5 h-5 text-gray-600 dark:text-white" />
                   <span>로그인</span>
                 </button>
+                
+                {/* 테마 토글 스위치 - 비로그인 사용자 */}
+                <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-600 flex justify-center">
+                  <ThemeToggle 
+                    variant="switch" 
+                    size="sm" 
+                    showLabel={false}
+                  />
+                </div>
               </div>
             )}
           </>
