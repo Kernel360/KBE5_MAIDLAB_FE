@@ -339,16 +339,4 @@ export const formatKoreanArray = (arr: string[]): string => {
   return `${rest.join(', ')} 및 ${last}`;
 };
 
-// 날짜와 시간을 포맷팅하는 함수 - date.ts로 이동 예정
-// @deprecated - Use formatDateTime from date.ts instead
-export const formatDateTimeWithLocale = (date: string): string => {
-  const dateObj = new Date(date);
-  return dateObj.toLocaleString('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
-  });
-};
+
