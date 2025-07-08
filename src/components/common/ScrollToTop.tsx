@@ -8,28 +8,96 @@ const ScrollToTop = () => {
 
   // 페이지 변경 시 스크롤을 맨 위로
   useEffect(() => {
-    window.scrollTo(0, 0);
+    // 현재 화면 크기에 맞는 스크롤 컨테이너 찾기
+    const getScrollContainer = () => {
+      // 모든 뷰포트 컨테이너 확인
+      const desktopViewports = document.querySelectorAll('.desktop-viewport');
+      
+      // 현재 보이는 뷰포트 찾기 (display: none이 아닌 것)
+      for (const viewport of desktopViewports) {
+        const styles = window.getComputedStyle(viewport);
+        if (styles.display !== 'none') {
+          return viewport;
+        }
+      }
+      
+      // 뷰포트가 없으면 window 사용
+      return null;
+    };
+
+    const scrollContainer = getScrollContainer();
+    
+    if (scrollContainer) {
+      scrollContainer.scrollTo(0, 0);
+    } else {
+      window.scrollTo(0, 0);
+    }
   }, [pathname]);
 
   // 스크롤 위치에 따라 버튼 표시/숨김
   useEffect(() => {
+    const getScrollContainer = () => {
+      const desktopViewports = document.querySelectorAll('.desktop-viewport');
+      
+      for (const viewport of desktopViewports) {
+        const styles = window.getComputedStyle(viewport);
+        if (styles.display !== 'none') {
+          return viewport;
+        }
+      }
+      
+      return null;
+    };
+
     const toggleVisibility = () => {
-      if (window.pageYOffset > 300) {
+      const scrollContainer = getScrollContainer();
+      const scrollTop = scrollContainer ? scrollContainer.scrollTop : window.pageYOffset;
+      
+      if (scrollTop > 300) {
         setIsVisible(true);
       } else {
         setIsVisible(false);
       }
     };
 
-    window.addEventListener('scroll', toggleVisibility);
-    return () => window.removeEventListener('scroll', toggleVisibility);
+    const scrollContainer = getScrollContainer();
+    
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', toggleVisibility);
+      return () => scrollContainer.removeEventListener('scroll', toggleVisibility);
+    } else {
+      window.addEventListener('scroll', toggleVisibility);
+      return () => window.removeEventListener('scroll', toggleVisibility);
+    }
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
+    const getScrollContainer = () => {
+      const desktopViewports = document.querySelectorAll('.desktop-viewport');
+      
+      for (const viewport of desktopViewports) {
+        const styles = window.getComputedStyle(viewport);
+        if (styles.display !== 'none') {
+          return viewport;
+        }
+      }
+      
+      return null;
+    };
+
+    const scrollContainer = getScrollContainer();
+    
+    if (scrollContainer) {
+      scrollContainer.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    } else {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    }
   };
 
   return (
