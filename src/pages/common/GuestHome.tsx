@@ -1,11 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Header,
-  ServiceGrid,
-  PromotionBanner,
-  HeroSection,
-} from '@/components';
+import { Header, ServiceGrid, HeroSection } from '@/components';
 import { ROUTES } from '@/constants';
 import { useEvent } from '@/hooks';
 
@@ -33,7 +28,7 @@ const GuestHome: React.FC = () => {
         onNotificationClick={handleNotificationClick}
       />
 
-      <main className="px-4 py-6 pb-20 pt-20">
+      <main className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto">
           <HeroSection
             onEventClick={handleEventClick}

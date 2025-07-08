@@ -128,17 +128,23 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
       {/* 리뷰어 정보 */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <h3 className="font-semibold text-gray-900 text-base">{review.name}</h3>
+          <h3 className="font-semibold text-gray-900 text-base">
+            {review.name}
+          </h3>
           <div className="flex items-center gap-1">
             {renderStars(review.rating)}
-            <span className="text-sm text-gray-500 ml-1">({review.rating})</span>
+            <span className="text-sm text-gray-500 ml-1">
+              ({review.rating})
+            </span>
           </div>
         </div>
       </div>
 
       {/* 리뷰 내용 */}
       <div className="bg-gray-50 rounded-lg p-4 mb-4">
-        <p className="text-gray-700 leading-relaxed text-sm">{review.comment}</p>
+        <p className="text-gray-700 leading-relaxed text-sm">
+          {review.comment}
+        </p>
       </div>
 
       {/* 서비스 정보 */}
@@ -244,7 +250,9 @@ const ReviewStats: React.FC<ReviewStatsProps> = ({ reviews }) => {
       <div className="space-y-3">
         {ratingCounts.map(({ rating, count, percentage }) => (
           <div key={rating} className="flex items-center gap-3">
-            <span className="text-sm text-gray-600 w-8 font-medium">{rating}점</span>
+            <span className="text-sm text-gray-600 w-8 font-medium">
+              {rating}점
+            </span>
             <div className="flex-1 bg-gray-200 rounded-full h-2.5">
               <div
                 className="bg-gradient-to-r from-yellow-400 to-orange-400 h-2.5 rounded-full transition-all duration-500 ease-out"
@@ -343,7 +351,7 @@ const ManagerReviews: React.FC = () => {
       />
 
       {/* Content */}
-      <div className="px-4 py-6 pt-20">
+      <div className="px-4 py-6">
         <div className="max-w-md mx-auto">
           {reviews.length > 0 ? (
             <>

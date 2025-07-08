@@ -48,7 +48,6 @@ const ManagerProfileSetup: React.FC = () => {
 
   // ✅ 프로필 체크 로직 제거됨 - ProtectedRoute에서 처리
 
-
   const timeSlots = [
     '06:00',
     '07:00',
@@ -68,7 +67,6 @@ const ManagerProfileSetup: React.FC = () => {
     '21:00',
     '22:00',
   ];
-
 
   const documentTypes = [
     { id: 'ID_CARD', label: '신분증 사본' },
@@ -192,11 +190,7 @@ const ManagerProfileSetup: React.FC = () => {
     }));
   };
 
-  const updateTimeSlot = (
-    index: number,
-    field: string,
-    value: string,
-  ) => {
+  const updateTimeSlot = (index: number, field: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
       availableTimes: prev.availableTimes.map((slot, i) =>
@@ -674,7 +668,7 @@ const ManagerProfileSetup: React.FC = () => {
       />
 
       {/* Progress */}
-      <div className="px-4 py-6 pt-20">
+      <div className="px-4 py-6">
         <div className="max-w-md mx-auto">
           <div className="flex items-center justify-between mb-6">
             {[1, 2, 3, 4].map((step) => (

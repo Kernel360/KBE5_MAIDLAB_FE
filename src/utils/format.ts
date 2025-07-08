@@ -1,4 +1,5 @@
 import { CURRENCY_FORMATTERS, CURRENCY } from '@/constants/service';
+import { BUSINESS_CONFIG } from '@/config/constants';
 
 /**
  * 숫자를 천 단위로 콤마 포맷팅
@@ -152,6 +153,16 @@ export const formatRoomSize = (size: number): string => {
  * roomSize에 따른 가격 포맷팅 (8 -> 52500원)
  */
 export const formatEstimatedPriceByRoomSize = (size: number): string => {
+  // 비즈니스 룰에서 가져오도록 수정
+  const roomSizeConfig = BUSINESS_CONFIG.ROOM_SIZES.find(
+    config => config.key === getRoomSizeKey(size)
+  );
+  
+  if (roomSizeConfig) {
+    return `${roomSizeConfig.basePrice.toLocaleString('ko-KR')}원`;
+  }
+  
+  // 폴백: 기존 매핑 테이블 사용
   const ESTIMATED_PRICE_BY_SIZE: Record<number, number> = {
     8: 52500,
     9: 54600,
@@ -165,6 +176,17 @@ export const formatEstimatedPriceByRoomSize = (size: number): string => {
 
   const price = ESTIMATED_PRICE_BY_SIZE[size];
   return price ? `${price.toLocaleString('ko-KR')}원` : '-';
+};
+
+/**
+ * 방 크기에 따른 설정 키 찾기
+ */
+const getRoomSizeKey = (size: number): string => {
+  if (size <= 8) return 'STUDIO';
+  if (size <= 9) return 'ONE_ROOM';
+  if (size <= 16) return 'TWO_ROOM';
+  if (size <= 26) return 'THREE_ROOM';
+  return 'FOUR_PLUS_ROOM';
 };
 
 /**
@@ -317,7 +339,8 @@ export const formatKoreanArray = (arr: string[]): string => {
   return `${rest.join(', ')} 및 ${last}`;
 };
 
-// 날짜와 시간을 포맷팅하는 함수
+// 날짜와 시간을 포맷팅하는 함수 - date.ts로 이동 예정
+// @deprecated - Use formatDateTime from date.ts instead
 export const formatDateTimeWithLocale = (date: string): string => {
   const dateObj = new Date(date);
   return dateObj.toLocaleString('ko-KR', {

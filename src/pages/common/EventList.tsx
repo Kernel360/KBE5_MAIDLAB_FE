@@ -49,7 +49,6 @@ const EventList: React.FC = () => {
   // 현재 페이지에 표시할 이벤트들
   const currentEvents = filteredEvents.slice(startIndex, endIndex);
 
-
   // 이벤트 상세로 이동
   const handleEventClick = (eventId: number) => {
     navigate(`/events/${eventId}`);
@@ -77,7 +76,7 @@ const EventList: React.FC = () => {
         showMenu={true}
       />
 
-      <main className="pt-20 px-4 py-6 pb-20">
+      <main className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto">
           {/* 검색바 */}
           <div className="mb-8">
@@ -199,7 +198,6 @@ const EventList: React.FC = () => {
               </button>
             </div>
           )}
-
         </div>
       </main>
     </div>

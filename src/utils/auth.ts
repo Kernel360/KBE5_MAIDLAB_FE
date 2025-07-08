@@ -1,6 +1,8 @@
 import { tokenStorage, userStorage } from './storage';
 import { USER_TYPES } from '@/constants/user';
 import { generateGoogleOAuthUrl } from './googleOAuth';
+import { AUTH_CONFIG } from '@/config/constants';
+import type { UserInfo, JWTPayload } from '@/types/auth';
 
 /**
  * 로그인 상태 확인
@@ -55,17 +57,13 @@ export const getCurrentUser = <T>(): T | null => {
 /**
  * 로그인 처리
  */
+
 export const login = (
   accessToken: string,
   userType: string,
-  userInfo?: any,
 ): void => {
   tokenStorage.setAccessToken(accessToken);
   userStorage.setUserType(userType);
-
-  if (userInfo) {
-    userStorage.setUserInfo(userInfo);
-  }
 };
 
 /**
@@ -104,14 +102,30 @@ export const isValidToken = (token: string): boolean => {
 /**
  * 토큰에서 사용자 정보 추출
  */
-export const decodeToken = (token: string): any => {
+
+export const decodeToken = (token: string): JWTPayload | null => {
+  if (!token || typeof token !== 'string') {
+    return null;
+  }
+
   try {
     const parts = token.split('.');
-    if (parts.length !== 3) return null;
+    if (parts.length !== 3) {
+      console.warn('Invalid JWT format: wrong number of parts');
+      return null;
+    }
 
     const payload = JSON.parse(atob(parts[1]));
-    return payload;
-  } catch {
+    
+    // 기본 타입 검증
+    if (typeof payload !== 'object' || payload === null) {
+      console.warn('Invalid JWT payload: not an object');
+      return null;
+    }
+
+    return payload as JWTPayload;
+  } catch (error) {
+    console.warn('Token decoding failed:', error);
     return null;
   }
 };
@@ -133,15 +147,17 @@ export const isTokenExpiringSoon = (token: string): boolean => {
   const expiry = getTokenExpiry(token);
   if (!expiry) return true;
 
-  const fiveMinutesFromNow = new Date(Date.now() + 5 * 60 * 1000);
-  return expiry <= fiveMinutesFromNow;
+  const warningTimeFromNow = new Date(
+    Date.now() + AUTH_CONFIG.TOKEN_EXPIRY_WARNING_MINUTES * 60 * 1000,
+  );
+  return expiry <= warningTimeFromNow;
 };
 
 /**
  * 권한 확인 (특정 역할이나 권한 체크)
  */
 export const hasPermission = (permission: string): boolean => {
-  const user = getCurrentUser<any>();
+  const user = getCurrentUser<UserInfo>();
   if (!user || !user.permissions) return false;
 
   return user.permissions.includes(permission);
@@ -186,10 +202,10 @@ export const checkPasswordStrength = (
   let score = 0;
 
   // 길이 체크
-  if (password.length >= 8) {
+  if (password.length >= AUTH_CONFIG.PASSWORD_MIN_LENGTH) {
     score += 1;
   } else {
-    feedback.push('8자 이상 입력해주세요');
+    feedback.push(`${AUTH_CONFIG.PASSWORD_MIN_LENGTH}자 이상 입력해주세요`);
   }
 
   // 대문자 포함
@@ -236,7 +252,9 @@ export const checkSessionTimeout = (): boolean => {
 /**
  * 자동 로그아웃 설정
  */
-export const setupAutoLogout = (timeoutMinutes: number = 30): void => {
+export const setupAutoLogout = (
+  timeoutMinutes: number = AUTH_CONFIG.AUTO_LOGOUT_TIMEOUT_MINUTES,
+): void => {
   let timeout: NodeJS.Timeout;
 
   const resetTimer = () => {
@@ -269,9 +287,9 @@ export const getDeviceInfo = (): {
   timezone: string;
 } => {
   return {
-    userAgent: navigator.userAgent,
-    platform: navigator.platform,
-    language: navigator.language,
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    userAgent: navigator.userAgent || 'unknown',
+    platform: (navigator as any).userAgentData?.platform || navigator.platform || 'unknown',
+    language: navigator.language || 'unknown',
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'unknown',
   };
 };

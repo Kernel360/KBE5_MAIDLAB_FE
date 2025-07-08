@@ -41,46 +41,74 @@ const ReservationList = () => {
     [],
   );
   const [matchings, setMatchings] = useState<MatchingResponse[]>([]);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [reservationPage, setReservationPage] = useState(0);
+  const [matchingPage, setMatchingPage] = useState(0);
+  const [reservationRowsPerPage, setReservationRowsPerPage] = useState(10);
+  const [matchingRowsPerPage, setMatchingRowsPerPage] = useState(10);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedMatching, setSelectedMatching] =
     useState<MatchingResponse | null>(null);
+  const [changingManager, setChangingManager] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchReservations = async () => {
       try {
-        const [reservationsData, matchingsData] = await Promise.all([
-          adminApi.getReservations(),
-          adminApi.getAllMatching(),
-        ]);
+        setLoading(true);
+        const reservationsData = await adminApi.getReservations({
+          page: reservationPage,
+          size: reservationRowsPerPage,
+        });
         setReservations(reservationsData);
-        setMatchings(matchingsData);
       } catch (error) {
-        console.error('데이터를 불러오는데 실패했습니다:', error);
+        console.error('예약 데이터를 불러오는데 실패했습니다:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, []);
+    if (tabValue === 0) {
+      fetchReservations();
+    }
+  }, [tabValue, reservationPage, reservationRowsPerPage]);
+
+  useEffect(() => {
+    const fetchMatchings = async () => {
+      try {
+        setLoading(true);
+        const matchingsData = await adminApi.getAllMatching({
+          page: matchingPage,
+          size: matchingRowsPerPage,
+        });
+        setMatchings(matchingsData);
+      } catch (error) {
+        console.error('매칭 데이터를 불러오는데 실패했습니다:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (tabValue === 1) {
+      fetchMatchings();
+    }
+  }, [tabValue, matchingPage, matchingRowsPerPage]);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
-    setPage(0);
     handleCloseDialog();
   };
 
-  const handleChangePage = (_event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (
+  const handleReservationChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLSelectElement>,
   ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+    setReservationRowsPerPage(parseInt(event.target.value, 10));
+    setReservationPage(0);
+  };
+
+  const handleMatchingChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    setMatchingRowsPerPage(parseInt(event.target.value, 10));
+    setMatchingPage(0);
   };
 
   const formatDateTime = (date: string, time: string) => {
@@ -127,17 +155,29 @@ const ReservationList = () => {
     if (!selectedMatching) return;
 
     try {
-      // adminApi.changeManager는 객체 형태의 파라미터를 받습니다
+      setChangingManager(true);
+
+      // 매니저 변경 API 호출
       await adminApi.changeManager({
         reservationId: selectedMatching.reservationId,
         managerId: managerId,
       });
-      // 매칭 목록 새로고침
-      const matchingsData = await adminApi.getAllMatching();
-      setMatchings(matchingsData);
+
+      // 성공 시 해당 매칭 항목만 업데이트 (전체 새로고침 대신)
+      setMatchings((prevMatchings) =>
+        prevMatchings.map((matching) =>
+          matching.reservationId === selectedMatching.reservationId
+            ? { ...matching, managerId: managerId }
+            : matching,
+        ),
+      );
+
       handleCloseDialog();
     } catch (error) {
       console.error('매니저 변경 실패:', error);
+      // TODO: 사용자에게 에러 메시지 표시 (토스트 등)
+    } finally {
+      setChangingManager(false);
     }
   };
 
@@ -160,9 +200,7 @@ const ReservationList = () => {
   return (
     <div className="container mx-auto mt-8 px-4">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">
-          예약/매칭 관리
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-900">예약/매칭 관리</h1>
       </div>
 
       <div className="border-b border-gray-200">
@@ -196,41 +234,62 @@ const ReservationList = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">예약 ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">서비스 유형</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">상세 서비스</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">예약 일시</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">금액</th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">액션</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    예약 ID
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    서비스 유형
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    상세 서비스
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    예약 일시
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    금액
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    액션
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {reservations
-                  .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
-                  .map((reservation) => (
-                    <tr key={reservation.reservationId} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{reservation.reservationId}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{getServiceTypeName(reservation.serviceType)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{reservation.detailServiceType}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {formatDateTime(
-                          reservation.reservationDate,
-                          reservation.startTime,
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatPrice(reservation.totalPrice)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-center">
-                        <button
-                          onClick={() =>
-                            handleDetailView(reservation.reservationId)
-                          }
-                          className="text-blue-600 hover:text-blue-900 px-3 py-1 text-sm border border-blue-600 rounded hover:bg-blue-50 transition-colors"
-                        >
-                          상세보기
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                {reservations.map((reservation) => (
+                  <tr
+                    key={reservation.reservationId}
+                    className="hover:bg-gray-50"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {reservation.reservationId}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {getServiceTypeName(reservation.serviceType)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {reservation.detailServiceType}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {formatDateTime(
+                        reservation.reservationDate,
+                        reservation.startTime,
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {formatPrice(reservation.totalPrice)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      <button
+                        onClick={() =>
+                          handleDetailView(reservation.reservationId)
+                        }
+                        className="text-blue-600 hover:text-blue-900 px-3 py-1 text-sm border border-blue-600 rounded hover:bg-blue-50 transition-colors"
+                      >
+                        상세보기
+                      </button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -239,13 +298,16 @@ const ReservationList = () => {
           <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
             <div className="flex-1 flex justify-between items-center">
               <div className="flex items-center">
-                <label htmlFor="rows-per-page-reservations" className="mr-2 text-sm text-gray-700">
+                <label
+                  htmlFor="rows-per-page-reservations"
+                  className="mr-2 text-sm text-gray-700"
+                >
                   페이지당 행 수:
                 </label>
                 <select
                   id="rows-per-page-reservations"
-                  value={rowsPerPage}
-                  onChange={handleChangeRowsPerPage}
+                  value={reservationRowsPerPage}
+                  onChange={handleReservationChangeRowsPerPage}
                   className="border border-gray-300 rounded px-2 py-1 text-sm"
                 >
                   <option value={5}>5</option>
@@ -255,18 +317,18 @@ const ReservationList = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-700">
-                  {page * rowsPerPage + 1}-{Math.min((page + 1) * rowsPerPage, reservations.length)} of {reservations.length}
+                  Page {reservationPage + 1} - {reservations.length} items shown
                 </span>
                 <button
-                  onClick={() => handleChangePage(null, page - 1)}
-                  disabled={page === 0}
+                  onClick={() => setReservationPage(reservationPage - 1)}
+                  disabled={reservationPage === 0}
                   className="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   이전
                 </button>
                 <button
-                  onClick={() => handleChangePage(null, page + 1)}
-                  disabled={page >= Math.ceil(reservations.length / rowsPerPage) - 1}
+                  onClick={() => setReservationPage(reservationPage + 1)}
+                  disabled={reservations.length < reservationRowsPerPage}
                   className="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   다음
@@ -283,39 +345,63 @@ const ReservationList = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">예약 ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">매니저 ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">매칭 상태</th>
-                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">매니저 변경</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    예약 ID
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    매니저 ID
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    매칭 상태
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    매칭 횟수
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    업데이트 시간
+                  </th>
+                  <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    매니저 변경
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {matchings
-                  .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
-                  .map((matching) => (
-                    <tr key={matching.reservationId} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{matching.reservationId}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{matching.managerId}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            getStatusChipColor(matching.matchingStatus)
-                          }`}
-                        >
-                          {matching.matchingStatus}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-center">
-                        <button
-                          disabled={matching.matchingStatus.toLowerCase() === 'pending'}
-                          onClick={() => handleOpenDialog(matching)}
-                          className="text-blue-600 hover:text-blue-900 px-3 py-1 text-sm border border-blue-600 rounded hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white"
-                        >
-                          매니저 변경
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                {matchings.map((matching) => (
+                  <tr key={matching.reservationId} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {matching.reservationId}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {matching.managerId}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusChipColor(
+                          matching.matchingStatus,
+                        )}`}
+                      >
+                        {matching.matchingStatus}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {matching.matchingCount}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {matching.updatedAt}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                      <button
+                        disabled={
+                          matching.matchingStatus.toLowerCase() === 'pending'
+                        }
+                        onClick={() => handleOpenDialog(matching)}
+                        className="text-blue-600 hover:text-blue-900 px-3 py-1 text-sm border border-blue-600 rounded hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white"
+                      >
+                        매니저 변경
+                      </button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -324,13 +410,16 @@ const ReservationList = () => {
           <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
             <div className="flex-1 flex justify-between items-center">
               <div className="flex items-center">
-                <label htmlFor="rows-per-page-matchings" className="mr-2 text-sm text-gray-700">
+                <label
+                  htmlFor="rows-per-page-matchings"
+                  className="mr-2 text-sm text-gray-700"
+                >
                   페이지당 행 수:
                 </label>
                 <select
                   id="rows-per-page-matchings"
-                  value={rowsPerPage}
-                  onChange={handleChangeRowsPerPage}
+                  value={matchingRowsPerPage}
+                  onChange={handleMatchingChangeRowsPerPage}
                   className="border border-gray-300 rounded px-2 py-1 text-sm"
                 >
                   <option value={5}>5</option>
@@ -340,18 +429,18 @@ const ReservationList = () => {
               </div>
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-700">
-                  {page * rowsPerPage + 1}-{Math.min((page + 1) * rowsPerPage, matchings.length)} of {matchings.length}
+                  Page {matchingPage + 1} - {matchings.length} items shown
                 </span>
                 <button
-                  onClick={() => handleChangePage(null, page - 1)}
-                  disabled={page === 0}
+                  onClick={() => setMatchingPage(matchingPage - 1)}
+                  disabled={matchingPage === 0}
                   className="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   이전
                 </button>
                 <button
-                  onClick={() => handleChangePage(null, page + 1)}
-                  disabled={page >= Math.ceil(matchings.length / rowsPerPage) - 1}
+                  onClick={() => setMatchingPage(matchingPage + 1)}
+                  disabled={matchings.length < matchingRowsPerPage}
                   className="px-3 py-1 text-sm bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   다음
@@ -366,6 +455,7 @@ const ReservationList = () => {
           matching={selectedMatching}
           onClose={handleCloseDialog}
           onConfirm={handleConfirmChange}
+          loading={changingManager}
         />
       </TabPanel>
     </div>

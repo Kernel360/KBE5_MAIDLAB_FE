@@ -154,7 +154,7 @@ const SignUp: React.FC = () => {
         showMenu={false}
       />
 
-      <main className="px-4 py-6 pt-20">
+      <main className="px-4 py-6">
         <div className="max-w-md mx-auto">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* 사용자 타입 선택 */}

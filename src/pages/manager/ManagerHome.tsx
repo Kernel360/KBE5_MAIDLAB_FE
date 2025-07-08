@@ -226,14 +226,14 @@ const ManagerHome: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       <Header showNotification={true} />
 
-      <main className="px-4 py-6 pb-20 pt-20">
+      <main className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto space-y-6">
           {/* 매니저 프로필 섹션 */}
           <section
-            className="bg-white rounded-2xl cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] p-6"
+            className="bg-white dark:bg-gray-800 rounded-2xl cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] p-6"
             onClick={() => navigate(ROUTES.MANAGER.MYPAGE)}
           >
               {profileLoading ? (
@@ -256,17 +256,17 @@ const ManagerHome: React.FC = () => {
                 <div>
                   <div className="flex items-center justify-between">
                     <div>
-                      <h1 className="text-xl font-bold mb-1 text-gray-900">
+                      <h1 className="text-xl font-bold mb-1 text-gray-900 dark:text-white">
                         {profile?.name || '매니저'}님, 좋은 하루 보내세요!
                       </h1>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-gray-600 dark:text-gray-300 text-sm">
                         승인 상태:{' '}
                         <span className={`font-medium ${profile?.isVerified ? 'text-green-600' : 'text-orange-500'}`}>
                           {profile?.isVerified ? '활동 가능' : '승인 대기중'}
                         </span>
                       </p>
                     </div>
-                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-lg">
+                    <div className="w-16 h-16 bg-white dark:bg-gray-700 rounded-full flex items-center justify-center overflow-hidden shadow-lg">
                       {profile?.profileImage ? (
                         <img
                           src={profile.profileImage}
@@ -282,7 +282,7 @@ const ManagerHome: React.FC = () => {
                         />
                       ) : null}
                       <User
-                        className="w-7 h-7 text-gray-400"
+                        className="w-7 h-7 text-gray-400 dark:text-gray-300"
                         style={{
                           display: profile?.profileImage ? 'none' : 'block',
                         }}
@@ -319,13 +319,13 @@ const ManagerHome: React.FC = () => {
           </section>
 
           {/* 간단한 통계 정보 */}
-          <section className="bg-white rounded-2xl p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">
+          <section className="bg-white dark:bg-gray-800 rounded-2xl p-6">
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
               이번 달 활동
             </h2>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
-                <p className="text-gray-500 text-xs mb-1">이번 달 예약</p>
+                <p className="text-gray-500 dark:text-gray-400 text-xs mb-1">이번 달 예약</p>
                 <p className="text-2xl font-bold text-orange-500">
                   {
                     managerReservations.filter((r) => {
@@ -336,10 +336,10 @@ const ManagerHome: React.FC = () => {
                     }).length
                   }
                 </p>
-                <p className="text-xs text-gray-400">건</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">건</p>
               </div>
               <div>
-                <p className="text-gray-500 text-xs mb-1">총 완료</p>
+                <p className="text-gray-500 dark:text-gray-400 text-xs mb-1">총 완료</p>
                 <p className="text-2xl font-bold text-blue-500">
                   {
                     managerReservations.filter(
@@ -347,22 +347,22 @@ const ManagerHome: React.FC = () => {
                     ).length
                   }
                 </p>
-                <p className="text-xs text-gray-400">건</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">건</p>
               </div>
               <div>
-                <p className="text-gray-500 text-xs mb-1">평균 평점</p>
+                <p className="text-gray-500 dark:text-gray-400 text-xs mb-1">평균 평점</p>
                 <p className="text-2xl font-bold text-green-500">
                   {averageRating > 0 ? averageRating : '-'}
                 </p>
-                <p className="text-xs text-gray-400">점</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">점</p>
               </div>
             </div>
           </section>
 
           {/* 이번달 주간별 정산 */}
-          <section className="bg-white rounded-2xl p-6">
+          <section className="bg-white dark:bg-gray-800 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-gray-900">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">
                 이번 달 주간별 정산
               </h2>
               <button
@@ -378,9 +378,9 @@ const ManagerHome: React.FC = () => {
           </section>
 
           {/* 가까운 예약 */}
-          <section className="bg-white rounded-2xl p-6">
+          <section className="bg-white dark:bg-gray-800 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-gray-900">가까운 예약</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">가까운 예약</h2>
               <button
                 onClick={() => navigate(ROUTES.MANAGER.RESERVATIONS)}
                 className="text-orange-500 text-sm font-medium"
@@ -431,7 +431,7 @@ const ManagerHome: React.FC = () => {
                       onClick={() =>
                         handleReservationClick(reservation.reservationId)
                       }
-                      className="w-full bg-white border border-gray-200 rounded-xl p-4 text-left hover:border-orange-300 hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-1"
+                      className="w-full bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl p-4 text-left hover:border-orange-300 hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-1"
                     >
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center space-x-2">
@@ -446,34 +446,34 @@ const ManagerHome: React.FC = () => {
                         </span>
                       </div>
 
-                      <h3 className="font-semibold text-gray-900 text-base mb-3">
+                      <h3 className="font-semibold text-gray-900 dark:text-white text-base mb-3">
                         {reservation.detailServiceType ||
                           reservation.serviceType ||
                           '가사도우미'}{' '}
                         서비스
                       </h3>
 
-                      <div className="space-y-2 text-sm text-gray-600">
+                      <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                         <div className="flex items-center">
-                          <Calendar className="w-4 h-4 mr-2 text-gray-400" />
+                          <Calendar className="w-4 h-4 mr-2 text-gray-400 dark:text-gray-300" />
                           <span>
                             {formatDate(reservation.reservationDate) ||
                               '날짜 미정'}
                           </span>
                         </div>
                         <div className="flex items-center">
-                          <Clock className="w-4 h-4 mr-2 text-gray-400" />
+                          <Clock className="w-4 h-4 mr-2 text-gray-400 dark:text-gray-300" />
                           <span>
                             {reservation.startTime} - {reservation.endTime}
                           </span>
                         </div>
                       </div>
 
-                      <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
+                      <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-600 flex items-center justify-between">
                         <span className="text-orange-600 font-semibold text-lg">
                           {formatPrice(reservation.totalPrice)}
                         </span>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
                           자세히 보기 →
                         </div>
                       </div>
@@ -482,12 +482,12 @@ const ManagerHome: React.FC = () => {
                 })}
               </div>
             ) : (
-              <div className="text-center py-12 text-gray-500">
-                <Calendar className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+              <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                <Calendar className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-500" />
                 <p className="text-base font-medium mb-2">
                   다음 예약이 없습니다
                 </p>
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-gray-400 dark:text-gray-500">
                   새로운 예약 요청을 기다리고 있어요
                 </p>
               </div>
@@ -496,15 +496,15 @@ const ManagerHome: React.FC = () => {
 
           {/* 오늘의 작업 요약 */}
           {todayReservations.length > 0 && (
-            <section className="bg-blue-50 rounded-2xl p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">
+            <section className="bg-blue-50 dark:bg-gray-800 rounded-2xl p-6">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
                 오늘의 일정
               </h2>
               <div className="space-y-3">
                 {todayReservations.map((reservation) => (
                   <div
                     key={reservation.reservationId}
-                    className="bg-white rounded-xl p-3 flex items-center justify-between"
+                    className="bg-white dark:bg-gray-700 rounded-xl p-3 flex items-center justify-between"
                   >
                     <div className="flex items-center space-x-3">
                       <div
@@ -518,10 +518,10 @@ const ManagerHome: React.FC = () => {
                         }`}
                       />
                       <div>
-                        <p className="font-medium text-gray-900 text-sm">
+                        <p className="font-medium text-gray-900 dark:text-white text-sm">
                           {formatTime(reservation.startTime)}
                         </p>
-                        <p className="text-gray-600 text-xs">
+                        <p className="text-gray-600 dark:text-gray-300 text-xs">
                           {reservation.detailServiceType ||
                             reservation.serviceType ||
                             '가사도우미'}
@@ -531,13 +531,13 @@ const ManagerHome: React.FC = () => {
 
                     <div className="flex items-center space-x-2">
                       {reservation.status === RESERVATION_STATUS.WORKING && (
-                        <CheckCircle2 className="w-4 h-4 text-green-500" />
+                        <CheckCircle2 className="w-4 h-4 text-green-500 dark:text-green-400" />
                       )}
                       {reservation.status === RESERVATION_STATUS.MATCHED && (
-                        <AlertCircle className="w-4 h-4 text-blue-500" />
+                        <AlertCircle className="w-4 h-4 text-blue-500 dark:text-blue-400" />
                       )}
                       {reservation.status === RESERVATION_STATUS.PAID && (
-                        <CheckCircle2 className="w-4 h-4 text-teal-500" />
+                        <CheckCircle2 className="w-4 h-4 text-teal-500 dark:text-teal-400" />
                       )}
                     </div>
                   </div>

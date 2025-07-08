@@ -204,11 +204,23 @@ apiClient.interceptors.response.use(
           ? API_ENDPOINTS.ADMIN.AUTH.REFRESH
           : API_ENDPOINTS.AUTH.REFRESH;
 
-        const refreshResponse = await apiClient.post(refreshEndpoint);
+        // 리프레시 토큰을 요청에 포함
+        const refreshToken = tokenStorage.getRefreshToken();
+        if (!refreshToken) {
+          throw new Error('No refresh token available');
+        }
+
+        const refreshResponse = await apiClient.post(refreshEndpoint, {
+          refreshToken: refreshToken
+        });
         const newToken = refreshResponse.data.data.accessToken;
+        const newRefreshToken = refreshResponse.data.data.refreshToken;
 
         // tokenStorage 유틸리티 사용으로 일관성 확보
         tokenStorage.setAccessToken(newToken);
+        if (newRefreshToken) {
+          tokenStorage.setRefreshToken(newRefreshToken);
+        }
 
         // 대기 중인 요청들 처리
         processQueue(null, newToken);

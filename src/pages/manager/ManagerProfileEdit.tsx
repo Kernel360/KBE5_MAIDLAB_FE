@@ -103,7 +103,6 @@ const ManagerProfileEdit: React.FC = () => {
     setProfile((prev) => (prev ? { ...prev, birth: value } : prev));
   };
 
-
   const validate = () => {
     const newErrors = {
       name: '',
@@ -132,7 +131,8 @@ const ManagerProfileEdit: React.FC = () => {
     } else {
       const birthValidation = validateBirthDate(profile.birth);
       if (!birthValidation.isValid) {
-        newErrors.birth = birthValidation.error || '올바른 생년월일을 입력해주세요.';
+        newErrors.birth =
+          birthValidation.error || '올바른 생년월일을 입력해주세요.';
       }
     }
 
@@ -417,7 +417,7 @@ const ManagerProfileEdit: React.FC = () => {
         showMenu={true}
       />
 
-      <div className="px-4 py-6 pt-20">
+      <div className="px-4 py-6">
         <div className="max-w-md mx-auto">
           <div className="bg-white rounded-xl shadow-sm p-6 space-y-8">
             {/* 프로필 이미지 */}

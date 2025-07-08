@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, User } from 'lucide-react';
+import { User } from 'lucide-react';
 import { useConsumer } from '@/hooks/domain/useConsumer';
 import { ROUTES } from '@/constants';
 import type { ProfileData } from '@/types/consumer';
@@ -62,7 +62,7 @@ const Profile: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+    <div className="min-h-screen bg-gray-50">
       <Header
         variant="sub"
         title="프로필"

@@ -110,7 +110,7 @@ const SocialSignUp: React.FC = () => {
         showMenu={false}
       />
 
-      <main className="px-4 py-6 pt-20">
+      <main className="px-4 py-6">
         <div className="max-w-md mx-auto">
           <div className="mb-6">
             <div className="text-center mb-6">

@@ -146,10 +146,8 @@ const Login: React.FC = () => {
         showMenu={false}
       />
 
-      <main className="px-4 py-6 pt-12">
+      <main className="px-4 py-6">
         <div className="max-w-md mx-auto">
-          <div className="text-center mb-8"></div>
-
           {/* 사용자 타입 선택 */}
           <div className="flex bg-gray-100 rounded-lg p-1 mb-6">
             <button

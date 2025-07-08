@@ -137,7 +137,7 @@ export default function LikedManagerList() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header variant="sub" title="찜한 도우미" backRoute={ROUTES.CONSUMER.MYPAGE} showMenu={true} />
-      <div className="pt-20 pb-6">
+      <div className="pb-6">
         <div className="max-w-2xl mx-auto px-4">
           <div className="space-y-3">
             {favoriteManagers.length > 0 ? (

@@ -58,7 +58,7 @@ export default function BoardDetail() {
     const day = String(date.getDate()).padStart(2, '0');
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
-    
+
     return `${year}/${month}/${day} ${hours}:${minutes}`;
   };
 
@@ -140,7 +140,7 @@ export default function BoardDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+    <div className="min-h-screen bg-gray-50">
       <Header
         variant="sub"
         title="문의 상세"
@@ -155,12 +155,20 @@ export default function BoardDetail() {
               {/* 게시글 타입과 답변 상태 */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-sm text-gray-500 whitespace-nowrap">{BOARD_TYPE_LABELS[board.boardType]}</span>
-                  <span className="text-xs text-gray-400 whitespace-nowrap">{formatDate(board.createdAt)}</span>
+                  <span className="text-sm text-gray-500 whitespace-nowrap">
+                    {BOARD_TYPE_LABELS[board.boardType]}
+                  </span>
+                  <span className="text-xs text-gray-400 whitespace-nowrap">
+                    {formatDate(board.createdAt)}
+                  </span>
                   {board.answered ? (
-                    <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full whitespace-nowrap">답변완료</span>
+                    <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full whitespace-nowrap">
+                      답변완료
+                    </span>
                   ) : (
-                    <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full whitespace-nowrap">답변대기</span>
+                    <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full whitespace-nowrap">
+                      답변대기
+                    </span>
                   )}
                 </div>
                 {board && (
@@ -227,7 +235,10 @@ export default function BoardDetail() {
           )}
 
           {/* 답변 섹션 */}
-          <AnswerSection answer={board.answer?.content} answerCreatedAt={board.answer?.createdAt} />
+          <AnswerSection
+            answer={board.answer?.content}
+            answerCreatedAt={board.answer?.createdAt}
+          />
 
           {/* 이미지 모달 */}
           {selectedImage && (

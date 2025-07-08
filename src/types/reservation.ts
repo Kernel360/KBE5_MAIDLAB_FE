@@ -2,13 +2,44 @@ import type { ReservationStatus } from '@/constants/status';
 import type { HousingType, PetType, ServiceType } from '@/constants/service';
 
 /**
+ * 페이징 요청 파라미터
+ */
+export interface PagingParams {
+  status?: ReservationStatus;
+  page?: number;
+  size?: number;
+  sortBy?:
+    | 'createdAt'
+    | 'reservationDate'
+    | 'totalPrice'
+    | 'completedAt'
+    | 'startTime';
+  sortOrder?: 'ASC' | 'DESC';
+}
+
+/**
+ * 페이징 응답 (Spring Data Page)
+ */
+export interface PageResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  numberOfElements: number;
+  first: boolean;
+  last: boolean;
+  empty: boolean;
+}
+
+/**
  * 예약 생성 요청 (통합)
  */
 export interface ReservationCreateRequest {
   serviceDetailTypeId: number;
   address: string;
   addressDetail: string;
-  managerUuId: string;
+  managerUuid: string;
   housingType: string;
   lifeCleaningRoomIdx?: number;
   housingInformation: string;
@@ -72,7 +103,6 @@ export interface ReservationDetailResponse {
   managerProfileImageUrl: string;
   managerAverageRate: number;
   managerRegion: string[];
-  
 }
 
 /**
@@ -103,7 +133,7 @@ export interface ReviewRegisterRequest {
   reservationId: number;
   rating: number;
   comment: string;
-  keywords : string[];
+  keywords: string[];
   likes?: boolean;
 }
 
@@ -161,7 +191,7 @@ export interface ReservationFormData {
   startTime: string;
   endTime: string;
   pet: PetType;
-  managerUuId?: string;
+  managerUuid?: string;
   chooseManager: boolean; // 직접 선택 여부
   // 생활청소 평수 인덱스
   lifeCleaningRoomIdx?: number;

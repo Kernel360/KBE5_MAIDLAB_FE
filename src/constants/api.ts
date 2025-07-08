@@ -55,8 +55,7 @@ export const HTTP_STATUS = {
 
 // ===== API 기본 설정 =====
 export const API_CONFIG = {
-  BASE_URL:
-    import.meta.env.VITE_API_BASE_URL,
+  BASE_URL: import.meta.env.VITE_API_BASE_URL,
   TIMEOUT: 10000,
   RETRY_COUNT: 3,
   RETRY_DELAY: 1000,
@@ -80,6 +79,8 @@ export const API_ENDPOINTS = {
     REVIEWS: '/api/manager/myReviews',
   },
   CONSUMER: {
+    POINT:'/api/point',
+    POINT_RECORD:'/api/point/record',
     PROFILE: '/api/consumers/profile',
     MYPAGE: '/api/consumers/mypage',
     LIKES: '/api/consumers/likes',
@@ -90,6 +91,7 @@ export const API_ENDPOINTS = {
   RESERVATION: {
     CREATE: '/api/reservations/register',
     LIST: '/api/reservations',
+    MANAGER: '/api/reservations/manager',
     DETAIL: (id: number) => `/api/reservations/${id}`,
     CANCEL: (id: number) => `/api/reservations/${id}/cancel`,
     PRICE_CHECK: '/api/reservations/price',
@@ -136,12 +138,12 @@ export const API_ENDPOINTS = {
       REJECT: (id: number) => `/api/admin/manager/${id}/reject`,
       STATUS: '/api/admin/manager/status',
       GETCOUNT: '/api/admin/manager/managercount',
-      NEWMANAGERCOUNT: '/api/admin/manager/newmanagercount'
+      NEWMANAGERCOUNT: '/api/admin/manager/newmanagercount',
     },
     CONSUMER: {
       LIST: '/api/admin/consumer',
       DETAIL: (id: number) => `/api/admin/consumer/${id}`,
-      GETCOUNT: '/api/admin/consumer/consumercount'
+      GETCOUNT: '/api/admin/consumer/consumercount',
     },
     RESERVATION: {
       LIST: '/api/admin/reservations',
@@ -155,10 +157,8 @@ export const API_ENDPOINTS = {
       SETTLEMENT_REJECT: (id: number) =>
         `/api/admin/reservations/settlement/${id}/reject`,
       GETTODAYCOUNT: '/api/admin/reservations/todayreservation',
-      CONSUMER: (id: number) => 
-        `/api/admin/reservations/consumer/${id}`,
-      MANAGER: (id: number) =>
-        `/api/admin/reservations/manager/${id}`
+      CONSUMER: (id: number) => `/api/admin/reservations/consumer/${id}`,
+      MANAGER: (id: number) => `/api/admin/reservations/manager/${id}`,
     },
     MATCHING: {
       LIST: '/api/admin/matching',
