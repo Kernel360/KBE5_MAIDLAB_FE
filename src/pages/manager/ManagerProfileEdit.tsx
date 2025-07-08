@@ -21,7 +21,7 @@ import { LENGTH_LIMITS } from '@/constants/validation';
 import type {
   ManagerProfileResponse,
   ManagerProfileUpdateRequest,
-} from '@/types/manager';
+} from '@/types/domain/manager';
 import type { ServiceType } from '@/constants/service';
 import { uploadToS3 } from '@/utils/s3';
 import { validateImageFile } from '@/utils/validation';

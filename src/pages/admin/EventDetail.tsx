@@ -4,7 +4,7 @@ import { useEvent } from '@/hooks';
 import { ROUTES } from '@/constants';
 import { formatDate } from '@/utils';
 import { LoadingSpinner } from '@/components/common';
-import type { EventDetailResponse } from '@/types/event';
+import type { EventDetailResponse } from '@/types/domain/event';
 
 const EventDetail = () => {
   const navigate = useNavigate();

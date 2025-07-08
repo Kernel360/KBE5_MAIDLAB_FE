@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { useConsumer } from '@/hooks/domain/useConsumer';
 import { useToast } from '@/hooks/useToast';
-import type { ConsumerMyPageResponse } from '@/types/consumer';
+import type { ConsumerMyPageResponse } from '@/types/domain/consumer';
 import { ROUTES } from '@/constants';
 import { useAuth } from '@/hooks/useAuth';
 import { Header } from '@/components/layout/Header/Header';

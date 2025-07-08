@@ -9,8 +9,8 @@ import {
   removeLocalStorage,
 } from '@/utils/storage';
 import { openGoogleLoginPopup, cleanupOAuthStorage } from '@/utils/googleOAuth';
-import type { LoginRequest, SocialLoginRequest } from '@/types/auth';
-import type { SavedLoginInfo } from '@/types/user';
+import type { LoginRequest, SocialLoginRequest } from '@/types/domain/auth';
+import type { SavedLoginInfo } from '@/types/domain/user';
 import { LOGIN_USER_TYPES, type LoginUserType } from '@/constants/user';
 import { Header } from '@/components/layout/Header/Header';
 

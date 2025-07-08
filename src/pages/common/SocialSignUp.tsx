@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth, useForm, useToast } from '@/hooks';
 import { ROUTES } from '@/constants';
 import { validateBirthDate } from '@/constants/validation';
-import type { SocialSignUpRequest } from '@/types/auth';
+import type { SocialSignUpRequest } from '@/types/domain/auth';
 import { Header } from '@/components/layout/Header/Header';
 
 const SocialSignUp: React.FC = () => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
-import type { EventListItem } from '@/types/event';
+import type { EventListItem } from '@/types/domain/event';
 
 interface HeroSectionProps {
   onEventClick?: (eventId: number) => void;

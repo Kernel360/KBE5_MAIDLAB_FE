@@ -10,7 +10,7 @@ import type {
   WeeklySettlementResponse,
   PagingParams,
   PageResponse,
-} from '@/types/reservation';
+} from '@/types/domain/reservation';
 import { API_ENDPOINTS } from '@/constants/api';
 
 export const reservationApi = {

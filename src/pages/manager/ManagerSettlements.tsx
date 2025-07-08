@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useReservation } from '@/hooks';
 import { formatDate } from '@/utils/date';
-import type { SettlementResponse } from '@/types/reservation';
+import type { SettlementResponse } from '@/types/domain/reservation';
 import WeekSelector from '@/components/features/manager/WeekSelector';
 import SettlementSummary from '@/components/features/manager/SettlementSummary';
 import StatusFilter from '@/components/features/manager/StatusFilter';

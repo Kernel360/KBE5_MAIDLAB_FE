@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { ROUTES } from '@/constants';
 import { RESERVATION_STATUS } from '@/constants/status';
-import type { ReservationItem } from '@/types/reservation';
+import type { ReservationItem } from '@/types/domain/reservation';
 
 interface ReservationCalendarProps {
   reservations: ReservationItem[];

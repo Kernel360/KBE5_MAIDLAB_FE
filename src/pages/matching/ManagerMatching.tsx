@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useMatching } from '@/hooks/domain/useMatching';
 import { useReservation } from '@/hooks/domain/useReservation';
-import type { MatchingRequestListResponse } from '@/types/matching';
+import type { MatchingRequestListResponse } from '@/types/domain/matching';
 import { IoArrowBack } from 'react-icons/io5';
 import { formatPrice } from '@/utils/format';
 import { formatDateTime } from '@/utils/date';

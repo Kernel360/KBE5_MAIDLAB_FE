@@ -3,7 +3,7 @@ import {
   RESERVATION_STATUS,
   RESERVATION_STATUS_COLORS,
 } from '@/constants/status';
-import type { ReservationListResponse } from '@/types/reservation';
+import type { ReservationListResponse } from '@/types/domain/reservation';
 
 export type ReservationTab = 'scheduled' | 'today' | 'completed';
 

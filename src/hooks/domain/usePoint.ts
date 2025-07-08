@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { consumerApi } from '@/apis/consumer';
-import type { PointRecordResponseDto } from '@/types/consumer';
+import type { PointRecordResponseDto } from '@/types/domain/consumer';
 
 export const usePoint = () => {
   const [point, setPoint] = useState<number | null>(null);

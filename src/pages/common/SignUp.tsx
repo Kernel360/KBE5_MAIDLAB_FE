@@ -4,7 +4,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { useAuth, useForm, useToast } from '@/hooks';
 import { ROUTES } from '@/constants';
 import { validateBirthDate } from '@/constants/validation';
-import type { SignUpRequest } from '@/types/auth';
+import type { SignUpRequest } from '@/types/domain/auth';
 import { Header } from '@/components/layout/Header/Header';
 
 const SignUp: React.FC = () => {

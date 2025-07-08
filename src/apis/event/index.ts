@@ -4,7 +4,7 @@ import type {
   EventUpdateRequest,
   EventListResponse,
   EventDetailResponse,
-} from '@/types/event';
+} from '@/types/domain/event';
 import { API_ENDPOINTS } from '@/constants/api';
 
 export const eventApi = {

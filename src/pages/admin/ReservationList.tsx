@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { type ReservationListResponse } from '@/types/reservation';
-import { type MatchingResponse } from '@/types/matching';
+import { type ReservationListResponse } from '@/types/domain/reservation';
+import { type MatchingResponse } from '@/types/domain/matching';
 import { adminApi } from '../../apis/admin';
 import { getServiceTypeName } from '@/constants/admin';
 import MatchingChangeDialog from '../../components/features/admin/MatchingChangeDialog';
-import type { TabPanelProps } from '@/types/userList';
+import type { TabPanelProps } from '@/types/common';
 
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;

@@ -5,7 +5,7 @@ import type {
   EventCreateRequest,
   EventUpdateRequest,
   EventListItem,
-} from '@/types/event';
+} from '@/types/domain/event';
 
 export const useEvent = () => {
   const [events, setEvents] = useState<EventListItem[]>([]);

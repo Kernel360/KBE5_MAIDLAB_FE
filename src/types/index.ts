@@ -4,7 +4,7 @@ export type { ApiResponse, PaginationResponse, PaginationParams } from './api';
 
 // 사용자 관련 핵심 타입들
 export type { UserType, Gender } from '@/constants/user';
-export type { BaseUser, Consumer, Manager, Admin } from './user';
+export type { BaseUser, Consumer, Manager, Admin } from './domain/user';
 
 // 인증 관련
 export type {
@@ -14,52 +14,52 @@ export type {
   SocialLoginRequest,
   SocialSignUpRequest,
   AuthState,
-} from './auth';
+} from './domain/auth';
 
 // 예약 관련 핵심 타입들
 export type {
   ReservationCreateRequest,
   ReservationListResponse,
   ReservationDetailResponse,
-} from './reservation';
+} from './domain/reservation';
 
 // 매니저 관련
 export type {
   ManagerProfileCreateRequest,
   ManagerProfileResponse,
   ManagerDetail,
-} from './manager';
+} from './domain/manager';
 
 // 소비자 관련
 export type {
   ConsumerProfileResponse,
   ConsumerMyPageResponse,
-} from './consumer';
+} from './domain/consumer';
 
 // 매칭 관련
 export type {
   MatchingResponse,
   AvailableManager,
   MatchingStatus,
-} from './matching';
+} from './domain/matching';
 
 // 게시판 관련
 export type {
   BoardCreateRequest,
   BoardResponse,
   BoardDetailResponse,
-} from './board';
+} from './domain/board';
 
 // 이벤트 관련
 export type {
   EventCreateRequest,
   EventListResponse,
   EventDetailResponse,
-} from './event';
+} from './domain/event';
 
 // 관리자 관련
 export type {
   AdminLoginRequest,
   ManagerListResponse,
   AdminManagerDetail,
-} from './admin';
+} from './domain/admin';

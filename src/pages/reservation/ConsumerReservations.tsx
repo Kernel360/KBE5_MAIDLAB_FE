@@ -4,7 +4,7 @@ import { useReservation } from '@/hooks/domain/useReservation';
 import { ReservationCard } from '@/components';
 import { ROUTES, RESERVATION_STATUS } from '@/constants';
 import { useNavigate } from 'react-router-dom';
-import type { PagingParams } from '@/types/reservation';
+import type { PagingParams } from '@/types/domain/reservation';
 import type { ReservationStatus } from '@/constants/status';
 import { Header } from '@/components';
 import { useReservationStatus } from '@/hooks/useReservationStatus';

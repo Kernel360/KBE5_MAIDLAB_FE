@@ -10,7 +10,7 @@ import { SERVICE_TYPE_LABELS } from '@/constants/service';
 import type {
   ManagerReviewListResponse,
   ManagerReviewItem,
-} from '@/types/manager';
+} from '@/types/domain/manager';
 import { Header } from '@/components/layout/Header/Header';
 
 interface PaginationProps {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ReservationStep0 from '@/components/features/consumer/ReservationStep0';
 import ReservationStep1 from '@/components/features/consumer/ReservationStep1';
 import ReservationStep2 from '@/components/features/consumer/ReservationStep2';
-import type { ReservationFormData } from '@/types/reservation';
+import type { ReservationFormData } from '@/types/domain/reservation';
 import { useLocation } from 'react-router-dom';
 
 const ConsumerReservationCreate: React.FC = () => {

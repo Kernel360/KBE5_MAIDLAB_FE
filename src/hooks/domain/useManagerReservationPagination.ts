@@ -5,7 +5,7 @@ import type {
   ReservationListResponse,
   PageResponse,
   PagingParams,
-} from '@/types/reservation';
+} from '@/types/domain/reservation';
 
 interface UseManagerReservationPaginationParams {
   initialStatus?: 'TODAY' | 'PAID' | 'WORKING' | 'COMPLETED';

@@ -23,7 +23,7 @@ import type {
   SignUpRequest,
   SocialLoginRequest,
   SocialSignUpRequest,
-} from '@/types/auth';
+} from '@/types/domain/auth';
 import type { UserType } from '@/types';
 
 // 🆕 전역 로그아웃 핸들러 타입 정의
