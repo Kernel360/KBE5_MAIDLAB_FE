@@ -16,9 +16,9 @@ import {
 } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useAdmin } from '@/hooks';
-import { type MatchingResponse } from '@/types/matching';
+import { type MatchingResponse } from '@/types/domain/matching';
 // ✅ 올바른 타입 import - 개별 매니저 아이템 타입
-import { type ManagerListItem } from '@/types/admin';
+import { type ManagerListItem } from '@/types/domain/admin';
 import { RESERVATION_STATUS } from '@/constants/status';
 
 interface MatchingChangeDialogProps {

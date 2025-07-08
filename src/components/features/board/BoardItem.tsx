@@ -5,7 +5,7 @@ import {
   BOARD_TYPE_ICONS,
   BOARD_TYPES,
 } from '@/constants/board';
-import type { BoardResponse } from '@/types/board';
+import type { BoardResponse } from '@/types/domain/board';
 import type { BoardType } from '@/constants/board';
 import { useState } from 'react';
 

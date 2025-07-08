@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { ReservationListResponse } from '@/types/reservation';
+import type { ReservationListResponse } from '@/types/domain/reservation';
 import { useReservation } from '@/hooks/domain/useReservation';
 import { useMatching } from '@/hooks/domain/useMatching';
 import { useManagerReservationPagination } from '@/hooks/domain/useManagerReservationPagination';

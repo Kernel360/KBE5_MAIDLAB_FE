@@ -1,12 +1,12 @@
 import { apiClient, handleApiError, apiCall, buildQueryString } from '../index';
 import type { ApiResponse } from '@/types/api';
-import type { LoginResponse } from '@/types/auth';
+import type { LoginResponse } from '@/types/domain/auth';
 import type {
   ReservationListResponse,
   ReservationDetailResponse,
-} from '@/types/reservation';
-import type { MatchingResponse } from '@/types/matching';
-import type { BoardResponse, BoardDetailResponse, BoardListResponse } from '@/types/board';
+} from '@/types/domain/reservation';
+import type { MatchingResponse } from '@/types/domain/matching';
+import type { BoardResponse, BoardDetailResponse, BoardListResponse } from '@/types/domain/board';
 import type {
   AdminLoginRequest,
   AdminPageParams,
@@ -19,7 +19,7 @@ import type {
   SettlementDetailInfo,
   ManagerChangeRequest,
   ConsumerProfileDetail,
-} from '@/types/admin';
+} from '@/types/domain/admin';
 import { API_ENDPOINTS } from '@/constants/api';
 
 export const adminApi = {

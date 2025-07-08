@@ -8,7 +8,7 @@ import type {
   PreferenceRequest,
   ConsumerProfileCreateRequest,
   PointRecordResponseDto,
-} from '@/types/consumer';
+} from '@/types/domain/consumer';
 import { API_ENDPOINTS } from '@/constants/api';
 
 export const consumerApi = {

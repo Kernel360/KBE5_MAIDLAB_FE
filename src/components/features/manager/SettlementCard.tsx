@@ -10,7 +10,7 @@ import {
   ArrowUpRight,
   Eye,
 } from 'lucide-react';
-import type { SettlementResponse } from '@/types/reservation';
+import type { SettlementResponse } from '@/types/domain/reservation';
 
 interface SettlementCardProps {
   settlement: SettlementResponse;

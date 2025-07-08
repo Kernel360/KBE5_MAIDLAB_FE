@@ -5,7 +5,7 @@ import type {
   ManagerProfileUpdateRequest,
   ManagerMyPageResponse,
   ManagerReviewListResponse,
-} from '@/types/manager';
+} from '@/types/domain/manager';
 import { API_ENDPOINTS } from '@/constants/api';
 
 export const managerApi = {

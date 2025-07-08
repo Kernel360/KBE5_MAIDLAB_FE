@@ -5,7 +5,7 @@ import { useEvent, useToast } from '@/hooks';
 import { ROUTES } from '@/constants';
 import { formatDate } from '@/utils';
 import { ERROR_MESSAGES, INFO_MESSAGES } from '@/constants/message';
-import type { EventDetailResponse } from '@/types/event';
+import type { EventDetailResponse } from '@/types/domain/event';
 import { Header } from '@/components';
 import ShareModal from '@/components/common/ShareModal/ShareModal';
 

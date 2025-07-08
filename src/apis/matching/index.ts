@@ -3,7 +3,7 @@ import type {
   MatchingRequestListResponse,
   AvailableManagerResponse,
   MatchingRequest,
-} from '@/types/matching';
+} from '@/types/domain/matching';
 import { API_ENDPOINTS } from '@/constants/api';
 
 export const matchingApi = {

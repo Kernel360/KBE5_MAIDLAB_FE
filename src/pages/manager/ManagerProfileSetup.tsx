@@ -22,7 +22,7 @@ import type {
   ManagerProfileFormData,
   ManagerProfileErrors,
   Document,
-} from '@/types/manager';
+} from '@/types/domain/manager';
 import { Header } from '@/components/layout/Header/Header';
 import RegionSelectionModal from '@/components/features/manager/RegionSelectionModal';
 import ScheduleSelector from '@/components/features/manager/ScheduleSelector';

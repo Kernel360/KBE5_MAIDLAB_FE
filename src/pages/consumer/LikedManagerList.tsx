@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/useToast';
 import { consumerApi } from '@/apis/consumer';
-import type { LikedManagerResponse } from '@/types/consumer';
+import type { LikedManagerResponse } from '@/types/domain/consumer';
 import { ROUTES } from '@/constants/route';
 import { Star, Trash2 } from 'lucide-react';
 import { SEOUL_DISTRICT_LABELS } from '@/constants/region';

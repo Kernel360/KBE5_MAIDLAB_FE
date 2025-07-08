@@ -4,8 +4,8 @@ import { useReservation } from '@/hooks/domain/useReservation';
 import { ROUTES } from '@/constants';
 import { LENGTH_LIMITS } from '@/constants/validation';
 import { ArrowLeft, Star, Sparkles, Edit3, X } from 'lucide-react';
-import type { ReviewRegisterRequest } from '@/types/reservation';
-import type { ReviewFormData } from '@/types/consumer';
+import type { ReviewRegisterRequest } from '@/types/domain/reservation';
+import type { ReviewFormData } from '@/types/domain/consumer';
 
 // 매니저용 키워드 템플릿 데이터
 const MANAGER_REVIEW_KEYWORDS = {

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAdmin } from '@/hooks/domain/useAdmin';
 import { formatNumber } from '@/utils';
-import type { SettlementDetailInfo } from '@/types/admin';
+import type { SettlementDetailInfo } from '@/types/domain/admin';
 import { getServiceTypeName } from '@/constants/admin';
 
 const SettlementDetail = () => {

@@ -21,7 +21,7 @@ import {
   formatRoomSize,
   formatPhoneNumber,
 } from '@/utils/format';
-import type { ReservationDetailResponse } from '@/types/reservation';
+import type { ReservationDetailResponse } from '@/types/domain/reservation';
 import { useAuth } from '@/hooks/useAuth';
 import {
   MessageCircle,

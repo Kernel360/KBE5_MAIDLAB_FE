@@ -8,7 +8,7 @@ import type {
   ConsumerProfileCreateRequest,
   ConsumerProfileFormData,
   ConsumerProfileErrors,
-} from '@/types/consumer';
+} from '@/types/domain/consumer';
 import { Header } from '@/components/layout/Header/Header';
 
 const ConsumerProfileSetup: React.FC = () => {

@@ -5,7 +5,7 @@ import type {
   PagingParams,
   PageResponse,
   ReservationListResponse,
-} from '@/types/reservation';
+} from '@/types/domain/reservation';
 import type { ReservationStatus } from '@/constants/status';
 
 interface UseReservationPaginationResult {

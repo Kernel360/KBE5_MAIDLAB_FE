@@ -8,7 +8,7 @@ import type {
   ManagerListResponse, 
   ManagerListItem, 
   AdminManagerDetail
-} from '@/types/admin';
+} from '@/types/domain/admin';
 import { adminApi } from '../../apis/admin';
 import { MANAGER_VERIFICATION_LABELS, MANAGER_VERIFICATION_STATUS, type ManagerVerificationStatus } from '../../constants/status';
 

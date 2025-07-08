@@ -6,7 +6,7 @@ import type {
   BoardResponse,
   BoardDetailResponse,
   BoardUpdateRequest,
-} from '@/types/board';
+} from '@/types/domain/board';
 
 export const useBoard = () => {
   const [boards, setBoards] = useState<BoardResponse[]>([]);

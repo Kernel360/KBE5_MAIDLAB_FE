@@ -7,7 +7,7 @@ import { validateBirthDate } from '@/constants/validation';
 import type {
   ConsumerProfileUpdateRequest,
   ProfileData,
-} from '@/types/consumer';
+} from '@/types/domain/consumer';
 import { ROUTES } from '@/constants';
 import { uploadToS3 } from '@/utils/s3';
 import { Header } from '@/components/layout/Header/Header';

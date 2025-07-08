@@ -11,7 +11,7 @@ import type {
   ManagerProfileCreateRequest,
   ManagerProfileUpdateRequest,
   ManagerProfileResponse,
-} from '@/types/manager';
+} from '@/types/domain/manager';
 import { useConsumer } from './useConsumer';
 
 /**

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { RESERVATION_STATUS } from '@/constants/status';
-import type { ReservationListResponse } from '@/types/reservation';
+import type { ReservationListResponse } from '@/types/domain/reservation';
 
 export type ReservationTab = 'scheduled' | 'today' | 'completed';
 

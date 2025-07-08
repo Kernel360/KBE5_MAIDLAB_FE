@@ -21,7 +21,7 @@ import {
   formatPrice,
   formatRoomSize,
 } from '@/utils/format';
-import type { ReservationDetailResponse } from '@/types/reservation';
+import type { ReservationDetailResponse } from '@/types/domain/reservation';
 import { Header } from '@/components';
 import {
   MapPin,

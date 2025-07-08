@@ -7,7 +7,7 @@ import type {
   PasswordChangeRequest,
   LoginResponse,
   SocialLoginResponse,
-} from '@/types/auth';
+} from '@/types/domain/auth';
 import { API_ENDPOINTS } from '@/constants/api';
 
 /**

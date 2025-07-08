@@ -1,5 +1,5 @@
 import type { Gender } from '@/constants';
-import type { PaginationResponse } from './api';
+import type { PaginationResponse } from '../api';
 
 /**
  * 관리자 로그인 요청

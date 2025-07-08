@@ -3,7 +3,7 @@ import { adminApi } from '@/apis/admin';
 import { tokenStorage, userStorage } from '@/utils/storage';
 import { useToast } from './useToast';
 import { SUCCESS_MESSAGES, ERROR_MESSAGES, USER_TYPES } from '@/constants';
-import type { AdminLoginRequest } from '@/types/admin';
+import type { AdminLoginRequest } from '@/types/domain/admin';
 
 export const useAdminAuth = () => {
   const [loading, setLoading] = useState(false);

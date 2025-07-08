@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { User } from 'lucide-react';
 import { useConsumer } from '@/hooks/domain/useConsumer';
 import { ROUTES } from '@/constants';
-import type { ProfileData } from '@/types/consumer';
+import type { ProfileData } from '@/types/domain/consumer';
 import { Header } from '@/components/layout/Header/Header';
 
 const DEFAULT_PROFILE_IMAGE = '/default-profile.png';

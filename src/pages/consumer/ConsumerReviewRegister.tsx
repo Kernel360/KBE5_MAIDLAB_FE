@@ -17,8 +17,8 @@ import {
 import type {
   ReviewRegisterRequest,
   ReservationDetailResponse,
-} from '@/types/reservation';
-import type { ReviewFormData } from '@/types/consumer';
+} from '@/types/domain/reservation';
+import type { ReviewFormData } from '@/types/domain/consumer';
 import type { PreferenceType } from '@/constants';
 
 // 키워드 템플릿 데이터

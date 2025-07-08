@@ -11,7 +11,7 @@ import type {
   PaymentRequestBody,
   CheckInOutRequest,
   ReviewRegisterRequest,
-} from '@/types/reservation';
+} from '@/types/domain/reservation';
 
 // 🔧 날짜/시간 변환 유틸리티 함수
 const toISODateTime = (date: string, time: string): string => {

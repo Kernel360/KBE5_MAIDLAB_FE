@@ -6,7 +6,7 @@ import { ROUTES } from '@/constants/route';
 import { BOARD_TYPES } from '@/constants/board';
 import { uploadToS3 } from '@/utils/s3';
 import type { BoardType } from '@/constants/board';
-import type { ImageInfo, BoardCreateRequest } from '@/types/board';
+import type { ImageInfo, BoardCreateRequest } from '@/types/domain/board';
 import BoardTypeSelector from '@/components/features/board/BoardTypeSelector';
 import ImageUploader from '@/components/features/board/ImageUploader';
 

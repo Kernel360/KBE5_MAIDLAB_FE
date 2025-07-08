@@ -1,4 +1,3 @@
-// types/toast.ts
 import type {
   TOAST_TYPES,
   TOAST_POSITIONS,

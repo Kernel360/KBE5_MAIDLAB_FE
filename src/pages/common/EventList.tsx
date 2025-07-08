@@ -12,7 +12,7 @@ import { useEvent } from '@/hooks/domain/useEvent';
 import { usePagination } from '@/hooks/usePagination';
 import { formatDate } from '@/utils';
 import { ROUTES, INFO_MESSAGES } from '@/constants';
-import type { EventListItem } from '@/types/event';
+import type { EventListItem } from '@/types/domain/event';
 import { Header } from '@/components';
 
 const EventList: React.FC = () => {

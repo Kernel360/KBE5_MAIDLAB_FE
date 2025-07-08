@@ -14,7 +14,7 @@ import { LoadingSpinner, ShareModal } from '@/components/common';
 import PasswordChangeModal from '@/components/common/PasswordChangeModal/PasswordChangeModal';
 import { Header } from '@/components/layout/Header/Header';
 import { ROUTES } from '@/constants';
-import type { ManagerMyPageResponse } from '@/types/manager';
+import type { ManagerMyPageResponse } from '@/types/domain/manager';
 
 interface MenuItemProps {
   icon: React.ReactNode;
