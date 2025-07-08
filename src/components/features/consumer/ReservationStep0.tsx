@@ -25,7 +25,7 @@ const ReservationStep0: React.FC<Props> = ({ onNext }) => {
         backRoute={ROUTES.HOME}
         showMenu={true}
       />
-      <div className="flex-1 flex flex-col justify-start items-center pt-20 px-4">
+      <div className="flex-1 flex flex-col justify-start items-center px-4">
         <h2 className="text-xl font-bold mb-2 mt-2">서비스를 선택해주세요</h2>
         <div className="w-full max-w-md flex flex-col gap-6 mt-8">
           {SERVICE_LIST.map((item) => (

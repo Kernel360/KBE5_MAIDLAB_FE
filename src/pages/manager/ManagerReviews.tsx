@@ -351,7 +351,7 @@ const ManagerReviews: React.FC = () => {
       />
 
       {/* Content */}
-      <div className="px-4 py-6 pt-20">
+      <div className="px-4 py-6">
         <div className="max-w-md mx-auto">
           {reviews.length > 0 ? (
             <>

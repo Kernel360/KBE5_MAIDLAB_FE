@@ -76,7 +76,7 @@ const EventList: React.FC = () => {
         showMenu={true}
       />
 
-      <main className="pt-20 px-4 py-6 pb-20">
+      <main className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto">
           {/* 검색바 */}
           <div className="mb-8">

@@ -201,7 +201,7 @@ const ConsumerReservationDetail: React.FC = () => {
         showMenu={true}
       />
 
-      <div className="max-w-md mx-auto pt-20">
+      <div className="max-w-md mx-auto">
         {/* 상태 카드 */}
         <div className="mx-4 mt-4 bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="p-6">

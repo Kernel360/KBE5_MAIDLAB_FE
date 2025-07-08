@@ -132,7 +132,7 @@ const ConsumerProfileSetup: React.FC = () => {
         hideBackButton={true}
       />
 
-      <div className="px-4 py-6 pt-20">
+      <div className="px-4 py-6">
         <div className="max-w-md mx-auto space-y-6">
           {/* 프로필 이미지 */}
           <div className="text-center">
