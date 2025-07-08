@@ -1,0 +1,193 @@
+/* 배경 이미지 고정 */
+.background-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: -1;
+}
+
+/* 휴대폰 프레임 위치 조정 */
+.mobile-frame {
+  position: absolute;
+  top: 5%;
+  right: 8%;
+  width: 280px;
+  height: 560px;
+  background: #000;
+  border-radius: 32px;
+  padding: 4px;
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  transform: scale(0.9);
+  transition: transform 0.3s ease;
+}
+
+/* 큰 화면에서 스케일 조정 */
+@media (min-width: 1024px) {
+  .mobile-frame {
+    transform: scale(1);
+  }
+}
+
+/* 중간 화면에서 위치 조정 */
+@media (max-width: 1024px) and (min-width: 768px) {
+  .mobile-frame {
+    right: 4%;
+    transform: scale(0.8);
+  }
+}
+
+/* 작은 화면에서는 숨김 */
+@media (max-width: 767px) {
+  .mobile-frame {
+    display: none;
+  }
+}
+
+/* 휴대폰 내부 화면 */
+.mobile-screen {
+  width: 100%;
+  height: 100%;
+  background: white;
+  border-radius: 28px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 상단 노치 영역 */
+.mobile-notch {
+  height: 20px;
+  background: #000;
+  border-radius: 28px 28px 0 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-notch::before {
+  content: '';
+  width: 60px;
+  height: 4px;
+  background: #333;
+  border-radius: 2px;
+}
+
+.mobile-notch::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  background: #333;
+  border-radius: 50%;
+}
+
+/* 앱 콘텐츠 영역 */
+.mobile-content {
+  flex: 1;
+  overflow-y: auto;
+  background: white;
+}
+
+/* 하단 홈 인디케이터 */
+.mobile-home-indicator {
+  height: 16px;
+  background: white;
+  border-radius: 0 0 28px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-home-indicator::before {
+  content: '';
+  width: 80px;
+  height: 2px;
+  background: #ccc;
+  border-radius: 1px;
+}
+
+/* 반응형 전체 화면 모드 */
+.mobile-fullscreen {
+  width: 100vw;
+  height: 100vh;
+  background: white;
+}
+
+@media (min-width: 768px) {
+  .mobile-fullscreen {
+    display: none;
+  }
+}
+
+/* 스크롤바 숨김 */
+.mobile-content::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-content {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* 휴대폰 화면 내 텍스트 크기 조정 */
+.mobile-frame .App {
+  font-size: 14px;
+}
+
+.mobile-frame h1 {
+  font-size: 1.5rem;
+}
+
+.mobile-frame h2 {
+  font-size: 1.25rem;
+}
+
+.mobile-frame h3 {
+  font-size: 1.125rem;
+}
+
+/* 버튼 크기 조정 */
+.mobile-frame button {
+  min-height: 44px;
+  padding: 8px 16px;
+}
+
+/* 입력 필드 크기 조정 */
+.mobile-frame input,
+.mobile-frame textarea,
+.mobile-frame select {
+  min-height: 44px;
+  padding: 8px 12px;
+}
+
+/* 데스크톱 뷰포트 스크롤바 커스터마이징 */
+
+.desktop-viewport::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+}
+
+.desktop-viewport::-webkit-scrollbar-track {
+  background: transparent;
+  margin-top: 64px; /* 헤더 높이만큼 스크롤바 트랙 시작점 조정 */
+}
+
+.desktop-viewport::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.desktop-viewport::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

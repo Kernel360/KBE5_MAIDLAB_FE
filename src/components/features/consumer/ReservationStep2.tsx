@@ -1207,7 +1207,7 @@ const ReservationStep2: React.FC<Props> = ({
       />
 
       {/* 진행 단계 표시 */}
-      <div className="bg-gray-50 px-10 py-6 pt-20">
+      <div className="bg-gray-50 px-10 py-6">
         <div className="max-w-md mx-auto">
           <div className="flex items-center justify-center mb-6">
             {STEPS.map((step, index) => (

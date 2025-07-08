@@ -113,7 +113,7 @@ const EventDetail: React.FC = () => {
         showMenu={true}
       />
 
-      <main className="pt-20 pb-24 px-4">
+      <main className="pb-24 px-4">
         <div className="max-w-md mx-auto">
           {/* 메인 이미지와 기본 정보 */}
           <div className="bg-white rounded-2xl overflow-hidden mb-6">

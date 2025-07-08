@@ -229,7 +229,7 @@ const ManagerHome: React.FC = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       <Header showNotification={true} />
 
-      <main className="px-4 py-6 pb-20 pt-20">
+      <main className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto space-y-6">
           {/* 매니저 프로필 섹션 */}
           <section

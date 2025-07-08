@@ -140,7 +140,7 @@ export default function BoardDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+    <div className="min-h-screen bg-gray-50">
       <Header
         variant="sub"
         title="문의 상세"

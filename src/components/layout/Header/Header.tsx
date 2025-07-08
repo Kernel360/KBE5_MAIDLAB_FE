@@ -82,7 +82,7 @@ export const Header: React.FC<HeaderProps> = ({
   if (variant === 'sub') {
     if (hideBackButton) {
       return (
-        <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-[18px] border-b bg-white dark:bg-gray-900 dark:border-gray-700 transition-colors">
+        <header className="sticky top-0 z-[9999] flex items-center justify-between px-4 py-[18px] border-b bg-white dark:bg-gray-900 dark:border-gray-700 transition-colors">
           <div className="w-10" />
           <h1 className="text-lg font-bold text-center w-full text-gray-900 dark:text-white">{title}</h1>
           <div className="w-10" />
@@ -90,7 +90,7 @@ export const Header: React.FC<HeaderProps> = ({
       );
     }
     return (
-      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 p-3 border-b bg-white dark:bg-gray-900 dark:border-gray-700 transition-colors">
+      <header className="sticky top-0 z-[9999] flex items-center justify-between px-4 p-3 border-b bg-white dark:bg-gray-900 dark:border-gray-700 transition-colors">
         <button
           onClick={handleBackClick}
           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -201,7 +201,7 @@ export const Header: React.FC<HeaderProps> = ({
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 px-4 p-3 flex items-center justify-between shadow-sm transition-colors">
+    <header className="sticky top-0 z-[9999] bg-white dark:bg-gray-900 px-4 p-3 flex items-center justify-between shadow-sm transition-colors">
       <button
         onClick={handleLogoClick}
         className="flex items-center gap-3 hover:opacity-80 transition-opacity"

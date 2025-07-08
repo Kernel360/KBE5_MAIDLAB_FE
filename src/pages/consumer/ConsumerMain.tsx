@@ -116,13 +116,13 @@ const ConsumerMain: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-14">
+    <div className="min-h-screen bg-gray-50">
       <Header
         showNotification={true}
         onNotificationClick={handleNotificationClick}
       />
 
-      <main className="px-4 pt-6">
+      <main className="px-4 py-6">
         <div className="max-w-md mx-auto">
           <HeroSection
             onEventClick={handleEventClick}

@@ -115,7 +115,7 @@ const ManagerSettlements: React.FC = () => {
         showMenu={true}
       />
       
-      <div className="px-4 py-6 pb-20 pt-20">
+      <div className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto space-y-6">
           <WeekSelector
             currentWeek={currentWeek}
