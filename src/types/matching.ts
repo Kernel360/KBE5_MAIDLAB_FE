@@ -23,7 +23,7 @@ export interface AvailableManagerResponse {
   name: string;
   averageRate: number;
   introduceText: string;
-  profileImage : string; 
+  profileImage: string;
 }
 
 /**
@@ -70,6 +70,8 @@ export interface MatchingResponse {
   reservationId: number;
   managerId: number;
   matchingStatus: ReservationStatus;
+  matchingCount: number;
+  updatedAt: string;
 }
 
 /**
