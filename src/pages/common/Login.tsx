@@ -9,8 +9,8 @@ import {
   removeLocalStorage,
 } from '@/utils/storage';
 import { openGoogleLoginPopup, cleanupOAuthStorage } from '@/utils/googleOAuth';
-import type { LoginRequest, SocialLoginRequest } from '@/types/auth';
-import type { SavedLoginInfo } from '@/types/user';
+import type { LoginRequest, SocialLoginRequest } from '@/types/domain/auth';
+import type { SavedLoginInfo } from '@/types/domain/user';
 import { LOGIN_USER_TYPES, type LoginUserType } from '@/constants/user';
 import { Header } from '@/components/layout/Header/Header';
 
@@ -146,10 +146,8 @@ const Login: React.FC = () => {
         showMenu={false}
       />
 
-      <main className="px-4 py-6 pt-12">
+      <main className="px-4 py-6">
         <div className="max-w-md mx-auto">
-          <div className="text-center mb-8"></div>
-
           {/* 사용자 타입 선택 */}
           <div className="flex bg-gray-100 rounded-lg p-1 mb-6">
             <button

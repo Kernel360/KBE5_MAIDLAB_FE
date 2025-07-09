@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/useToast';
 import { useBoard } from '@/hooks/domain/useBoard';
 import { ROUTES } from '@/constants/route';
 import { BOARD_TYPE_LABELS } from '@/constants/board';
-import type { BoardDetailResponse, ImageInfo } from '@/types/board';
+import type { BoardDetailResponse, ImageInfo } from '@/types/domain/board';
 import AnswerSection from '@/components/features/board/AnswerSection';
 import { Header } from '@/components/layout/Header/Header';
 
@@ -140,7 +140,7 @@ export default function BoardDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+    <div className="min-h-screen bg-gray-50">
       <Header
         variant="sub"
         title="문의 상세"

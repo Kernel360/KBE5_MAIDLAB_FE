@@ -2,8 +2,8 @@ import React from 'react';
 import { RESERVATION_STATUS_LABELS } from '@/constants/status';
 import { SERVICE_TYPE_LABELS, SERVICE_TYPES } from '@/constants/service';
 import { formatKoreanDate, formatPrice } from '@/utils';
-import type { ReservationListResponse } from '@/types/reservation';
-import { Calendar, Clock, DollarSign, ChevronRight } from 'lucide-react';
+import type { ReservationListResponse } from '@/types/domain/reservation';
+import { Calendar, Clock, DollarSign, User, ChevronRight } from 'lucide-react';
 
 interface ReservationCardProps {
   reservation: ReservationListResponse;

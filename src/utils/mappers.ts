@@ -1,3 +1,11 @@
+import type {
+  BoardResponse,
+  BoardDetailResponse,
+  BoardCreateRequest,
+  AnswerCreateRequest,
+} from '@/types/domain/board';
+import type { ReservationListResponse } from '@/types/domain/reservation';
+
 /**
  * API 응답을 내부 데이터 형식으로 변환하는 제네릭 매퍼
  */
@@ -213,4 +221,76 @@ export const mapManagerProfile = (managerData: any) => {
     profileImage: null,
     introduceText: '',
   });
+};
+
+// ===== 추가된 매퍼 함수들 =====
+
+/**
+ * API 게시글 목록 응답 → 내부 타입
+ * API의 boardId를 내부 id로 변환
+ */
+export const mapBoardListResponse = (apiData: any[]): BoardResponse[] => {
+  return apiData.map((item) => ({
+    boardId: item.boardId || item.id,
+    title: item.title,
+    content: item.content,
+    answered: item.answered,
+    boardType: item.boardType,
+    createdAt: item.createdAt,
+    updatedAt: item.updatedAt,
+  }));
+};
+
+/**
+ * API 게시글 상세 응답 → 내부 타입
+ * API의 boardId를 내부 id로 변환
+ */
+export const mapBoardDetailResponse = (
+  apiData: any,
+): BoardDetailResponse => ({
+  boardId: apiData.boardId || apiData.id,
+  title: apiData.title,
+  content: apiData.content,
+  answered: apiData.answered,
+  boardType: apiData.boardType,
+  images: apiData.images || [],
+  answer: apiData.answer,
+  createdAt: apiData.createdAt,
+  updatedAt: apiData.updatedAt,
+});
+
+/**
+ * 내부 게시글 생성 요청 → API 요청
+ */
+export const mapBoardCreateToApi = (data: BoardCreateRequest): any => ({
+  boardType: data.boardType,
+  title: data.title,
+  content: data.content,
+  images: data.images,
+});
+
+/**
+ * 내부 답변 요청 → API 요청
+ */
+export const mapAnswerCreateToApi = (data: AnswerCreateRequest): any => ({
+  content: data.content,
+});
+
+/**
+ * API 예약 목록 응답 → 내부 타입
+ */
+export const mapReservationListResponse = (
+  apiData: any[],
+): ReservationListResponse[] => {
+  return apiData.map((item) => ({
+    reservationId: item.reservationId,
+    status: item.status,
+    serviceType: item.serviceType,
+    detailServiceType: item.detailServiceType,
+    reservationDate: item.reservationDate,
+    startTime: item.startTime,
+    endTime: item.endTime,
+    isExistReview: item.isExistReview,
+    totalPrice: item.totalPrice,
+  }));
 };

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useReservation } from '@/hooks';
 import { formatDate } from '@/utils/date';
-import type { SettlementResponse } from '@/types/reservation';
+import type { SettlementResponse } from '@/types/domain/reservation';
 import WeekSelector from '@/components/features/manager/WeekSelector';
 import SettlementSummary from '@/components/features/manager/SettlementSummary';
 import StatusFilter from '@/components/features/manager/StatusFilter';
@@ -115,7 +115,7 @@ const ManagerSettlements: React.FC = () => {
         showMenu={true}
       />
       
-      <div className="px-4 py-6 pb-20 pt-20">
+      <div className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto space-y-6">
           <WeekSelector
             currentWeek={currentWeek}

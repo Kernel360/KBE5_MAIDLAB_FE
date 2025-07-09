@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { adminApi } from '../../apis/admin';
-import type { AdminManagerDetail } from '@/types/admin';
+import type { AdminManagerDetail } from '@/types/domain/admin';
 import { useAdmin } from '@/hooks';
 import { getServiceTypeName } from '@/constants/admin';
 

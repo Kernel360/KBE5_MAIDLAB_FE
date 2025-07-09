@@ -8,7 +8,7 @@ import { SERVICE_TYPES, SERVICE_TYPE_LABELS } from '@/constants/service';
 import { SEOUL_DISTRICT_LABELS } from '@/constants/region';
 import { GENDER_LABELS, GENDER } from '@/constants/user';
 import { ROUTES } from '@/constants/route';
-import type { ManagerProfileResponse } from '@/types/manager';
+import type { ManagerProfileResponse } from '@/types/domain/manager';
 import type { ServiceType } from '@/constants/service';
 import type { SeoulDistrict } from '@/constants/region';
 import ScheduleSummary from '@/components/features/manager/ScheduleSummary';
@@ -39,7 +39,7 @@ const ManagerProfile: React.FC = () => {
         showMenu={true}
       />
 
-      <div className="px-4 py-6 pt-20">
+      <div className="px-4 py-6">
         <div className="max-w-md mx-auto">
           <div className="bg-white rounded-xl shadow-sm p-6 space-y-8">
             {/* 프로필 이미지 */}

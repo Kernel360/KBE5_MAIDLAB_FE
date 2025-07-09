@@ -2,7 +2,7 @@ import { tokenStorage, userStorage } from './storage';
 import { USER_TYPES } from '@/constants/user';
 import { generateGoogleOAuthUrl } from './googleOAuth';
 import { AUTH_CONFIG } from '@/config/constants';
-import type { UserInfo, JWTPayload } from '@/types/auth';
+import type { UserInfo, JWTPayload } from '@/types/domain/auth';
 
 /**
  * 로그인 상태 확인
@@ -61,14 +61,9 @@ export const getCurrentUser = <T>(): T | null => {
 export const login = (
   accessToken: string,
   userType: string,
-  userInfo?: UserInfo,
 ): void => {
   tokenStorage.setAccessToken(accessToken);
   userStorage.setUserType(userType);
-
-  if (userInfo) {
-    userStorage.setUserInfo(userInfo);
-  }
 };
 
 /**

@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { adminApi } from '@/apis/admin';
-import type { AdminPageParams, AdminAnswerRequest } from '@/types/admin';
+import type { AdminPageParams, AdminAnswerRequest } from '@/types/domain/admin';
 import { useToast } from '../useToast';
 
 export const useAdmin = () => {

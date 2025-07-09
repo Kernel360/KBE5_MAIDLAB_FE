@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { adminApi } from '@/apis';
-import type { ReservationDetailResponse } from '@/types/reservation';
+import type { ReservationDetailResponse } from '@/types/domain/reservation';
 import { formatDateTime } from '@/utils';
 import { getServiceTypeName } from '@/constants/admin';
 import {

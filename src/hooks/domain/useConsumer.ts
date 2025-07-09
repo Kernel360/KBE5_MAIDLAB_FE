@@ -7,7 +7,7 @@ import type {
   LikedManagerResponse,
   BlackListedManagerResponse,
   ConsumerProfileCreateRequest,
-} from '@/types/consumer';
+} from '@/types/domain/consumer';
 
 export const useConsumer = () => {
   const [profile, setProfile] = useState<ConsumerProfileResponse | null>(null);

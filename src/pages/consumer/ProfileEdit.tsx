@@ -7,7 +7,7 @@ import { validateBirthDate } from '@/constants/validation';
 import type {
   ConsumerProfileUpdateRequest,
   ProfileData,
-} from '@/types/consumer';
+} from '@/types/domain/consumer';
 import { ROUTES } from '@/constants';
 import { uploadToS3 } from '@/utils/s3';
 import { Header } from '@/components/layout/Header/Header';
@@ -219,7 +219,7 @@ const ProfileEdit: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+    <div className="min-h-screen bg-gray-50">
       <Header
         variant="sub"
         title="프로필 수정"

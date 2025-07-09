@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { useConsumer } from '@/hooks/domain/useConsumer';
 import { useToast } from '@/hooks/useToast';
-import type { ConsumerMyPageResponse } from '@/types/consumer';
+import type { ConsumerMyPageResponse } from '@/types/domain/consumer';
 import { ROUTES } from '@/constants';
 import { useAuth } from '@/hooks/useAuth';
 import { Header } from '@/components/layout/Header/Header';
@@ -114,7 +114,7 @@ const MyPage: React.FC = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50 pt-20">
+      <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <Header
           variant="sub"

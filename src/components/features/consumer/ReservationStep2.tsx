@@ -1,6 +1,6 @@
 // src/components/features/consumer/ReservationStep2.tsx
 import React, { useState, useEffect } from 'react';
-import type { ReservationFormData } from '@/types/reservation';
+import type { ReservationFormData } from '@/types/domain/reservation';
 import { useMatching } from '@/hooks/domain/useMatching';
 import { format, addDays } from 'date-fns';
 import {
@@ -1207,7 +1207,7 @@ const ReservationStep2: React.FC<Props> = ({
       />
 
       {/* 진행 단계 표시 */}
-      <div className="bg-gray-50 px-10 py-6 pt-20">
+      <div className="bg-gray-50 px-10 py-6">
         <div className="max-w-md mx-auto">
           <div className="flex items-center justify-center mb-6">
             {STEPS.map((step, index) => (

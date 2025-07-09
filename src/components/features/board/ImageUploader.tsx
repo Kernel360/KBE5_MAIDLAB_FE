@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { useToast } from '@/hooks/useToast';
-import type { ImageInfo } from '@/types/board';
+import type { ImageInfo } from '@/types/domain/board';
 
 interface ImageUploaderProps {
   images: File[];

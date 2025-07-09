@@ -82,7 +82,7 @@ export const Header: React.FC<HeaderProps> = ({
   if (variant === 'sub') {
     if (hideBackButton) {
       return (
-        <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-[18px] border-b bg-white dark:bg-gray-900 dark:border-gray-700 transition-colors">
+        <header className="sticky top-0 z-[9999] flex items-center justify-between px-4 py-[18px] border-b bg-white dark:bg-gray-900 dark:border-gray-700 transition-colors">
           <div className="w-10" />
           <h1 className="text-lg font-bold text-center w-full text-gray-900 dark:text-white">{title}</h1>
           <div className="w-10" />
@@ -90,7 +90,7 @@ export const Header: React.FC<HeaderProps> = ({
       );
     }
     return (
-      <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 p-3 border-b bg-white dark:bg-gray-900 dark:border-gray-700 transition-colors">
+      <header className="sticky top-0 z-[9999] flex items-center justify-between px-4 p-3 border-b bg-white dark:bg-gray-900 dark:border-gray-700 transition-colors">
         <button
           onClick={handleBackClick}
           className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -201,7 +201,7 @@ export const Header: React.FC<HeaderProps> = ({
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 px-4 p-3 flex items-center justify-between shadow-sm transition-colors">
+    <header className="sticky top-0 z-[9999] bg-white dark:bg-gray-900 px-4 p-3 flex items-center justify-between shadow-sm transition-colors">
       <button
         onClick={handleLogoClick}
         className="flex items-center gap-3 hover:opacity-80 transition-opacity"
@@ -326,11 +326,20 @@ export const Header: React.FC<HeaderProps> = ({
                 </button>
                 <button
                   onClick={() => handleMenuClick(ROUTES.LOGIN)}
-                  className="flex items-center px-4 py-2 hover:bg-gray-100 gap-2"
+                  className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 gap-2 text-gray-700 dark:text-gray-200"
                 >
-                  <User className="w-5 h-5 text-gray-600" />
+                  <User className="w-5 h-5 text-gray-600 dark:text-white" />
                   <span>로그인</span>
                 </button>
+                
+                {/* 테마 토글 스위치 - 비로그인 사용자 */}
+                <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-600 flex justify-center">
+                  <ThemeToggle 
+                    variant="switch" 
+                    size="sm" 
+                    showLabel={false}
+                  />
+                </div>
               </div>
             )}
           </>

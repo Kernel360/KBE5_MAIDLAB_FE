@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { ReservationListResponse } from '@/types/reservation';
+import type { ReservationListResponse } from '@/types/domain/reservation';
 import { useReservation } from '@/hooks/domain/useReservation';
 import { useMatching } from '@/hooks/domain/useMatching';
 import { useManagerReservationPagination } from '@/hooks/domain/useManagerReservationPagination';
@@ -342,7 +342,7 @@ const ManagerReservationsAndMatching: React.FC = () => {
           showMenu={true}
         />
       </div>
-      <div className="max-w-md mx-auto bg-gray-50 min-h-screen p-0 pb-20 relative pt-20">
+      <div className="max-w-md mx-auto bg-gray-50 min-h-screen p-0 pb-20 relative">
         {/* 탭 헤더 */}
         <div className="bg-white shadow-sm border-b border-gray-200 sticky top-[65px] z-10">
           <div className="max-w-md mx-auto px-4 py-4">

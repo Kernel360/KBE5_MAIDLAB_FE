@@ -1,23 +1,20 @@
-import React from 'react';
-import { AuthProvider, ThemeProvider, ToastProvider } from '@/hooks';
-import { ToastContainer } from '@/components/common';
+import React, { useEffect } from 'react';
 import { AppRoutes } from '@/routes';
-import { Analytics } from '@vercel/analytics/react';
 import '@/styles/index.css';
 
 const App: React.FC = () => {
+  // 초기 테마 설정
+  useEffect(() => {
+    // localStorage에 테마가 없으면 light로 초기화
+    if (!localStorage.getItem('theme')) {
+      localStorage.setItem('theme', 'light');
+    }
+  }, []);
+
   return (
-    <ThemeProvider>
-      <ToastProvider>
-        <AuthProvider>
-          <div className="App min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors">
-            <AppRoutes />
-            <ToastContainer />
-            <Analytics />
-          </div>
-        </AuthProvider>
-      </ToastProvider>
-    </ThemeProvider>
+    <div className="w-full h-full bg-white dark:bg-gray-900 text-gray-900 dark:text-white transition-colors">
+      <AppRoutes />
+    </div>
   );
 };
 

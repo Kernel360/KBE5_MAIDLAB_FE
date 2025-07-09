@@ -4,7 +4,7 @@ import type {
   BoardResponse,
   BoardDetailResponse,
   BoardUpdateRequest,
-} from '@/types/board';
+} from '@/types/domain/board';
 import { API_ENDPOINTS } from '@/constants/api';
 
 export const boardApi = {

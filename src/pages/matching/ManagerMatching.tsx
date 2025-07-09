@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useMatching } from '@/hooks/domain/useMatching';
 import { useReservation } from '@/hooks/domain/useReservation';
-import type { MatchingRequestListResponse } from '@/types/matching';
+import type { MatchingRequestListResponse } from '@/types/domain/matching';
 import { IoArrowBack } from 'react-icons/io5';
-import { formatDateTimeWithLocale, formatPrice } from '@/utils/format';
+import { formatPrice } from '@/utils/format';
+import { formatDateTime } from '@/utils/date';
 import { useNavigate } from 'react-router-dom';
 
 const ManagerMatching = () => {
@@ -110,7 +111,7 @@ const ManagerMatching = () => {
                     <div className="text-gray-600 space-y-1">
                       <p>
                         예약일:{' '}
-                        {formatDateTimeWithLocale(matching.reservationDate)}
+                        {formatDateTime(matching.reservationDate)}
                       </p>
                       <p>
                         서비스 시간: {range} ({hours}시간)

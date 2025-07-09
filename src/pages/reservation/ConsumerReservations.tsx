@@ -4,7 +4,7 @@ import { useReservation } from '@/hooks/domain/useReservation';
 import { ReservationCard } from '@/components';
 import { ROUTES, RESERVATION_STATUS } from '@/constants';
 import { useNavigate } from 'react-router-dom';
-import type { PagingParams } from '@/types/reservation';
+import type { PagingParams } from '@/types/domain/reservation';
 import type { ReservationStatus } from '@/constants/status';
 import { Header } from '@/components';
 import { useReservationStatus } from '@/hooks/useReservationStatus';
@@ -202,7 +202,7 @@ const ConsumerReservations: React.FC = () => {
         backRoute={ROUTES.HOME}
         showMenu={true}
       />
-      <div className="max-w-md mx-auto bg-gray-50 min-h-screen p-0 pb-20 relative pt-20">
+      <div className="max-w-md mx-auto bg-gray-50 min-h-screen p-0 pb-20 relative">
         {/* 탭 네비게이션 */}
         <div className="bg-white shadow-sm border-b border-gray-200 sticky top-[65px] z-10">
           <div className="px-4 py-3">

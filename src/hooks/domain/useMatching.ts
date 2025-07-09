@@ -6,7 +6,7 @@ import type {
   MatchingRequest,
   AvailableManagerResponse,
   MatchingRequestListResponse,
-} from '@/types/matching';
+} from '@/types/domain/matching';
 
 export const useMatching = () => {
   const [availableManagers, setAvailableManagers] = useState<

@@ -22,7 +22,7 @@ import type {
   ManagerProfileFormData,
   ManagerProfileErrors,
   Document,
-} from '@/types/manager';
+} from '@/types/domain/manager';
 import { Header } from '@/components/layout/Header/Header';
 import RegionSelectionModal from '@/components/features/manager/RegionSelectionModal';
 import ScheduleSelector from '@/components/features/manager/ScheduleSelector';
@@ -668,7 +668,7 @@ const ManagerProfileSetup: React.FC = () => {
       />
 
       {/* Progress */}
-      <div className="px-4 py-6 pt-20">
+      <div className="px-4 py-6">
         <div className="max-w-md mx-auto">
           <div className="flex items-center justify-between mb-6">
             {[1, 2, 3, 4].map((step) => (

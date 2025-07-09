@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth, useForm, useToast } from '@/hooks';
 import { ROUTES } from '@/constants';
 import { validateBirthDate } from '@/constants/validation';
-import type { SocialSignUpRequest } from '@/types/auth';
+import type { SocialSignUpRequest } from '@/types/domain/auth';
 import { Header } from '@/components/layout/Header/Header';
 
 const SocialSignUp: React.FC = () => {
@@ -110,7 +110,7 @@ const SocialSignUp: React.FC = () => {
         showMenu={false}
       />
 
-      <main className="px-4 py-6 pt-20">
+      <main className="px-4 py-6">
         <div className="max-w-md mx-auto">
           <div className="mb-6">
             <div className="text-center mb-6">

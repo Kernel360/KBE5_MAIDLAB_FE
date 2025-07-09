@@ -12,7 +12,7 @@ import { useEvent } from '@/hooks/domain/useEvent';
 import { usePagination } from '@/hooks/usePagination';
 import { formatDate } from '@/utils';
 import { ROUTES, INFO_MESSAGES } from '@/constants';
-import type { EventListItem } from '@/types/event';
+import type { EventListItem } from '@/types/domain/event';
 import { Header } from '@/components';
 
 const EventList: React.FC = () => {
@@ -76,7 +76,7 @@ const EventList: React.FC = () => {
         showMenu={true}
       />
 
-      <main className="pt-20 px-4 py-6 pb-20">
+      <main className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto">
           {/* 검색바 */}
           <div className="mb-8">

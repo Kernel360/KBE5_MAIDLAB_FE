@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAdmin } from '@/hooks';
 import { ROUTES } from '@/constants';
 import { BOARD_TYPE_NAMES, BOARD_TYPE_COLORS } from '@/constants/admin';
-import type { BoardDetailResponse } from '@/types/board';
+import type { BoardDetailResponse } from '@/types/domain/board';
 
 // Admin-friendly color scheme matching the admin layout
 const chipColors = {

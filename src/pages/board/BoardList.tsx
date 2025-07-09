@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { MessageSquare } from 'lucide-react';
 import { useBoard } from '@/hooks/domain/useBoard';
 import { ROUTES } from '@/constants/route';
-import type { BoardResponse } from '@/types/board';
+import type { BoardResponse } from '@/types/domain/board';
 import BoardItem from '@/components/features/board/BoardItem';
 import { usePagination } from '@/hooks';
 import { Header } from '@/components/layout/Header/Header';
@@ -42,7 +42,7 @@ export default function BoardList() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+    <div className="min-h-screen bg-gray-50">
       <Header
         variant="sub"
         title="상담 게시판"
@@ -50,7 +50,7 @@ export default function BoardList() {
         showMenu={true}
       />
       {/* Content */}
-      <div className="px-4 py-0 pb-6">
+      <div className="px-4 py-6">
         <div className="max-w-md mx-auto">
           {boards.length > 0 ? (
             <>

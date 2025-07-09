@@ -14,7 +14,7 @@ import { LoadingSpinner, ShareModal } from '@/components/common';
 import PasswordChangeModal from '@/components/common/PasswordChangeModal/PasswordChangeModal';
 import { Header } from '@/components/layout/Header/Header';
 import { ROUTES } from '@/constants';
-import type { ManagerMyPageResponse } from '@/types/manager';
+import type { ManagerMyPageResponse } from '@/types/domain/manager';
 
 interface MenuItemProps {
   icon: React.ReactNode;
@@ -130,7 +130,7 @@ const ManagerMyPage: React.FC = () => {
       />
 
       {/* Content */}
-      <div className="px-4 py-6 pt-20">
+      <div className="px-4 py-6">
         <div className="max-w-md mx-auto">
           <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
             {/* Profile Section */}

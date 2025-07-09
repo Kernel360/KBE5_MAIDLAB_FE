@@ -1,5 +1,5 @@
 import type { BoardType } from '@/constants/board';
-import type { PaginationResponse } from './api';
+import type { PaginationResponse } from '../api';
 
 /**
  * 이미지 정보

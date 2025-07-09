@@ -3,7 +3,7 @@ import { useAdmin } from '@/hooks';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/constants';
 import { BOARD_TYPE_NAMES, DEFAULT_PAGE_SIZE, DEFAULT_PAGE_NUMBER } from '@/constants/admin';
-import type { BoardListResponse } from '@/types/board';
+import type { BoardListResponse } from '@/types/domain/board';
 
 const ConsumerBoard = () => {
   const navigate = useNavigate();

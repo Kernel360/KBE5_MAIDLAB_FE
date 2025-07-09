@@ -22,7 +22,8 @@ import {
   formatRoomSize,
   formatPhoneNumber,
 } from '@/utils/format';
-import type { ReservationDetailResponse } from '@/types/reservation';
+import type { ReservationDetailResponse } from '@/types/domain/reservation';
+import { useAuth } from '@/hooks/useAuth';
 import {
   Phone,
   Star,
@@ -243,7 +244,7 @@ const ConsumerReservationDetail: React.FC = () => {
         showMenu={true}
       />
 
-      <div className="max-w-md mx-auto pt-20">
+      <div className="max-w-md mx-auto">
         {/* 상태 카드 */}
         <div className="mx-4 mt-4 bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="p-6">

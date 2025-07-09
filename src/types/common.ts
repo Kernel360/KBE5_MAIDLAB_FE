@@ -284,78 +284,15 @@ export interface TimeSlot {
   endTime: string;
 }
 
+/**
+ * 탭 패널 속성
+ */
+export interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
 // ===== 공통 유틸리티 타입들 =====
 
-/**
- * API 요청 타입 생성 유틸리티
- */
-export type ApiRequest<T> = T;
 
-/**
- * 생성 요청 타입 (ID, 생성일, 수정일 제외)
- */
-export type CreateRequest<T> = Omit<T, 'id' | 'createdAt' | 'updatedAt'>;
-
-/**
- * 수정 요청 타입 (선택적 필드들)
- */
-export type UpdateRequest<T> = Partial<CreateRequest<T>>;
-
-/**
- * API 리스트 응답 타입
- */
-export interface ListResponse<T> {
-  data: T[];
-  total: number;
-  page: number;
-  limit: number;
-}
-
-/**
- * API 응답 래퍼 타입
- */
-export interface ApiResponse<T> {
-  data: T;
-  message: string;
-  code: string;
-  success: boolean;
-}
-
-/**
- * 에러 응답 타입
- */
-export interface ErrorResponse {
-  code: string;
-  message: string;
-  details?: Record<string, unknown>;
-}
-
-/**
- * 페이지네이션 정보
- */
-export interface PaginationInfo {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
-  hasNext: boolean;
-  hasPrev: boolean;
-}
-
-/**
- * 정렬 옵션
- */
-export interface SortOption<T = string> {
-  field: T;
-  direction: 'ASC' | 'DESC';
-}
-
-/**
- * 필터 옵션
- */
-export interface FilterOptions<T = Record<string, unknown>> {
-  search?: string;
-  filters?: T;
-  sort?: SortOption[];
-  pagination?: Pick<PaginationInfo, 'page' | 'limit'>;
-}

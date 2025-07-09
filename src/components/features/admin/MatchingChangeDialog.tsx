@@ -16,9 +16,9 @@ import {
 } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { useAdmin } from '@/hooks';
-import { type MatchingResponse } from '@/types/matching';
+import { type MatchingResponse } from '@/types/domain/matching';
 // ✅ 올바른 타입 import - 개별 매니저 아이템 타입
-import { type ManagerListItem } from '@/types/admin';
+import { type ManagerListItem } from '@/types/domain/admin';
 import { RESERVATION_STATUS } from '@/constants/status';
 
 interface MatchingChangeDialogProps {
@@ -26,6 +26,7 @@ interface MatchingChangeDialogProps {
   matching: MatchingResponse | null;
   onClose: () => void;
   onConfirm: (managerId: number) => void;
+  loading?: boolean;
 }
 
 const MatchingChangeDialog = ({
@@ -33,6 +34,7 @@ const MatchingChangeDialog = ({
   matching,
   onClose,
   onConfirm,
+  loading: externalLoading = false,
 }: MatchingChangeDialogProps) => {
   const { managerManagement } = useAdmin();
   // ✅ 매니저 배열 타입 수정
@@ -76,12 +78,13 @@ const MatchingChangeDialog = ({
     return () => {
       isMounted = false;
     };
-  }, [open, managerManagement, isInitialized]);
+  }, [open, isInitialized]); // managerManagement 제거
 
   // 다이얼로그가 닫힐 때만 상태 초기화
   useEffect(() => {
     if (!open) {
       setSelectedManagerId(null);
+      setIsInitialized(false); // 다음에 다시 열 때 매니저 목록 새로 가져오기
     }
   }, [open]);
 
@@ -167,17 +170,19 @@ const MatchingChangeDialog = ({
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>취소</Button>
+        <Button onClick={onClose} disabled={externalLoading}>취소</Button>
         <Button
           variant="contained"
           color="primary"
           onClick={handleConfirm}
           disabled={
             !selectedManagerId ||
-            matching?.matchingStatus === RESERVATION_STATUS.PENDING
+            matching?.matchingStatus === RESERVATION_STATUS.PENDING ||
+            externalLoading
           }
+          startIcon={externalLoading ? <CircularProgress size={16} /> : null}
         >
-          변경
+          {externalLoading ? '변경 중...' : '변경'}
         </Button>
       </DialogActions>
     </Dialog>
