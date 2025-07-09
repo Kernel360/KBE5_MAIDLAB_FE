@@ -23,7 +23,6 @@ import {
   formatPhoneNumber,
 } from '@/utils/format';
 import type { ReservationDetailResponse } from '@/types/domain/reservation';
-import { useAuth } from '@/hooks/useAuth';
 import {
   Phone,
   Star,
