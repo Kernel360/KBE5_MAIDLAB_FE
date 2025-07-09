@@ -4,20 +4,16 @@ import { useNavigate } from 'react-router-dom';
 // API 및 타입 import
 import type { ConsumerListResponse } from '@/types/domain/admin';
 import { adminApi } from '../../apis/admin';
-import { 
-  DEFAULT_PAGE_SIZE,
-  DEFAULT_PAGE_NUMBER,
-  USER_TYPES
-} from '../../constants/admin';
-
+import { DEFAULT_PAGE_SIZE, DEFAULT_PAGE_NUMBER } from '../../constants/admin';
+import { USER_TYPES } from '@/constants/user';
 
 const ConsumerList = () => {
   const navigate = useNavigate();
-  
+
   const [page, setPage] = useState(DEFAULT_PAGE_NUMBER);
   const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_PAGE_SIZE);
   const [loading, setLoading] = useState(false);
-  
+
   const [consumerData, setConsumerData] = useState<ConsumerListResponse>({
     content: [],
     totalElements: 0,
@@ -34,7 +30,9 @@ const ConsumerList = () => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(DEFAULT_PAGE_NUMBER);
   };
@@ -42,8 +40,8 @@ const ConsumerList = () => {
   const fetchConsumers = async () => {
     try {
       setLoading(true);
-      const response = await adminApi.getConsumers({ 
-        page, 
+      const response = await adminApi.getConsumers({
+        page,
         size: rowsPerPage,
       });
       setConsumerData(response);
@@ -76,24 +74,28 @@ const ConsumerList = () => {
     }
 
     return consumerData.content.map((consumer) => (
-      <tr 
+      <tr
         key={consumer.id}
         onClick={() => handleRowClick(consumer.id)}
         className="cursor-pointer hover:bg-gray-50 transition-colors duration-200"
       >
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{consumer.id}</td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{consumer.name}</td>
-        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{consumer.phoneNumber}</td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+          {consumer.id}
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+          {consumer.name}
+        </td>
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+          {consumer.phoneNumber}
+        </td>
       </tr>
     ));
   };
 
   return (
     <div className="container mx-auto mt-8 px-4">
-      <h1 className="text-3xl font-bold mb-6 text-gray-900">
-        수요자 관리
-      </h1>
-      
+      <h1 className="text-3xl font-bold mb-6 text-gray-900">수요자 관리</h1>
+
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -120,7 +122,10 @@ const ConsumerList = () => {
         <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
           <div className="flex-1 flex justify-between items-center">
             <div className="flex items-center">
-              <label htmlFor="rows-per-page" className="mr-2 text-sm text-gray-700">
+              <label
+                htmlFor="rows-per-page"
+                className="mr-2 text-sm text-gray-700"
+              >
                 페이지당 행 수:
               </label>
               <select
@@ -136,7 +141,9 @@ const ConsumerList = () => {
             </div>
             <div className="flex items-center space-x-2">
               <span className="text-sm text-gray-700">
-                {page * rowsPerPage + 1}-{Math.min((page + 1) * rowsPerPage, consumerData.totalElements)} of {consumerData.totalElements}
+                {page * rowsPerPage + 1}-
+                {Math.min((page + 1) * rowsPerPage, consumerData.totalElements)}{' '}
+                of {consumerData.totalElements}
               </span>
               <button
                 onClick={() => handleChangePage(null, page - 1)}

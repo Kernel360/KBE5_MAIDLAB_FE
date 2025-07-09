@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { adminApi } from '@/apis';
 import type { ReservationDetailResponse } from '@/types/domain/reservation';
+import type { ServiceType } from '@/constants/service';
 import { formatDateTime } from '@/utils';
-import { getServiceTypeName } from '@/constants/admin';
+import { getServiceTypeName } from '@/utils/format';
 import {
   User,
   MapPin,
@@ -291,7 +292,9 @@ const ReservationDetail = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <InfoItem
                 label="서비스 유형"
-                value={getServiceTypeName(reservation.serviceType)}
+                value={getServiceTypeName(
+                  reservation.serviceType as ServiceType,
+                )}
                 icon={<Home className="w-4 h-4" />}
               />
               <InfoItem

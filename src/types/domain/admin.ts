@@ -1,5 +1,6 @@
 import type { Gender } from '@/constants';
 import type { PaginationResponse } from '../api';
+import type { ManagerVerificationStatus } from '@/constants/status';
 
 /**
  * 관리자 로그인 요청
@@ -194,3 +195,8 @@ export interface PresignedUrlResponse {
   url: string;
   key: string;
 }
+
+/**
+ * 매니저 상태 필터 타입
+ */
+export type ManagerStatusFilter = ManagerVerificationStatus | 'ALL';

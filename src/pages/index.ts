@@ -125,10 +125,9 @@ export { default as AdminLogin } from '@/pages/admin/AdminLogin';
 
 // 관리자 어쩌구 페이지...
 export { default as AdminLayout } from '@/pages/admin/layout/AdminLayout';
-export { default as AdminUserList } from '@/pages/admin/UserList';
-export { default as AdminManagerList} from '@/pages/admin/ManagerList'
+export { default as AdminManagerList } from '@/pages/admin/ManagerList';
 export { default as AdminManagerDetail } from '@/pages/admin/ManagerDetail';
-export { default as AdminConsumerList} from '@/pages/admin/ConsumerList'
+export { default as AdminConsumerList } from '@/pages/admin/ConsumerList';
 export { default as AdminConsumerDetail } from '@/pages/admin/ConsumerDetail';
 export { default as AdminReservationList } from '@/pages/admin/ReservationList';
 export { default as AdminReservationDetail } from '@/pages/admin/ReservationDetail';
