@@ -220,8 +220,9 @@ const ConsumerReservationDetail: React.FC = () => {
 
   // 결제 완료 후 포인트 할인 정보 표시를 위한 변수
   // 실제 결제에 사용된 포인트(usagePoint)는 결제 후 서버에서 내려주는 값이 있다면 reservation 객체에서 받아야 함
+  // paidUsagePoint를 usageAmount로만 계산
   const paidUsagePoint =
-    reservation && reservation.usagePoint ? reservation.usagePoint : 0;
+    reservation && reservation.usageAmount ? reservation.usageAmount : 0;
   const isPaid =
     reservation &&
     (reservation.status === RESERVATION_STATUS.PAID ||
@@ -557,10 +558,26 @@ const ConsumerReservationDetail: React.FC = () => {
                   </span>
                 </div>
               ))}
+            {/* 결제 정보 영역에서 결제 완료 여부와 상관없이 총 가격(원가)과 결제할 가격(최종 결제 금액)을 모두 표시 */}
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-base text-gray-700">전체 가격</span>
+              <span className="text-base text-gray-900 font-semibold">
+                {formatPrice(reservation.totalPrice)}
+              </span>
+            </div>
+            {typeof reservation.finalPaymentPrice === 'number' && (
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-base text-gray-700">결제할 가격</span>
+                <span className="text-xl font-bold text-orange-500">
+                  {formatPrice(reservation.finalPaymentPrice)}
+                </span>
+              </div>
+            )}
             <div className="border-t border-gray-200 pt-3 mt-3">
               {/* 결제 완료 후에는 원가/포인트할인/최종결제금액을 모두 보여줌 */}
               {isPaid && (
                 <>
+                  {/* usageAmount가 0보다 크면 포인트 할인 UI 노출 */}
                   {typeof paidUsagePoint === 'number' && paidUsagePoint > 0 && (
                     <div className="flex justify-between items-center mb-1">
                       <span className="text-base text-gray-700">

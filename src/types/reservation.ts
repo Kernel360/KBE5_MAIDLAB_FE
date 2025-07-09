@@ -103,7 +103,8 @@ export interface ReservationDetailResponse {
   managerProfileImageUrl: string;
   managerAverageRate: number;
   managerRegion: string[];
-  usagePoint?: number;
+  usageAmount?: number;
+  finalPaymentPrice?: number;
 }
 
 /**
