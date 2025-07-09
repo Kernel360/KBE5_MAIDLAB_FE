@@ -20,7 +20,6 @@ import {
   Banknote,
 } from 'lucide-react';
 
-
 type TabType = '전체' | '결제하기' | '예정' | '대기중' | '완료';
 
 const TABS = [
@@ -47,7 +46,6 @@ const TABS = [
     label: '대기중',
     icon: Clock,
     color: 'text-amber-600',
-
   },
   {
     key: '완료' as TabType,
@@ -56,7 +54,6 @@ const TABS = [
     color: 'text-green-600',
   },
 ];
-
 
 // 탭에서 서버 상태로 매핑
 const TAB_TO_STATUS_MAP: Record<TabType, ReservationStatus | undefined> = {
@@ -187,12 +184,14 @@ const ConsumerReservations: React.FC = () => {
     );
   };
 
-  const handlePaymentClick = async (
+  const handlePaymentClick = (
     reservationId: number,
     event: React.MouseEvent,
   ) => {
     event.stopPropagation();
-    await handlePayment(reservationId);
+    navigate(
+      ROUTES.CONSUMER.RESERVATION_DETAIL.replace(':id', String(reservationId)),
+    );
   };
 
   return (
@@ -221,7 +220,6 @@ const ConsumerReservations: React.FC = () => {
                     <SortDesc className="w-4 h-4 text-orange-600" />
                   ) : (
                     <SortAsc className="w-4 h-4 text-orange-600" />
-
                   )}
                 </button>
                 {/* 정렬 기준 선택 버튼 */}
