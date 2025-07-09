@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useReservation } from '@/hooks/domain/useReservation';
+import { usePoint as usePointHook } from '@/hooks/domain/usePoint';
 import {
   SERVICE_TYPE_LABELS,
   SERVICE_OPTIONS,
@@ -22,9 +23,7 @@ import {
   formatPhoneNumber,
 } from '@/utils/format';
 import type { ReservationDetailResponse } from '@/types/domain/reservation';
-import { useAuth } from '@/hooks/useAuth';
 import {
-  MessageCircle,
   Phone,
   Star,
   MapPin,
@@ -95,7 +94,10 @@ const ConsumerReservationDetail: React.FC = () => {
   const navigate = useNavigate();
   const { fetchReservationDetail, cancelReservation, payReservation } =
     useReservation();
-  const { isAuthenticated } = useAuth();
+  const { point, fetchPoint, loading: pointLoading } = usePointHook();
+  const [usePointChecked, setUsePointChecked] = useState(false);
+  const [pointToUse, setPointToUse] = useState<string | number>('');
+  const [pointError, setPointError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reservation, setReservation] =
@@ -120,7 +122,8 @@ const ConsumerReservationDetail: React.FC = () => {
       }
     };
     loadReservationDetail();
-  }, [id, fetchReservationDetail]);
+    fetchPoint();
+  }, [id, fetchReservationDetail, fetchPoint]);
 
   // 예약 취소 핸들러
   const handleCancel = async () => {
@@ -135,7 +138,15 @@ const ConsumerReservationDetail: React.FC = () => {
   // 결제 핸들러
   const handlePayment = async () => {
     if (!reservation) return;
-    await payReservation(Number(id));
+    let usageAmount = 0;
+    if (usePointChecked && point && Number(pointToUse) > 0) {
+      usageAmount = Math.min(Number(pointToUse), point, reservation.totalPrice);
+    }
+    await payReservation({
+      reservationId: Number(id),
+      usePoint: usePointChecked && usageAmount > 0,
+      usageAmount: usageAmount > 0 ? usageAmount : undefined,
+    });
   };
 
   if (loading) {
@@ -190,6 +201,37 @@ const ConsumerReservationDetail: React.FC = () => {
   const phoneNumber = reservation.managerPhoneNumber
     ? formatPhoneNumber(reservation.managerPhoneNumber)
     : '';
+
+  // 최대 사용 가능 포인트 계산
+  const maxUsablePoint = Math.min(point ?? 0, reservation?.totalPrice ?? 0);
+
+  // 결제 완료 상태인지 여부
+  const isPaidOrAfter =
+    reservation &&
+    (reservation.status === RESERVATION_STATUS.PAID ||
+      reservation.status === RESERVATION_STATUS.COMPLETED ||
+      reservation.status === RESERVATION_STATUS.WORKING ||
+      reservation.status === RESERVATION_STATUS.CANCELED ||
+      reservation.status === RESERVATION_STATUS.REJECTED ||
+      reservation.status === RESERVATION_STATUS.FAILURE ||
+      reservation.status === RESERVATION_STATUS.APPROVED);
+
+  const isPaying = reservation.status === RESERVATION_STATUS.PAID;
+
+  // 결제 완료 후 포인트 할인 정보 표시를 위한 변수
+  // 실제 결제에 사용된 포인트(usagePoint)는 결제 후 서버에서 내려주는 값이 있다면 reservation 객체에서 받아야 함
+  // paidUsagePoint를 usageAmount로만 계산
+  const paidUsagePoint =
+    reservation && reservation.usageAmount ? reservation.usageAmount : 0;
+  const isPaid =
+    reservation &&
+    (reservation.status === RESERVATION_STATUS.PAID ||
+      reservation.status === RESERVATION_STATUS.COMPLETED ||
+      reservation.status === RESERVATION_STATUS.WORKING ||
+      reservation.status === RESERVATION_STATUS.CANCELED ||
+      reservation.status === RESERVATION_STATUS.REJECTED ||
+      reservation.status === RESERVATION_STATUS.FAILURE ||
+      reservation.status === RESERVATION_STATUS.APPROVED);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -422,6 +464,81 @@ const ConsumerReservationDetail: React.FC = () => {
                 {formatEstimatedPriceByRoomSize(reservation.roomSize)}
               </span>
             </div>
+            {/* 포인트 사용 UI: 서비스 기본 요금 바로 아래 */}
+            {!isPaid && (
+              <div className="flex flex-col gap-2 py-2">
+                <div className="flex items-center gap-3">
+                  <input
+                    id="usePoint"
+                    type="checkbox"
+                    className="w-5 h-5 accent-blue-500"
+                    checked={usePointChecked}
+                    onChange={(e) => {
+                      setUsePointChecked(e.target.checked);
+                      if (!e.target.checked) setPointToUse('');
+                      else setPointToUse('');
+                    }}
+                  />
+                  <label
+                    htmlFor="usePoint"
+                    className="text-gray-800 font-medium cursor-pointer"
+                  >
+                    포인트 사용하기
+                  </label>
+                  <span className="ml-auto text-sm text-gray-500">
+                    보유:{' '}
+                    <span className="font-bold text-blue-600">
+                      {point?.toLocaleString() ?? 0}P
+                    </span>
+                  </span>
+                </div>
+                {usePointChecked && (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      min={0}
+                      max={maxUsablePoint}
+                      value={
+                        pointToUse === ''
+                          ? ''
+                          : Number(pointToUse).toLocaleString()
+                      }
+                      inputMode="numeric"
+                      pattern="[0-9,]*"
+                      onChange={(e) => {
+                        let val = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 추출
+                        if (val === '') {
+                          setPointToUse('');
+                          setPointError(null);
+                          return;
+                        }
+                        let num = Number(val);
+                        if (isNaN(num) || num < 0) {
+                          setPointError('0 이상의 값을 입력하세요.');
+                          setPointToUse('');
+                        } else if (num > maxUsablePoint) {
+                          setPointError(
+                            `최대 사용 가능 포인트는 ${maxUsablePoint.toLocaleString()}P 입니다.`,
+                          );
+                          setPointToUse(maxUsablePoint);
+                        } else {
+                          setPointError(null);
+                          setPointToUse(num);
+                        }
+                      }}
+                      className="w-32 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 text-right font-semibold text-blue-700 bg-white"
+                      disabled={!usePointChecked}
+                    />
+                    <span className="text-gray-700 font-medium">P</span>
+                    {pointError && (
+                      <span className="ml-2 text-sm text-red-500">
+                        {pointError}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
             {additionalOptions.length > 0 &&
               additionalOptions.map((option: any, idx: number) => (
                 <div
@@ -441,15 +558,70 @@ const ConsumerReservationDetail: React.FC = () => {
                   </span>
                 </div>
               ))}
-            <div className="border-t border-gray-200 pt-3 mt-3">
-              <div className="flex justify-between items-center">
-                <span className="text-lg font-semibold text-gray-900">
-                  총 결제금액
-                </span>
+            {/* 결제 정보 영역에서 결제 완료 여부와 상관없이 총 가격(원가)과 결제할 가격(최종 결제 금액)을 모두 표시 */}
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-base text-gray-700">전체 가격</span>
+              <span className="text-base text-gray-900 font-semibold">
+                {formatPrice(reservation.totalPrice)}
+              </span>
+            </div>
+            {typeof reservation.finalPaymentPrice === 'number' && (
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-base text-gray-700">결제할 가격</span>
                 <span className="text-xl font-bold text-orange-500">
-                  {formatPrice(reservation.totalPrice)}
+                  {formatPrice(reservation.finalPaymentPrice)}
                 </span>
               </div>
+            )}
+            <div className="border-t border-gray-200 pt-3 mt-3">
+              {/* 결제 완료 후에는 원가/포인트할인/최종결제금액을 모두 보여줌 */}
+              {isPaid && (
+                <>
+                  {/* usageAmount가 0보다 크면 포인트 할인 UI 노출 */}
+                  {typeof paidUsagePoint === 'number' && paidUsagePoint > 0 && (
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-base text-gray-700">
+                        포인트 할인
+                      </span>
+                      <span className="text-base text-blue-600 font-semibold">
+                        - {formatPrice(paidUsagePoint)}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-semibold text-gray-900">
+                      결제 금액
+                    </span>
+                    <span className="text-xl font-bold text-orange-500">
+                      {formatPrice(
+                        Math.max(
+                          0,
+                          reservation.totalPrice - (paidUsagePoint || 0),
+                        ),
+                      )}
+                    </span>
+                  </div>
+                </>
+              )}
+              {/* 결제 전에는 기존 방식 유지 */}
+              {!isPaid && (
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-semibold text-gray-900">
+                    총 결제금액
+                  </span>
+                  <span className="text-xl font-bold text-orange-500">
+                    {formatPrice(
+                      Math.max(
+                        0,
+                        reservation.totalPrice -
+                          (usePointChecked && Number(pointToUse) > 0
+                            ? Number(pointToUse)
+                            : 0),
+                      ),
+                    )}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import type { ReservationStatus } from '@/constants/status';
+import type { ReservationStatus } from '@/constants';
 import type { HousingType, PetType, ServiceType } from '@/constants/service';
 
 /**

@@ -15,7 +15,6 @@ interface ReservationCardProps {
 
 export const ReservationCard: React.FC<ReservationCardProps> = ({
   reservation,
-  getStatusBadgeStyle,
   onReviewClick,
   onDetailClick,
   onPaymentClick,
@@ -43,7 +42,10 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
 
   const showReviewButton =
     !reservation.isExistReview && reservation.status === 'COMPLETED';
+  // Only show payment button if status is MATCHED (not paid yet)
   const showPaymentButton = reservation.status === 'MATCHED';
+  // Only show detail button if status is PAID
+  const showDetailButton = reservation.status === 'PAID';
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden">
@@ -55,7 +57,11 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
               {reservation.detailServiceType}
             </h3>
             <p className="text-sm text-gray-500">
-              {SERVICE_TYPE_LABELS[reservation.serviceType as keyof typeof SERVICE_TYPES]}
+              {
+                SERVICE_TYPE_LABELS[
+                  reservation.serviceType as keyof typeof SERVICE_TYPES
+                ]
+              }
             </p>
           </div>
           <span
@@ -101,15 +107,7 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
 
       {/* 하단 액션 영역 */}
       <div className="px-4 pb-4 flex gap-2">
-        <button
-          className="flex-1 flex items-center justify-center text-sm text-gray-500 bg-gray-50 rounded-xl px-3 py-2 hover:bg-gray-100 transition"
-          onClick={() =>
-            onDetailClick && onDetailClick(reservation.reservationId)
-          }
-        >
-          <span>자세히 보기</span>
-          <ChevronRight className="w-4 h-4 ml-1" />
-        </button>
+        {/* Only show payment button if status is MATCHED */}
         {showPaymentButton && onPaymentClick && (
           <button
             className="flex-1 flex items-center justify-center text-sm bg-blue-500 text-white rounded-xl px-3 py-2 hover:bg-blue-600 transition"
@@ -118,6 +116,19 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
             <span>결제하기</span>
           </button>
         )}
+        {/* Only show detail button if status is PAID */}
+        {showDetailButton && (
+          <button
+            className="flex-1 flex items-center justify-center text-sm text-gray-500 bg-gray-50 rounded-xl px-3 py-2 hover:bg-gray-100 transition"
+            onClick={() =>
+              onDetailClick && onDetailClick(reservation.reservationId)
+            }
+          >
+            <span>자세히 보기</span>
+            <ChevronRight className="w-4 h-4 ml-1" />
+          </button>
+        )}
+        {/* 리뷰 작성 버튼은 기존과 동일 */}
         {showReviewButton && onReviewClick && (
           <button
             className="flex-1 flex items-center justify-center text-sm bg-orange-500 text-white rounded-xl px-3 py-2 hover:bg-orange-600 transition"
