@@ -19,19 +19,6 @@ export const DEBOUNCE_DELAY = {
   SCROLL: 50,
 } as const;
 
-// ✅ 브레이크포인트 제거 - theme.ts에서 통합 관리
-// 기존: export const BREAKPOINTS = { SM: 640, MD: 768, ... }
-// → theme.ts의 BREAKPOINTS 사용
-
-// 테마 설정
-export const THEME = {
-  LIGHT: 'light',
-  DARK: 'dark',
-  SYSTEM: 'system',
-} as const;
-
-export type ThemeType = (typeof THEME)[keyof typeof THEME];
-
 // 언어 설정
 export const LANGUAGES = {
   KO: 'ko',
@@ -50,7 +37,7 @@ export const APP_INFO = {
   COMPANY: 'MaidLab Inc.',
 } as const;
 
-// ✅ 브레이크포인트 유틸리티 함수 (theme.ts의 값 사용)
+// 브레이크포인트 유틸리티 함수 (theme.ts의 값 사용)
 import { BREAKPOINTS } from './theme';
 
 /**

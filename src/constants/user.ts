@@ -11,6 +11,7 @@ export type UserType = (typeof USER_TYPES)[keyof typeof USER_TYPES];
 export const LOGIN_USER_TYPES = {
   CONSUMER: USER_TYPES.CONSUMER,
   MANAGER: USER_TYPES.MANAGER,
+  ADMIN: USER_TYPES.ADMIN,
 } as const;
 
 export type LoginUserType =
@@ -48,4 +49,3 @@ export const SOCIAL_TYPE_LABELS = {
  * 도우미 선호도(찜/블랙리스트/선택없음) 타입
  */
 export type PreferenceType = 'LIKE' | 'BLACKLIST' | 'NONE';
-
