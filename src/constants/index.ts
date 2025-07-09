@@ -1,6 +1,3 @@
-// 관리자 관련
-export * from './admin';
-
 // API 관련
 export * from './api';
 

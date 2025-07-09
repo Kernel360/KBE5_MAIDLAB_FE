@@ -1,4 +1,6 @@
 // 페이지네이션 기본값
+export const DEFAULT_PAGE_SIZE = 10;
+export const DEFAULT_PAGE_NUMBER = 0;
 export const PAGINATION_DEFAULTS = {
   PAGE: 0,
   SIZE: 10,
@@ -77,3 +79,15 @@ export const getCurrentBreakpoint = (): keyof typeof BREAKPOINTS => {
 
   return 'XS';
 };
+
+// 테이블 컬럼 수
+export const TABLE_COLUMNS = {
+  CONSUMER: 4,
+  MANAGER: 4,
+} as const;
+
+// 탭 인덱스
+export const TAB_INDICES = {
+  CONSUMER: 0,
+  MANAGER: 1,
+} as const;

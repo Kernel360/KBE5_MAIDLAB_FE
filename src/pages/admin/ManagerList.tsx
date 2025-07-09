@@ -14,12 +14,9 @@ import {
   type ManagerVerificationStatus,
 } from '../../constants/status';
 
-import {
-  DEFAULT_PAGE_SIZE,
-  DEFAULT_PAGE_NUMBER,
-  LOCAL_STORAGE_KEYS,
-  STATUS_FILTER_OPTIONS,
-} from '../../constants/admin';
+import { DEFAULT_PAGE_SIZE, DEFAULT_PAGE_NUMBER } from '@/constants/ui';
+import { LOCAL_STORAGE_KEYS } from '@/constants/storage';
+import { STATUS_FILTER_OPTIONS } from '@/constants/status';
 import { USER_TYPES } from '@/constants/user';
 
 import type { ManagerStatusFilter } from '@/types/domain/admin';

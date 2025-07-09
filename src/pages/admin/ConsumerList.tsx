@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 // API 및 타입 import
 import type { ConsumerListResponse } from '@/types/domain/admin';
 import { adminApi } from '../../apis/admin';
-import { DEFAULT_PAGE_SIZE, DEFAULT_PAGE_NUMBER } from '../../constants/admin';
+import { DEFAULT_PAGE_SIZE, DEFAULT_PAGE_NUMBER } from '../../constants/ui';
 import { USER_TYPES } from '@/constants/user';
 
 const ConsumerList = () => {

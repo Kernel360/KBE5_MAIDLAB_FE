@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAdmin } from '@/hooks';
 import { ROUTES } from '@/constants';
-import { BOARD_TYPE_NAMES, BOARD_TYPE_COLORS } from '@/constants/admin';
+import { BOARD_TYPE_LABELS, BOARD_TYPE_COLORS } from '@/constants/board';
 import type { BoardDetailResponse } from '@/types/domain/board';
 
 // Admin-friendly color scheme matching the admin layout
@@ -193,7 +193,7 @@ const BoardEdit = () => {
               <span
                 className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${chipColors[BOARD_TYPE_COLORS[board.boardType]] || chipColors.default}`}
               >
-                {BOARD_TYPE_NAMES[board.boardType]}
+                {BOARD_TYPE_LABELS[board.boardType]}
               </span>
             </div>
 

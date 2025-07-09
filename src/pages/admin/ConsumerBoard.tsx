@@ -2,17 +2,18 @@ import { useState, useEffect } from 'react';
 import { useAdmin } from '@/hooks';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/constants';
-import { BOARD_TYPE_NAMES, DEFAULT_PAGE_SIZE, DEFAULT_PAGE_NUMBER } from '@/constants/admin';
+import { BOARD_TYPE_LABELS } from '@/constants/board';
+import { DEFAULT_PAGE_SIZE, DEFAULT_PAGE_NUMBER } from '@/constants/ui';
 import type { BoardListResponse } from '@/types/domain/board';
 
 const ConsumerBoard = () => {
   const navigate = useNavigate();
-  
+
   const [page, setPage] = useState(DEFAULT_PAGE_NUMBER);
   const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_PAGE_SIZE);
   const [loading, setLoading] = useState(false);
   const { boardManagement } = useAdmin();
-  
+
   const [boardData, setBoardData] = useState<BoardListResponse>({
     content: [],
     totalElements: 0,
@@ -29,7 +30,9 @@ const ConsumerBoard = () => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(DEFAULT_PAGE_NUMBER);
   };
@@ -124,7 +127,6 @@ const ConsumerBoard = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            
             {loading ? (
               <tr>
                 <td colSpan={5} className="px-6 py-4 text-center">
@@ -133,10 +135,9 @@ const ConsumerBoard = () => {
                   </div>
                 </td>
               </tr>
-
             ) : boardData.content && boardData.content.length > 0 ? (
               boardData.content.map((board, index) => (
-                <tr 
+                <tr
                   key={index}
                   onClick={() => handleViewDetail(board.boardId)}
                   className="hover:bg-gray-50 cursor-pointer transition-colors duration-200"
@@ -145,7 +146,7 @@ const ConsumerBoard = () => {
                     <span
                       className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTypeBadgeColor(board.boardType)}`}
                     >
-                      {BOARD_TYPE_NAMES[board.boardType]}
+                      {BOARD_TYPE_LABELS[board.boardType]}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -186,7 +187,10 @@ const ConsumerBoard = () => {
       <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
         <div className="flex-1 flex justify-between items-center">
           <div className="flex items-center">
-            <label htmlFor="rows-per-page" className="mr-2 text-sm text-gray-700">
+            <label
+              htmlFor="rows-per-page"
+              className="mr-2 text-sm text-gray-700"
+            >
               페이지당 행 수:
             </label>
             <select
@@ -202,7 +206,9 @@ const ConsumerBoard = () => {
           </div>
           <div className="flex items-center space-x-2">
             <span className="text-sm text-gray-700">
-              {page * rowsPerPage + 1}-{Math.min((page + 1) * rowsPerPage, boardData.totalElements || 0)} of {boardData.totalElements || 0}
+              {page * rowsPerPage + 1}-
+              {Math.min((page + 1) * rowsPerPage, boardData.totalElements || 0)}{' '}
+              of {boardData.totalElements || 0}
             </span>
             <button
               onClick={() => handleChangePage(null, page - 1)}

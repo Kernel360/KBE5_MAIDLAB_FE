@@ -56,3 +56,9 @@ export const MANAGER_VERIFICATION_LABELS = {
   [MANAGER_VERIFICATION_STATUS.APPROVED]: '승인됨',
   [MANAGER_VERIFICATION_STATUS.REJECTED]: '거절됨',
 } as const;
+
+// 상태 필터 옵션
+export const STATUS_FILTER_OPTIONS = {
+  APPROVED: 'APPROVED',
+  ALL: 'ALL',
+} as const;
