@@ -152,24 +152,10 @@ export const useReservation = () => {
 
   // 예약 결제
   const payReservation = useCallback(
-    async (
-      arg:
-        | number
-        | { reservationId: number; usePoint?: boolean; usageAmount?: number },
-    ) => {
-      let paymentData: PaymentRequestBody;
-      let reservationId: number;
-      if (typeof arg === 'number') {
-        reservationId = arg;
-        paymentData = { reservationId };
-      } else {
-        reservationId = arg.reservationId;
-        paymentData = {
-          reservationId: arg.reservationId,
-          usePoint: arg.usePoint,
-          usageAmount: arg.usageAmount,
-        };
-      }
+    async (reservationId: number) => {
+      const paymentData: PaymentRequestBody = {
+        reservationId: reservationId,
+      };
 
       const result = await callApi(
         () => reservationApi.payment(paymentData as any),
