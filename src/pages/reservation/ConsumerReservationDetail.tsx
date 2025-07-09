@@ -96,7 +96,7 @@ const ConsumerReservationDetail: React.FC = () => {
     useReservation();
   const { point, fetchPoint, loading: pointLoading } = usePointHook();
   const [usePointChecked, setUsePointChecked] = useState(false);
-  const [pointToUse, setPointToUse] = useState(0);
+  const [pointToUse, setPointToUse] = useState<string | number>('');
   const [pointError, setPointError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -139,8 +139,8 @@ const ConsumerReservationDetail: React.FC = () => {
   const handlePayment = async () => {
     if (!reservation) return;
     let usageAmount = 0;
-    if (usePointChecked && point && pointToUse > 0) {
-      usageAmount = Math.min(pointToUse, point, reservation.totalPrice);
+    if (usePointChecked && point && Number(pointToUse) > 0) {
+      usageAmount = Math.min(Number(pointToUse), point, reservation.totalPrice);
     }
     await payReservation({
       reservationId: Number(id),
@@ -474,7 +474,8 @@ const ConsumerReservationDetail: React.FC = () => {
                     checked={usePointChecked}
                     onChange={(e) => {
                       setUsePointChecked(e.target.checked);
-                      if (!e.target.checked) setPointToUse(0);
+                      if (!e.target.checked) setPointToUse('');
+                      else setPointToUse('');
                     }}
                   />
                   <label
@@ -493,24 +494,27 @@ const ConsumerReservationDetail: React.FC = () => {
                 {usePointChecked && (
                   <div className="flex items-center gap-2">
                     <input
-                      type="number"
+                      type="text"
                       min={0}
                       max={maxUsablePoint}
-                      value={pointToUse}
+                      value={
+                        pointToUse === ''
+                          ? ''
+                          : Number(pointToUse).toLocaleString()
+                      }
                       inputMode="numeric"
-                      pattern="[0-9]*"
+                      pattern="[0-9,]*"
                       onChange={(e) => {
-                        let val = e.target.value;
-                        // 빈 문자열 허용 (키보드 입력 자연스럽게)
+                        let val = e.target.value.replace(/[^0-9]/g, ''); // 숫자만 추출
                         if (val === '') {
-                          setPointToUse(0);
+                          setPointToUse('');
                           setPointError(null);
                           return;
                         }
                         let num = Number(val);
                         if (isNaN(num) || num < 0) {
                           setPointError('0 이상의 값을 입력하세요.');
-                          setPointToUse(0);
+                          setPointToUse('');
                         } else if (num > maxUsablePoint) {
                           setPointError(
                             `최대 사용 가능 포인트는 ${maxUsablePoint.toLocaleString()}P 입니다.`,
@@ -557,13 +561,7 @@ const ConsumerReservationDetail: React.FC = () => {
               {/* 결제 완료 후에는 원가/포인트할인/최종결제금액을 모두 보여줌 */}
               {isPaid && (
                 <>
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-base text-gray-700">원가</span>
-                    <span className="text-base text-gray-900 font-semibold">
-                      {formatPrice(reservation.totalPrice)}
-                    </span>
-                  </div>
-                  {paidUsagePoint > 0 && (
+                  {typeof paidUsagePoint === 'number' && paidUsagePoint > 0 && (
                     <div className="flex justify-between items-center mb-1">
                       <span className="text-base text-gray-700">
                         포인트 할인
@@ -579,7 +577,10 @@ const ConsumerReservationDetail: React.FC = () => {
                     </span>
                     <span className="text-xl font-bold text-orange-500">
                       {formatPrice(
-                        Math.max(0, reservation.totalPrice - paidUsagePoint),
+                        Math.max(
+                          0,
+                          reservation.totalPrice - (paidUsagePoint || 0),
+                        ),
                       )}
                     </span>
                   </div>
@@ -596,7 +597,9 @@ const ConsumerReservationDetail: React.FC = () => {
                       Math.max(
                         0,
                         reservation.totalPrice -
-                          (usePointChecked && pointToUse > 0 ? pointToUse : 0),
+                          (usePointChecked && Number(pointToUse) > 0
+                            ? Number(pointToUse)
+                            : 0),
                       ),
                     )}
                   </span>
