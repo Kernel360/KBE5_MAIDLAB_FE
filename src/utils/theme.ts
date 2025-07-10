@@ -5,7 +5,7 @@ import {
   THEME_CONFIG,
   type Theme,
   type ResolvedTheme,
-} from '@/constants/theme';
+} from '@/constants';
 
 // ===== 에러 처리 =====
 export const handleThemeError = (operation: string, error: unknown): void => {

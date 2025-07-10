@@ -111,3 +111,15 @@ export const UI_CONFIG = {
   TOAST_DURATION: 3000,
   ANIMATION_DURATION: 200,
 } as const;
+
+// ===== Breakpoints =====
+export const BREAKPOINTS = {
+  XS: 0,
+  SM: 640,
+  MD: 768,
+  LG: 1024,
+  XL: 1280,
+  '2XL': 1536,
+} as const;
+
+export type BreakpointKey = keyof typeof BREAKPOINTS;

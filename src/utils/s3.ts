@@ -1,12 +1,6 @@
 import { apiClient } from '@/apis';
-import { API_ENDPOINTS } from '@/constants/api';
-import { S3_CONFIG } from '@/config/constants';
-import type { PresignedUrlResponse } from '@/types/utils';
-
-/**
- * S3 Presigned URL 응답 타입
- * @see {@link PresignedUrlResponse} from '@/types/utils'
- */
+import { API_ENDPOINTS, S3_CONFIG } from '@/constants';
+import type { PresignedUrlResponse } from '@/types/api';
 
 /**
  * 단일 파일을 S3에 업로드하고 CloudFront URL 반환
@@ -117,8 +111,6 @@ export const getPresignedUrls = async (
     throw error;
   }
 };
-
-
 
 /**
  * 다중 파일 업로드 후 파일 키(이름)만 반환하는 함수

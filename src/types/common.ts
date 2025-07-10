@@ -96,3 +96,11 @@ export interface KeyValue<T = unknown> {
   key: string;
   value: T;
 }
+
+/**
+ * 스토리지 아이템 (만료 시간 포함)
+ */
+export interface StorageItem<T> {
+  value: T;
+  expiry: number;
+}

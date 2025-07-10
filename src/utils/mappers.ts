@@ -3,8 +3,8 @@ import type {
   BoardDetailResponse,
   BoardCreateRequest,
   AnswerCreateRequest,
-} from '@/types/domain/board';
-import type { ReservationListResponse } from '@/types/domain/reservation';
+  ReservationListResponse,
+} from '@/types';
 
 /**
  * API 응답을 내부 데이터 형식으로 변환하는 제네릭 매퍼
@@ -245,9 +245,7 @@ export const mapBoardListResponse = (apiData: any[]): BoardResponse[] => {
  * API 게시글 상세 응답 → 내부 타입
  * API의 boardId를 내부 id로 변환
  */
-export const mapBoardDetailResponse = (
-  apiData: any,
-): BoardDetailResponse => ({
+export const mapBoardDetailResponse = (apiData: any): BoardDetailResponse => ({
   boardId: apiData.boardId || apiData.id,
   title: apiData.title,
   content: apiData.content,
