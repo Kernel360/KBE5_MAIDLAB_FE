@@ -103,8 +103,6 @@ export interface ReservationDetailResponse {
   managerProfileImageUrl: string;
   managerAverageRate: number;
   managerRegion: string[];
-  usageAmount?: number;
-  finalPaymentPrice?: number;
 }
 
 /**
@@ -119,8 +117,6 @@ export interface ReservationApprovalRequest {
  */
 export interface PaymentRequestBody {
   reservationId: number;
-  usePoint?: boolean;
-  usageAmount?: number;
 }
 
 /**
