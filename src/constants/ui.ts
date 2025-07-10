@@ -39,47 +39,6 @@ export const APP_INFO = {
   COMPANY: 'MaidLab Inc.',
 } as const;
 
-// 브레이크포인트 유틸리티 함수 (theme.ts의 값 사용)
-import { BREAKPOINTS } from './theme';
-
-/**
- * 브레이크포인트 값을 숫자로 변환 (px 제거)
- */
-export const getBreakpointValue = (
-  breakpoint: keyof typeof BREAKPOINTS,
-): number => {
-  return parseInt(BREAKPOINTS[breakpoint].replace('px', ''), 10);
-};
-
-/**
- * 현재 화면 크기가 지정된 브레이크포인트보다 큰지 확인
- */
-export const isAboveBreakpoint = (
-  breakpoint: keyof typeof BREAKPOINTS,
-): boolean => {
-  if (typeof window === 'undefined') return false;
-
-  const breakpointValue = getBreakpointValue(breakpoint);
-  return window.innerWidth >= breakpointValue;
-};
-
-/**
- * 현재 화면 크기에 해당하는 브레이크포인트 반환
- */
-export const getCurrentBreakpoint = (): keyof typeof BREAKPOINTS => {
-  if (typeof window === 'undefined') return 'SM';
-
-  const width = window.innerWidth;
-
-  if (width >= getBreakpointValue('2XL')) return '2XL';
-  if (width >= getBreakpointValue('XL')) return 'XL';
-  if (width >= getBreakpointValue('LG')) return 'LG';
-  if (width >= getBreakpointValue('MD')) return 'MD';
-  if (width >= getBreakpointValue('SM')) return 'SM';
-
-  return 'XS';
-};
-
 // 테이블 컬럼 수
 export const TABLE_COLUMNS = {
   CONSUMER: 4,
@@ -90,4 +49,58 @@ export const TABLE_COLUMNS = {
 export const TAB_INDICES = {
   CONSUMER: 0,
   MANAGER: 1,
+} as const;
+
+// ===== 버튼 텍스트 =====
+export const BUTTON_TEXTS = {
+  // 기본 액션
+  SAVE: '저장',
+  CANCEL: '취소',
+  DELETE: '삭제',
+  EDIT: '수정',
+  CREATE: '생성',
+  UPDATE: '업데이트',
+  SUBMIT: '제출',
+  RESET: '초기화',
+
+  // 인증
+  LOGIN: '로그인',
+  LOGOUT: '로그아웃',
+  SIGNUP: '회원가입',
+
+  // 예약
+  RESERVE: '예약하기',
+  CANCEL_RESERVATION: '예약 취소',
+  APPROVE: '승인',
+  REJECT: '거절',
+
+  // 찜하기/블랙리스트
+  LIKE: '찜하기',
+  UNLIKE: '찜 해제',
+  BLACKLIST: '블랙리스트',
+
+  // 리뷰
+  WRITE_REVIEW: '리뷰 작성',
+  SUBMIT_REVIEW: '리뷰 제출',
+
+  // 네비게이션
+  BACK: '뒤로',
+  NEXT: '다음',
+  PREVIOUS: '이전',
+  HOME: '홈',
+
+  // 검색/필터
+  SEARCH: '검색',
+  FILTER: '필터',
+  RESET_FILTER: '필터 초기화',
+
+  // 파일
+  UPLOAD: '업로드',
+  DOWNLOAD: '다운로드',
+
+  // 기타
+  CONFIRM: '확인',
+  CLOSE: '닫기',
+  VIEW_MORE: '더보기',
+  REFRESH: '새로고침',
 } as const;

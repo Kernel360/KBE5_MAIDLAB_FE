@@ -113,11 +113,6 @@ const ConsumerDetail = () => {
     );
   }
 
-  // 통계 계산
-  const completedReservations = recentReservations.filter(
-    (r) => r.status === 'COMPLETED',
-  ).length;
-
   return (
     <div className="max-w-5xl mx-auto p-6 bg-gray-50">
       {/* Header */}
