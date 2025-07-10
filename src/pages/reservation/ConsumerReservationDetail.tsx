@@ -101,7 +101,6 @@ const ConsumerReservationDetail: React.FC = () => {
   const [reservation, setReservation] =
     useState<ReservationDetailResponse | null>(null);
   const [showPhoneNumber, setShowPhoneNumber] = useState(false);
-  const [pointToUse] = useState<number>(0);
 
   useEffect(() => {
     const loadReservationDetail = async () => {
@@ -138,7 +137,6 @@ const ConsumerReservationDetail: React.FC = () => {
     if (!reservation) return;
     await payReservation({
       reservationId: Number(id),
-      pointToUse: Number(pointToUse),
     });
   };
 
