@@ -18,6 +18,7 @@ import type {
   ReviewRegisterRequest,
   ReservationDetailResponse,
 } from '@/types/domain/reservation';
+import { ReviewRegisterRequest } from '@/types/domain/review';
 import type { ReviewFormData } from '@/types/domain/consumer';
 import type { PreferenceType } from '@/constants';
 

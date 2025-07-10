@@ -1,6 +1,10 @@
-import type { Gender } from '@/constants';
+import type {
+  Gender,
+  ManagerVerificationStatus,
+  ServiceType,
+  SettlementStatus,
+} from '@/constants';
 import type { PaginationResponse } from '../api';
-import type { ManagerVerificationStatus } from '@/constants/status';
 
 /**
  * 관리자 로그인 요청
@@ -88,7 +92,7 @@ export interface ConsumerProfileDetail {
  */
 export interface AdminSettlement {
   managerName: string;
-  serviceType: 'HOUSEKEEPING' | 'CARE';
+  serviceType: ServiceType;
   status: string;
   amount: number;
   createdAt: string;
@@ -109,9 +113,9 @@ export interface AdminWeeklySettlementResponse {
  */
 export interface SettlementDetailInfo {
   settlementId: number;
-  serviceType: 'HOUSEKEEPING';
+  serviceType: ServiceType;
   serviceDetailType: string;
-  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  status: SettlementStatus;
   platformFee: number;
   amount: number;
 }
@@ -180,7 +184,6 @@ export interface AdminStats {
   totalReservations: number;
   totalRevenue: number;
 }
-export type BoardType = 'REFUND' | 'MANAGER' | 'SERVICE' | 'ETC';
 
 export type TabType = 'consultation' | 'refund';
 

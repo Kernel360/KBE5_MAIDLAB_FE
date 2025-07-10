@@ -1,5 +1,4 @@
 import type { ReservationStatus } from '@/constants/status';
-import type { HousingType, PetType, ServiceType } from '@/constants/service';
 
 /**
  * 페이징 요청 파라미터
@@ -98,8 +97,7 @@ export interface ReservationDetailResponse {
   consumerProfileImage: string;
   managerPhoneNumber: string;
   consumerPhoneNumber: string;
-
-  managerUuId: string;
+  managerUuid: string;
   managerProfileImageUrl: string;
   managerAverageRate: number;
   managerRegion: string[];
@@ -124,88 +122,6 @@ export interface PaymentRequestBody {
  */
 export interface CheckInOutRequest {
   checkTime: string;
-}
-
-/**
- * 리뷰 등록 요청
- */
-export interface ReviewRegisterRequest {
-  reservationId: number;
-  rating: number;
-  comment: string;
-  keywords: string[];
-  likes?: boolean;
-}
-
-/**
- * 리뷰 정보
- */
-export interface Review {
-  reviewId: string;
-  rating: number;
-  name: string;
-  comment: string;
-  serviceType: string;
-  serviceDetailType: string;
-  createdAt: string;
-}
-
-/**
- * 리뷰 목록 응답
- */
-export interface ReviewListResponse {
-  reviews: Review[];
-}
-
-/**
- * 정산 응답
- */
-export interface SettlementResponse {
-  settlementId: number;
-  reservationId: number;
-  serviceType: ServiceType;
-  serviceDetailType: string;
-  status: string;
-  platformFee: number;
-  amount: number;
-}
-
-/**
- * 주간 정산 응답 (통합)
- */
-export interface WeeklySettlementResponse {
-  totalAmount: number;
-  settlements: SettlementResponse[];
-}
-
-/**
- * 예약 폼 데이터
- */
-export interface ReservationFormData {
-  serviceType: string;
-  serviceDetailType: string;
-  address: string;
-  addressDetail: string;
-  housingType: HousingType;
-  reservationDate: string;
-  startTime: string;
-  endTime: string;
-  pet: PetType;
-  managerUuid?: string;
-  chooseManager: boolean; // 직접 선택 여부
-  // 생활청소 평수 인덱스
-  lifeCleaningRoomIdx?: number;
-  // 추가 서비스 옵션 (id, count)
-  serviceOptions?: { id: string; count?: number }[];
-  housingInformation: string;
-  specialRequest: string;
-  managerInfo?: {
-    uuid: string;
-    name: string;
-    profileImage?: string;
-    averageRate?: number;
-    introduceText?: string;
-  };
 }
 
 /**

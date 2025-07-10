@@ -62,3 +62,13 @@ export const STATUS_FILTER_OPTIONS = {
   APPROVED: 'APPROVED',
   ALL: 'ALL',
 } as const;
+
+// ===== 정산 상태 =====
+export const SETTLEMENT_STATUS = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export type SettlementStatus =
+  (typeof SETTLEMENT_STATUS)[keyof typeof SETTLEMENT_STATUS];

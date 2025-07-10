@@ -1,5 +1,5 @@
 import type { BaseUser } from './user';
-import type { Gender, PreferenceType} from '@/constants/user';
+import type { Gender, PreferenceType } from '@/constants/user';
 
 /**
  * 소비자 프로필 생성 요청
@@ -16,8 +16,8 @@ export interface ConsumerProfileCreateRequest {
 export interface ConsumerProfileUpdateRequest {
   profileImage?: string;
   name?: string;
-  gender?: Gender
-  birth?: string
+  gender?: Gender;
+  birth?: string;
   address?: string;
   detailAddress?: string;
 }
@@ -174,7 +174,7 @@ export interface ReviewFormData {
 
 /**
  * 소비자 프로필/프로필 수정 등에서 사용하는 사용자 정보 타입
-  */
+ */
 export interface ProfileData {
   name: string;
   birth: string;
@@ -189,4 +189,3 @@ export interface PointRecordResponseDto {
   description: string;
   createdAt: string;
 }
-

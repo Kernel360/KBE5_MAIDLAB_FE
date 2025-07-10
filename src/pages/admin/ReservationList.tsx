@@ -5,7 +5,7 @@ import { type MatchingResponse } from '@/types/domain/matching';
 import { adminApi } from '../../apis/admin';
 import { getServiceTypeName } from '@/utils/format';
 import MatchingChangeDialog from '../../components/features/admin/MatchingChangeDialog';
-import type { TabPanelProps } from '@/types/common';
+import type { TabPanelProps } from '@/types/ui';
 import type { ServiceType } from '@/constants/service';
 
 function TabPanel(props: TabPanelProps) {

@@ -1,65 +1,26 @@
-// 기본 타입들
-export type { ID, BaseEntity } from './common';
-export type { ApiResponse, PaginationResponse, PaginationParams } from './api';
+// API & Common
+export * from './api';
+export * from './common';
+export * from './ui';
+export * from './form';
 
-// 사용자 관련 핵심 타입들
-export type { UserType, Gender } from '@/constants/user';
-export type { BaseUser, Consumer, Manager, Admin } from './domain/user';
+// Domain
+export * from './domain/admin';
+export * from './domain/auth';
+export * from './domain/board';
+export * from './domain/consumer';
+export * from './domain/event';
+export * from './domain/manager';
+export * from './domain/matching';
+export * from './domain/reservation';
+export * from './domain/review';
+export * from './domain/settlement';
+export * from './domain/user';
 
-// 인증 관련
-export type {
-  LoginRequest,
-  LoginResponse,
-  SignUpRequest,
-  SocialLoginRequest,
-  SocialSignUpRequest,
-  AuthState,
-} from './domain/auth';
+// Form
+export * from './forms/reservationForm';
 
-// 예약 관련 핵심 타입들
-export type {
-  ReservationCreateRequest,
-  ReservationListResponse,
-  ReservationDetailResponse,
-} from './domain/reservation';
-
-// 매니저 관련
-export type {
-  ManagerProfileCreateRequest,
-  ManagerProfileResponse,
-  ManagerDetail,
-} from './domain/manager';
-
-// 소비자 관련
-export type {
-  ConsumerProfileResponse,
-  ConsumerMyPageResponse,
-} from './domain/consumer';
-
-// 매칭 관련
-export type {
-  MatchingResponse,
-  AvailableManager,
-  MatchingStatus,
-} from './domain/matching';
-
-// 게시판 관련
-export type {
-  BoardCreateRequest,
-  BoardResponse,
-  BoardDetailResponse,
-} from './domain/board';
-
-// 이벤트 관련
-export type {
-  EventCreateRequest,
-  EventListResponse,
-  EventDetailResponse,
-} from './domain/event';
-
-// 관리자 관련
-export type {
-  AdminLoginRequest,
-  ManagerListResponse,
-  AdminManagerDetail,
-} from './domain/admin';
+// Hook
+export * from './hooks/theme';
+export * from './hooks/toast';
+export * from './hooks/validation';

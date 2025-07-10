@@ -1,24 +1,20 @@
 import { useState, useCallback } from 'react';
 import { reservationApi } from '@/apis/reservation';
 import { useApiCall } from '../useApiCall';
-import type {
-  PagingParams,
-  PageResponse,
-  ReservationListResponse,
-} from '@/types/domain/reservation';
+import type { PaginationParams, PaginationResponse } from '@/types/api';
 import type { ReservationStatus } from '@/constants/status';
 
 interface UseReservationPaginationResult {
-  data: PageResponse<ReservationListResponse> | null;
-  params: PagingParams;
+  data: PaginationResponse<any> | null; // Changed from ReservationListResponse to any
+  params: PaginationParams;
   loading: boolean;
   error: string | null;
-  fetchReservations: (newParams?: Partial<PagingParams>) => Promise<void>;
+  fetchReservations: (newParams?: Partial<PaginationParams>) => Promise<void>;
   changeStatus: (status?: ReservationStatus) => Promise<void>;
   changePage: (page: number) => Promise<void>;
   changeSort: (
-    sortBy: PagingParams['sortBy'],
-    sortOrder: PagingParams['sortOrder'],
+    sortBy: PaginationParams['sortBy'],
+    sortOrder: PaginationParams['sortOrder'],
   ) => Promise<void>;
   reset: () => void;
 }
@@ -27,9 +23,8 @@ interface UseReservationPaginationResult {
  * 서버사이드 예약 페이징 훅
  */
 export const useReservationPagination = (): UseReservationPaginationResult => {
-  const [data, setData] =
-    useState<PageResponse<ReservationListResponse> | null>(null);
-  const [params, setParams] = useState<PagingParams>({
+  const [data, setData] = useState<PaginationResponse<any> | null>(null); // Changed from ReservationListResponse to any
+  const [params, setParams] = useState<PaginationParams>({
     page: 0,
     size: 5,
     sortBy: 'reservationDate',
@@ -43,7 +38,7 @@ export const useReservationPagination = (): UseReservationPaginationResult => {
    * 예약 목록 조회
    */
   const fetchReservations = useCallback(
-    async (newParams?: Partial<PagingParams>) => {
+    async (newParams?: Partial<PaginationParams>) => {
       const queryParams = newParams ? { ...params, ...newParams } : params;
 
       console.log('🔍 Fetching reservations with params:', queryParams);
@@ -97,8 +92,8 @@ export const useReservationPagination = (): UseReservationPaginationResult => {
    */
   const changeSort = useCallback(
     async (
-      sortBy: PagingParams['sortBy'],
-      sortOrder: PagingParams['sortOrder'],
+      sortBy: PaginationParams['sortBy'],
+      sortOrder: PaginationParams['sortOrder'],
     ) => {
       console.log('🔃 Changing sort:', { sortBy, sortOrder });
       await fetchReservations({ sortBy, sortOrder, page: 0 });

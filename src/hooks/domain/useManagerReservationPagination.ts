@@ -1,11 +1,21 @@
 import { useState, useEffect, useCallback } from 'react';
 import { reservationApi } from '@/apis/reservation';
 import { useApiCall } from '../useApiCall';
-import type {
-  ReservationListResponse,
-  PageResponse,
-  PagingParams,
-} from '@/types/domain/reservation';
+import type { PaginationParams, PaginationResponse } from '@/types/api';
+import type { ReservationStatus } from '@/constants/status';
+
+// 페이지네이션 + 정렬/필터 확장 타입
+type ReservationSortBy =
+  | 'createdAt'
+  | 'reservationDate'
+  | 'totalPrice'
+  | 'completedAt'
+  | 'startTime';
+interface ManagerReservationPaginationParams extends PaginationParams {
+  sortBy?: ReservationSortBy;
+  sortOrder?: 'ASC' | 'DESC';
+  status?: ReservationStatus;
+}
 
 interface UseManagerReservationPaginationParams {
   initialStatus?: 'TODAY' | 'PAID' | 'WORKING' | 'COMPLETED';
@@ -28,15 +38,14 @@ export const useManagerReservationPagination = ({
   >(initialStatus);
   const [sortBy, setSortBy] = useState(initialSortBy);
   const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>(initialSortOrder);
-  const [data, setData] =
-    useState<PageResponse<ReservationListResponse> | null>(null);
+  const [data, setData] = useState<PaginationResponse<any> | null>(null);
 
   const { callApi, loading } = useApiCall();
 
   // API 호출 함수
   const fetchReservations = useCallback(
-    async (params?: Partial<PagingParams>) => {
-      const queryParams: PagingParams = {
+    async (params?: Partial<ManagerReservationPaginationParams>) => {
+      const queryParams: ManagerReservationPaginationParams = {
         page: currentPage,
         size: pageSize,
         sortBy: sortBy as any,
