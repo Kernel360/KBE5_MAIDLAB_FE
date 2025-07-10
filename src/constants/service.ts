@@ -271,3 +271,21 @@ export const CURRENCY_FORMATTERS: Record<Currency, (value: number) => string> =
     [CURRENCY.USD]: (val) => `$${val.toLocaleString('en-US')}`,
     [CURRENCY.EUR]: (val) => `€${val.toLocaleString('de-DE')}`,
   } as const;
+
+// ===== 비즈니스 룰 설정 =====
+export const BUSINESS_CONFIG = {
+  ROOM_SIZES: [
+    { key: 'STUDIO', label: '원룸/스튜디오', basePrice: 50000 },
+    { key: 'ONE_ROOM', label: '1.5룸', basePrice: 60000 },
+    { key: 'TWO_ROOM', label: '2룸', basePrice: 70000 },
+    { key: 'THREE_ROOM', label: '3룸', basePrice: 80000 },
+    { key: 'FOUR_PLUS_ROOM', label: '4룸 이상', basePrice: 100000 },
+  ],
+  SERVICE_HOURS: {
+    START: 9,
+    END: 18,
+  },
+  MAX_FILE_SIZE_MB: 10,
+  SUPPORTED_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/webp'],
+  SUPPORTED_DOCUMENT_TYPES: ['application/pdf', 'image/jpeg', 'image/png'],
+} as const;

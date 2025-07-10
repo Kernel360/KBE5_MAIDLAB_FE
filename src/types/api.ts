@@ -103,3 +103,11 @@ export interface RequestConfig {
   retries?: number;
   headers?: Record<string, string>;
 }
+
+/**
+ * S3 Presigned URL 응답 타입
+ */
+export interface PresignedUrlResponse {
+  key: string;
+  url: string;
+}

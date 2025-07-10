@@ -104,3 +104,10 @@ export const BUTTON_TEXTS = {
   VIEW_MORE: '더보기',
   REFRESH: '새로고침',
 } as const;
+
+// ===== UI 설정 =====
+export const UI_CONFIG = {
+  DEBOUNCE_DELAY: 300,
+  TOAST_DURATION: 3000,
+  ANIMATION_DURATION: 200,
+} as const;

@@ -12,6 +12,11 @@ export const STORAGE_KEYS = {
   SAVED_LOGIN_INFO: 'savedLoginInfo',
 } as const;
 
+// ===== S3 관련 설정 =====
+export const S3_CONFIG = {
+  CLOUDFRONT_DOMAIN: 'https://d1llec2m3tvk5i.cloudfront.net',
+} as const;
+
 // 어드민 등 도메인별 스토리지 키
 export const LOCAL_STORAGE_KEYS = {
   ADMIN_USER_TAB: 'adminUserTab',

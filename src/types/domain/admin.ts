@@ -194,10 +194,6 @@ export interface UploadResult {
   type: string;
 }
 
-export interface PresignedUrlResponse {
-  url: string;
-  key: string;
-}
 
 /**
  * 매니저 상태 필터 타입
