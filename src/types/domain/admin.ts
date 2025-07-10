@@ -194,7 +194,6 @@ export interface UploadResult {
   type: string;
 }
 
-
 /**
  * 매니저 상태 필터 타입
  */

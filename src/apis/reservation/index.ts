@@ -6,11 +6,11 @@ import type {
   ReservationApprovalRequest,
   PaymentRequestBody,
   CheckInOutRequest,
-  ReviewRegisterRequest,
-  WeeklySettlementResponse,
   PagingParams,
   PageResponse,
 } from '@/types/domain/reservation';
+import type { ReviewRegisterRequest } from '@/types/domain/review';
+import type { WeeklySettlementResponse } from '@/types/domain/settlement';
 import { API_ENDPOINTS } from '@/constants/api';
 
 export const reservationApi = {

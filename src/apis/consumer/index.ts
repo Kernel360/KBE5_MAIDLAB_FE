@@ -12,19 +12,25 @@ import type {
 import { API_ENDPOINTS } from '@/constants/api';
 
 export const consumerApi = {
-/**
- * 포인트 조회
- */
-getPoint: async (): Promise<{ totalPoint: number }> => {
-  return apiCall<{ totalPoint: number }>('get', API_ENDPOINTS.CONSUMER.POINT);
-},
+  /**
+   * 포인트 조회
+   */
+  getPoint: async (): Promise<{ totalPoint: number }> => {
+    return apiCall<{ totalPoint: number }>('get', API_ENDPOINTS.CONSUMER.POINT);
+  },
 
-/**
- * 포인트 내역 조회 (post)
- */
-getPointRecord: async (data: any): Promise<{ content: PointRecordResponseDto[]; hasNext: boolean }> => {
-  return apiCall<{ content: PointRecordResponseDto[]; hasNext: boolean }>('post', API_ENDPOINTS.CONSUMER.POINT_RECORD, data);
-},
+  /**
+   * 포인트 내역 조회 (post)
+   */
+  getPointRecord: async (
+    data: any,
+  ): Promise<{ content: PointRecordResponseDto[]; hasNext: boolean }> => {
+    return apiCall<{ content: PointRecordResponseDto[]; hasNext: boolean }>(
+      'post',
+      API_ENDPOINTS.CONSUMER.POINT_RECORD,
+      data,
+    );
+  },
   /**
    * 프로필 조회
    */
@@ -40,7 +46,7 @@ getPointRecord: async (data: any): Promise<{ content: PointRecordResponseDto[]; 
    */
   createProfile: async (data: ConsumerProfileCreateRequest): Promise<void> => {
     return apiCall<void>('post', API_ENDPOINTS.CONSUMER.PROFILE, data);
-  }, 
+  },
 
   /**
    * 프로필 수정
@@ -99,6 +105,4 @@ getPointRecord: async (data: any): Promise<{ content: PointRecordResponseDto[]; 
       API_ENDPOINTS.CONSUMER.BLACKLIST,
     );
   },
-
-  
 };

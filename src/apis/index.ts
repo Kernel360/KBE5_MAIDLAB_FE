@@ -2,6 +2,7 @@ import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
 import { tokenStorage } from '@/utils/storage';
 import { API_CODE_MESSAGES, API_ENDPOINTS } from '@/constants/api';
 import { USER_TYPES } from '@/constants/user';
+import { showApiErrorToast } from '@/utils/toast';
 
 // 환경변수 검증
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -134,30 +135,6 @@ apiClient.interceptors.request.use(
   },
 );
 
-// ===== 🆕 Toast 중복 방지 시스템 =====
-let lastToastMessage = '';
-let lastToastTime = 0;
-const TOAST_DUPLICATE_THRESHOLD = 3000; // 3초
-
-const showDuplicatePreventedToast = (
-  message: string,
-  type: 'error' | 'info' = 'error',
-) => {
-  const now = Date.now();
-
-  if (
-    message === lastToastMessage &&
-    now - lastToastTime < TOAST_DUPLICATE_THRESHOLD
-  ) {
-    return false;
-  }
-
-  lastToastMessage = message;
-  lastToastTime = now;
-
-  return true;
-};
-
 // ===== 응답 인터셉터 (🆕 수정된 버전) =====
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
@@ -211,7 +188,7 @@ apiClient.interceptors.response.use(
         }
 
         const refreshResponse = await apiClient.post(refreshEndpoint, {
-          refreshToken: refreshToken
+          refreshToken: refreshToken,
         });
         const newToken = refreshResponse.data.data.accessToken;
         const newRefreshToken = refreshResponse.data.data.refreshToken;
@@ -268,10 +245,7 @@ const handleAuthFailure = () => {
   sessionStorage.clear();
 
   // 🆕 중복 방지된 Toast 메시지
-  showDuplicatePreventedToast(
-    '세션이 만료되었습니다. 다시 로그인해주세요.',
-    'error',
-  );
+  showApiErrorToast('세션이 만료되었습니다. 다시 로그인해주세요.');
 
   // 🆕 전역 로그아웃 핸들러 호출 (여러 방법 시도)
   const globalLogout = getGlobalLogoutHandler();

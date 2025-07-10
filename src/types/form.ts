@@ -31,5 +31,3 @@ export interface FormFieldConfig {
     custom?: (value: unknown) => boolean | string;
   };
 }
-
-

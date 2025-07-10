@@ -174,8 +174,6 @@ export const Z_INDEX = {
   TOOLTIP: 1090,
 } as const;
 
-
-
 // ===== 한국어 특화 설정 =====
 export const KOREAN_DESIGN = {
   // 모바일 터치 최적화

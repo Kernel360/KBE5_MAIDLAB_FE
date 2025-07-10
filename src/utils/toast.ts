@@ -292,3 +292,40 @@ export class ToastManager {
     this.stats = { totalShown: 0, duplicatesBlocked: 0 };
   }
 }
+
+// 중복 토스트 방지 함수
+let lastToastMessage = '';
+let lastToastTime = 0;
+const TOAST_COOLDOWN = 1000; // 1초 쿨다운
+
+export const showDuplicatePreventedToast = (
+  message: string,
+  type: 'success' | 'error' | 'info' | 'warning',
+  duration?: number,
+): void => {
+  const currentTime = Date.now();
+  const toastKey = `${message}_${type}`;
+
+  // 같은 메시지를 쿨다운 시간 내에 호출한 경우 무시
+  if (
+    toastKey === lastToastMessage &&
+    currentTime - lastToastTime < TOAST_COOLDOWN
+  ) {
+    return;
+  }
+
+  lastToastMessage = toastKey;
+  lastToastTime = currentTime;
+
+  // 전역 토스트 함수 호출
+  if (typeof window !== 'undefined' && (window as any).showToast) {
+    (window as any).showToast(message, type, duration);
+  } else {
+    console.warn('토스트 함수를 찾을 수 없습니다:', message);
+  }
+};
+
+// API 에러 토스트 함수
+export const showApiErrorToast = (message: string): void => {
+  showDuplicatePreventedToast(message, 'error');
+};
