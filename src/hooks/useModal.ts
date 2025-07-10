@@ -1,9 +1,5 @@
 import { useState, useCallback } from 'react';
-
-interface ModalState {
-  isOpen: boolean;
-  data?: any;
-}
+import type { ModalState, UseModalReturn } from '@/types/hooks/modal';
 
 export const useModal = (initialState: boolean = false) => {
   const [state, setState] = useState<ModalState>({
@@ -32,5 +28,5 @@ export const useModal = (initialState: boolean = false) => {
     openModal,
     closeModal,
     toggleModal,
-  };
+  } as UseModalReturn;
 };

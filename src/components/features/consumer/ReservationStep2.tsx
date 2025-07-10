@@ -10,7 +10,7 @@ import {
   MAX_COUNTABLE_ITEMS,
   SERVICE_DETAIL_TYPES,
 } from '@/constants/service';
-import { useReservation } from '@/hooks/domain/useReservation';
+import { useReservation } from '@/hooks/domain/reservation';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks';
 import {

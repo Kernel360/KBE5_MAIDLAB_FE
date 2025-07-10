@@ -13,6 +13,8 @@ export interface ApiResponse<T = any> {
 export interface PaginationParams {
   page?: number;
   size?: number;
+  sortBy?: string;
+  sortOrder?: 'ASC' | 'DESC';
 }
 
 /**

@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { consumerApi } from '@/apis/consumer';
-import { useToast } from '../useToast';
+import { useApiCall } from '../useApiCall';
+import { formatConsumerProfile } from '@/utils/format';
 import type {
   ConsumerProfileUpdateRequest,
   ConsumerProfileResponse,
@@ -17,114 +18,93 @@ export const useConsumer = () => {
   const [blacklistedManagers, setBlacklistedManagers] = useState<
     BlackListedManagerResponse[]
   >([]);
-  const [loading, setLoading] = useState(false);
-  const { showToast } = useToast();
+  const { executeApi, loading } = useApiCall();
 
   // 프로필 조회
   const fetchProfile = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await consumerApi.getProfile();
-      setProfile(data);
-      return data;
-    } catch (error: any) {
-      showToast(error.message || '프로필을 불러오는데 실패했습니다.', 'error');
-      return null;
-    } finally {
-      setLoading(false);
+    const result = await executeApi(() => consumerApi.getProfile(), {
+      successMessage: null,
+      errorMessage: '프로필을 불러오는데 실패했습니다.',
+    });
+
+    if (result.success && result.data) {
+      setProfile(result.data);
+      return result.data;
     }
-  }, [showToast]);
+    return null;
+  }, [executeApi]);
 
   // 프로필 수정
   const updateProfile = useCallback(
     async (data: ConsumerProfileUpdateRequest) => {
-      try {
-        setLoading(true);
-        await consumerApi.updateProfile(data);
+      const result = await executeApi(() => consumerApi.updateProfile(data), {
+        successMessage: '프로필이 수정되었습니다.',
+        errorMessage: '프로필 수정에 실패했습니다.',
+      });
 
-        // 프로필 새로고침
+      if (result.success) {
         await fetchProfile();
-        showToast('프로필이 수정되었습니다.', 'success');
-
-        return { success: true };
-      } catch (error: any) {
-        showToast(error.message || '프로필 수정에 실패했습니다.', 'error');
-        return { success: false, error: error.message };
-      } finally {
-        setLoading(false);
       }
+
+      return result;
     },
-    [fetchProfile, showToast],
+    [executeApi, fetchProfile],
   );
 
   // 프로필 생성
   const createProfile = useCallback(
     async (data: ConsumerProfileCreateRequest) => {
-      try {
-        setLoading(true);
-        await consumerApi.createProfile(data);
+      const result = await executeApi(() => consumerApi.createProfile(data), {
+        successMessage: '프로필이 등록되었습니다.',
+        errorMessage: '프로필 등록에 실패했습니다.',
+      });
+
+      if (result.success) {
         await fetchProfile();
-        showToast('프로필이 등록되었습니다.', 'success');
-        return { success: true };
-      } catch (error: any) {
-        showToast(error.message || '프로필 등록에 실패했습니다.', 'error');
-        return { success: false, error: error.message };
-      } finally {
-        setLoading(false);
       }
+
+      return result;
     },
-    [fetchProfile, showToast],
+    [executeApi, fetchProfile],
   );
 
   // 마이페이지 조회
   const fetchMypage = useCallback(async () => {
-    try {
-      const data = await consumerApi.getMypage();
-      return data;
-    } catch (error: any) {
-      showToast(
-        error.message || '마이페이지 정보를 불러오는데 실패했습니다.',
-        'error',
-      );
-      return null;
-    }
-  }, [showToast]);
+    const result = await executeApi(() => consumerApi.getMypage(), {
+      successMessage: null,
+      errorMessage: '마이페이지 정보를 불러오는데 실패했습니다.',
+    });
+
+    return result.success ? result.data : null;
+  }, [executeApi]);
 
   // 찜한 매니저 목록 조회
   const fetchLikedManagers = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await consumerApi.getLikedManagers();
-      setLikedManagers(data);
-      return data;
-    } catch (error: any) {
-      showToast(
-        error.message || '찜한 매니저 목록을 불러오는데 실패했습니다.',
-        'error',
-      );
-      return [];
-    } finally {
-      setLoading(false);
+    const result = await executeApi(() => consumerApi.getLikedManagers(), {
+      successMessage: null,
+      errorMessage: '찜한 매니저 목록을 불러오는데 실패했습니다.',
+    });
+
+    if (result.success && result.data) {
+      setLikedManagers(result.data);
+      return result.data;
     }
-  }, [showToast]);
+    return [];
+  }, [executeApi]);
 
   // 블랙리스트 매니저 목록 조회
   const fetchBlacklistedManagers = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await consumerApi.getBlackListManagers();
-      setBlacklistedManagers(data);
-      return data;
-    } catch (error: any) {
-      showToast(
-        error.message || '블랙리스트를 불러오는데 실패했습니다.',
-        'error',
-      );
-      return [];
-    } finally {
-      setLoading(false);
+    const result = await executeApi(() => consumerApi.getBlackListManagers(), {
+      successMessage: null,
+      errorMessage: '블랙리스트를 불러오는데 실패했습니다.',
+    });
+
+    if (result.success && result.data) {
+      setBlacklistedManagers(result.data);
+      return result.data;
     }
-  }, [showToast]);
+    return [];
+  }, [executeApi]);
 
   // 매니저 찜하기/블랙리스트 추가
   const setManagerPreference = useCallback(
@@ -132,52 +112,56 @@ export const useConsumer = () => {
       managerUuid: string,
       preference: boolean, // true: 찜하기, false: 블랙리스트
     ) => {
-      try {
-        await consumerApi.createPreference(managerUuid, { preference });
+      const successMessage = preference
+        ? '찜 목록에 추가되었습니다.'
+        : '블랙리스트에 추가되었습니다.';
+      const errorMessage = preference
+        ? '찜하기에 실패했습니다.'
+        : '블랙리스트 추가에 실패했습니다.';
 
-        const message = preference
-          ? '찜 목록에 추가되었습니다.'
-          : '블랙리스트에 추가되었습니다.';
-        showToast(message, 'success');
+      const result = await executeApi(
+        () => consumerApi.createPreference(managerUuid, { preference }),
+        {
+          successMessage,
+          errorMessage,
+        },
+      );
 
+      if (result.success) {
         // 목록 새로고침
         if (preference) {
           await fetchLikedManagers();
         } else {
           await fetchBlacklistedManagers();
         }
-
-        return { success: true };
-      } catch (error: any) {
-        const errorMessage = preference
-          ? '찜하기에 실패했습니다.'
-          : '블랙리스트 추가에 실패했습니다.';
-        showToast(error.message || errorMessage, 'error');
-        return { success: false, error: error.message };
       }
+
+      return result;
     },
-    [showToast, fetchLikedManagers, fetchBlacklistedManagers],
+    [executeApi, fetchLikedManagers, fetchBlacklistedManagers],
   );
 
   // 찜한 매니저 삭제
   const removeLikedManager = useCallback(
     async (managerUuid: string) => {
-      try {
-        await consumerApi.removePreferenceManager(managerUuid);
+      const result = await executeApi(
+        () => consumerApi.removePreferenceManager(managerUuid),
+        {
+          successMessage: '찜 목록에서 제거되었습니다.',
+          errorMessage: '찜 해제에 실패했습니다.',
+        },
+      );
 
+      if (result.success) {
         // 로컬 상태에서 제거
         setLikedManagers((prev) =>
           prev.filter((manager) => manager.managerUuid !== managerUuid),
         );
-
-        showToast('찜 목록에서 제거되었습니다.', 'success');
-        return { success: true };
-      } catch (error: any) {
-        showToast(error.message || '찜 해제에 실패했습니다.', 'error');
-        return { success: false, error: error.message };
       }
+
+      return result;
     },
-    [showToast],
+    [executeApi],
   );
 
   // 매니저 찜하기
@@ -196,15 +180,9 @@ export const useConsumer = () => {
     [setManagerPreference],
   );
 
-  // 소비자 프로필 포맷팅 함수 (이름 마스킹 예시)
+  // 소비자 프로필 포맷팅 함수
   const formatProfileData = useCallback((profile: ConsumerProfileResponse) => {
-    return {
-      ...profile,
-      maskedName: profile.name
-        ? profile.name[0] + '*'.repeat(profile.name.length - 1)
-        : '',
-      formattedName: profile.name,
-    };
+    return formatConsumerProfile(profile);
   }, []);
 
   return {

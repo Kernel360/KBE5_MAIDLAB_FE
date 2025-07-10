@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { ReservationListResponse } from '@/types/domain/reservation';
-import { useReservation } from '@/hooks/domain/useReservation';
+import { useReservation } from '@/hooks/domain/reservation';
 import { useMatching } from '@/hooks/domain/useMatching';
-import { useManagerReservationPagination } from '@/hooks/domain/useManagerReservationPagination';
+import { useManagerReservationPagination } from '@/hooks/domain/reservation';
 import { formatDateTime } from '@/utils';
-import { useReservationStatus } from '@/hooks/domain/useReservationStatus';
+import { useReservationStatus } from '@/hooks/domain/reservation';
 import { SERVICE_TYPE_LABELS, SERVICE_TYPES } from '@/constants/service';
 import { RESERVATION_STATUS } from '@/constants/status';
 import { ManagerReservationCard } from '@/components';
@@ -78,7 +78,6 @@ const ManagerReservationsAndMatching: React.FC = () => {
   const { showToast } = useToast();
   const { checkIn, checkOut, respondToReservation } = useReservation();
   const { fetchMatchings, matchings } = useMatching();
-  const { getStatusBadgeStyle } = useReservationStatus();
 
   // 서버사이드 페이징 훅 사용
   const {
@@ -98,25 +97,6 @@ const ManagerReservationsAndMatching: React.FC = () => {
     pageSize: 5,
   });
 
-  // 매니저 페이지 전용 상태 레이블 함수
-  const getManagerStatusLabel = (status: string, reservationDate?: string) => {
-    if (status === RESERVATION_STATUS.PAID && reservationDate) {
-      const today = new Date();
-      const resDate = new Date(reservationDate);
-      const diffTime = resDate.getTime() - today.getTime();
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-      if (diffDays === 0) return '업무를 시작하세요!';
-      if (diffDays === 1) return '내일 예정';
-      if (diffDays > 0) return `D-${diffDays}`;
-      if (diffDays < 0) return `D+${Math.abs(diffDays)}`;
-    }
-
-    return (
-      MANAGER_STATUS_LABELS[status as keyof typeof MANAGER_STATUS_LABELS] ||
-      status
-    );
-  };
   const [tab, setTab] = useState<'schedule' | 'request'>('schedule');
   const [matchingLoading, setMatchingLoading] = useState(true);
   const [filterOpen, setFilterOpen] = useState(false);
@@ -203,8 +183,6 @@ const ManagerReservationsAndMatching: React.FC = () => {
     <ManagerReservationCard
       key={reservation.reservationId}
       reservation={reservation}
-      getStatusBadgeStyle={getStatusBadgeStyle}
-      getStatusLabel={getManagerStatusLabel}
       onDetailClick={() =>
         navigate(
           ROUTES.MANAGER.RESERVATION_DETAIL.replace(

@@ -233,6 +233,14 @@ export const timeStringToDate = (
 };
 
 /**
+ * 날짜와 시간을 ISO DateTime 형식으로 변환
+ */
+export const toISODateTime = (date: string, time: string): string => {
+  const [hours, minutes] = time.split(':').map(Number);
+  return `${date}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`;
+};
+
+/**
  * 서비스 시간이 유효한지 확인 (06:00 - 22:00)
  */
 export const isValidServiceTime = (timeString: string): boolean => {

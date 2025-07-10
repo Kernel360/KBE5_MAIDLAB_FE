@@ -82,6 +82,13 @@ export const authApi = {
   },
 
   /**
+   * 토큰 갱신
+   */
+  refreshToken: async (): Promise<LoginResponse> => {
+    return apiCall<LoginResponse>('post', API_ENDPOINTS.AUTH.REFRESH);
+  },
+
+  /**
    * 회원 탈퇴
    */
   withdraw: async (): Promise<void> => {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAdmin } from '@/hooks/domain/useAdmin';
+import { useAdmin } from '@/hooks';
 import { formatNumber } from '@/utils';
 import type { SettlementDetailInfo } from '@/types/domain/admin';
 import { getServiceTypeName } from '@/utils/format';

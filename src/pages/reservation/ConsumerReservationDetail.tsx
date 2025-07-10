@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useReservation } from '@/hooks/domain/useReservation';
+import { useReservation } from '@/hooks/domain/reservation';
 import {
   SERVICE_TYPE_LABELS,
   SERVICE_OPTIONS,

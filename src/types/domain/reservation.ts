@@ -1,19 +1,17 @@
 import type { ReservationStatus } from '@/constants/status';
+import type { PaginationParams } from '../api';
 
 /**
- * 페이징 요청 파라미터
+ * 예약 페이징 요청 파라미터
  */
-export interface PagingParams {
+export interface ReservationPagingParams extends PaginationParams {
   status?: ReservationStatus;
-  page?: number;
-  size?: number;
   sortBy?:
     | 'createdAt'
     | 'reservationDate'
     | 'totalPrice'
     | 'completedAt'
     | 'startTime';
-  sortOrder?: 'ASC' | 'DESC';
 }
 
 /**
@@ -148,3 +146,17 @@ export interface ReservationStats {
   totalRevenue: number;
   statusBreakdown: Record<ReservationStatus, number>;
 }
+
+// Re-export from forms for backward compatibility
+export type { ReservationFormData } from '@/types/forms/reservationForm';
+
+// Re-export from settlement for backward compatibility
+export type { SettlementResponse, WeeklySettlementResponse } from '@/types/domain/settlement';
+
+// Alias for backward compatibility
+export type ReservationItem = ReservationListResponse;
+
+/**
+ * 예약 목록 UI에서 사용하는 탭 종류
+ */
+export type ReservationTab = 'scheduled' | 'today' | 'completed';

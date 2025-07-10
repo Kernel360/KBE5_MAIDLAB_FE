@@ -1,24 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { reservationApi } from '@/apis/reservation';
-import { useApiCall } from '../useApiCall';
-import { useReservationCache } from '../useReservationCache';
+import { useApiCall } from '../../useApiCall';
+import { useReservationCache } from './useReservationCache';
 import { formatPrice } from '@/utils/format'; // 🔧 utils 활용
-import { formatDate, formatTime } from '@/utils/date'; // 🔧 utils 활용
+import { formatDate, formatTime, toISODateTime } from '@/utils/date'; // 🔧 utils 활용
 import type {
   ReservationCreateRequest,
   ReservationListResponse,
   ReservationApprovalRequest,
   PaymentRequestBody,
   CheckInOutRequest,
-  ReviewRegisterRequest,
 } from '@/types/domain/reservation';
-import { ReviewRegisterRequest } from '@/types/domain/review';
-
-// 🔧 날짜/시간 변환 유틸리티 함수
-const toISODateTime = (date: string, time: string): string => {
-  const [hours, minutes] = time.split(':').map(Number);
-  return `${date}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`;
-};
 
 export const useReservation = () => {
   const [reservations, setReservations] = useState<ReservationListResponse[]>(
@@ -26,7 +18,7 @@ export const useReservation = () => {
   );
   const [error, setError] = useState<string | null>(null);
 
-  const { callApi, loading } = useApiCall();
+  const { executeApi, loading } = useApiCall();
   const { shouldUpdate, updateTime } = useReservationCache();
 
   // 🔧 의존성 순환 문제 해결
@@ -37,10 +29,13 @@ export const useReservation = () => {
         return reservations;
       }
 
-      const result = await callApi(() => reservationApi.getAllReservations(), {
-        showSuccessToast: false,
-        errorMessage: '예약 목록을 불러오는데 실패했습니다.',
-      });
+      const result = await executeApi(
+        () => reservationApi.getAllReservations(),
+        {
+          successMessage: null,
+          errorMessage: '예약 목록을 불러오는데 실패했습니다.',
+        },
+      );
 
       if (result.success) {
         setReservations(result.data ?? []);
@@ -52,7 +47,7 @@ export const useReservation = () => {
         return reservations;
       }
     },
-    [callApi, shouldUpdate, updateTime],
+    [executeApi, shouldUpdate, updateTime],
   ); // 🔧 reservations 의존성 제거
 
   // 로컬 상태 업데이트 함수 (낙관적 UI 업데이트용)
@@ -72,17 +67,17 @@ export const useReservation = () => {
   // 예약 상세 조회
   const fetchReservationDetail = useCallback(
     async (reservationId: number) => {
-      const result = await callApi(
+      const result = await executeApi(
         () => reservationApi.getReservationDetail(reservationId),
         {
-          showSuccessToast: false,
+          successMessage: null,
           errorMessage: '예약 상세 정보를 불러오는데 실패했습니다.',
         },
       );
 
       return result.success ? result.data : null;
     },
-    [callApi],
+    [executeApi],
   );
 
   // 예약 생성
@@ -119,26 +114,32 @@ export const useReservation = () => {
         totalPrice: reservationData.totalPrice,
       };
 
-      const result = await callApi(() => reservationApi.create(formattedData), {
-        showSuccessToast: false,
-        errorMessage: '예약에 실패했습니다.',
-      });
+      const result = await executeApi(
+        () => reservationApi.create(formattedData),
+        {
+          successMessage: null,
+          errorMessage: '예약에 실패했습니다.',
+        },
+      );
       if (result.success) {
         await fetchReservations(true); // 강제 새로고침
       }
 
       return result;
     },
-    [callApi, fetchReservations],
+    [executeApi, fetchReservations],
   );
 
   // 예약 취소
   const cancelReservation = useCallback(
     async (reservationId: number) => {
-      const result = await callApi(() => reservationApi.cancel(reservationId), {
-        successMessage: '예약이 취소되었습니다.',
-        errorMessage: '예약 취소에 실패했습니다.',
-      });
+      const result = await executeApi(
+        () => reservationApi.cancel(reservationId),
+        {
+          successMessage: '예약이 취소되었습니다.',
+          errorMessage: '예약 취소에 실패했습니다.',
+        },
+      );
 
       if (result.success) {
         setReservations((prev) =>
@@ -148,7 +149,7 @@ export const useReservation = () => {
 
       return result;
     },
-    [callApi],
+    [executeApi],
   );
 
   // 예약 결제
@@ -158,7 +159,7 @@ export const useReservation = () => {
         reservationId: reservationId,
       };
 
-      const result = await callApi(
+      const result = await executeApi(
         () => reservationApi.payment(paymentData as any),
         {
           successMessage: '결제가 완료되었습니다.',
@@ -174,7 +175,7 @@ export const useReservation = () => {
 
       return result;
     },
-    [callApi, updateLocalReservation],
+    [executeApi, updateLocalReservation],
   );
 
   // 예약 승인/거절 (매니저용)
@@ -184,7 +185,7 @@ export const useReservation = () => {
         ? '예약을 승인했습니다.'
         : '예약을 거절했습니다.';
 
-      const result = await callApi(
+      const result = await executeApi(
         () => reservationApi.respondToReservation(reservationId, data),
         {
           successMessage: message,
@@ -198,13 +199,13 @@ export const useReservation = () => {
 
       return result;
     },
-    [callApi, fetchReservations],
+    [executeApi, fetchReservations],
   );
 
   // 체크인
   const checkIn = useCallback(
     async (reservationId: number, data: CheckInOutRequest) => {
-      const result = await callApi(
+      const result = await executeApi(
         () => reservationApi.checkIn(reservationId, data),
         {
           successMessage: '체크인이 완료되었습니다.',
@@ -220,13 +221,13 @@ export const useReservation = () => {
 
       return result;
     },
-    [callApi, updateLocalReservation],
+    [executeApi, updateLocalReservation],
   );
 
   // 체크아웃
   const checkOut = useCallback(
     async (reservationId: number, data: CheckInOutRequest) => {
-      const result = await callApi(
+      const result = await executeApi(
         () => reservationApi.checkOut(reservationId, data),
         {
           successMessage: '체크아웃이 완료되었습니다.',
@@ -242,42 +243,23 @@ export const useReservation = () => {
 
       return result;
     },
-    [callApi, updateLocalReservation],
-  );
-
-  // 리뷰 등록
-  const registerReview = useCallback(
-    async (data: ReviewRegisterRequest) => {
-      const result = await callApi(() => reservationApi.registerReview(data), {
-        successMessage: '리뷰가 등록되었습니다.',
-        errorMessage: '리뷰 등록에 실패했습니다.',
-      });
-
-      if (result.success && data.reservationId) {
-        updateLocalReservation(data.reservationId, {
-          isExistReview: true,
-        });
-      }
-
-      return result;
-    },
-    [callApi, updateLocalReservation],
+    [executeApi, updateLocalReservation],
   );
 
   // 주간 정산 조회
   const fetchWeeklySettlements = useCallback(
     async (startDate: string) => {
-      const result = await callApi(
+      const result = await executeApi(
         () => reservationApi.getWeeklySettlements(startDate),
         {
-          showSuccessToast: false,
+          successMessage: null,
           errorMessage: '정산 정보를 불러오는데 실패했습니다.',
         },
       );
 
       return result.success ? result.data : null;
     },
-    [callApi],
+    [executeApi],
   );
 
   // 🔧 utils/format.ts와 utils/date.ts 활용한 포맷팅 함수들
@@ -311,7 +293,6 @@ export const useReservation = () => {
     respondToReservation,
     checkIn,
     checkOut,
-    registerReview,
     fetchWeeklySettlements,
     formatReservationData, // 🔧 포맷팅 유틸리티 제공
   };

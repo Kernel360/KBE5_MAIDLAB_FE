@@ -6,7 +6,7 @@ import type {
   ReservationApprovalRequest,
   PaymentRequestBody,
   CheckInOutRequest,
-  PagingParams,
+  ReservationPagingParams,
   PageResponse,
 } from '@/types/domain/reservation';
 import type { ReviewRegisterRequest } from '@/types/domain/review';
@@ -42,7 +42,7 @@ export const reservationApi = {
    * 페이징된 예약 조회 (새로운 API)
    */
   getReservationsPaginated: async (
-    params: PagingParams = {},
+    params: ReservationPagingParams = {},
   ): Promise<PageResponse<ReservationListResponse>> => {
     const defaultParams = {
       page: 0,
@@ -63,7 +63,7 @@ export const reservationApi = {
    * 매니저 페이징된 예약 조회 (새로운 API)
    */
   getManagerReservationsPaginated: async (
-    params: PagingParams = {},
+    params: ReservationPagingParams = {},
   ): Promise<PageResponse<ReservationListResponse>> => {
     const defaultParams = {
       page: 0,

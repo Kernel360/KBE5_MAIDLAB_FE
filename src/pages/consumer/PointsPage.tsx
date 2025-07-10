@@ -7,7 +7,7 @@ import { usePoint } from '@/hooks/domain/usePoint';
 const PAGE_SIZE = 5;
 
 const PointsPage: React.FC = () => {
-  const { point, history, hasNext, loading, error, fetchPoint, fetchPointHistory } = usePoint();
+  const { point, history, hasNext, loading, fetchPoint, fetchPointHistory } = usePoint();
   const [monthOffset, setMonthOffset] = useState(0);
   const [page, setPage] = useState(0);
   const [allLoaded, setAllLoaded] = useState(false);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useReservation } from '@/hooks/domain/useReservation';
+import { useReservation } from '@/hooks';
 import { useAuth } from '@/hooks/useAuth';
 import { ROUTES } from '@/constants';
 import { LENGTH_LIMITS } from '@/constants/validation';
@@ -14,11 +14,8 @@ import {
   Minus,
   X,
 } from 'lucide-react';
-import type {
-  ReviewRegisterRequest,
-  ReservationDetailResponse,
-} from '@/types/domain/reservation';
-import { ReviewRegisterRequest } from '@/types/domain/review';
+import type { ReservationDetailResponse } from '@/types/domain/reservation';
+import type { ReviewRegisterRequest } from '@/types/domain/review';
 import type { ReviewFormData } from '@/types/domain/consumer';
 import type { PreferenceType } from '@/constants';
 

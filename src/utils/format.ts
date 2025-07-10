@@ -327,3 +327,27 @@ export const formatKoreanArray = (arr: string[]): string => {
 
   return `${rest.join(', ')} 및 ${last}`;
 };
+
+/**
+ * 소비자 프로필 데이터 포맷팅
+ */
+export const formatConsumerProfile = (profile: any) => {
+  return {
+    ...profile,
+    maskedName: profile.name
+      ? profile.name[0] + '*'.repeat(profile.name.length - 1)
+      : '',
+    formattedName: profile.name,
+  };
+};
+
+/**
+ * 매니저 프로필 데이터 포맷팅
+ */
+export const formatManagerProfile = (profile: any) => {
+  return {
+    ...profile,
+    maskedName: maskName(profile.name),
+    formattedName: profile.name,
+  };
+};

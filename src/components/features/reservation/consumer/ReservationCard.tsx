@@ -1,13 +1,15 @@
 import React from 'react';
-import { RESERVATION_STATUS_LABELS } from '@/constants/status';
 import { SERVICE_TYPE_LABELS, SERVICE_TYPES } from '@/constants/service';
 import { formatKoreanDate, formatPrice } from '@/utils';
+import {
+  getReservationStatusClasses,
+  getReservationStatusText,
+} from '@/utils/reservationStatus';
 import type { ReservationListResponse } from '@/types/domain/reservation';
-import { Calendar, Clock, DollarSign, User, ChevronRight } from 'lucide-react';
+import { Calendar, Clock, DollarSign, ChevronRight } from 'lucide-react';
 
 interface ReservationCardProps {
   reservation: ReservationListResponse;
-  getStatusBadgeStyle: (status: string, reservationDate: string) => string;
   onReviewClick?: (reservationId: number, event: React.MouseEvent) => void;
   onDetailClick?: (reservationId: number) => void;
   onPaymentClick?: (reservationId: number, event: React.MouseEvent) => void;
@@ -15,32 +17,10 @@ interface ReservationCardProps {
 
 export const ReservationCard: React.FC<ReservationCardProps> = ({
   reservation,
-  getStatusBadgeStyle,
   onReviewClick,
   onDetailClick,
   onPaymentClick,
 }) => {
-  // 상태별 색상 매핑
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'PENDING':
-        return 'bg-amber-100 text-amber-800 border-amber-200';
-      case 'MATCHED':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'PAID':
-        return 'bg-teal-100 text-teal-800 border-teal-200';
-      case 'WORKING':
-        return 'bg-purple-100 text-purple-800 border-purple-200';
-      case 'COMPLETED':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'REJECTED':
-      case 'CANCELLED':
-        return 'bg-red-100 text-red-800 border-red-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
-
   const showReviewButton =
     !reservation.isExistReview && reservation.status === 'COMPLETED';
   const showPaymentButton = reservation.status === 'MATCHED';
@@ -55,16 +35,23 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
               {reservation.detailServiceType}
             </h3>
             <p className="text-sm text-gray-500">
-              {SERVICE_TYPE_LABELS[reservation.serviceType as keyof typeof SERVICE_TYPES]}
+              {
+                SERVICE_TYPE_LABELS[
+                  reservation.serviceType as keyof typeof SERVICE_TYPES
+                ]
+              }
             </p>
           </div>
           <span
             className={`
               px-3 py-1 text-xs font-medium rounded-full border
-              ${getStatusColor(reservation.status)}
+              ${getReservationStatusClasses(reservation.status, reservation.reservationDate)}
             `}
           >
-            {RESERVATION_STATUS_LABELS[reservation.status]}
+            {getReservationStatusText(
+              reservation.status,
+              reservation.reservationDate,
+            )}
           </span>
         </div>
       </div>

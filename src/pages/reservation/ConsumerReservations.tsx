@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useReservationPagination } from '@/hooks/domain/useReservationPagination';
-import { useReservation } from '@/hooks/domain/useReservation';
+import { useReservationPagination } from '@/hooks/domain/reservation';
+import { useReservation } from '@/hooks/domain/reservation';
 import { ReservationCard } from '@/components';
 import { ROUTES, RESERVATION_STATUS } from '@/constants';
 import { useNavigate } from 'react-router-dom';
 import type { PagingParams } from '@/types/domain/reservation';
 import type { ReservationStatus } from '@/constants/status';
 import { Header } from '@/components';
-import { useReservationStatus } from '@/hooks/useReservationStatus';
+import { useReservationStatus } from '@/hooks/domain/reservation';
 import {
   Clock,
   Calendar,
@@ -91,7 +91,6 @@ const ConsumerReservations: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<TabType>('전체');
   const [showSortOptions, setShowSortOptions] = useState(false);
-  const { getStatusBadgeStyle } = useReservationStatus();
 
   // 현재 데이터
   const currentReservations = paginatedData?.content || [];
@@ -363,7 +362,6 @@ const ConsumerReservations: React.FC = () => {
                     }
                     onPaymentClick={handlePaymentClick}
                     onReviewClick={handleReviewClick}
-                    getStatusBadgeStyle={getStatusBadgeStyle}
                   />
                 ))}
               </div>

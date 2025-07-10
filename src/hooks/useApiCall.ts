@@ -2,15 +2,14 @@ import { useState, useCallback } from 'react';
 import { useToast } from './useToast';
 
 interface ApiCallOptions {
-  successMessage?: string;
-  errorMessage?: string;
+  successMessage?: string | null;
+  errorMessage?: string | null;
   showSuccessToast?: boolean;
   showErrorToast?: boolean;
 }
 
 /**
  * 공통 API 호출 패턴을 추상화한 훅
- * 모든 도메인 훅에서 반복되는 try-catch-finally 패턴을 제거
  */
 export const useApiCall = () => {
   const [loading, setLoading] = useState(false);
@@ -35,7 +34,7 @@ export const useApiCall = () => {
 
         return { success: true, data };
       } catch (error: any) {
-        if (showErrorToast) {
+        if (showErrorToast && errorMessage) {
           showToast(error.message || errorMessage, 'error');
         }
         return { success: false, error: error.message };
@@ -46,5 +45,8 @@ export const useApiCall = () => {
     [showToast],
   );
 
-  return { callApi, loading };
+  // Alias for consistency with other patterns
+  const executeApi = callApi;
+
+  return { callApi, executeApi, loading };
 };

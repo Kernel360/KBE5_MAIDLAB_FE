@@ -329,3 +329,12 @@ export const showDuplicatePreventedToast = (
 export const showApiErrorToast = (message: string): void => {
   showDuplicatePreventedToast(message, 'error');
 };
+
+// ToastManager 인스턴스 생성 함수
+export const createToastManager = (config: {
+  defaultDuration: number;
+  maxToasts: number;
+  duplicateThreshold: number;
+}): ToastManager => {
+  return new ToastManager(config);
+};

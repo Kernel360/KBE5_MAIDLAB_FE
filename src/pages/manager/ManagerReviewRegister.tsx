@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useReservation } from '@/hooks/domain/useReservation';
+import { useReservation } from '@/hooks/domain/reservation';
 import { ROUTES } from '@/constants';
 import { LENGTH_LIMITS } from '@/constants/validation';
 import { ArrowLeft, Star, Sparkles, Edit3, X } from 'lucide-react';
