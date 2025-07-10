@@ -155,16 +155,16 @@ export const useReservation = () => {
     async ({
       reservationId,
       pointToUse,
-      isPointUsed,
+      pointUsed,
     }: {
       reservationId: number;
       pointToUse?: number;
-      isPointUsed?: boolean;
+      pointUsed?: boolean;
     }) => {
       const paymentData: PaymentRequestBody = {
         reservationId,
         ...(typeof pointToUse === 'number' ? { pointToUse } : {}),
-        ...(typeof isPointUsed === 'boolean' ? { isPointUsed } : {}),
+        ...(typeof pointUsed === 'boolean' ? { pointUsed } : {}),
       };
 
       const result = await callApi(
