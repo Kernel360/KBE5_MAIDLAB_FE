@@ -101,6 +101,7 @@ const ConsumerReservationDetail: React.FC = () => {
   const [reservation, setReservation] =
     useState<ReservationDetailResponse | null>(null);
   const [showPhoneNumber, setShowPhoneNumber] = useState(false);
+  const [pointToUse] = useState<number>(0);
 
   useEffect(() => {
     const loadReservationDetail = async () => {
@@ -135,7 +136,10 @@ const ConsumerReservationDetail: React.FC = () => {
   // 결제 핸들러
   const handlePayment = async () => {
     if (!reservation) return;
-    await payReservation(Number(id));
+    await payReservation({
+      reservationId: Number(id),
+      pointToUse: Number(pointToUse),
+    });
   };
 
   if (loading) {

@@ -152,9 +152,16 @@ export const useReservation = () => {
 
   // 예약 결제
   const payReservation = useCallback(
-    async (reservationId: number) => {
+    async ({
+      reservationId,
+      pointToUse,
+    }: {
+      reservationId: number;
+      pointToUse?: number;
+    }) => {
       const paymentData: PaymentRequestBody = {
-        reservationId: reservationId,
+        reservationId,
+        ...(typeof pointToUse === 'number' ? { pointToUse } : {}),
       };
 
       const result = await callApi(
