@@ -1,6 +1,13 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Box, Button, Container, TextField, Typography, Paper, Alert } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import {
+  Button,
+  Container,
+  TextField,
+  Typography,
+  Paper,
+  Alert,
+} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import React from 'react';
@@ -37,7 +44,6 @@ const AdminLogin = () => {
   const { login, loading, isAuthenticated } = useAdminAuth();
 
   const navigate = useNavigate();
-  const location = useLocation();
 
   // 인증 성공 시 자동 이동
   React.useEffect(() => {

@@ -17,13 +17,13 @@ const StatusFilter: React.FC<StatusFilterProps> = ({
   selectedFilter,
   onFilterChange,
   totalCount,
-  statusStats
+  statusStats,
 }) => {
   const filters = [
     { key: 'ALL', label: '전체', count: totalCount },
     { key: 'APPROVED', label: '승인', count: statusStats.APPROVED.count },
     { key: 'PENDING', label: '대기', count: statusStats.PENDING.count },
-    { key: 'REJECTED', label: '거절', count: statusStats.REJECTED.count }
+    { key: 'REJECTED', label: '거절', count: statusStats.REJECTED.count },
   ];
 
   return (

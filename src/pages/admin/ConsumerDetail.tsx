@@ -2,12 +2,10 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { adminApi } from '../../apis/admin';
 import type { ConsumerProfileDetail } from '@/types/domain/admin';
-import { useAdmin } from '@/hooks';
-import { getServiceTypeName } from '@/utils/format';
-import type { ServiceType } from '@/constants/service';
+import { useAdminReservations } from '@/hooks/domain/admin';
 
 const ConsumerDetail = () => {
-  const { reservationManagement } = useAdmin();
+  const { fetchConsumerReservations } = useAdminReservations();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -62,7 +60,7 @@ const ConsumerDetail = () => {
       size: 5,
     };
 
-    const reservations = await reservationManagement.fetchConsumerReservation(
+    const reservations = await fetchConsumerReservations(
       parseInt(id),
       params,
     );
@@ -343,9 +341,8 @@ const ConsumerDetail = () => {
 
                     <div className="mb-2">
                       <h4 className="font-semibold text-gray-900 text-base">
-                        {getServiceTypeName(
-                          reservation.serviceType as ServiceType,
-                        )}{' '}
+                        {reservation.serviceType === 'CLEANING' ? '청소' : reservation.serviceType === 'MOVING' ? '이사' : reservation.serviceType}
+                        {' '}
                         - {reservation.detailServiceType}
                       </h4>
                     </div>

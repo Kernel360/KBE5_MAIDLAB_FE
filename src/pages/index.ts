@@ -30,15 +30,19 @@ export { default as EventDetail } from './common/EventDetail';
  * consumer
  */
 
-// 소비자 프로필 설정 페이지
+// 수요자 프로필 등록 페이지
 export { default as ConsumerProfileSetup } from './consumer/ConsumerProfileSetup';
 
+// 수요자 프로필 수정 페이지
 export { default as ConsumerProfileEdit } from './consumer/ProfileEdit';
 
+// 수요자 마이페이지
 export { default as ConsumerMyPage } from './consumer/MyPage';
+
+// 수요자 프로필 페이지
 export { default as ConsumerProfile } from './consumer/Profile';
 
-// 소비자 리뷰 등록 페이지
+// 수요자 리뷰 등록 페이지
 export { default as ConsumerReviewRegister } from './consumer/ConsumerReviewRegister';
 
 // 수요자의 찜한 매니저 조회
@@ -47,7 +51,7 @@ export { default as LikedManagerList } from './consumer/LikedManagerList';
 // 수요자의 블랙리스트 매니저 조회
 export { default as BlackListManagerList } from './consumer/BlackListManagerList';
 
-// 소비자 포인트 페이지
+// 수요자 포인트 페이지
 export { default as PointsPage } from './consumer/PointsPage';
 
 /**

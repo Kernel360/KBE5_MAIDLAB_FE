@@ -106,7 +106,7 @@ const ManagerList = () => {
           sortByRating: true,
           isDescending: sortOrder === 'desc',
         });
-        response = statusResponse.data;
+        response = statusResponse;
         setManagerData(response);
       } else {
         const statusResponse = await adminApi.getManagersByStatus({
@@ -114,7 +114,7 @@ const ManagerList = () => {
           size: rowsPerPage,
           status: selectedStatus,
         });
-        response = statusResponse.data;
+        response = statusResponse;
         setManagerData(response);
       }
 
@@ -233,7 +233,7 @@ const ManagerList = () => {
             className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value={STATUS_FILTER_OPTIONS.ALL}>전체</option>
-            {Object.entries(MANAGER_VERIFICATION_STATUS).map(([key, value]) => (
+            {Object.entries(MANAGER_VERIFICATION_STATUS).map(([, value]) => (
               <option key={value} value={value}>
                 {
                   MANAGER_VERIFICATION_LABELS[

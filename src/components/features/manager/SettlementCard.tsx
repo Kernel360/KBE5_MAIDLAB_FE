@@ -20,10 +20,10 @@ interface SettlementCardProps {
 const getServiceTypeInfo = (serviceType: string) => {
   switch (serviceType) {
     case 'GENERAL_CLEANING':
-      return { 
-        label: '일반청소', 
-        icon: Home, 
-        gradient: 'from-orange-500 to-orange-500'
+      return {
+        label: '일반청소',
+        icon: Home,
+        gradient: 'from-orange-500 to-orange-500',
       };
     case 'BABYSITTER':
       return {
@@ -57,8 +57,8 @@ const getStatusInfo = (status: string) => {
         border: 'border-emerald-200',
       };
     case 'PENDING':
-      return { 
-        icon: Clock, 
+      return {
+        icon: Clock,
         label: '정산 대기중',
         bg: 'bg-amber-50',
         text: 'text-amber-700',

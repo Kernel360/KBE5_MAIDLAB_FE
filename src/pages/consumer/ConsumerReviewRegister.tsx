@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useReservation } from '@/hooks';
-import { useAuth } from '@/hooks/useAuth';
+import { useReview } from '@/hooks';
 import { ROUTES } from '@/constants';
 import { LENGTH_LIMITS } from '@/constants/validation';
 import {
@@ -14,7 +13,6 @@ import {
   Minus,
   X,
 } from 'lucide-react';
-import type { ReservationDetailResponse } from '@/types/domain/reservation';
 import type { ReviewRegisterRequest } from '@/types/domain/review';
 import type { ReviewFormData } from '@/types/domain/consumer';
 import type { PreferenceType } from '@/constants';
@@ -147,28 +145,6 @@ const RatingSection: React.FC<{
             {getRatingText(rating)}
           </div>
         </div>
-      </div>
-    </div>
-  );
-};
-
-// 간단한 모달 컴포넌트
-const SimpleModal: React.FC<{
-  isOpen: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-}> = ({ isOpen, onClose, children }) => {
-  if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white rounded-2xl shadow-lg max-w-md w-full p-6 relative">
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 p-1 rounded-full hover:bg-gray-100"
-        >
-          <X className="w-5 h-5 text-gray-500" />
-        </button>
-        {children}
       </div>
     </div>
   );
@@ -415,8 +391,7 @@ const HelperManagement: React.FC<{
 const ConsumerReviewRegister: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { registerReview } = useReservation();
-  const { userInfo } = useAuth();
+  const { registerReview } = useReview();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
 

@@ -5,16 +5,10 @@ import { useReservation } from '@/hooks/domain/reservation';
 import { useMatching } from '@/hooks/domain/useMatching';
 import { useManagerReservationPagination } from '@/hooks/domain/reservation';
 import { formatDateTime } from '@/utils';
-import { useReservationStatus } from '@/hooks/domain/reservation';
 import { SERVICE_TYPE_LABELS, SERVICE_TYPES } from '@/constants/service';
-import { RESERVATION_STATUS } from '@/constants/status';
 import { ManagerReservationCard } from '@/components';
 import { useToast } from '@/hooks/useToast';
-import { 
-  CheckInOutModal, 
-  ConfirmModal, 
-  MatchingCard, 
-  } from '@/components';
+import { CheckInOutModal, ConfirmModal, MatchingCard } from '@/components';
 import { ROUTES } from '@/constants/route';
 import { Header } from '@/components';
 import {
@@ -66,12 +60,6 @@ const FILTERS = [
     description: '완료된 일정',
   },
 ];
-
-// 매니저 예약 페이지 전용 상태 레이블
-const MANAGER_STATUS_LABELS = {
-  [RESERVATION_STATUS.MATCHED]: '결제 대기중',
-  [RESERVATION_STATUS.PAID]: '예정',
-};
 
 const ManagerReservationsAndMatching: React.FC = () => {
   const navigate = useNavigate();
@@ -227,7 +215,6 @@ const ManagerReservationsAndMatching: React.FC = () => {
           setModal({ type: 'success', info: matching });
           refresh(); // 서버사이드 페이징이므로 새로고침 필요
         }
-
       }}
       onReject={async () => {
         const result = await respondToReservation(matching.reservationId, {
@@ -238,7 +225,6 @@ const ManagerReservationsAndMatching: React.FC = () => {
           setModal({ type: 'fail' });
           refresh(); // 서버사이드 페이징이므로 새로고침 필요
         }
-
       }}
     />
   );

@@ -351,3 +351,18 @@ export const formatManagerProfile = (profile: any) => {
     formattedName: profile.name,
   };
 };
+
+/**
+ * 서비스 타입명 변환
+ */
+export const getServiceTypeName = (serviceType: string): string => {
+  const serviceTypeMap: Record<string, string> = {
+    CLEANING: '청소',
+    MOVING: '이사',
+    GENERAL_CLEANING: '일반청소',
+    BABYSITTER: '베이비시터',
+    PET_CARE: '반려동물 케어',
+  };
+  
+  return serviceTypeMap[serviceType] || serviceType;
+};

@@ -29,6 +29,7 @@ export {
   useAdminBoard,
   useAdminMatching,
   useAdminDashboard,
+  useAdmin,
 } from './domain/admin';
 
 // Reservation 관련 훅들

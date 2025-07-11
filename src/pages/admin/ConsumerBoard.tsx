@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAdmin } from '@/hooks';
+import { useAdminBoard } from '@/hooks/domain/admin';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/constants';
 import { BOARD_TYPE_LABELS } from '@/constants/board';
@@ -12,7 +12,7 @@ const ConsumerBoard = () => {
   const [page, setPage] = useState(DEFAULT_PAGE_NUMBER);
   const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_PAGE_SIZE);
   const [loading, setLoading] = useState(false);
-  const { boardManagement } = useAdmin();
+  const { fetchRefundBoards: adminFetchRefundBoards } = useAdminBoard();
 
   const [boardData, setBoardData] = useState<BoardListResponse>({
     content: [],
@@ -40,7 +40,7 @@ const ConsumerBoard = () => {
   const fetchRefundBoards = async () => {
     try {
       setLoading(true);
-      const response = await boardManagement.fetchRefundBoards({
+      const response = await adminFetchRefundBoards({
         page,
         size: rowsPerPage,
       });
@@ -71,7 +71,7 @@ const ConsumerBoard = () => {
 
   useEffect(() => {
     fetchRefundBoards();
-  }, [page, rowsPerPage]);
+  }, [page, rowsPerPage, adminFetchRefundBoards]);
 
   // 게시글 상세 페이지로 이동
   const handleViewDetail = (boardId: number) => {

@@ -151,7 +151,10 @@ export interface ReservationStats {
 export type { ReservationFormData } from '@/types/forms/reservationForm';
 
 // Re-export from settlement for backward compatibility
-export type { SettlementResponse, WeeklySettlementResponse } from '@/types/domain/settlement';
+export type {
+  SettlementResponse,
+  WeeklySettlementResponse,
+} from '@/types/domain/settlement';
 
 // Alias for backward compatibility
 export type ReservationItem = ReservationListResponse;

@@ -8,7 +8,7 @@ export const getReservationStatusClasses = (
   reservationDate?: string,
 ): string => {
   const today = new Date().toISOString().split('T')[0];
-  
+
   switch (status) {
     case RESERVATION_STATUS.COMPLETED:
       return 'bg-green-100 text-green-800 border-green-200';
@@ -36,7 +36,7 @@ export const getReservationStatusText = (
   reservationDate?: string,
 ): string => {
   const today = new Date().toISOString().split('T')[0];
-  
+
   switch (status) {
     case RESERVATION_STATUS.COMPLETED:
       return '완료';

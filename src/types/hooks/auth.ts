@@ -1,5 +1,3 @@
-// 인증 관련 타입 정의
-
 import type { UserType } from '@/constants/user';
 import type {
   LoginRequest,
@@ -82,7 +80,10 @@ export interface AuthProviderProps {
  */
 export interface SocialLoginHookReturn {
   handleNewUser: (response: any, userType: UserType) => SocialLoginResponse;
-  handleExistingUser: (response: any, userType: UserType) => SocialLoginResponse;
+  handleExistingUser: (
+    response: any,
+    userType: UserType,
+  ) => SocialLoginResponse;
 }
 
 /**

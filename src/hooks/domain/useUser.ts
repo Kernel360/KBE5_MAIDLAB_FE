@@ -42,7 +42,6 @@ export const useUser = () => {
     ...(userType === 'MANAGER' && {
       createProfile: managerHook.createProfile,
       fetchMyReviews: managerHook.fetchMyReviews,
-      formatProfileData: managerHook.formatProfileData,
     }),
     // 소비자 전용 기능
     ...(userType === 'CONSUMER' && {
@@ -52,7 +51,6 @@ export const useUser = () => {
       blacklistManager: consumerHook.blacklistManager,
       setManagerPreference: consumerHook.setManagerPreference,
       removeLikedManager: consumerHook.removeLikedManager,
-      formatProfileData: consumerHook.formatProfileData,
     }),
   };
 

@@ -7,7 +7,12 @@ import { SERVICE_DETAIL_TYPES } from '@/constants/service';
 import { ROUTES } from '@/constants';
 import { Header } from '@/components';
 interface Props {
-  onNext: (data: { serviceType: string; serviceDetailType: string, address : string, addressDetail : string }) => void;
+  onNext: (data: {
+    serviceType: string;
+    serviceDetailType: string;
+    address: string;
+    addressDetail: string;
+  }) => void;
   onBack?: () => void;
 }
 
@@ -17,34 +22,40 @@ const TABS = [
 ];
 
 const ReservationStep1: React.FC<Props> = ({ onNext, onBack }) => {
-  const [selectedTab, setSelectedTab] = useState<'생활청소' | '부분청소'>('생활청소');
-  const [ FetchAddress, setAdresss] = useState('');
+  const [selectedTab, setSelectedTab] = useState<'생활청소' | '부분청소'>(
+    '생활청소',
+  );
+  const [FetchAddress, setAdresss] = useState('');
   const [FetchAddressDetail, setDetailAddress] = useState('');
   const { isAuthenticated } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
 
   const detail = SERVICE_DETAIL_TYPES[selectedTab];
-  const {fetchProfile} = useConsumer();
+  const { fetchProfile } = useConsumer();
 
   useEffect(() => {
-    fetchProfile().then(profile => {
+    fetchProfile().then((profile) => {
       if (profile && profile.address) {
         setAdresss(profile.address);
-        if (profile.detailAddress){
+        if (profile.detailAddress) {
           setDetailAddress(profile.detailAddress);
         }
       }
     });
   }, []);
 
-
   const handleNext = () => {
     if (selectedTab === '부분청소') {
       showToast('서비스 준비중입니다.');
       return;
     }
-    onNext({ serviceType: 'GENERAL_CLEANING', serviceDetailType: selectedTab, address : FetchAddress, addressDetail : FetchAddressDetail });
+    onNext({
+      serviceType: 'GENERAL_CLEANING',
+      serviceDetailType: selectedTab,
+      address: FetchAddress,
+      addressDetail: FetchAddressDetail,
+    });
   };
 
   return (
@@ -57,16 +68,23 @@ const ReservationStep1: React.FC<Props> = ({ onNext, onBack }) => {
       />
       <main className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto space-y-6">
-        <h2 className="text-lg font-bold mb-2 mt-2 text-center">하위 옵션을 선택해 주세요.</h2>
+          <h2 className="text-lg font-bold mb-2 mt-2 text-center">
+            하위 옵션을 선택해 주세요.
+          </h2>
 
           <section className="bg-white rounded-2xl shadow p-6">
-            
             <div className="w-full flex gap-2 mt-4 mb-6">
               {TABS.map((tab) => (
                 <button
                   key={tab.key}
                   className={`flex-1 py-2 rounded-lg font-semibold border transition text-base ${selectedTab === tab.key ? 'bg-orange-50 border-orange-500 text-orange-500' : 'bg-white border-gray-200 text-gray-500'}`}
-                  onClick={() => setSelectedTab(tab.key as '\uC0DD\uD65C\uCCAD\uC18C' | '\uBD80\uBD84\uCCAD\uC18C')}
+                  onClick={() =>
+                    setSelectedTab(
+                      tab.key as
+                        | '\uC0DD\uD65C\uCCAD\uC18C'
+                        | '\uBD80\uBD84\uCCAD\uC18C',
+                    )
+                  }
                 >
                   {tab.label}
                 </button>
@@ -89,10 +107,7 @@ const ReservationStep1: React.FC<Props> = ({ onNext, onBack }) => {
               >
                 이전
               </button>
-              <button
-                onClick={handleNext}
-                className="btn btn-primary w-1/2"
-              >
+              <button onClick={handleNext} className="btn btn-primary w-1/2">
                 다음
               </button>
             </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAdmin } from '@/hooks';
+import { useAdminBoard } from '@/hooks/domain/admin';
 import { ROUTES } from '@/constants';
 import { BOARD_TYPE_LABELS, BOARD_TYPE_COLORS } from '@/constants/board';
 import type { BoardDetailResponse } from '@/types/domain/board';
@@ -19,7 +19,7 @@ const chipColors = {
 const BoardEdit = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { boardManagement } = useAdmin();
+  const { fetchBoardDetail, updateAnswer } = useAdminBoard();
   const [board, setBoard] = useState<BoardDetailResponse | null>(null);
   const [answer, setAnswer] = useState('');
   const [loading, setLoading] = useState(true);
@@ -61,10 +61,10 @@ const BoardEdit = () => {
 
   // 게시글 상세 정보 조회
   useEffect(() => {
-    const fetchBoardDetail = async () => {
+    const fetchBoardDetailData = async () => {
       if (!id) return;
       try {
-        const data = await boardManagement.fetchBoardDetail(Number(id));
+        const data = await fetchBoardDetail(Number(id));
         if (data) {
           setBoard(data);
           if (data.answer) {
@@ -79,9 +79,9 @@ const BoardEdit = () => {
     };
 
     if (loading) {
-      fetchBoardDetail();
+      fetchBoardDetailData();
     }
-  }, [id, boardManagement, loading]);
+  }, [id, fetchBoardDetail, loading]);
 
   // 답변 수정
   const handleSubmit = async () => {
@@ -89,7 +89,7 @@ const BoardEdit = () => {
     setSubmitting(true);
 
     try {
-      const result = await boardManagement.updateAnswer(Number(id), {
+      const result = await updateAnswer(Number(id), {
         content: answer.trim(),
       });
 

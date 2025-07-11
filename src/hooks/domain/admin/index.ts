@@ -5,3 +5,4 @@ export { useAdminReservations } from './useAdminReservations';
 export { useAdminBoard } from './useAdminBoard';
 export { useAdminMatching } from './useAdminMatching';
 export { useAdminDashboard } from './useAdminDashboard';
+export { useAdmin } from './useAdmin';

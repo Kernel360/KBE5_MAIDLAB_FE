@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import { consumerApi } from '@/apis/consumer';
 import { useApiCall } from '../useApiCall';
-import { formatConsumerProfile } from '@/utils/format';
 import type {
   ConsumerProfileUpdateRequest,
   ConsumerProfileResponse,
@@ -180,11 +179,6 @@ export const useConsumer = () => {
     [setManagerPreference],
   );
 
-  // 소비자 프로필 포맷팅 함수
-  const formatProfileData = useCallback((profile: ConsumerProfileResponse) => {
-    return formatConsumerProfile(profile);
-  }, []);
-
   return {
     profile,
     likedManagers,
@@ -200,6 +194,5 @@ export const useConsumer = () => {
     removeLikedManager,
     likeManager,
     blacklistManager,
-    formatProfileData,
   };
 };

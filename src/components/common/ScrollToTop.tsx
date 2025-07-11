@@ -12,7 +12,7 @@ const ScrollToTop = () => {
     const getScrollContainer = () => {
       // 모든 뷰포트 컨테이너 확인
       const desktopViewports = document.querySelectorAll('.desktop-viewport');
-      
+
       // 현재 보이는 뷰포트 찾기 (display: none이 아닌 것)
       for (const viewport of desktopViewports) {
         const styles = window.getComputedStyle(viewport);
@@ -20,13 +20,13 @@ const ScrollToTop = () => {
           return viewport;
         }
       }
-      
+
       // 뷰포트가 없으면 window 사용
       return null;
     };
 
     const scrollContainer = getScrollContainer();
-    
+
     if (scrollContainer) {
       scrollContainer.scrollTo(0, 0);
     } else {
@@ -38,21 +38,23 @@ const ScrollToTop = () => {
   useEffect(() => {
     const getScrollContainer = () => {
       const desktopViewports = document.querySelectorAll('.desktop-viewport');
-      
+
       for (const viewport of desktopViewports) {
         const styles = window.getComputedStyle(viewport);
         if (styles.display !== 'none') {
           return viewport;
         }
       }
-      
+
       return null;
     };
 
     const toggleVisibility = () => {
       const scrollContainer = getScrollContainer();
-      const scrollTop = scrollContainer ? scrollContainer.scrollTop : window.pageYOffset;
-      
+      const scrollTop = scrollContainer
+        ? scrollContainer.scrollTop
+        : window.pageYOffset;
+
       if (scrollTop > 300) {
         setIsVisible(true);
       } else {
@@ -61,10 +63,11 @@ const ScrollToTop = () => {
     };
 
     const scrollContainer = getScrollContainer();
-    
+
     if (scrollContainer) {
       scrollContainer.addEventListener('scroll', toggleVisibility);
-      return () => scrollContainer.removeEventListener('scroll', toggleVisibility);
+      return () =>
+        scrollContainer.removeEventListener('scroll', toggleVisibility);
     } else {
       window.addEventListener('scroll', toggleVisibility);
       return () => window.removeEventListener('scroll', toggleVisibility);
@@ -74,19 +77,19 @@ const ScrollToTop = () => {
   const scrollToTop = () => {
     const getScrollContainer = () => {
       const desktopViewports = document.querySelectorAll('.desktop-viewport');
-      
+
       for (const viewport of desktopViewports) {
         const styles = window.getComputedStyle(viewport);
         if (styles.display !== 'none') {
           return viewport;
         }
       }
-      
+
       return null;
     };
 
     const scrollContainer = getScrollContainer();
-    
+
     if (scrollContainer) {
       scrollContainer.scrollTo({
         top: 0,

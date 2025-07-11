@@ -22,9 +22,7 @@ import {
   formatPhoneNumber,
 } from '@/utils/format';
 import type { ReservationDetailResponse } from '@/types/domain/reservation';
-import { useAuth } from '@/hooks/useAuth';
 import {
-  MessageCircle,
   Phone,
   Star,
   MapPin,
@@ -95,7 +93,6 @@ const ConsumerReservationDetail: React.FC = () => {
   const navigate = useNavigate();
   const { fetchReservationDetail, cancelReservation, payReservation } =
     useReservation();
-  const { isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reservation, setReservation] =

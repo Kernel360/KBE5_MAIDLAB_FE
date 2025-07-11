@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/useToast';
 import { consumerApi } from '@/apis/consumer';
 import type { BlackListedManagerResponse } from '@/types/domain/consumer';
@@ -10,7 +9,15 @@ import React from 'react';
 import { usePagination } from '@/hooks';
 import { Header } from '@/components/layout/Header/Header';
 
-function ManagerNameModal({ name, introduceText, children }: { name: string, introduceText?: string, children: React.ReactNode }) {
+function ManagerNameModal({
+  name,
+  introduceText,
+  children,
+}: {
+  name: string;
+  introduceText?: string;
+  children: React.ReactNode;
+}) {
   const nameRef = useRef<HTMLHeadingElement | null>(null);
   const [open, setOpen] = useState(false);
   const isNameTruncated = (el: HTMLHeadingElement | null) => {
@@ -25,23 +32,37 @@ function ManagerNameModal({ name, introduceText, children }: { name: string, int
       {React.cloneElement(children as React.ReactElement, {
         ref: nameRef,
         onClick: handleClick,
-        className: (children as React.ReactElement).props.className + ' cursor-pointer hover:text-orange-600 transition-colors',
+        className:
+          (children as React.ReactElement).props.className +
+          ' cursor-pointer hover:text-orange-600 transition-colors',
       })}
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30" onClick={() => setOpen(false)}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30"
+          onClick={() => setOpen(false)}
+        >
           <div
             className="bg-white rounded-xl shadow-lg p-6 min-w-[220px] max-w-xs"
-            onClick={e => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-2">
               <span className="font-bold text-gray-900">도우미 정보</span>
-              <button onClick={() => setOpen(false)} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+              <button
+                onClick={() => setOpen(false)}
+                className="text-gray-400 hover:text-gray-600 text-xl"
+              >
+                &times;
+              </button>
             </div>
             <div className="mb-2">
-              <div className="font-semibold text-gray-800 break-words">{name}</div>
+              <div className="font-semibold text-gray-800 break-words">
+                {name}
+              </div>
             </div>
             {introduceText && (
-              <div className="text-sm text-gray-600 mt-2 break-words">{introduceText}</div>
+              <div className="text-sm text-gray-600 mt-2 break-words">
+                {introduceText}
+              </div>
             )}
           </div>
         </div>
@@ -51,12 +72,17 @@ function ManagerNameModal({ name, introduceText, children }: { name: string, int
 }
 
 export default function BlackListManagerList() {
-  const navigate = useNavigate();
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [blacklistManagers, setBlacklistManagers] = useState<BlackListedManagerResponse[]>([]);
-  const [imageLoadErrors, setImageLoadErrors] = useState<Record<string, boolean>>({});
-  const [expandedRegions, setExpandedRegions] = useState<Record<string, boolean>>({});
+  const [blacklistManagers, setBlacklistManagers] = useState<
+    BlackListedManagerResponse[]
+  >([]);
+  const [imageLoadErrors, setImageLoadErrors] = useState<
+    Record<string, boolean>
+  >({});
+  const [expandedRegions, setExpandedRegions] = useState<
+    Record<string, boolean>
+  >({});
 
   const PAGE_SIZE = 10;
   const {
@@ -69,7 +95,10 @@ export default function BlackListManagerList() {
     goToPage,
     goToNext,
     goToPrevious,
-  } = usePagination({ totalItems: blacklistManagers.length, itemsPerPage: PAGE_SIZE });
+  } = usePagination({
+    totalItems: blacklistManagers.length,
+    itemsPerPage: PAGE_SIZE,
+  });
 
   useEffect(() => {
     const loadData = async () => {
@@ -89,15 +118,13 @@ export default function BlackListManagerList() {
   const handleRemoveBlacklist = async (managerUuid: string) => {
     try {
       await consumerApi.removePreferenceManager(managerUuid);
-      setBlacklistManagers((prev) => prev.filter((m) => m.managerUuid !== managerUuid));
+      setBlacklistManagers((prev) =>
+        prev.filter((m) => m.managerUuid !== managerUuid),
+      );
       showToast('블랙리스트에서 삭제되었습니다.', 'success');
     } catch (error) {
       showToast('매니저 삭제에 실패했습니다.', 'error');
     }
-  };
-
-  const handleBack = () => {
-    navigate(ROUTES.CONSUMER.MYPAGE);
   };
 
   const handleImageError = (managerUuid: string) => {
@@ -105,7 +132,10 @@ export default function BlackListManagerList() {
   };
 
   const toggleRegions = (managerUuid: string) => {
-    setExpandedRegions((prev) => ({ ...prev, [managerUuid]: !prev[managerUuid] }));
+    setExpandedRegions((prev) => ({
+      ...prev,
+      [managerUuid]: !prev[managerUuid],
+    }));
   };
 
   const renderRegions = (regions: string[], managerUuid: string) => {
@@ -117,13 +147,23 @@ export default function BlackListManagerList() {
       <div className="flex flex-wrap gap-1.5">
         {displayRegions.map((region) => (
           <span key={region} className="region-tag">
-            {SEOUL_DISTRICT_LABELS[region as keyof typeof SEOUL_DISTRICT_LABELS] || region}
+            {SEOUL_DISTRICT_LABELS[
+              region as keyof typeof SEOUL_DISTRICT_LABELS
+            ] || region}
           </span>
         ))}
         {hasMore && (
-          <button type="button" onClick={() => toggleRegions(managerUuid)} className="expand-btn">
+          <button
+            type="button"
+            onClick={() => toggleRegions(managerUuid)}
+            className="expand-btn"
+          >
             {isExpanded ? '접기' : `+${regions.length - 3}개 더보기`}
-            <span className={`inline-block transition-transform duration-200 text-[10px] ${isExpanded ? 'rotate-180' : ''}`}>▼</span>
+            <span
+              className={`inline-block transition-transform duration-200 text-[10px] ${isExpanded ? 'rotate-180' : ''}`}
+            >
+              ▼
+            </span>
           </button>
         )}
       </div>
@@ -131,18 +171,28 @@ export default function BlackListManagerList() {
   };
 
   if (isLoading) {
-    return <div className="flex justify-center items-center h-64">로딩중...</div>;
+    return (
+      <div className="flex justify-center items-center h-64">로딩중...</div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header variant="sub" title="블랙리스트 도우미" backRoute={ROUTES.CONSUMER.MYPAGE} showMenu={true} />
+      <Header
+        variant="sub"
+        title="블랙리스트 도우미"
+        backRoute={ROUTES.CONSUMER.MYPAGE}
+        showMenu={true}
+      />
       <div className="pb-6">
         <div className="max-w-2xl mx-auto px-4">
           <div className="space-y-3">
             {blacklistManagers.length > 0 ? (
               blacklistManagers.slice(startIndex, endIndex).map((manager) => (
-                <div key={manager.managerUuid} className="relative bg-white rounded-xl p-6 shadow-sm border border-slate-200 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 hover:border-slate-300 overflow-hidden group">
+                <div
+                  key={manager.managerUuid}
+                  className="relative bg-white rounded-xl p-6 shadow-sm border border-slate-200 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 hover:border-slate-300 overflow-hidden group"
+                >
                   {/* 상단 그라데이션 바 */}
                   <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-orange-500 to-orange-400 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
                   {/* 상단: 프로필, 정보, 삭제 버튼 */}
@@ -150,12 +200,15 @@ export default function BlackListManagerList() {
                     {/* 프로필 이미지 */}
                     <div className="w-20 h-20 min-w-[80px] min-h-[80px] relative flex-shrink-0">
                       <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
-                        {manager.profileImage && !imageLoadErrors[manager.managerUuid] ? (
+                        {manager.profileImage &&
+                        !imageLoadErrors[manager.managerUuid] ? (
                           <img
                             src={manager.profileImage}
                             alt={`${manager.name}의 프로필`}
                             className="w-full h-full object-cover rounded-full"
-                            onError={() => handleImageError(manager.managerUuid)}
+                            onError={() =>
+                              handleImageError(manager.managerUuid)
+                            }
                             loading="lazy"
                           />
                         ) : (
@@ -170,14 +223,19 @@ export default function BlackListManagerList() {
                     {/* 매니저 정보 */}
                     <div className="flex-1 min-w-0 px-4 flex flex-col justify-center h-20">
                       <div className="flex items-center gap-2">
-                        <ManagerNameModal name={manager.name} introduceText={manager.introduceText}>
+                        <ManagerNameModal
+                          name={manager.name}
+                          introduceText={manager.introduceText}
+                        >
                           <h3 className="text-lg font-semibold text-gray-900 truncate max-w-[120px] block">
                             {manager.name}
                           </h3>
                         </ManagerNameModal>
                         <div className="flex-shrink-0 inline-flex items-center gap-1 h-8 text-xs font-semibold rounded-full">
                           <Star className="w-4 h-4 text-yellow-500" />
-                          <span className="text-yellow-800 text-base">{manager.averageRate.toFixed(1)}</span>
+                          <span className="text-yellow-800 text-base">
+                            {manager.averageRate.toFixed(1)}
+                          </span>
                         </div>
                       </div>
                       {manager.introduceText && (
@@ -188,7 +246,9 @@ export default function BlackListManagerList() {
                     </div>
                     <div className="flex flex-row items-center justify-center h-20 mr-2 gap-2">
                       <button
-                        onClick={() => handleRemoveBlacklist(manager.managerUuid)}
+                        onClick={() =>
+                          handleRemoveBlacklist(manager.managerUuid)
+                        }
                         className="h-8 w-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors duration-200"
                         style={{ border: 'none', padding: 0 }}
                         aria-label="삭제"
@@ -262,4 +322,4 @@ export default function BlackListManagerList() {
       </div>
     </div>
   );
-} 
+}

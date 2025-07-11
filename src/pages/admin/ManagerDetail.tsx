@@ -72,7 +72,7 @@ const ManagerDetail = () => {
         size: 5,
       };
 
-      const reservations = await reservationManagement.fetchManagerReservation(
+      const reservations = await reservationManagement.fetchManagerReservations(
         parseInt(id),
         params,
       );

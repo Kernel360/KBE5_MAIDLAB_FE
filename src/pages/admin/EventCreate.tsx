@@ -4,7 +4,8 @@ import { useEvent } from '@/hooks';
 import { ROUTES } from '@/constants';
 import { useFileUpload } from '@/hooks';
 import { LoadingSpinner } from '@/components/common';
-import type { UploadResult, PresignedUrlResponse  } from '@/types/domain/admin';
+import type { UploadResult } from '@/types/domain/admin';
+import type { PresignedUrlResponse } from '@/types/api';
 
 const EventCreate = () => {
   const navigate = useNavigate();

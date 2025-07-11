@@ -1,26 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
-import { useAdminAuth } from '@/hooks/useAdminAuth';
-import { ROUTES } from '../../../constants';
-import { adminApi } from '../../../apis/admin';
 import { AdminThemeProvider } from '@/components/features/admin/AdminThemeProvider';
-
-// 아이콘 컴포넌트들 (Heroicons 또는 Lucide React로 대체 가능)
-const MenuIcon = () => (
-  <svg
-    className="w-6 h-6"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M4 6h16M4 12h16M4 18h16"
-    />
-  </svg>
-);
 
 const PeopleIcon = () => (
   <svg
@@ -66,22 +46,6 @@ const CampaignIcon = () => (
       strokeLinejoin="round"
       strokeWidth={2}
       d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"
-    />
-  </svg>
-);
-
-const ArticleIcon = () => (
-  <svg
-    className="w-6 h-6"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
     />
   </svg>
 );
@@ -198,20 +162,8 @@ const menuItems = [
 const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout } = useAdminAuth();
   const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-
-  // 현재 경로 변경 시 서브메뉴는 자동으로 확장하지 않음
-  // 사용자가 직접 클릭해야만 확장됨
-
-  const toggleMenu = (menuText: string) => {
-    setExpandedMenus((prev) =>
-      prev.includes(menuText)
-        ? prev.filter((item) => item !== menuText)
-        : [...prev, menuText],
-    );
-  };
 
   const handleMenuClick = (item: any) => {
     if (item.subItems) {
@@ -248,18 +200,20 @@ const AdminLayout = () => {
     setIsLoggingOut(true);
     try {
       //await adminApi.logout(); // API 호출을 먼저 수행
-      
+
       // 로컬 스토리지 직접 정리
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('userType');
       sessionStorage.clear();
-      
+
       // 쿠키 정리
-      document.cookie.split(";").forEach(function(c) { 
-        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+      document.cookie.split(';').forEach(function (c) {
+        document.cookie = c
+          .replace(/^ +/, '')
+          .replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
       });
-      
+
       // 강제 페이지 새로고침으로 완전한 리셋
       window.location.href = '/admin/login';
     } catch (error) {

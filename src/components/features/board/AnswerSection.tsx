@@ -5,7 +5,10 @@ interface AnswerSectionProps {
   answerCreatedAt?: string;
 }
 
-export default function AnswerSection({ answer, answerCreatedAt }: AnswerSectionProps) {
+export default function AnswerSection({
+  answer,
+  answerCreatedAt,
+}: AnswerSectionProps) {
   const hasAnswer = !!answer;
   const formatDate = (dateString?: string) => {
     if (!dateString) return '';
@@ -20,9 +23,13 @@ export default function AnswerSection({ answer, answerCreatedAt }: AnswerSection
   return (
     <div className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
       {/* 답변 헤더 */}
-      <div className={`flex items-center justify-between px-5 py-3 ${hasAnswer ? 'bg-green-50' : 'bg-yellow-50'}`}>
+      <div
+        className={`flex items-center justify-between px-5 py-3 ${hasAnswer ? 'bg-green-50' : 'bg-yellow-50'}`}
+      >
         <div className="flex items-center gap-2">
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${hasAnswer ? 'bg-green-100' : 'bg-yellow-100'}`}>
+          <div
+            className={`w-8 h-8 rounded-full flex items-center justify-center ${hasAnswer ? 'bg-green-100' : 'bg-yellow-100'}`}
+          >
             {hasAnswer ? (
               <MessageSquare className="w-4 h-4 text-green-600" />
             ) : (
@@ -51,7 +58,8 @@ export default function AnswerSection({ answer, answerCreatedAt }: AnswerSection
               <Clock className="w-6 h-6 text-yellow-600" />
             </div>
             <p className="text-gray-500 text-sm">
-              관리자가 답변을 작성하는 중입니다.<br />
+              관리자가 답변을 작성하는 중입니다.
+              <br />
               조금만 기다려주세요.
             </p>
           </div>
@@ -59,4 +67,4 @@ export default function AnswerSection({ answer, answerCreatedAt }: AnswerSection
       </div>
     </div>
   );
-} 
+}

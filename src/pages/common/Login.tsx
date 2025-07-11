@@ -101,6 +101,12 @@ const Login: React.FC = () => {
   };
 
   const handleGoogleLogin = () => {
+    // Admin users should not use Google OAuth login
+    if (selectedUserType === 'ADMIN') {
+      showToast('관리자는 Google 로그인을 사용할 수 없습니다.', 'error');
+      return;
+    }
+
     openGoogleLoginPopup(
       selectedUserType,
       async (code: string, userType: 'CONSUMER' | 'MANAGER') => {

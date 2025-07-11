@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import { managerApi } from '@/apis/manager';
 import { useApiCall } from '../useApiCall';
-import { formatManagerProfile } from '@/utils/format';
 import type {
   ManagerProfileCreateRequest,
   ManagerProfileUpdateRequest,
@@ -77,18 +76,12 @@ export const useManager = () => {
     return result.success ? result.data : null;
   }, [executeApi]);
 
-  // 포맷팅 함수들
-  const formatProfileData = useCallback((profile: ManagerProfileResponse) => {
-    return formatManagerProfile(profile);
-  }, []);
-
   return {
     profile,
     loading,
     fetchProfile,
     updateProfile,
     fetchMypage,
-    formatProfileData,
     createProfile,
     fetchMyReviews,
   };
