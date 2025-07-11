@@ -18,16 +18,12 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 const applyThemeToDOM = (theme: ResolvedTheme): void => {
   const root = document.documentElement;
 
-  console.log('Applying theme to DOM:', theme);
-
   // 기존 테마 클래스 제거
   root.classList.remove('light', 'dark');
 
   // 새 테마 클래스 추가
   root.classList.add(theme);
   root.setAttribute('data-theme', theme);
-
-  console.log('DOM classes after theme change:', root.className);
 
   // 메타 태그 업데이트 (PWA 지원)
   const metaThemeColor = document.querySelector('meta[name="theme-color"]');
