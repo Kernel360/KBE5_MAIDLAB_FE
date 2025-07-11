@@ -155,27 +155,19 @@ export const formatRoomSize = (size: number): string => {
 /**
  * roomSize에 따른 가격 포맷팅 (8 -> 52500원)
  */
-export const formatEstimatedPriceByRoomSize = (size: number): string => {
-  const roomSizeConfig = BUSINESS_CONFIG.ROOM_SIZES.find(
-    (config) => config.key === getRoomSizeKey(size),
-  );
-
-  if (roomSizeConfig) {
-    return `${roomSizeConfig.basePrice.toLocaleString('ko-KR')}원`;
-  }
-
-  return '-';
+const ESTIMATED_PRICE_BY_SIZE: Record<number, number> = {
+  8: 52500,
+  9: 54600,
+  11: 63000,
+  16: 64000,
+  21: 74250,
+  26: 75600,
+  31: 76500,
+  35: 78000,
 };
-
-/**
- * 방 크기에 따른 설정 키 찾기
- */
-const getRoomSizeKey = (size: number): string => {
-  if (size <= 8) return 'STUDIO';
-  if (size <= 9) return 'ONE_ROOM';
-  if (size <= 16) return 'TWO_ROOM';
-  if (size <= 26) return 'THREE_ROOM';
-  return 'FOUR_PLUS_ROOM';
+export const formatEstimatedPriceByRoomSize = (size: number): string => {
+  const price = ESTIMATED_PRICE_BY_SIZE[size];
+  return price ? `${price.toLocaleString('ko-KR')}원` : '-';
 };
 
 /**
@@ -363,6 +355,6 @@ export const getServiceTypeName = (serviceType: string): string => {
     BABYSITTER: '베이비시터',
     PET_CARE: '반려동물 케어',
   };
-  
+
   return serviceTypeMap[serviceType] || serviceType;
 };
