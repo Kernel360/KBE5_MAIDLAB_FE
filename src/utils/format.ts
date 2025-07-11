@@ -363,6 +363,6 @@ export const getServiceTypeName = (serviceType: string): string => {
     BABYSITTER: '베이비시터',
     PET_CARE: '반려동물 케어',
   };
-  
+
   return serviceTypeMap[serviceType] || serviceType;
 };
