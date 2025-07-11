@@ -113,6 +113,8 @@ export interface ReservationApprovalRequest {
  */
 export interface PaymentRequestBody {
   reservationId: number;
+  pointToUse?: number;
+  pointUsed?: boolean;
 }
 
 /**

@@ -132,7 +132,9 @@ const ConsumerReservationDetail: React.FC = () => {
   // 결제 핸들러
   const handlePayment = async () => {
     if (!reservation) return;
-    await payReservation(Number(id));
+    await payReservation({
+      reservationId: Number(id),
+    });
   };
 
   if (loading) {
