@@ -79,7 +79,9 @@ export default function BoardItem({ board }: BoardItemProps) {
         </span>
       </div>
       <h2 className="text-lg font-semibold mb-2 text-left">
-        {board.title.length > 20 ? `${board.title.slice(0, 20)}...` : board.title}
+        {board.title.length > 20
+          ? `${board.title.slice(0, 20)}...`
+          : board.title}
       </h2>
       <p className="text-gray-600 line-clamp-2 text-left">{board.content}</p>
       {/* 답변 토글 */}
@@ -88,9 +90,9 @@ export default function BoardItem({ board }: BoardItemProps) {
           <button
             type="button"
             className="text-green-700 text-sm font-semibold underline hover:text-green-800 mb-2"
-            onClick={e => {
+            onClick={(e) => {
               e.stopPropagation();
-              setOpenAnswer(v => !v);
+              setOpenAnswer((v) => !v);
             }}
           >
             {openAnswer ? '답변 닫기' : '답변 보기'}
@@ -100,7 +102,9 @@ export default function BoardItem({ board }: BoardItemProps) {
               <div className="mb-1 flex items-center gap-2">
                 <span className="font-semibold text-green-700">답변</span>
                 {board.answerCreatedAt && (
-                  <span className="text-xs text-gray-400">{formatDate(board.answerCreatedAt)}</span>
+                  <span className="text-xs text-gray-400">
+                    {formatDate(board.answerCreatedAt)}
+                  </span>
                 )}
               </div>
               <div className="whitespace-pre-line">{board.answerContent}</div>

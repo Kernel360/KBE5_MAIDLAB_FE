@@ -1,6 +1,8 @@
 import { Route } from 'react-router-dom';
 import { ROUTES } from '@/constants';
 import { ProtectedRoute } from '@/components/common';
+import GoogleMap from '@/pages/reservation/GoogleMap';
+import { Status, Wrapper } from '@googlemaps/react-wrapper';
 import {
   ConsumerProfileSetup,
   ConsumerMyPage,
@@ -14,8 +16,7 @@ import {
   BlackListManagerList,
   PointsPage,
 } from '@/pages';
-import GoogleMap from '@/pages/reservation/GoogleMap';
-import { Status, Wrapper } from '@googlemaps/react-wrapper';
+
 const render = (status: Status) => {
   switch (status) {
     case Status.LOADING:
@@ -128,6 +129,5 @@ export const ConsumerRoutes = () => (
         </ProtectedRoute>
       }
     />
-    <Route path={'/google-map'} element={<GoogleMap />} />
   </>
 );

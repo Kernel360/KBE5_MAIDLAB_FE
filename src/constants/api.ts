@@ -79,8 +79,8 @@ export const API_ENDPOINTS = {
     REVIEWS: '/api/manager/myReviews',
   },
   CONSUMER: {
-    POINT:'/api/point',
-    POINT_RECORD:'/api/point/record',
+    POINT: '/api/point',
+    POINT_RECORD: '/api/point/record',
     PROFILE: '/api/consumers/profile',
     MYPAGE: '/api/consumers/mypage',
     LIKES: '/api/consumers/likes',
@@ -159,6 +159,18 @@ export const API_ENDPOINTS = {
       GETTODAYCOUNT: '/api/admin/reservations/todayreservation',
       CONSUMER: (id: number) => `/api/admin/reservations/consumer/${id}`,
       MANAGER: (id: number) => `/api/admin/reservations/manager/${id}`,
+      TOTAL_RESERVATION_COUNT: (id: number) =>
+        `/api/admin/reservations/reservationcount/${id}`,
+      REVIEW_PERCENT: (id: number) =>
+        `/api/admin/reservations/reviewedpercent/${id}`,
+      TOTAL_PAID_MONEY: (id: number) =>
+        `/api/admin/reservations/totalpaidmoney/${id}`,
+      MATCHED_COUNT: (id: number) =>
+        `/api/admin/reservations/matchedcount/${id}`,
+      MANAGER_SETTLEMENT_SUM: (id: number) =>
+        `/api/admin/reservations/manager/settlementsum/${id}`,
+      MANAGER_REVIEW_PERCENT: (id: number) =>
+        `/api/admin/reservations/managerreviewedpercent/${id}`,
     },
     MATCHING: {
       LIST: '/api/admin/matching',
@@ -172,7 +184,10 @@ export const API_ENDPOINTS = {
       REFUND: '/api/admin/board/refund',
       UPDATE_ANSWER: (id: number) => `/api/admin/board/answer/${id}`,
       REFUND_COUNT: '/api/admin/board/refundboardcount',
-      COUNSEL_COUNT: '/api/admin/board/counselboardcount'
+      COUNSEL_COUNT: '/api/admin/board/counselboardcount',
+    },
+    LOGS: {
+      ADMIN_LOGS: (lines: number) => `/api/admin/logs/tail?lines=${lines}`,
     },
   },
 } as const;

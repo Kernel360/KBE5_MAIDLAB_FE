@@ -5,6 +5,9 @@ export const ROUTES = {
   SIGNUP: '/signup',
   SOCIAL_SIGNUP: '/social-signup',
   GOOGLE_CALLBACK: '/google-callback',
+  EVENTS: '/events',
+  NOT_FOUND: '/404',
+  EVENT_DETAIL: '/events/:id',
 
   // 소비자 페이지
   CONSUMER: {
@@ -31,7 +34,6 @@ export const ROUTES = {
     RESERVATION_DETAIL: '/manager/reservations/:id',
     REVIEW_REGISTER: '/managers/reservations/:id/review',
     REVIEWS: '/manager/reviews',
-    MATCHING: '/manager/matching',
     SETTLEMENTS: '/manager/settlements',
   },
 
@@ -59,14 +61,11 @@ export const ROUTES = {
     BOARD_EDIT: '/admin/boards/:id/edit',
   },
 
-  // 기타 페이지
-  EVENTS: '/events',
-  EVENT_DETAIL: '/events/:id',
+  // 게시판 페이지
   BOARD: {
     LIST: '/board',
     CREATE: '/board/create',
     DETAIL: '/board/:id',
     EDIT: '/board/:id/edit',
   },
-  NOT_FOUND: '/404',
 } as const;

@@ -14,7 +14,7 @@ import { Header } from '@/components';
 
 const SETTLEMENT_STATUS_LABELS: Record<string, string> = {
   PENDING: '정산 대기중',
-  APPROVED: '승인완료', 
+  APPROVED: '승인완료',
   REJECTED: '거절됨',
 };
 
@@ -58,10 +58,6 @@ const ManagerSettlements: React.FC = () => {
 
   const handlePrevWeek = () => setCurrentWeek((prev) => addWeeks(prev, -1));
   const handleNextWeek = () => setCurrentWeek((prev) => addWeeks(prev, 1));
-
-  const handleBackClick = () => {
-    navigate(-1);
-  };
 
   const handleReservationClick = (reservationId: number) => {
     navigate(`/manager/reservations/${reservationId}`);
@@ -114,7 +110,7 @@ const ManagerSettlements: React.FC = () => {
         backRoute={ROUTES.HOME}
         showMenu={true}
       />
-      
+
       <div className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto space-y-6">
           <WeekSelector

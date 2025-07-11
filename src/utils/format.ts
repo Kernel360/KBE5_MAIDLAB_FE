@@ -1,5 +1,8 @@
-import { CURRENCY_FORMATTERS, CURRENCY } from '@/constants/service';
-import { BUSINESS_CONFIG } from '@/config/constants';
+import {
+  CURRENCY_FORMATTERS,
+  CURRENCY,
+  BUSINESS_CONFIG,
+} from '@/constants/service';
 
 /**
  * 숫자를 천 단위로 콤마 포맷팅
@@ -153,29 +156,15 @@ export const formatRoomSize = (size: number): string => {
  * roomSize에 따른 가격 포맷팅 (8 -> 52500원)
  */
 export const formatEstimatedPriceByRoomSize = (size: number): string => {
-  // 비즈니스 룰에서 가져오도록 수정
   const roomSizeConfig = BUSINESS_CONFIG.ROOM_SIZES.find(
-    config => config.key === getRoomSizeKey(size)
+    (config) => config.key === getRoomSizeKey(size),
   );
-  
+
   if (roomSizeConfig) {
     return `${roomSizeConfig.basePrice.toLocaleString('ko-KR')}원`;
   }
-  
-  // 폴백: 기존 매핑 테이블 사용
-  const ESTIMATED_PRICE_BY_SIZE: Record<number, number> = {
-    8: 52500,
-    9: 54600,
-    11: 63000,
-    16: 64000,
-    21: 74250,
-    26: 75600,
-    31: 76500,
-    35: 78000,
-  };
 
-  const price = ESTIMATED_PRICE_BY_SIZE[size];
-  return price ? `${price.toLocaleString('ko-KR')}원` : '-';
+  return '-';
 };
 
 /**
@@ -209,7 +198,7 @@ export const formatServiceDuration = (hours: number): string => {
 };
 
 /**
- * 서비스 시간 포맷팅 
+ * 서비스 시간 포맷팅
  * 분 단위 숫자를 "시간 분" 형식으로 포맷팅
  * 예: 30 -> "30분", 90 -> "1시간 30분", 120 -> "2시간"
  */
@@ -339,4 +328,41 @@ export const formatKoreanArray = (arr: string[]): string => {
   return `${rest.join(', ')} 및 ${last}`;
 };
 
+/**
+ * 소비자 프로필 데이터 포맷팅
+ */
+export const formatConsumerProfile = (profile: any) => {
+  return {
+    ...profile,
+    maskedName: profile.name
+      ? profile.name[0] + '*'.repeat(profile.name.length - 1)
+      : '',
+    formattedName: profile.name,
+  };
+};
 
+/**
+ * 매니저 프로필 데이터 포맷팅
+ */
+export const formatManagerProfile = (profile: any) => {
+  return {
+    ...profile,
+    maskedName: maskName(profile.name),
+    formattedName: profile.name,
+  };
+};
+
+/**
+ * 서비스 타입명 변환
+ */
+export const getServiceTypeName = (serviceType: string): string => {
+  const serviceTypeMap: Record<string, string> = {
+    CLEANING: '청소',
+    MOVING: '이사',
+    GENERAL_CLEANING: '일반청소',
+    BABYSITTER: '베이비시터',
+    PET_CARE: '반려동물 케어',
+  };
+  
+  return serviceTypeMap[serviceType] || serviceType;
+};

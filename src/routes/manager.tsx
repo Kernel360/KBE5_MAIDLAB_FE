@@ -1,7 +1,6 @@
 import { Route } from 'react-router-dom';
 import { ROUTES } from '@/constants';
 import { ProtectedRoute } from '@/components/common';
-
 import {
   ManagerProfileSetup,
   ManagerProfileEdit,

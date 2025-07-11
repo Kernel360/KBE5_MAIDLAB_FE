@@ -4,7 +4,9 @@ interface DesktopViewportProps {
   children: React.ReactNode;
 }
 
-export const DesktopViewport: React.FC<DesktopViewportProps> = ({ children }) => {
+export const DesktopViewport: React.FC<DesktopViewportProps> = ({
+  children,
+}) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
@@ -19,7 +21,10 @@ export const DesktopViewport: React.FC<DesktopViewportProps> = ({ children }) =>
     // MutationObserver로 DOM 클래스 변경 감지
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+        if (
+          mutation.type === 'attributes' &&
+          mutation.attributeName === 'class'
+        ) {
           checkTheme();
         }
       });

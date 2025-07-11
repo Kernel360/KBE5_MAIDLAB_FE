@@ -1,6 +1,6 @@
 // src/components/features/consumer/ReservationStep2.tsx
 import React, { useState, useEffect } from 'react';
-import type { ReservationFormData } from '@/types/domain/reservation';
+import type { ReservationFormData } from '@/types/forms/reservationForm';
 import { useMatching } from '@/hooks/domain/useMatching';
 import { format, addDays } from 'date-fns';
 import {
@@ -10,7 +10,7 @@ import {
   MAX_COUNTABLE_ITEMS,
   SERVICE_DETAIL_TYPES,
 } from '@/constants/service';
-import { useReservation } from '@/hooks/domain/useReservation';
+import { useReservation } from '@/hooks/domain/reservation';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks';
 import {
@@ -124,9 +124,9 @@ const ReservationStep2: React.FC<Props> = ({
 
   // 서비스 옵션 토글
   const handleServiceToggle = (serviceId: string) => {
-    setSelectedServices((prev) => {
+    setSelectedServices((prev: string[]) => {
       if (prev.includes(serviceId)) {
-        setOptionCounts((counts) => {
+        setOptionCounts((counts: ServiceOptionCounts) => {
           const newCounts = { ...counts };
           delete newCounts[serviceId];
           return newCounts;
@@ -140,7 +140,7 @@ const ReservationStep2: React.FC<Props> = ({
   // 옵션 개수 변경
   const handleCountChange = (serviceId: string, count: number) => {
     if (count >= 1 && count <= MAX_COUNTABLE_ITEMS) {
-      setOptionCounts((prev) => ({
+      setOptionCounts((prev: ServiceOptionCounts) => ({
         ...prev,
         [serviceId]: count,
       }));
@@ -159,7 +159,7 @@ const ReservationStep2: React.FC<Props> = ({
 
     const endTimeString = `${String(endTime.getHours()).padStart(2, '0')}:${String(endTime.getMinutes()).padStart(2, '0')}`;
 
-    setForm((prev) => ({
+    setForm((prev: ReservationFormData) => ({
       ...prev,
       endTime: endTimeString,
     }));
@@ -167,7 +167,7 @@ const ReservationStep2: React.FC<Props> = ({
 
   // 매니저 선택 관련 함수들
   const handleManagerToggle = () => {
-    setForm((prev) => ({
+    setForm((prev: ReservationFormData) => ({
       ...prev,
       chooseManager: !prev.chooseManager,
       // 토글을 비활성화할 때 기존 매니저 선택 정보도 초기화
@@ -307,7 +307,7 @@ const ReservationStep2: React.FC<Props> = ({
         const result = await fetchAvailableManagers(request);
         if (Array.isArray(result) && result.length > 0) {
           const manager = result[0];
-          setForm((prev) => ({
+          setForm((prev: ReservationFormData) => ({
             ...prev,
             managerUuid: manager.uuid,
             managerInfo: {
@@ -404,7 +404,7 @@ const ReservationStep2: React.FC<Props> = ({
     if (petType.dog) pets.push('DOG');
     if (petType.cat) pets.push('CAT');
     if (petType.etc.trim()) pets.push(petType.etc.trim());
-    setForm((prev) => ({
+    setForm((prev: ReservationFormData) => ({
       ...prev,
       pet: pets.length > 0 ? (pets.join(',') as any) : 'NONE',
     }));
@@ -417,7 +417,7 @@ const ReservationStep2: React.FC<Props> = ({
   const [selectedDate, setSelectedDate] = useState<Date>(tomorrow);
 
   useEffect(() => {
-    setForm((prev) => ({
+    setForm((prev: ReservationFormData) => ({
       ...prev,
       reservationDate: format(selectedDate, 'yyyy-MM-dd'),
       startTime: prev.startTime || '09:00',
@@ -426,7 +426,7 @@ const ReservationStep2: React.FC<Props> = ({
 
   // 날짜, 시간, 주소, 평수 등 예약 조건이 바뀔 때 매니저 정보 초기화
   useEffect(() => {
-    setForm((prev) => ({
+    setForm((prev: ReservationFormData) => ({
       ...prev,
       managerUuid: '',
       managerInfo: undefined,
@@ -468,7 +468,10 @@ const ReservationStep2: React.FC<Props> = ({
                     placeholder="서울특별시 서초구 서초대로 74길 29"
                     value={form.address}
                     onChange={(e) =>
-                      setForm((prev) => ({ ...prev, address: e.target.value }))
+                      setForm((prev: ReservationFormData) => ({
+                        ...prev,
+                        address: e.target.value,
+                      }))
                     }
                   />
                   <button
@@ -492,7 +495,7 @@ const ReservationStep2: React.FC<Props> = ({
                   placeholder="동/호수, 층수 등 상세 주소를 입력해주세요"
                   value={form.addressDetail}
                   onChange={(e) =>
-                    setForm((prev) => ({
+                    setForm((prev: ReservationFormData) => ({
                       ...prev,
                       addressDetail: e.target.value,
                     }))
@@ -510,7 +513,7 @@ const ReservationStep2: React.FC<Props> = ({
                   placeholder="현관 비밀번호, 출입 방법 등을 알려주세요"
                   value={form.housingInformation}
                   onChange={(e) =>
-                    setForm((prev) => ({
+                    setForm((prev: ReservationFormData) => ({
                       ...prev,
                       housingInformation: e.target.value,
                     }))
@@ -544,7 +547,7 @@ const ReservationStep2: React.FC<Props> = ({
                     <button
                       key={key}
                       onClick={() =>
-                        setForm((prev) => ({
+                        setForm((prev: ReservationFormData) => ({
                           ...prev,
                           housingType: key as any,
                         }))
@@ -719,7 +722,7 @@ const ReservationStep2: React.FC<Props> = ({
                 placeholder="매니저가 알아야 할 특이사항이 있다면 알려주세요 (예: 집 구조, 주의사항 등)"
                 value={form.specialRequest}
                 onChange={(e) =>
-                  setForm((prev) => ({
+                  setForm((prev: ReservationFormData) => ({
                     ...prev,
                     specialRequest: e.target.value,
                   }))
@@ -802,7 +805,10 @@ const ReservationStep2: React.FC<Props> = ({
                       <button
                         key={time}
                         onClick={() =>
-                          setForm((prev) => ({ ...prev, startTime: time }))
+                          setForm((prev: ReservationFormData) => ({
+                            ...prev,
+                            startTime: time,
+                          }))
                         }
                         className={`p-3 rounded-xl border-2 transition-all font-medium text-sm shadow-sm hover:shadow-md ${
                           form.startTime === time
@@ -1282,10 +1288,10 @@ const ReservationStep2: React.FC<Props> = ({
               setShowManagerModal(false);
               // 매니저가 선택되지 않았다면 토글을 비활성화하고 매니저 정보 초기화
               if (!form.managerUuid) {
-                setForm((prev) => ({
+                setForm((prev: ReservationFormData) => ({
                   ...prev,
                   chooseManager: false,
-                  managerUuId: '',
+                  managerUuid: '',
                   managerInfo: undefined,
                 }));
               }
@@ -1301,10 +1307,10 @@ const ReservationStep2: React.FC<Props> = ({
                     setShowManagerModal(false);
                     // 매니저가 선택되지 않았다면 토글을 비활성화하고 매니저 정보 초기화
                     if (!form.managerUuid) {
-                      setForm((prev) => ({
+                      setForm((prev: ReservationFormData) => ({
                         ...prev,
                         chooseManager: false,
-                        managerUuId: '',
+                        managerUuid: '',
                         managerInfo: undefined,
                       }));
                     }
@@ -1339,7 +1345,7 @@ const ReservationStep2: React.FC<Props> = ({
                         : 'border-gray-200 hover:border-orange-300'
                     }`}
                     onClick={() => {
-                      setForm((prev) => ({
+                      setForm((prev: ReservationFormData) => ({
                         ...prev,
                         managerUuid: manager.uuid,
                         managerInfo: {
@@ -1422,7 +1428,13 @@ const ReservationStep2: React.FC<Props> = ({
                       type="checkbox"
                       checked={petType.dog}
                       onChange={(e) =>
-                        setPetType((pt) => ({ ...pt, dog: e.target.checked }))
+                        setPetType(
+                          (pt: {
+                            dog: boolean;
+                            cat: boolean;
+                            etc: string;
+                          }) => ({ ...pt, dog: e.target.checked }),
+                        )
                       }
                       className="sr-only"
                     />
@@ -1445,7 +1457,13 @@ const ReservationStep2: React.FC<Props> = ({
                       type="checkbox"
                       checked={petType.cat}
                       onChange={(e) =>
-                        setPetType((pt) => ({ ...pt, cat: e.target.checked }))
+                        setPetType(
+                          (pt: {
+                            dog: boolean;
+                            cat: boolean;
+                            etc: string;
+                          }) => ({ ...pt, cat: e.target.checked }),
+                        )
                       }
                       className="sr-only"
                     />
@@ -1470,7 +1488,12 @@ const ReservationStep2: React.FC<Props> = ({
                   placeholder="기타 (예: 토끼, 햄스터 등)"
                   value={petType.etc}
                   onChange={(e) =>
-                    setPetType((pt) => ({ ...pt, etc: e.target.value }))
+                    setPetType(
+                      (pt: { dog: boolean; cat: boolean; etc: string }) => ({
+                        ...pt,
+                        etc: e.target.value,
+                      }),
+                    )
                   }
                 />
 

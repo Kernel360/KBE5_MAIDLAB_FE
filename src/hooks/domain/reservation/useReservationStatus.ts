@@ -1,11 +1,9 @@
 import { useState } from 'react';
-import {
-  RESERVATION_STATUS,
-  RESERVATION_STATUS_COLORS,
-} from '@/constants/status';
-import type { ReservationListResponse } from '@/types/domain/reservation';
-
-export type ReservationTab = 'scheduled' | 'today' | 'completed';
+import { RESERVATION_STATUS } from '@/constants/status';
+import type {
+  ReservationListResponse,
+  ReservationTab,
+} from '@/types/domain/reservation';
 
 export const useReservationStatus = () => {
   const [activeTab, setActiveTab] = useState<ReservationTab>('scheduled');
@@ -41,25 +39,26 @@ export const useReservationStatus = () => {
     }
   };
 
-  const getStatusBadgeStyle = (status: string, reservationDate: string) => {
+  const getReservationStatusLabel = (
+    status: string,
+    reservationDate: string,
+  ) => {
     const today = new Date().toISOString().split('T')[0];
+
     if (status === RESERVATION_STATUS.COMPLETED) {
-      return 'bg-gray-200 text-gray-600 border border-gray-300';
+      return 'COMPLETED';
     }
     if (status === RESERVATION_STATUS.WORKING) {
-      return 'bg-green-100 text-green-700 border border-green-300';
+      return 'WORKING';
     }
     if (status === RESERVATION_STATUS.MATCHED) {
       if (reservationDate === today) {
-        return 'bg-blue-100 text-blue-700 border border-blue-300';
+        return 'D_DAY';
       }
-      return 'bg-orange-100 text-orange-700 border border-orange-300';
+      return 'SCHEDULED';
     }
-    const color =
-      RESERVATION_STATUS_COLORS[
-        status as keyof typeof RESERVATION_STATUS_COLORS
-      ] || '#ccc';
-    return `bg-[${color}] text-white`;
+
+    return status.toUpperCase();
   };
 
   const isCheckInAvailable = (reservation: ReservationListResponse) => {
@@ -78,7 +77,7 @@ export const useReservationStatus = () => {
     activeTab,
     setActiveTab,
     filterReservationsByTab,
-    getStatusBadgeStyle,
+    getReservationStatusLabel,
     isCheckInAvailable,
     isCheckOutAvailable,
   };

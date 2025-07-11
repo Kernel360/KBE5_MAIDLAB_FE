@@ -3,7 +3,7 @@ import type {
   ToastType,
   PromiseToastMessages,
 } from '@/types/hooks/toast';
-import { generateId } from '@/utils/common';
+import { generateId } from '@/utils/data';
 
 /**
  * 토스트 매니저 클래스 - 모든 비즈니스 로직 관리
@@ -293,115 +293,48 @@ export class ToastManager {
   }
 }
 
-// ===== 편의 함수들 =====
+// 중복 토스트 방지 함수
+let lastToastMessage = '';
+let lastToastTime = 0;
+const TOAST_COOLDOWN = 1000; // 1초 쿨다운
 
-/**
- * 토스트 매니저 인스턴스 생성
- */
-export const createToastManager = (
-  config: {
-    defaultDuration?: number;
-    maxToasts?: number;
-    duplicateThreshold?: number;
-  } = {},
-): ToastManager => {
-  return new ToastManager({
-    defaultDuration: config.defaultDuration ?? 3000,
-    maxToasts: config.maxToasts ?? 5,
-    duplicateThreshold: config.duplicateThreshold ?? 5000,
-  });
-};
-
-/**
- * 메시지 유효성 검사
- */
-export const validateToastMessage = (message: string): boolean => {
-  return !!(message && typeof message === 'string' && message.trim());
-};
-
-/**
- * 토스트 타입 유효성 검사
- */
-export const validateToastType = (type: string): type is ToastType => {
-  return ['success', 'error', 'warning', 'info'].includes(type);
-};
-
-/**
- * 토스트 메시지와 타입을 조합하여 고유 키 생성 (하위 호환)
- */
-export const generateToastKey = (message: string, type: string): string => {
-  return `${message}_${type}`;
-};
-
-/**
- * 토스트 중복 여부 체크 (하위 호환)
- */
-export const isDuplicateToast = (
-  toasts: Array<{ message: string; type: string }>,
-  recentToasts: Map<string, number>,
+export const showDuplicatePreventedToast = (
   message: string,
-  type: string,
-  duplicateThreshold: number = 5000,
-): boolean => {
-  // 현재 활성 토스트 중복 체크
-  const hasActiveToast = toasts.some(
-    (toast) => toast.message === message && toast.type === type,
-  );
-
-  // 최근 토스트 중복 체크
-  const toastKey = generateToastKey(message, type);
-  const lastShownTime = recentToasts.get(toastKey);
-  const isRecentlyShown =
-    lastShownTime && Date.now() - lastShownTime < duplicateThreshold;
-
-  return hasActiveToast || !!isRecentlyShown;
-};
-
-/**
- * Map에서 만료된 항목 정리 및 크기 제한 적용 (하위 호환)
- */
-export const cleanupExpiredEntries = (
-  map: Map<string, number>,
-  expiryMs: number = 10000,
-  maxSize: number = 100,
+  type: 'success' | 'error' | 'info' | 'warning',
+  duration?: number,
 ): void => {
-  const now = Date.now();
-  const expiredKeys: string[] = [];
+  const currentTime = Date.now();
+  const toastKey = `${message}_${type}`;
 
-  // 만료된 키 찾기
-  map.forEach((time, key) => {
-    if (now - time > expiryMs) {
-      expiredKeys.push(key);
-    }
-  });
+  // 같은 메시지를 쿨다운 시간 내에 호출한 경우 무시
+  if (
+    toastKey === lastToastMessage &&
+    currentTime - lastToastTime < TOAST_COOLDOWN
+  ) {
+    return;
+  }
 
-  // 만료된 키 제거
-  expiredKeys.forEach((key) => {
-    map.delete(key);
-  });
+  lastToastMessage = toastKey;
+  lastToastTime = currentTime;
 
-  // 크기 제한 적용
-  if (map.size > maxSize) {
-    const entries = Array.from(map.entries());
-    const sortedEntries = entries.sort(([, a], [, b]) => a - b);
-    const keysToRemove = sortedEntries
-      .slice(0, Math.floor(maxSize / 2))
-      .map(([key]) => key);
-
-    keysToRemove.forEach((key) => {
-      map.delete(key);
-    });
+  // 전역 토스트 함수 호출
+  if (typeof window !== 'undefined' && (window as any).showToast) {
+    (window as any).showToast(message, type, duration);
+  } else {
+    console.warn('토스트 함수를 찾을 수 없습니다:', message);
   }
 };
 
-/**
- * Map에 저장된 모든 타임아웃 일괄 정리 (하위 호환)
- */
-export const clearAllTimeouts = (
-  timeoutMap: Map<string, NodeJS.Timeout>,
-): void => {
-  timeoutMap.forEach((timeout) => {
-    clearTimeout(timeout);
-  });
-  timeoutMap.clear();
+// API 에러 토스트 함수
+export const showApiErrorToast = (message: string): void => {
+  showDuplicatePreventedToast(message, 'error');
+};
+
+// ToastManager 인스턴스 생성 함수
+export const createToastManager = (config: {
+  defaultDuration: number;
+  maxToasts: number;
+  duplicateThreshold: number;
+}): ToastManager => {
+  return new ToastManager(config);
 };

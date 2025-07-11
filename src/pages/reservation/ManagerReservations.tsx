@@ -1,20 +1,14 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { ReservationListResponse } from '@/types/domain/reservation';
-import { useReservation } from '@/hooks/domain/useReservation';
+import { useReservation } from '@/hooks/domain/reservation';
 import { useMatching } from '@/hooks/domain/useMatching';
-import { useManagerReservationPagination } from '@/hooks/domain/useManagerReservationPagination';
+import { useManagerReservationPagination } from '@/hooks/domain/reservation';
 import { formatDateTime } from '@/utils';
-import { useReservationStatus } from '@/hooks/domain/useReservationStatus';
 import { SERVICE_TYPE_LABELS, SERVICE_TYPES } from '@/constants/service';
-import { RESERVATION_STATUS } from '@/constants/status';
 import { ManagerReservationCard } from '@/components';
 import { useToast } from '@/hooks/useToast';
-import { 
-  CheckInOutModal, 
-  ConfirmModal, 
-  MatchingCard, 
-  } from '@/components';
+import { CheckInOutModal, ConfirmModal, MatchingCard } from '@/components';
 import { ROUTES } from '@/constants/route';
 import { Header } from '@/components';
 import {
@@ -67,18 +61,11 @@ const FILTERS = [
   },
 ];
 
-// 매니저 예약 페이지 전용 상태 레이블
-const MANAGER_STATUS_LABELS = {
-  [RESERVATION_STATUS.MATCHED]: '결제 대기중',
-  [RESERVATION_STATUS.PAID]: '예정',
-};
-
 const ManagerReservationsAndMatching: React.FC = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { checkIn, checkOut, respondToReservation } = useReservation();
   const { fetchMatchings, matchings } = useMatching();
-  const { getStatusBadgeStyle } = useReservationStatus();
 
   // 서버사이드 페이징 훅 사용
   const {
@@ -98,25 +85,6 @@ const ManagerReservationsAndMatching: React.FC = () => {
     pageSize: 5,
   });
 
-  // 매니저 페이지 전용 상태 레이블 함수
-  const getManagerStatusLabel = (status: string, reservationDate?: string) => {
-    if (status === RESERVATION_STATUS.PAID && reservationDate) {
-      const today = new Date();
-      const resDate = new Date(reservationDate);
-      const diffTime = resDate.getTime() - today.getTime();
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-      if (diffDays === 0) return '업무를 시작하세요!';
-      if (diffDays === 1) return '내일 예정';
-      if (diffDays > 0) return `D-${diffDays}`;
-      if (diffDays < 0) return `D+${Math.abs(diffDays)}`;
-    }
-
-    return (
-      MANAGER_STATUS_LABELS[status as keyof typeof MANAGER_STATUS_LABELS] ||
-      status
-    );
-  };
   const [tab, setTab] = useState<'schedule' | 'request'>('schedule');
   const [matchingLoading, setMatchingLoading] = useState(true);
   const [filterOpen, setFilterOpen] = useState(false);
@@ -203,8 +171,6 @@ const ManagerReservationsAndMatching: React.FC = () => {
     <ManagerReservationCard
       key={reservation.reservationId}
       reservation={reservation}
-      getStatusBadgeStyle={getStatusBadgeStyle}
-      getStatusLabel={getManagerStatusLabel}
       onDetailClick={() =>
         navigate(
           ROUTES.MANAGER.RESERVATION_DETAIL.replace(
@@ -249,7 +215,6 @@ const ManagerReservationsAndMatching: React.FC = () => {
           setModal({ type: 'success', info: matching });
           refresh(); // 서버사이드 페이징이므로 새로고침 필요
         }
-
       }}
       onReject={async () => {
         const result = await respondToReservation(matching.reservationId, {
@@ -260,7 +225,6 @@ const ManagerReservationsAndMatching: React.FC = () => {
           setModal({ type: 'fail' });
           refresh(); // 서버사이드 페이징이므로 새로고침 필요
         }
-
       }}
     />
   );

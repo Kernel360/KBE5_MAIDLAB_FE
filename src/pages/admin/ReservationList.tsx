@@ -3,9 +3,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { type ReservationListResponse } from '@/types/domain/reservation';
 import { type MatchingResponse } from '@/types/domain/matching';
 import { adminApi } from '../../apis/admin';
-import { getServiceTypeName } from '@/constants/admin';
+import { getServiceTypeName } from '@/utils/format';
 import MatchingChangeDialog from '../../components/features/admin/MatchingChangeDialog';
-import type { TabPanelProps } from '@/types/common';
+import type { TabPanelProps } from '@/types/ui';
+import type { ServiceType } from '@/constants/service';
 
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
@@ -264,7 +265,9 @@ const ReservationList = () => {
                       {reservation.reservationId}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {getServiceTypeName(reservation.serviceType)}
+                      {getServiceTypeName(
+                        reservation.serviceType as ServiceType,
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {reservation.detailServiceType}

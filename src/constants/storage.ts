@@ -1,4 +1,4 @@
-// ===== 로컬스토리지 키 상수 =====
+// 앱 전역 스토리지 키
 export const STORAGE_KEYS = {
   ACCESS_TOKEN: 'accessToken',
   REFRESH_TOKEN: 'refreshToken',
@@ -10,6 +10,17 @@ export const STORAGE_KEYS = {
   RECENT_SEARCHES: 'recentSearches',
   NOTIFICATION_SETTINGS: 'notificationSettings',
   SAVED_LOGIN_INFO: 'savedLoginInfo',
+} as const;
+
+// ===== S3 관련 설정 =====
+export const S3_CONFIG = {
+  CLOUDFRONT_DOMAIN: 'https://d1llec2m3tvk5i.cloudfront.net',
+} as const;
+
+// 어드민 등 도메인별 스토리지 키
+export const LOCAL_STORAGE_KEYS = {
+  ADMIN_USER_TAB: 'adminUserTab',
+  ADMIN_MANAGER_STATUS: 'adminManagerStatus',
 } as const;
 
 // ===== 세션스토리지 키 상수 =====

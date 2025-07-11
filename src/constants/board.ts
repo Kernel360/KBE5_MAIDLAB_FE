@@ -31,3 +31,14 @@ export const BOARD_TYPE_ICONS: Record<BoardType, string> = {
   [BOARD_TYPES.SERVICE]: '🛠️',
   [BOARD_TYPES.ETC]: '❓',
 } as const;
+
+// 게시판 타입별 칩 색상
+export const BOARD_TYPE_COLORS: Record<
+  string,
+  'error' | 'primary' | 'info' | 'default'
+> = {
+  REFUND: 'error',
+  MANAGER: 'primary',
+  SERVICE: 'info',
+  ETC: 'default',
+} as const;

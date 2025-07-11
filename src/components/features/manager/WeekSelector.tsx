@@ -25,7 +25,7 @@ const formatDateCustom = (date: Date, format: string) => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
-  
+
   return format
     .replace('yyyy', String(year))
     .replace('MM', month)
@@ -39,11 +39,11 @@ const getKoreanWeekRange = (date: Date) => {
   return `${formatDateCustom(start, 'M.dd')} - ${formatDateCustom(end, 'M.dd')}`;
 };
 
-const WeekSelector: React.FC<WeekSelectorProps> = ({ 
-  currentWeek, 
-  onPrevWeek, 
-  onNextWeek, 
-  loading = false 
+const WeekSelector: React.FC<WeekSelectorProps> = ({
+  currentWeek,
+  onPrevWeek,
+  onNextWeek,
+  loading = false,
 }) => {
   return (
     <div className="backdrop-blur-custom bg-white/80 rounded-2xl border border-white/20 p-4 shadow-lg">
@@ -55,14 +55,14 @@ const WeekSelector: React.FC<WeekSelectorProps> = ({
         >
           <ChevronLeft className="w-5 h-5 text-gray-600" />
         </button>
-        
+
         <div className="text-center">
           <div className="text-sm text-gray-500 mb-1">정산 기간</div>
           <div className="text-lg font-bold text-gray-900">
             {getKoreanWeekRange(currentWeek)}
           </div>
         </div>
-        
+
         <button
           onClick={onNextWeek}
           className="w-10 h-10 rounded-xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-all duration-200"

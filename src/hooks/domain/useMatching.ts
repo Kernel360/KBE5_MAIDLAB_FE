@@ -1,7 +1,6 @@
-// useMatching.ts - 수정버전 (useManager 코드 제거)
 import { useState, useCallback } from 'react';
 import { matchingApi } from '@/apis/matching';
-import { useToast } from '../useToast';
+import { useApiCall } from '../useApiCall';
 import type {
   MatchingRequest,
   AvailableManagerResponse,
@@ -13,68 +12,63 @@ export const useMatching = () => {
     AvailableManagerResponse[]
   >([]);
   const [matchings, setMatchings] = useState<MatchingRequestListResponse[]>([]);
-  const [loading, setLoading] = useState(false);
-  const { showToast } = useToast();
+  const { executeApi, loading } = useApiCall();
 
   // 사용 가능한 매니저 조회
   const fetchAvailableManagers = useCallback(
     async (data: MatchingRequest) => {
-      try {
-        setLoading(true);
-        const managers = await matchingApi.getMatchingManagers(data);
-        setAvailableManagers(managers);
-        return managers;
-      } catch (error: any) {
-        showToast(
-          '해당 날짜와 예약 시간에 가능한 매니저가 없습니다. 예약 날짜와 시간을 변경해주세요.',
-          'error',
-        );
-        return [];
-      } finally {
-        setLoading(false);
+      const result = await executeApi(
+        () => matchingApi.getMatchingManagers(data),
+        {
+          successMessage: null,
+          errorMessage:
+            '해당 날짜와 예약 시간에 가능한 매니저가 없습니다. 예약 날짜와 시간을 변경해주세요.',
+        },
+      );
+
+      if (result.success && result.data) {
+        setAvailableManagers(result.data);
+        return result.data;
       }
+      return [];
     },
-    [showToast],
+    [executeApi],
   );
 
   // 매칭 시작
   const startMatching = useCallback(
     async (reservationId: number, managerId: number) => {
-      try {
-        setLoading(true);
-        const result = await matchingApi.startMatch(reservationId, managerId);
+      const result = await executeApi(
+        () => matchingApi.startMatch(reservationId, managerId),
+        {
+          successMessage: '매칭이 시작되었습니다.',
+          errorMessage: '매칭 시작에 실패했습니다.',
+        },
+      );
 
-        showToast('매칭이 시작되었습니다.', 'success');
-        return { success: true, data: result };
-      } catch (error: any) {
-        showToast(error.message || '매칭 시작에 실패했습니다.', 'error');
-        return { success: false, error: error.message };
-      } finally {
-        setLoading(false);
-      }
+      return result;
     },
-    [showToast],
+    [executeApi],
   );
 
   // 매칭 목록 조회
   const fetchMatchings = useCallback(
     async (page: number = 0, size: number = 10) => {
-      try {
-        setLoading(true);
-        const data = await matchingApi.getMatching(page, size);
-        setMatchings(data);
-        return data;
-      } catch (error: any) {
-        showToast(
-          error.message || '매칭 목록을 불러오는데 실패했습니다.',
-          'error',
-        );
-        return [];
-      } finally {
-        setLoading(false);
+      const result = await executeApi(
+        () => matchingApi.getMatching(page, size),
+        {
+          successMessage: null,
+          errorMessage: '매칭 목록을 불러오는데 실패했습니다.',
+        },
+      );
+
+      if (result.success && result.data) {
+        setMatchings(result.data);
+        return result.data;
       }
+      return [];
     },
-    [showToast],
+    [executeApi],
   );
 
   return {

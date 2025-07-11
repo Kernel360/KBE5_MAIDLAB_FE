@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, Copy, Share } from 'lucide-react';
-import { copyToClipboard } from '@/utils/common';
+import { copyToClipboard } from '@/utils/browser';
 import { useToast } from '@/hooks';
 
 interface ShareModalProps {

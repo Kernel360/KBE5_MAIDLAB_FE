@@ -1,4 +1,9 @@
-import type { UserType, Gender } from '@/constants/user';
+import type {
+  UserType,
+  Gender,
+  ManagerVerificationStatus,
+  ServiceType,
+} from '@/constants';
 
 /**
  * 로그인 정보 저장 타입
@@ -41,10 +46,10 @@ export interface Consumer extends BaseUser {
  */
 export interface Manager extends BaseUser {
   userType: 'MANAGER';
-  isVerified: 'PENDING' | 'APPROVED' | 'REJECTED';
+  isVerified: ManagerVerificationStatus;
   averageRate: number;
   regions: string[];
-  services: ('HOUSEKEEPING' | 'CARE')[];
+  services: ServiceType[];
   schedules: Array<{
     day: string;
     startTime: string;

@@ -1,13 +1,9 @@
 import { useState, useCallback } from 'react';
-
-interface GeolocationState {
-  location: {
-    latitude: number;
-    longitude: number;
-  } | null;
-  loading: boolean;
-  error: string | null;
-}
+import type {
+  GeolocationState,
+  UseGeolocationReturn,
+  Location,
+} from '@/types/hooks/geolocation';
 
 export const useGeolocation = () => {
   const [state, setState] = useState<GeolocationState>({
@@ -33,7 +29,7 @@ export const useGeolocation = () => {
           location: {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
-          },
+          } as Location,
           loading: false,
           error: null,
         });
@@ -91,5 +87,5 @@ export const useGeolocation = () => {
     error: state.error,
     getCurrentLocation,
     calculateDistance,
-  };
+  } as UseGeolocationReturn;
 };

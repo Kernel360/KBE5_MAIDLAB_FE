@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/useToast';
 import { consumerApi } from '@/apis/consumer';
 import type { BlackListedManagerResponse } from '@/types/domain/consumer';
@@ -73,7 +72,6 @@ function ManagerNameModal({
 }
 
 export default function BlackListManagerList() {
-  const navigate = useNavigate();
   const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [blacklistManagers, setBlacklistManagers] = useState<
@@ -127,10 +125,6 @@ export default function BlackListManagerList() {
     } catch (error) {
       showToast('매니저 삭제에 실패했습니다.', 'error');
     }
-  };
-
-  const handleBack = () => {
-    navigate(ROUTES.CONSUMER.MYPAGE);
   };
 
   const handleImageError = (managerUuid: string) => {

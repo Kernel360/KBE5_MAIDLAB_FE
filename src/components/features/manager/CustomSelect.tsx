@@ -27,7 +27,10 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
+      if (
+        selectRef.current &&
+        !selectRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -56,7 +59,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
           {label}
         </label>
       )}
-      
+
       {/* 선택된 값 표시 버튼 */}
       <button
         type="button"
@@ -66,13 +69,15 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
           disabled
             ? 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200'
             : isOpen
-            ? 'border-orange-500 ring-1 ring-orange-200 shadow-md'
-            : 'border-gray-300 hover:border-orange-400 shadow-sm'
+              ? 'border-orange-500 ring-1 ring-orange-200 shadow-md'
+              : 'border-gray-300 hover:border-orange-400 shadow-sm'
         }`}
       >
         <div className="flex items-center gap-2">
           <IconComponent className="w-4 h-4 text-gray-400" />
-          <span className={`text-sm font-medium ${value ? 'text-gray-700' : 'text-gray-400'}`}>
+          <span
+            className={`text-sm font-medium ${value ? 'text-gray-700' : 'text-gray-400'}`}
+          >
             {value ? getDisplayText(value) : placeholder}
           </span>
         </div>

@@ -4,9 +4,16 @@
   --color-primary-dark: #ea580c;
   --color-secondary: #6b7280;
 
-  /* 그레이스케일 */
+  /* 그레이스케일 (라이트 모드 기본값) */
   --color-gray-50: #f9fafb;
   --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
   --color-gray-900: #111827;
 
   /* 간격 */
@@ -41,6 +48,22 @@
 
 /* 다크모드 변수 */
 [data-theme='dark'] {
+  --color-primary: #f97316; /* Primary color remains the same */
+  --color-primary-dark: #ea580c; /* Primary dark color remains the same */
+  --color-secondary: #9ca3af; /* Secondary color adjusted for dark mode */
+
+  /* 그레이스케일 (다크 모드) */
+  --color-gray-50: #111827; /* Dark background */
+  --color-gray-100: #1f2937;
+  --color-gray-200: #374151;
+  --color-gray-300: #4b5563;
+  --color-gray-400: #6b7280;
+  --color-gray-500: #9ca3af;
+  --color-gray-600: #d1d5db;
+  --color-gray-700: #e5e7eb;
+  --color-gray-800: #f3f4f6;
+  --color-gray-900: #f9fafb; /* Light text */
+
   --color-background: #111827;
   --color-text: #f9fafb;
   --color-border: #374151;

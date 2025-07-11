@@ -1,7 +1,7 @@
 import React from 'react';
 import { Sun, Moon, Monitor } from 'lucide-react';
 import { useTheme } from '@/hooks/useTheme';
-import { getThemeIcon, getThemeDisplayName } from '@/utils/theme';
+import { getThemeDisplayName } from '@/utils/theme';
 
 interface ThemeToggleProps {
   variant?: 'switch' | 'button';
@@ -17,18 +17,18 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
   className = '',
 }) => {
   const { theme, setTheme, resolvedTheme } = useTheme();
-  
+
   console.log('ThemeToggle render:', { theme, resolvedTheme });
 
   const sizeClasses = {
     sm: 'w-20 h-8',
-    md: 'w-24 h-10', 
+    md: 'w-24 h-10',
     lg: 'w-28 h-12',
   };
 
   const iconSizes = {
     sm: 'w-4 h-4',
-    md: 'w-5 h-5', 
+    md: 'w-5 h-5',
     lg: 'w-6 h-6',
   };
 
@@ -38,65 +38,31 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
     lg: 'w-10 h-10',
   };
 
-  const getThemePosition = () => {
-    switch (theme) {
-      case 'light': return 'translate-x-1';
-      case 'dark': return 'translate-x-[4rem]';
-      case 'system': return 'translate-x-[2rem]';
-      default: return 'translate-x-1';
-    }
-  };
-
   const handleLightClick = () => {
     console.log('Light clicked, setting theme to light');
     setTheme('light');
   };
-  
+
   const handleDarkClick = () => {
     console.log('Dark clicked, setting theme to dark');
     setTheme('dark');
   };
-  
+
   const handleSystemClick = () => {
     console.log('System clicked, setting theme to system');
     setTheme('system');
   };
-  
-  const handleSwitchClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-    
-    const rect = event.currentTarget.getBoundingClientRect();
-    const clickX = event.clientX - rect.left;
-    const width = rect.width;
-    const section = clickX / width;
-    
-    console.log('Switch clicked:', { clickX, width, section, currentTheme: theme });
-    
-    if (section < 0.33) {
-      handleLightClick();
-    } else if (section < 0.67) {
-      handleDarkClick();
-    } else {
-      handleSystemClick();
-    }
-  };
-
-  const getBackgroundColor = () => {
-    switch (theme) {
-      case 'light': return 'bg-yellow-400';
-      case 'dark': return 'bg-slate-700';
-      case 'system': return 'bg-blue-500';
-      default: return 'bg-gray-300';
-    }
-  };
 
   const getThemeIconComponent = (themeType: string) => {
     switch (themeType) {
-      case 'light': return <Sun className={`${iconSizes[size]} text-white`} />;
-      case 'dark': return <Moon className={`${iconSizes[size]} text-white`} />;
-      case 'system': return <Monitor className={`${iconSizes[size]} text-white`} />;
-      default: return <Sun className={`${iconSizes[size]} text-white`} />;
+      case 'light':
+        return <Sun className={`${iconSizes[size]} text-white`} />;
+      case 'dark':
+        return <Moon className={`${iconSizes[size]} text-white`} />;
+      case 'system':
+        return <Monitor className={`${iconSizes[size]} text-white`} />;
+      default:
+        return <Sun className={`${iconSizes[size]} text-white`} />;
     }
   };
 
@@ -106,7 +72,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
       else if (theme === 'dark') setTheme('system');
       else setTheme('light');
     };
-    
+
     return (
       <button
         onClick={cycleTheme}
@@ -128,8 +94,12 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
   }
 
   return (
-    <div className={`theme-toggle flex items-center justify-center ${className}`}>
-      <div className={`relative ${sizeClasses[size]} bg-gray-200 dark:bg-gray-600 rounded-full p-1 transition-colors duration-300`}>
+    <div
+      className={`theme-toggle flex items-center justify-center ${className}`}
+    >
+      <div
+        className={`relative ${sizeClasses[size]} bg-gray-200 dark:bg-gray-600 rounded-full p-1 transition-colors duration-300`}
+      >
         {/* 배경 트랙 - 3개 영역 */}
         <div className="absolute inset-1 flex">
           {/* 라이트 모드 영역 */}
@@ -145,7 +115,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
             <Moon className={`${iconSizes[size]} text-gray-400`} />
           </div>
         </div>
-        
+
         {/* 슬라이딩 버튼 */}
         <div
           className={`
@@ -153,16 +123,25 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
             transition-all duration-300 ease-in-out flex items-center justify-center z-10
           `}
           style={{
-            left: theme === 'light' ? '4px' : 
-                  theme === 'system' ? 'calc(33.33% + 2px)' : 
-                  'calc(66.66% + 0px)'
+            left:
+              theme === 'light'
+                ? '4px'
+                : theme === 'system'
+                  ? 'calc(33.33% + 2px)'
+                  : 'calc(66.66% + 0px)',
           }}
         >
-          {theme === 'light' && <Sun className={`${iconSizes[size]} text-yellow-500`} />}
-          {theme === 'system' && <Monitor className={`${iconSizes[size]} text-blue-500`} />}
-          {theme === 'dark' && <Moon className={`${iconSizes[size]} text-slate-600`} />}
+          {theme === 'light' && (
+            <Sun className={`${iconSizes[size]} text-yellow-500`} />
+          )}
+          {theme === 'system' && (
+            <Monitor className={`${iconSizes[size]} text-blue-500`} />
+          )}
+          {theme === 'dark' && (
+            <Moon className={`${iconSizes[size]} text-slate-600`} />
+          )}
         </div>
-        
+
         {/* 클릭 가능한 영역들 - 3개 영역 */}
         <button
           onClick={handleLightClick}
@@ -180,7 +159,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
           title="다크 모드"
         />
       </div>
-      
+
       {showLabel && (
         <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
           {getThemeDisplayName(theme)}
@@ -191,17 +170,17 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
 };
 
 // 간단한 아이콘만 있는 버전
-export const ThemeToggleIcon: React.FC<{ className?: string }> = ({ 
-  className = '' 
+export const ThemeToggleIcon: React.FC<{ className?: string }> = ({
+  className = '',
 }) => {
   const { theme, setTheme } = useTheme();
-  
+
   const cycleTheme = () => {
     if (theme === 'light') setTheme('dark');
     else if (theme === 'dark') setTheme('system');
     else setTheme('light');
   };
-  
+
   return (
     <button
       onClick={cycleTheme}

@@ -8,7 +8,10 @@ const LoadingSkeleton: React.FC<LoadingSkeletonProps> = ({ count = 3 }) => {
   return (
     <>
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+        <div
+          key={i}
+          className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100"
+        >
           <div className="animate-pulse">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-14 h-14 bg-gray-200 rounded-2xl"></div>

@@ -134,7 +134,8 @@ export const SERVICE_DETAIL_TYPES: Record<string, ServiceDetailType> = {
     id: 3,
     name: '영유아 돌봄',
     type: SERVICE_TYPES.BABYSITTER,
-    description: '수유, 이유식 먹이기, 기저귀 갈기, 재우기, 목욕시키기, 놀이 활동, 간단한 세탁 등',
+    description:
+      '수유, 이유식 먹이기, 기저귀 갈기, 재우기, 목욕시키기, 놀이 활동, 간단한 세탁 등',
     options: [
       '아이의 건강 관리, 위생 돌봄, 수면, 위생 관리 등',
       '기저귀 및 이유식 챙기기, 간단한 식사 준비, 목욕 등',
@@ -145,10 +146,7 @@ export const SERVICE_DETAIL_TYPES: Record<string, ServiceDetailType> = {
     name: '유아 교육',
     type: SERVICE_TYPES.BABYSITTER,
     description: '학습 보조, 독서 지도, 놀이 활동 등',
-    options: [
-      '아이의 학업/공부 도와주기',
-      '놀이 활동, 독서 지도 등',
-    ],
+    options: ['아이의 학업/공부 도와주기', '놀이 활동, 독서 지도 등'],
   },
   // 반려동물 케어
   기본돌봄: {
@@ -156,23 +154,14 @@ export const SERVICE_DETAIL_TYPES: Record<string, ServiceDetailType> = {
     name: '기본 돌봄',
     type: SERVICE_TYPES.PET_CARE,
     description: '기본 돌봄(배식/산책/배변 정리/응급처치 등)',
-    options: [
-      '배식/급수',
-      '배변 정리',
-      '응급처치',
-      '운동/놀이',
-    ],
+    options: ['배식/급수', '배변 정리', '응급처치', '운동/놀이'],
   },
   산책: {
     id: 6,
     name: '산책',
     type: SERVICE_TYPES.PET_CARE,
     description: '반려동물 산책 서비스',
-    options: [
-      '기본 산책',
-      '리드줄 착용',
-      '배변 정리',
-    ],
+    options: ['기본 산책', '리드줄 착용', '배변 정리'],
   },
 } as const;
 
@@ -200,7 +189,7 @@ export const SERVICE_LIST = [
     id: SERVICE_TYPES.PET_CARE,
     label: SERVICE_TYPE_LABELS[SERVICE_TYPES.PET_CARE],
     icon: '🦮',
-  }
+  },
 ];
 
 export const SERVICE_OPTIONS = [
@@ -208,28 +197,28 @@ export const SERVICE_OPTIONS = [
     id: 'WINDOW_CLEANING',
     label: '창문 유리/커튼 및 블라인드 청소',
     timeAdd: 90, // 1.5시간 = 90분
-    priceAdd: 27900
+    priceAdd: 27900,
   },
   {
     id: 'FAN_CLEANING',
     label: '선풍기 청소',
     timeAdd: 20, // 20분
     priceAdd: 7800,
-    countable: true // 개수 선택 가능
+    countable: true, // 개수 선택 가능
   },
   {
     id: 'SHOES_CLEANING',
     label: '운동화 세탁',
     timeAdd: 30, // 0.5시간 = 30분
     priceAdd: 8600,
-    countable: true // 개수 선택 가능
+    countable: true, // 개수 선택 가능
   },
   {
     id: 'IRONING',
     label: '다림질',
     timeAdd: 60, // 1시간 = 60분
-    priceAdd: 15600
-  }
+    priceAdd: 15600,
+  },
 ];
 
 // 개수 선택 가능한 옵션의 최대 개수
@@ -250,18 +239,21 @@ export const ROOM_SIZES: RoomSizeOption[] = [
   { id: 50, label: '50평 이상', priceMultiplier: 2.0 },
 ] as const;
 
-
-
 // ===== 생활청소 평수별 요금/시간 기준표 (이미지 표 기준) =====
 export const ROOM_SIZES_LIFE_CLEANING = [
-  { range: '8평 이하', baseTime: 3.5, unitPrice: 15000, estimatedPrice: 52500},
+  { range: '8평 이하', baseTime: 3.5, unitPrice: 15000, estimatedPrice: 52500 },
   { range: '9~10평', baseTime: 3.5, unitPrice: 15600, estimatedPrice: 54600 },
   { range: '11~15평', baseTime: 4, unitPrice: 15750, estimatedPrice: 63000 },
   { range: '16~20평', baseTime: 4, unitPrice: 16000, estimatedPrice: 64000 },
   { range: '21~25평', baseTime: 4.5, unitPrice: 16500, estimatedPrice: 74250 },
   { range: '26~30평', baseTime: 4.5, unitPrice: 16800, estimatedPrice: 75600 },
   { range: '31~34평', baseTime: 4.5, unitPrice: 17000, estimatedPrice: 76500 },
-  { range: '35평 이상', baseTime: 4.5, unitPrice: 17150, estimatedPrice: 78000 },
+  {
+    range: '35평 이상',
+    baseTime: 4.5,
+    unitPrice: 17150,
+    estimatedPrice: 78000,
+  },
 ];
 
 // ===== 수수료 관련 상수 =====
@@ -279,3 +271,21 @@ export const CURRENCY_FORMATTERS: Record<Currency, (value: number) => string> =
     [CURRENCY.USD]: (val) => `$${val.toLocaleString('en-US')}`,
     [CURRENCY.EUR]: (val) => `€${val.toLocaleString('de-DE')}`,
   } as const;
+
+// ===== 비즈니스 룰 설정 =====
+export const BUSINESS_CONFIG = {
+  ROOM_SIZES: [
+    { key: 'STUDIO', label: '원룸/스튜디오', basePrice: 50000 },
+    { key: 'ONE_ROOM', label: '1.5룸', basePrice: 60000 },
+    { key: 'TWO_ROOM', label: '2룸', basePrice: 70000 },
+    { key: 'THREE_ROOM', label: '3룸', basePrice: 80000 },
+    { key: 'FOUR_PLUS_ROOM', label: '4룸 이상', basePrice: 100000 },
+  ],
+  SERVICE_HOURS: {
+    START: 9,
+    END: 18,
+  },
+  MAX_FILE_SIZE_MB: 10,
+  SUPPORTED_IMAGE_TYPES: ['image/jpeg', 'image/png', 'image/webp'],
+  SUPPORTED_DOCUMENT_TYPES: ['application/pdf', 'image/jpeg', 'image/png'],
+} as const;

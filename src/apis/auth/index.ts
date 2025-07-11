@@ -68,27 +68,6 @@ export const authApi = {
   },
 
   /**
-   * 토큰 갱신
-   */
-  refreshToken: async (refreshToken?: string): Promise<LoginResponse> => {
-    // refreshToken이 있으면 헤더에 포함, 없으면 쿠키 자동 전송
-    const config = refreshToken
-      ? {
-          headers: {
-            Authorization: `Bearer ${refreshToken}`,
-          },
-        }
-      : undefined;
-
-    return apiCall<LoginResponse>(
-      'post',
-      API_ENDPOINTS.AUTH.REFRESH,
-      undefined,
-      config,
-    );
-  },
-
-  /**
    * 로그아웃
    */
   logout: async (): Promise<void> => {
@@ -100,6 +79,13 @@ export const authApi = {
    */
   changePassword: async (data: PasswordChangeRequest): Promise<void> => {
     return apiCall<void>('patch', API_ENDPOINTS.AUTH.CHANGE_PASSWORD, data);
+  },
+
+  /**
+   * 토큰 갱신
+   */
+  refreshToken: async (): Promise<LoginResponse> => {
+    return apiCall<LoginResponse>('post', API_ENDPOINTS.AUTH.REFRESH);
   },
 
   /**

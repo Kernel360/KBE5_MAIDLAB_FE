@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useMatching } from '@/hooks/domain/useMatching';
-import { useReservation } from '@/hooks/domain/useReservation';
+import { useReservation } from '@/hooks/domain/reservation';
 import type { MatchingRequestListResponse } from '@/types/domain/matching';
 import { IoArrowBack } from 'react-icons/io5';
 import { formatPrice } from '@/utils/format';
@@ -109,10 +109,7 @@ const ManagerMatching = () => {
                       {matching.detailServiceType} &gt; {matching.serviceType}
                     </h3>
                     <div className="text-gray-600 space-y-1">
-                      <p>
-                        예약일:{' '}
-                        {formatDateTime(matching.reservationDate)}
-                      </p>
+                      <p>예약일: {formatDateTime(matching.reservationDate)}</p>
                       <p>
                         서비스 시간: {range} ({hours}시간)
                       </p>

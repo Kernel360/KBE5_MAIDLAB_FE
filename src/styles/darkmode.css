@@ -1,0 +1,151 @@
+/* 통합된 다크모드 스타일 */
+.dark {
+  /* 루트 레벨 강제 적용 */
+  background-color: var(--color-gray-50) !important; /* Dark background */
+  color: var(--color-gray-900) !important; /* Light text */
+}
+
+/* 모든 요소에 다크모드 강제 적용 (force-dark.css의 더 강력한 규칙) */
+.dark *:not(.theme-toggle):not(svg):not(path) {
+  background-color: var(--color-gray-100) !important;
+  color: var(--color-gray-900) !important;
+  border-color: var(--color-gray-200) !important;
+}
+
+/* 특정 배경색 클래스들 재정의 */
+.dark .bg-white,
+.dark [class*='bg-white'] {
+  background-color: var(--color-gray-100) !important;
+}
+
+.dark .bg-gray-50,
+.dark [class*='bg-gray-50'] {
+  background-color: var(--color-gray-50) !important;
+}
+
+.dark .bg-gray-100,
+.dark [class*='bg-gray-100'] {
+  background-color: var(--color-gray-100) !important;
+}
+
+.dark .bg-gray-200,
+.dark [class*='bg-gray-200'] {
+  background-color: var(--color-gray-200) !important;
+}
+
+/* 텍스트 색상 강제 적용 */
+.dark .text-gray-900,
+.dark .text-gray-800,
+.dark .text-gray-700,
+.dark .text-gray-600,
+.dark .text-black,
+.dark [class*='text-gray'],
+.dark [class*='text-black'] {
+  color: var(--color-gray-900) !important;
+}
+
+/* 모든 SVG 아이콘을 흰색으로 */
+.dark svg,
+.dark svg *,
+.dark .lucide,
+.dark .lucide * {
+  color: var(--color-gray-900) !important;
+  fill: currentColor !important;
+  stroke: currentColor !important;
+}
+
+/* 페이지 전체 컨테이너들 */
+.dark body,
+.dark html,
+.dark #root,
+.dark .App {
+  background-color: var(--color-gray-50) !important;
+  color: var(--color-gray-900) !important;
+}
+
+/* 카드, 모달, 팝업 등 */
+.dark .shadow,
+.dark .shadow-sm,
+.dark .shadow-md,
+.dark .shadow-lg {
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.3),
+    0 2px 4px -1px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* 입력 필드들 */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: var(--color-gray-200) !important;
+  color: var(--color-gray-900) !important;
+  border-color: var(--color-gray-300) !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: var(--color-gray-500) !important;
+}
+
+/* 버튼 호버 효과 */
+.dark .hover\:bg-gray-100:hover,
+.dark .hover\:bg-gray-50:hover,
+.dark [class*='hover:bg-gray']:hover {
+  background-color: var(--color-gray-200) !important;
+}
+
+/* 메뉴 및 드롭다운 */
+.dark .border,
+.dark [class*='border'] {
+  border-color: var(--color-gray-200) !important;
+}
+
+/* 특별한 요소들은 제외 */
+.dark .theme-toggle,
+.dark .theme-toggle * {
+  background-color: unset !important;
+  color: unset !important;
+}
+
+/* dark-theme.css에서 force-dark.css에 없는 추가 규칙 (주로 특정 요소의 배경색) */
+.dark header {
+  background-color: var(--color-gray-100) !important;
+  color: var(--color-gray-900) !important;
+}
+
+.dark main,
+.dark .main-content,
+.dark .app-container {
+  background-color: var(--color-gray-50) !important;
+  color: var(--color-gray-900) !important;
+}
+
+.dark div[class*='bg-'] {
+  background-color: var(--color-gray-100) !important;
+}
+
+.dark div[class*='bg-gray-50'] {
+  background-color: var(--color-gray-50) !important;
+}
+
+.dark div[class*='bg-white'] {
+  background-color: var(--color-gray-100) !important;
+}
+
+.dark *[class*='bg-gray-50'],
+.dark *[class*='bg-gray-100'] {
+  background-color: var(--color-gray-50) !important;
+}
+
+.dark *[class*='bg-white'] {
+  background-color: var(--color-gray-100) !important;
+}
+
+.dark div,
+.dark section,
+.dark article,
+.dark aside,
+.dark nav {
+  background-color: var(--color-gray-100) !important;
+  color: var(--color-gray-900) !important;
+}

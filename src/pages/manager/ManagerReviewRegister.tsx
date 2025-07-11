@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useReservation } from '@/hooks/domain/useReservation';
+import { useReview } from '@/hooks';
 import { ROUTES } from '@/constants';
 import { LENGTH_LIMITS } from '@/constants/validation';
 import { ArrowLeft, Star, Sparkles, Edit3, X } from 'lucide-react';
-import type { ReviewRegisterRequest } from '@/types/domain/reservation';
+import type { ReviewRegisterRequest } from '@/types/domain/review';
 import type { ReviewFormData } from '@/types/domain/consumer';
 
 // 매니저용 키워드 템플릿 데이터
@@ -311,7 +311,7 @@ const ReviewTextArea: React.FC<{
 const ManagerReviewRegister: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { registerReview } = useReservation();
+  const { registerReview } = useReview();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
 

@@ -30,15 +30,19 @@ export { default as EventDetail } from './common/EventDetail';
  * consumer
  */
 
-// 소비자 프로필 설정 페이지
+// 수요자 프로필 등록 페이지
 export { default as ConsumerProfileSetup } from './consumer/ConsumerProfileSetup';
 
+// 수요자 프로필 수정 페이지
 export { default as ConsumerProfileEdit } from './consumer/ProfileEdit';
 
+// 수요자 마이페이지
 export { default as ConsumerMyPage } from './consumer/MyPage';
+
+// 수요자 프로필 페이지
 export { default as ConsumerProfile } from './consumer/Profile';
 
-// 소비자 리뷰 등록 페이지
+// 수요자 리뷰 등록 페이지
 export { default as ConsumerReviewRegister } from './consumer/ConsumerReviewRegister';
 
 // 수요자의 찜한 매니저 조회
@@ -47,7 +51,7 @@ export { default as LikedManagerList } from './consumer/LikedManagerList';
 // 수요자의 블랙리스트 매니저 조회
 export { default as BlackListManagerList } from './consumer/BlackListManagerList';
 
-// 소비자 포인트 페이지
+// 수요자 포인트 페이지
 export { default as PointsPage } from './consumer/PointsPage';
 
 /**
@@ -125,10 +129,9 @@ export { default as AdminLogin } from '@/pages/admin/AdminLogin';
 
 // 관리자 어쩌구 페이지...
 export { default as AdminLayout } from '@/pages/admin/layout/AdminLayout';
-export { default as AdminUserList } from '@/pages/admin/UserList';
-export { default as AdminManagerList} from '@/pages/admin/ManagerList'
+export { default as AdminManagerList } from '@/pages/admin/ManagerList';
 export { default as AdminManagerDetail } from '@/pages/admin/ManagerDetail';
-export { default as AdminConsumerList} from '@/pages/admin/ConsumerList'
+export { default as AdminConsumerList } from '@/pages/admin/ConsumerList';
 export { default as AdminConsumerDetail } from '@/pages/admin/ConsumerDetail';
 export { default as AdminReservationList } from '@/pages/admin/ReservationList';
 export { default as AdminReservationDetail } from '@/pages/admin/ReservationDetail';
