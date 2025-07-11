@@ -171,23 +171,23 @@
   padding: 8px 12px;
 }
 
-/* 데스크톱 뷰포트 스크롤바 커스터마이징 */
+/* 메인 컨테이너 스크롤바 커스터마이징 */
 
-.desktop-viewport::-webkit-scrollbar {
-  width: 8px;
+.main-container::-webkit-scrollbar {
+  width: 10px;
   background: transparent;
 }
 
-.desktop-viewport::-webkit-scrollbar-track {
+.main-container::-webkit-scrollbar-track {
   background: transparent;
-  margin-top: 64px; /* 헤더 높이만큼 스크롤바 트랙 시작점 조정 */
+  margin-top: 64px; /* 헤더 높이만큼 스크롤바 시작점 조정 */
 }
 
-.desktop-viewport::-webkit-scrollbar-thumb {
+.main-container::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 4px;
 }
 
-.desktop-viewport::-webkit-scrollbar-thumb:hover {
+.main-container::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }

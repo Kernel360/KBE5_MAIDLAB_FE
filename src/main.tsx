@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, useLocation } from 'react-router-dom';
 import App from './App';
 import { ScrollToTop } from './components/common';
-import { DesktopViewport } from './components/layout';
 import { AuthProvider, ThemeProvider, ToastProvider } from '@/hooks';
 import { ToastContainer } from '@/components/common';
 import { Analytics } from '@vercel/analytics/react';
@@ -38,13 +37,13 @@ const ConditionalLayout = () => {
     );
   }
 
-  // 일반 페이지는 뷰포트로 렌더링
+  // 일반 페이지는 전체 화면으로 렌더링
   return (
     <>
       <ScrollToTop />
-      <DesktopViewport>
+      <div className="w-screen h-screen bg-white dark:bg-gray-900 overflow-y-auto overflow-x-hidden main-container">
         <App />
-      </DesktopViewport>
+      </div>
 
       {/* 토스트 컨테이너 - 최상위에서 관리 */}
       <div style={{ position: 'fixed', zIndex: 10000 }}>

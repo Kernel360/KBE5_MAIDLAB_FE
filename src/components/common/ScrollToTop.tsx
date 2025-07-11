@@ -8,27 +8,10 @@ const ScrollToTop = () => {
 
   // 페이지 변경 시 스크롤을 맨 위로
   useEffect(() => {
-    // 현재 화면 크기에 맞는 스크롤 컨테이너 찾기
-    const getScrollContainer = () => {
-      // 모든 뷰포트 컨테이너 확인
-      const desktopViewports = document.querySelectorAll('.desktop-viewport');
+    const mainContainer = document.querySelector('.main-container');
 
-      // 현재 보이는 뷰포트 찾기 (display: none이 아닌 것)
-      for (const viewport of desktopViewports) {
-        const styles = window.getComputedStyle(viewport);
-        if (styles.display !== 'none') {
-          return viewport;
-        }
-      }
-
-      // 뷰포트가 없으면 window 사용
-      return null;
-    };
-
-    const scrollContainer = getScrollContainer();
-
-    if (scrollContainer) {
-      scrollContainer.scrollTo(0, 0);
+    if (mainContainer) {
+      mainContainer.scrollTo(0, 0);
     } else {
       window.scrollTo(0, 0);
     }
@@ -36,23 +19,10 @@ const ScrollToTop = () => {
 
   // 스크롤 위치에 따라 버튼 표시/숨김
   useEffect(() => {
-    const getScrollContainer = () => {
-      const desktopViewports = document.querySelectorAll('.desktop-viewport');
-
-      for (const viewport of desktopViewports) {
-        const styles = window.getComputedStyle(viewport);
-        if (styles.display !== 'none') {
-          return viewport;
-        }
-      }
-
-      return null;
-    };
-
     const toggleVisibility = () => {
-      const scrollContainer = getScrollContainer();
-      const scrollTop = scrollContainer
-        ? scrollContainer.scrollTop
+      const mainContainer = document.querySelector('.main-container');
+      const scrollTop = mainContainer
+        ? mainContainer.scrollTop
         : window.pageYOffset;
 
       if (scrollTop > 300) {
@@ -62,12 +32,15 @@ const ScrollToTop = () => {
       }
     };
 
-    const scrollContainer = getScrollContainer();
+    // 초기 실행
+    toggleVisibility();
 
-    if (scrollContainer) {
-      scrollContainer.addEventListener('scroll', toggleVisibility);
+    const mainContainer = document.querySelector('.main-container');
+
+    if (mainContainer) {
+      mainContainer.addEventListener('scroll', toggleVisibility);
       return () =>
-        scrollContainer.removeEventListener('scroll', toggleVisibility);
+        mainContainer.removeEventListener('scroll', toggleVisibility);
     } else {
       window.addEventListener('scroll', toggleVisibility);
       return () => window.removeEventListener('scroll', toggleVisibility);
@@ -75,23 +48,10 @@ const ScrollToTop = () => {
   }, []);
 
   const scrollToTop = () => {
-    const getScrollContainer = () => {
-      const desktopViewports = document.querySelectorAll('.desktop-viewport');
+    const mainContainer = document.querySelector('.main-container');
 
-      for (const viewport of desktopViewports) {
-        const styles = window.getComputedStyle(viewport);
-        if (styles.display !== 'none') {
-          return viewport;
-        }
-      }
-
-      return null;
-    };
-
-    const scrollContainer = getScrollContainer();
-
-    if (scrollContainer) {
-      scrollContainer.scrollTo({
+    if (mainContainer) {
+      mainContainer.scrollTo({
         top: 0,
         behavior: 'smooth',
       });
