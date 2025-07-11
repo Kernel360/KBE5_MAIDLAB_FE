@@ -1,4 +1,4 @@
-import { WEEKDAY_SHORT_LABELS, WEEKDAYS } from '@/constants/service';
+import { WEEKDAY_SHORT_LABELS, WEEKDAYS } from '@/constants';
 
 /**
  * 날짜를 YYYY-MM-DD 형식으로 포맷팅
@@ -45,7 +45,7 @@ export const formatTime = (date: Date | string): string => {
   if (typeof date === 'string' && /^\d{2}:\d{2}$/.test(date)) {
     return date;
   }
-  
+
   // 시간 문자열이 HH:MM:SS 형식인 경우
   if (typeof date === 'string' && /^\d{2}:\d{2}:\d{2}$/.test(date)) {
     return date.substring(0, 5); // HH:MM만 반환
@@ -230,6 +230,14 @@ export const timeStringToDate = (
 
   date.setHours(hours, minutes, 0, 0);
   return date;
+};
+
+/**
+ * 날짜와 시간을 ISO DateTime 형식으로 변환
+ */
+export const toISODateTime = (date: string, time: string): string => {
+  const [hours, minutes] = time.split(':').map(Number);
+  return `${date}T${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`;
 };
 
 /**

@@ -2,11 +2,10 @@ import { useCallback } from 'react';
 import { getUserType as getStoredUserType } from '@/utils/auth'; // 🔧 utils 활용
 import { useManager } from './useManager';
 import { useConsumer } from './useConsumer';
-import type { UserType } from '@/types';
+import type { UserType } from '@/constants';
 
 /**
  * 통합 사용자 인터페이스 훅
- * 🔧 실제 구현은 개별 훅에 위임하여 중복 완전 제거
  */
 export const useUser = () => {
   // 개별 훅들 가져오기
@@ -43,7 +42,6 @@ export const useUser = () => {
     ...(userType === 'MANAGER' && {
       createProfile: managerHook.createProfile,
       fetchMyReviews: managerHook.fetchMyReviews,
-      formatProfileData: managerHook.formatProfileData,
     }),
     // 소비자 전용 기능
     ...(userType === 'CONSUMER' && {
@@ -53,7 +51,6 @@ export const useUser = () => {
       blacklistManager: consumerHook.blacklistManager,
       setManagerPreference: consumerHook.setManagerPreference,
       removeLikedManager: consumerHook.removeLikedManager,
-      formatProfileData: consumerHook.formatProfileData,
     }),
   };
 

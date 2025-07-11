@@ -175,9 +175,7 @@ const SocialSignUp: React.FC = () => {
                 }`}
               />
               {errors.birth && touched.birth && (
-                <p className="text-red-500 text-sm">
-                  {getBirthErrorMessage()}
-                </p>
+                <p className="text-red-500 text-sm">{getBirthErrorMessage()}</p>
               )}
             </div>
 

@@ -15,7 +15,10 @@ export default function BoardCreate() {
         showMenu={false}
       />
       <div className="py-0">
-        <BoardForm mode="create" onSuccess={() => navigate(ROUTES.BOARD.LIST)} />
+        <BoardForm
+          mode="create"
+          onSuccess={() => navigate(ROUTES.BOARD.LIST)}
+        />
       </div>
     </div>
   );

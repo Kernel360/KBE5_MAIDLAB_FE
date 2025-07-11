@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAdmin } from '@/hooks';
+import { useAdminBoard } from '@/hooks/domain/admin';
 import { ROUTES } from '@/constants';
-import { BOARD_TYPE_NAMES, BOARD_TYPE_COLORS } from '@/constants/admin';
+import { BOARD_TYPE_LABELS, BOARD_TYPE_COLORS } from '@/constants/board';
 import type { BoardDetailResponse } from '@/types/domain/board';
 
 // Admin-friendly color scheme matching the admin layout
@@ -19,7 +19,7 @@ const chipColors = {
 const BoardDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { boardManagement } = useAdmin();
+  const { fetchBoardDetail, createAnswer, updateAnswer } = useAdminBoard();
   const [board, setBoard] = useState<BoardDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [answer, setAnswer] = useState('');
@@ -29,10 +29,10 @@ const BoardDetail = () => {
 
   // 게시글 상세 정보 조회
   useEffect(() => {
-    const fetchBoardDetail = async () => {
+    const loadBoardData = async () => {
       if (!id) return;
       try {
-        const data = await boardManagement.fetchBoardDetail(Number(id));
+        const data = await fetchBoardDetail(Number(id));
         if (data) {
           setBoard(data);
           if (data.answer) {
@@ -47,9 +47,9 @@ const BoardDetail = () => {
     };
 
     if (loading) {
-      fetchBoardDetail();
+      loadBoardData();
     }
-  }, [id, boardManagement, loading]);
+  }, [id, fetchBoardDetail, loading]);
 
   // 목록으로 돌아가기
   const handleBack = () => {
@@ -75,19 +75,19 @@ const BoardDetail = () => {
       let result;
       if (isEditing && board?.answer) {
         // 답변 수정
-        result = await boardManagement.updateAnswer(Number(id), {
+        result = await updateAnswer(Number(id), {
           content: answer.trim(),
         });
       } else {
         // 답변 등록
-        result = await boardManagement.createAnswer(Number(id), {
+        result = await createAnswer(Number(id), {
           content: answer.trim(),
         });
       }
 
       if (result.success) {
         // 답변 등록/수정 후 게시글 정보 새로고침
-        const data = await boardManagement.fetchBoardDetail(Number(id));
+        const data = await fetchBoardDetail(Number(id));
         if (data) {
           setBoard(data);
           setIsEditing(false);
@@ -227,7 +227,7 @@ const BoardDetail = () => {
               <span
                 className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${chipColors[BOARD_TYPE_COLORS[board.boardType]] || chipColors.default}`}
               >
-                {BOARD_TYPE_NAMES[board.boardType]}
+                {BOARD_TYPE_LABELS[board.boardType]}
               </span>
             </div>
 

@@ -1,7 +1,6 @@
+import { USER_TYPES, AUTH_CONFIG } from '@/constants';
 import { tokenStorage, userStorage } from './storage';
-import { USER_TYPES } from '@/constants/user';
 import { generateGoogleOAuthUrl } from './googleOAuth';
-import { AUTH_CONFIG } from '@/config/constants';
 import type { UserInfo, JWTPayload } from '@/types/domain/auth';
 
 /**
@@ -58,10 +57,7 @@ export const getCurrentUser = <T>(): T | null => {
  * 로그인 처리
  */
 
-export const login = (
-  accessToken: string,
-  userType: string,
-): void => {
+export const login = (accessToken: string, userType: string): void => {
   tokenStorage.setAccessToken(accessToken);
   userStorage.setUserType(userType);
 };
@@ -102,7 +98,6 @@ export const isValidToken = (token: string): boolean => {
 /**
  * 토큰에서 사용자 정보 추출
  */
-
 export const decodeToken = (token: string): JWTPayload | null => {
   if (!token || typeof token !== 'string') {
     return null;
@@ -116,7 +111,7 @@ export const decodeToken = (token: string): JWTPayload | null => {
     }
 
     const payload = JSON.parse(atob(parts[1]));
-    
+
     // 기본 타입 검증
     if (typeof payload !== 'object' || payload === null) {
       console.warn('Invalid JWT payload: not an object');
@@ -190,56 +185,6 @@ export const getSocialLoginUrl = (
 };
 
 /**
- * 비밀번호 강도 체크
- */
-export const checkPasswordStrength = (
-  password: string,
-): {
-  score: number;
-  feedback: string[];
-} => {
-  const feedback: string[] = [];
-  let score = 0;
-
-  // 길이 체크
-  if (password.length >= AUTH_CONFIG.PASSWORD_MIN_LENGTH) {
-    score += 1;
-  } else {
-    feedback.push(`${AUTH_CONFIG.PASSWORD_MIN_LENGTH}자 이상 입력해주세요`);
-  }
-
-  // 대문자 포함
-  if (/[A-Z]/.test(password)) {
-    score += 1;
-  } else {
-    feedback.push('대문자를 포함해주세요');
-  }
-
-  // 소문자 포함
-  if (/[a-z]/.test(password)) {
-    score += 1;
-  } else {
-    feedback.push('소문자를 포함해주세요');
-  }
-
-  // 숫자 포함
-  if (/\d/.test(password)) {
-    score += 1;
-  } else {
-    feedback.push('숫자를 포함해주세요');
-  }
-
-  // 특수문자 포함
-  if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-    score += 1;
-  } else {
-    feedback.push('특수문자를 포함해주세요');
-  }
-
-  return { score, feedback };
-};
-
-/**
  * 세션 타임아웃 체크
  */
 export const checkSessionTimeout = (): boolean => {
@@ -288,7 +233,10 @@ export const getDeviceInfo = (): {
 } => {
   return {
     userAgent: navigator.userAgent || 'unknown',
-    platform: (navigator as any).userAgentData?.platform || navigator.platform || 'unknown',
+    platform:
+      (navigator as any).userAgentData?.platform ||
+      navigator.platform ||
+      'unknown',
     language: navigator.language || 'unknown',
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'unknown',
   };

@@ -1,14 +1,24 @@
-import { BOARD_TYPE_LABELS, BOARD_TYPE_ICONS, BOARD_TYPE_DESCRIPTIONS, type BoardType } from '@/constants/board';
+import {
+  BOARD_TYPE_LABELS,
+  BOARD_TYPE_ICONS,
+  BOARD_TYPE_DESCRIPTIONS,
+  type BoardType,
+} from '@/constants/board';
 
 interface BoardTypeSelectorProps {
   selectedType: BoardType;
   onTypeChange: (type: BoardType) => void;
 }
 
-export default function BoardTypeSelector({ selectedType, onTypeChange }: BoardTypeSelectorProps) {
+export default function BoardTypeSelector({
+  selectedType,
+  onTypeChange,
+}: BoardTypeSelectorProps) {
   return (
     <div className="mb-6">
-      <label className="block text-sm font-medium text-gray-700 mb-2">문의 유형</label>
+      <label className="block text-sm font-medium text-gray-700 mb-2">
+        문의 유형
+      </label>
       <div className="grid grid-cols-2 gap-4">
         {Object.entries(BOARD_TYPE_LABELS).map(([type, label]) => (
           <button
@@ -21,7 +31,9 @@ export default function BoardTypeSelector({ selectedType, onTypeChange }: BoardT
                 : 'border-gray-200 hover:border-orange-200'
             }`}
           >
-            <span className="text-2xl mb-2">{BOARD_TYPE_ICONS[type as BoardType]}</span>
+            <span className="text-2xl mb-2">
+              {BOARD_TYPE_ICONS[type as BoardType]}
+            </span>
             <span className="font-medium mb-1">{label}</span>
             <span className="text-xs text-gray-500 text-center">
               {BOARD_TYPE_DESCRIPTIONS[type as BoardType]}
@@ -31,4 +43,4 @@ export default function BoardTypeSelector({ selectedType, onTypeChange }: BoardT
       </div>
     </div>
   );
-} 
+}

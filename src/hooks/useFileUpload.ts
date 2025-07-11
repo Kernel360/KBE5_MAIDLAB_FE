@@ -1,13 +1,10 @@
 import { useState, useCallback, useEffect } from 'react';
 import { validateImageFile } from '@/utils';
 import { useToast } from './useToast';
-
-interface FileUploadState {
-  files: File[];
-  previews: string[];
-  uploading: boolean;
-  progress: number;
-}
+import type {
+  FileUploadState,
+  UseFileUploadReturn,
+} from '@/types/hooks/fileUpload';
 
 export const useFileUpload = (maxFiles: number = 1) => {
   const [state, setState] = useState<FileUploadState>({
@@ -111,5 +108,5 @@ export const useFileUpload = (maxFiles: number = 1) => {
     removeFile,
     clearFiles,
     upload,
-  };
+  } as UseFileUploadReturn;
 };

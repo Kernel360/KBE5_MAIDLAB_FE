@@ -236,86 +236,88 @@ const ManagerHome: React.FC = () => {
             className="bg-white dark:bg-gray-800 rounded-2xl cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] p-6"
             onClick={() => navigate(ROUTES.MANAGER.MYPAGE)}
           >
-              {profileLoading ? (
-                // 로딩 상태
-                <div className="animate-pulse">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="h-6 bg-gray-200 rounded w-48 mb-2"></div>
-                      <div className="h-4 bg-gray-200 rounded w-32"></div>
-                    </div>
-                    <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
+            {profileLoading ? (
+              // 로딩 상태
+              <div className="animate-pulse">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="h-6 bg-gray-200 rounded w-48 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-32"></div>
                   </div>
-                  <div className="mt-6 flex items-center space-x-4">
-                    <div className="h-6 bg-gray-200 rounded w-20"></div>
-                    <div className="h-4 bg-gray-200 rounded w-16"></div>
-                  </div>
+                  <div className="w-16 h-16 bg-gray-200 rounded-full"></div>
                 </div>
-              ) : (
-                // 실제 매니저 정보
-                <div>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h1 className="text-xl font-bold mb-1 text-gray-900 dark:text-white">
-                        {profile?.name || '매니저'}님, 좋은 하루 보내세요!
-                      </h1>
-                      <p className="text-gray-600 dark:text-gray-300 text-sm">
-                        승인 상태:{' '}
-                        <span className={`font-medium ${profile?.isVerified ? 'text-green-600' : 'text-orange-500'}`}>
-                          {profile?.isVerified ? '활동 가능' : '승인 대기중'}
-                        </span>
-                      </p>
-                    </div>
-                    <div className="w-16 h-16 bg-white dark:bg-gray-700 rounded-full flex items-center justify-center overflow-hidden shadow-lg">
-                      {profile?.profileImage ? (
-                        <img
-                          src={profile.profileImage}
-                          alt={`${profile.name} 프로필`}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            // 이미지 로드 실패시 기본 아이콘 표시
-                            e.currentTarget.style.display = 'none';
-                            const fallback = e.currentTarget
-                              .nextElementSibling as HTMLElement;
-                            if (fallback) fallback.style.display = 'flex';
-                          }}
-                        />
-                      ) : null}
-                      <User
-                        className="w-7 h-7 text-gray-400 dark:text-gray-300"
-                        style={{
-                          display: profile?.profileImage ? 'none' : 'block',
+                <div className="mt-6 flex items-center space-x-4">
+                  <div className="h-6 bg-gray-200 rounded w-20"></div>
+                  <div className="h-4 bg-gray-200 rounded w-16"></div>
+                </div>
+              </div>
+            ) : (
+              // 실제 매니저 정보
+              <div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h1 className="text-xl font-bold mb-1 text-gray-900 dark:text-white">
+                      {profile?.name || '매니저'}님, 좋은 하루 보내세요!
+                    </h1>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm">
+                      승인 상태:{' '}
+                      <span
+                        className={`font-medium ${profile?.isVerified ? 'text-green-600' : 'text-orange-500'}`}
+                      >
+                        {profile?.isVerified ? '활동 가능' : '승인 대기중'}
+                      </span>
+                    </p>
+                  </div>
+                  <div className="w-16 h-16 bg-white dark:bg-gray-700 rounded-full flex items-center justify-center overflow-hidden shadow-lg">
+                    {profile?.profileImage ? (
+                      <img
+                        src={profile.profileImage}
+                        alt={`${profile.name} 프로필`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          // 이미지 로드 실패시 기본 아이콘 표시
+                          e.currentTarget.style.display = 'none';
+                          const fallback = e.currentTarget
+                            .nextElementSibling as HTMLElement;
+                          if (fallback) fallback.style.display = 'flex';
                         }}
                       />
-                    </div>
-                  </div>
-
-                  <div className="mt-6 flex items-center space-x-4">
-                    <div className="bg-orange-100 rounded-xl px-3 py-1.5">
-                      <span className="text-sm font-medium text-orange-700">
-                        {profile?.services
-                          ?.map(
-                            (service) =>
-                              SERVICE_TYPE_LABELS[service as ServiceType] ||
-                              service,
-                          )
-                          .join(', ') || '가사도우미'}
-                      </span>
-                    </div>
-                    {profile?.schedules && profile.schedules.length > 0 && (
-                      <span className="text-sm text-gray-600 bg-gray-100 rounded-xl px-3 py-1.5 font-medium">
-                        주{' '}
-                        {
-                          new Set(
-                            profile.schedules.map((schedule) => schedule.day),
-                          ).size
-                        }
-                        일 근무
-                      </span>
-                    )}
+                    ) : null}
+                    <User
+                      className="w-7 h-7 text-gray-400 dark:text-gray-300"
+                      style={{
+                        display: profile?.profileImage ? 'none' : 'block',
+                      }}
+                    />
                   </div>
                 </div>
-              )}
+
+                <div className="mt-6 flex items-center space-x-4">
+                  <div className="bg-orange-100 rounded-xl px-3 py-1.5">
+                    <span className="text-sm font-medium text-orange-700">
+                      {profile?.services
+                        ?.map(
+                          (service) =>
+                            SERVICE_TYPE_LABELS[service as ServiceType] ||
+                            service,
+                        )
+                        .join(', ') || '가사도우미'}
+                    </span>
+                  </div>
+                  {profile?.schedules && profile.schedules.length > 0 && (
+                    <span className="text-sm text-gray-600 bg-gray-100 rounded-xl px-3 py-1.5 font-medium">
+                      주{' '}
+                      {
+                        new Set(
+                          profile.schedules.map((schedule) => schedule.day),
+                        ).size
+                      }
+                      일 근무
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </section>
 
           {/* 간단한 통계 정보 */}
@@ -325,7 +327,9 @@ const ManagerHome: React.FC = () => {
             </h2>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
-                <p className="text-gray-500 dark:text-gray-400 text-xs mb-1">이번 달 예약</p>
+                <p className="text-gray-500 dark:text-gray-400 text-xs mb-1">
+                  이번 달 예약
+                </p>
                 <p className="text-2xl font-bold text-orange-500">
                   {
                     managerReservations.filter((r) => {
@@ -339,7 +343,9 @@ const ManagerHome: React.FC = () => {
                 <p className="text-xs text-gray-400 dark:text-gray-500">건</p>
               </div>
               <div>
-                <p className="text-gray-500 dark:text-gray-400 text-xs mb-1">총 완료</p>
+                <p className="text-gray-500 dark:text-gray-400 text-xs mb-1">
+                  총 완료
+                </p>
                 <p className="text-2xl font-bold text-blue-500">
                   {
                     managerReservations.filter(
@@ -350,7 +356,9 @@ const ManagerHome: React.FC = () => {
                 <p className="text-xs text-gray-400 dark:text-gray-500">건</p>
               </div>
               <div>
-                <p className="text-gray-500 dark:text-gray-400 text-xs mb-1">평균 평점</p>
+                <p className="text-gray-500 dark:text-gray-400 text-xs mb-1">
+                  평균 평점
+                </p>
                 <p className="text-2xl font-bold text-green-500">
                   {averageRating > 0 ? averageRating : '-'}
                 </p>
@@ -380,7 +388,9 @@ const ManagerHome: React.FC = () => {
           {/* 가까운 예약 */}
           <section className="bg-white dark:bg-gray-800 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">가까운 예약</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+                가까운 예약
+              </h2>
               <button
                 onClick={() => navigate(ROUTES.MANAGER.RESERVATIONS)}
                 className="text-orange-500 text-sm font-medium"

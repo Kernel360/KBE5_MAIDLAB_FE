@@ -15,7 +15,7 @@ import {
   Radio,
 } from '@mui/material';
 import { useState, useEffect } from 'react';
-import { useAdmin } from '@/hooks';
+import { useAdminManagers } from '@/hooks/domain/admin';
 import { type MatchingResponse } from '@/types/domain/matching';
 // ✅ 올바른 타입 import - 개별 매니저 아이템 타입
 import { type ManagerListItem } from '@/types/domain/admin';
@@ -36,7 +36,7 @@ const MatchingChangeDialog = ({
   onConfirm,
   loading: externalLoading = false,
 }: MatchingChangeDialogProps) => {
-  const { managerManagement } = useAdmin();
+  const { fetchManagers: adminFetchManagers } = useAdminManagers();
   // ✅ 매니저 배열 타입 수정
   const [managers, setManagers] = useState<ManagerListItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -54,7 +54,7 @@ const MatchingChangeDialog = ({
 
       setLoading(true);
       try {
-        const response = await managerManagement.fetchManagers({
+        const response = await adminFetchManagers({
           page: 0,
           size: 100,
         });
@@ -170,7 +170,9 @@ const MatchingChangeDialog = ({
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} disabled={externalLoading}>취소</Button>
+        <Button onClick={onClose} disabled={externalLoading}>
+          취소
+        </Button>
         <Button
           variant="contained"
           color="primary"

@@ -56,3 +56,19 @@ export const MANAGER_VERIFICATION_LABELS = {
   [MANAGER_VERIFICATION_STATUS.APPROVED]: '승인됨',
   [MANAGER_VERIFICATION_STATUS.REJECTED]: '거절됨',
 } as const;
+
+// 상태 필터 옵션
+export const STATUS_FILTER_OPTIONS = {
+  APPROVED: 'APPROVED',
+  ALL: 'ALL',
+} as const;
+
+// ===== 정산 상태 =====
+export const SETTLEMENT_STATUS = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED',
+} as const;
+
+export type SettlementStatus =
+  (typeof SETTLEMENT_STATUS)[keyof typeof SETTLEMENT_STATUS];

@@ -13,11 +13,7 @@ interface TabHeaderProps {
 export const TabHeader: React.FC<TabHeaderProps> = ({
   tab,
   setTab,
-  filter,
-  setFilter,
   filterDropdown,
-  filterOpen,
-  setFilterOpen,
 }) => {
   return (
     <div className="flex items-center justify-between bg-gray-50 border-b border-gray-100 sticky pt-4 top-[64px] z-10">
@@ -40,4 +36,4 @@ export const TabHeader: React.FC<TabHeaderProps> = ({
   );
 };
 
-export default TabHeader; 
+export default TabHeader;

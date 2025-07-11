@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Header,
-  HeroSection,
-} from '@/components';
+import { Header, HeroSection } from '@/components';
 import { ROUTES } from '@/constants';
 import { useAuth, useUser, useEvent } from '@/hooks';
 import { reservationApi } from '@/apis/reservation';
@@ -12,7 +9,7 @@ import { SERVICE_TYPE_LABELS } from '@/constants/service';
 
 const ConsumerMain: React.FC = () => {
   const navigate = useNavigate();
-  const { isAuthenticated,  } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { profile, fetchProfile } = useUser();
   const { activeEvents, loading: eventsLoading } = useEvent();
 

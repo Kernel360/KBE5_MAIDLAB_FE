@@ -13,6 +13,8 @@ export interface ApiResponse<T = any> {
 export interface PaginationParams {
   page?: number;
   size?: number;
+  sortBy?: string;
+  sortOrder?: 'ASC' | 'DESC';
 }
 
 /**
@@ -102,4 +104,12 @@ export interface RequestConfig {
   timeout?: number;
   retries?: number;
   headers?: Record<string, string>;
+}
+
+/**
+ * S3 Presigned URL 응답 타입
+ */
+export interface PresignedUrlResponse {
+  key: string;
+  url: string;
 }

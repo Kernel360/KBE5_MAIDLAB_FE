@@ -1,11 +1,9 @@
 import { useState, useMemo } from 'react';
 import { PAGINATION_DEFAULTS } from '@/constants';
-
-interface UsePaginationProps {
-  totalItems: number;
-  itemsPerPage?: number;
-  initialPage?: number;
-}
+import type {
+  UsePaginationProps,
+  UsePaginationReturn,
+} from '@/types/hooks/pagination';
 
 export const usePagination = ({
   totalItems,
@@ -63,5 +61,5 @@ export const usePagination = ({
     goToPrevious,
     goToFirst,
     goToLast,
-  };
+  } as UsePaginationReturn;
 };

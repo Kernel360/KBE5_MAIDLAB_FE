@@ -7,7 +7,8 @@ import { usePoint } from '@/hooks/domain/usePoint';
 const PAGE_SIZE = 5;
 
 const PointsPage: React.FC = () => {
-  const { point, history, hasNext, loading, error, fetchPoint, fetchPointHistory } = usePoint();
+  const { point, history, hasNext, loading, fetchPoint, fetchPointHistory } =
+    usePoint();
   const [monthOffset, setMonthOffset] = useState(0);
   const [page, setPage] = useState(0);
   const [allLoaded, setAllLoaded] = useState(false);
@@ -40,9 +41,7 @@ const PointsPage: React.FC = () => {
       pageable: {
         page,
         size: PAGE_SIZE,
-        sort: [
-          { property: 'createdAt', direction: 'DESC' },
-        ],
+        sort: [{ property: 'createdAt', direction: 'DESC' }],
       },
     });
   }, [monthOffset, page, fetchPointHistory]);
@@ -83,7 +82,9 @@ const PointsPage: React.FC = () => {
           <div className="flex flex-col items-center gap-2 mb-4">
             <Coins className="w-10 h-10 text-[#FF6B00]" />
             <span className="text-gray-600">내 포인트</span>
-            <span className="text-2xl font-bold text-[#FF6B00]">{point !== null ? point.toLocaleString() : '-'}P</span>
+            <span className="text-2xl font-bold text-[#FF6B00]">
+              {point !== null ? point.toLocaleString() : '-'}P
+            </span>
           </div>
         </div>
         <div className="bg-white rounded-xl shadow-sm p-6">
@@ -99,7 +100,9 @@ const PointsPage: React.FC = () => {
             >
               ◀
             </button>
-            <span className="font-semibold text-gray-800">{getMonthLabel(monthOffset)}</span>
+            <span className="font-semibold text-gray-800">
+              {getMonthLabel(monthOffset)}
+            </span>
             {/* 다음달 버튼 */}
             <button
               className={`px-2 py-1 min-w-[40px] rounded-md text-lg font-medium transition-colors
@@ -115,21 +118,39 @@ const PointsPage: React.FC = () => {
           <h3 className="text-lg font-semibold mb-4">포인트 내역</h3>
           {loading && page === 0 ? (
             <div className="text-gray-400 text-center py-8">로딩 중...</div>
-          ) : error ? (
-            <div className="text-red-400 text-center py-8">{error}</div>
           ) : list.length === 0 ? (
-            <div className="text-gray-400 text-center py-8">해당 월의 포인트 내역이 없습니다.</div>
+            <div className="text-gray-400 text-center py-8">
+              해당 월의 포인트 내역이 없습니다.
+            </div>
           ) : (
             <>
               <ul className="divide-y divide-gray-100">
                 {list.map((item, idx) => (
-                  <li key={idx} className="flex justify-between items-center py-3">
+                  <li
+                    key={idx}
+                    className="flex justify-between items-center py-3"
+                  >
                     <div>
-                      <div className="text-gray-900 font-medium">{item.description}</div>
-                      <div className="text-xs text-gray-400">{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '-'}</div>
+                      <div className="text-gray-900 font-medium">
+                        {item.description}
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        {item.createdAt
+                          ? new Date(item.createdAt).toLocaleDateString()
+                          : '-'}
+                      </div>
                     </div>
-                    <div className={item.amount > 0 ? 'text-[#FF6B00] font-bold' : 'text-gray-400 font-bold'}>
-                      {item.amount > 0 ? `+${item.amount.toLocaleString()}` : item.amount.toLocaleString()}P
+                    <div
+                      className={
+                        item.amount > 0
+                          ? 'text-[#FF6B00] font-bold'
+                          : 'text-gray-400 font-bold'
+                      }
+                    >
+                      {item.amount > 0
+                        ? `+${item.amount.toLocaleString()}`
+                        : item.amount.toLocaleString()}
+                      P
                     </div>
                   </li>
                 ))}
@@ -151,4 +172,4 @@ const PointsPage: React.FC = () => {
   );
 };
 
-export default PointsPage; 
+export default PointsPage;

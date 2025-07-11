@@ -3,8 +3,9 @@ import {
   LENGTH_LIMITS,
   NUMBER_LIMITS,
   validateBirthDate as validateBirth,
-} from '@/constants/validation';
-import { BUSINESS_CONFIG } from '@/config/constants';
+  BUSINESS_CONFIG,
+  AUTH_CONFIG,
+} from '@/constants';
 
 /**
  * 휴대폰 번호 유효성 검사
@@ -131,20 +132,70 @@ export const validateImageFile = (
   const maxSize = BUSINESS_CONFIG.MAX_FILE_SIZE_MB * 1024 * 1024;
 
   if (!validateFileType(file, allowedTypes)) {
-    return { 
-      isValid: false, 
-      error: 'JPEG, PNG, WebP 파일만 업로드 가능합니다.' 
+    return {
+      isValid: false,
+      error: 'JPEG, PNG, WebP 파일만 업로드 가능합니다.',
     };
   }
 
   if (!validateFileSize(file, maxSize)) {
-    return { 
-      isValid: false, 
-      error: `파일 크기는 ${BUSINESS_CONFIG.MAX_FILE_SIZE_MB}MB 이하여야 합니다.` 
+    return {
+      isValid: false,
+      error: `파일 크기는 ${BUSINESS_CONFIG.MAX_FILE_SIZE_MB}MB 이하여야 합니다.`,
     };
   }
 
   return { isValid: true };
+};
+
+/**
+ * 비밀번호 강도 체크
+ */
+export const checkPasswordStrength = (
+  password: string,
+): {
+  score: number;
+  feedback: string[];
+} => {
+  const feedback: string[] = [];
+  let score = 0;
+
+  // 길이 체크
+  if (password.length >= AUTH_CONFIG.PASSWORD_MIN_LENGTH) {
+    score += 1;
+  } else {
+    feedback.push(`${AUTH_CONFIG.PASSWORD_MIN_LENGTH}자 이상 입력해주세요`);
+  }
+
+  // 대문자 포함
+  if (/[A-Z]/.test(password)) {
+    score += 1;
+  } else {
+    feedback.push('대문자를 포함해주세요');
+  }
+
+  // 소문자 포함
+  if (/[a-z]/.test(password)) {
+    score += 1;
+  } else {
+    feedback.push('소문자를 포함해주세요');
+  }
+
+  // 숫자 포함
+  if (/\d/.test(password)) {
+    score += 1;
+  } else {
+    feedback.push('숫자를 포함해주세요');
+  }
+
+  // 특수문자 포함
+  if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    score += 1;
+  } else {
+    feedback.push('특수문자를 포함해주세요');
+  }
+
+  return { score, feedback };
 };
 
 /**
@@ -164,9 +215,9 @@ export const validateDocumentFile = (
   }
 
   if (!validateFileSize(file, maxSize)) {
-    return { 
-      isValid: false, 
-      error: `파일 크기는 ${BUSINESS_CONFIG.MAX_FILE_SIZE_MB}MB 이하여야 합니다.` 
+    return {
+      isValid: false,
+      error: `파일 크기는 ${BUSINESS_CONFIG.MAX_FILE_SIZE_MB}MB 이하여야 합니다.`,
     };
   }
 

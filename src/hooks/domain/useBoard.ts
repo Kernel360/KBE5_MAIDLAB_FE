@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { boardApi } from '@/apis/board';
-import { useToast } from '../useToast';
+import { useApiCall } from '../useApiCall';
 import type {
   BoardCreateRequest,
   BoardResponse,
@@ -10,107 +10,87 @@ import type {
 
 export const useBoard = () => {
   const [boards, setBoards] = useState<BoardResponse[]>([]);
-  const [loading, setLoading] = useState(false);
-  const { showToast } = useToast();
+  const { executeApi, loading } = useApiCall();
 
   // 게시글 목록 조회
   const fetchBoards = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await boardApi.getBoardList();
-      setBoards(data);
-    } catch (error: any) {
-      showToast(
-        error.message || '게시글 목록을 불러오는데 실패했습니다.',
-        'error',
-      );
-    } finally {
-      setLoading(false);
+    const result = await executeApi(() => boardApi.getBoardList(), {
+      successMessage: null, // 목록 조회는 토스트 메시지 없음
+      errorMessage: '게시글 목록을 불러오는데 실패했습니다.',
+    });
+
+    if (result.success) {
+      setBoards(result.data || []);
     }
-  }, [showToast]);
+
+    return result;
+  }, [executeApi]);
 
   // 게시글 상세 조회
   const fetchBoardDetail = useCallback(
     async (boardId: number): Promise<BoardDetailResponse | null> => {
-      try {
-        setLoading(true);
-        const data = await boardApi.getBoard(boardId);
-        return data;
-      } catch (error: any) {
-        showToast(
-          error.message || '게시글을 불러오는데 실패했습니다.',
-          'error',
-        );
-        return null;
-      } finally {
-        setLoading(false);
-      }
+      const result = await executeApi(() => boardApi.getBoard(boardId), {
+        successMessage: null,
+        errorMessage: '게시글을 불러오는데 실패했습니다.',
+      });
+
+      return result.success ? (result.data ?? null) : null;
     },
-    [showToast],
+    [executeApi],
   );
 
   // 게시글 작성
   const createBoard = useCallback(
     async (data: BoardCreateRequest) => {
-      try {
-        setLoading(true);
-        const result = await boardApi.createBoard(data);
+      const result = await executeApi(() => boardApi.createBoard(data), {
+        successMessage: '게시글이 등록되었습니다.',
+        errorMessage: '게시글 등록에 실패했습니다.',
+      });
 
-        // 목록 새로고침
-        await fetchBoards();
-        showToast('게시글이 등록되었습니다.', 'success');
-
-        return { success: true, data: result };
-      } catch (error: any) {
-        showToast(error.message || '게시글 등록에 실패했습니다.', 'error');
-        return { success: false, error: error.message };
-      } finally {
-        setLoading(false);
+      if (result.success) {
+        await fetchBoards(); // 목록 새로고침
       }
+
+      return result;
     },
-    [fetchBoards, showToast],
+    [executeApi, fetchBoards],
   );
 
   // 게시글 수정
   const updateBoard = useCallback(
     async (boardId: number, data: BoardUpdateRequest) => {
-      try {
-        setLoading(true);
-        const result = await boardApi.updateBoard(boardId, data);
+      const result = await executeApi(
+        () => boardApi.updateBoard(boardId, data),
+        {
+          successMessage: '게시글이 수정되었습니다.',
+          errorMessage: '게시글 수정에 실패했습니다.',
+        },
+      );
 
-        // 목록 새로고침
-        await fetchBoards();
-        showToast('게시글이 수정되었습니다.', 'success');
-
-        return { success: true, data: result };
-      } catch (error: any) {
-        showToast(error.message || '게시글 수정에 실패했습니다.', 'error');
-        return { success: false, error: error.message };
-      } finally {
-        setLoading(false);
+      if (result.success) {
+        await fetchBoards(); // 목록 새로고침
       }
+
+      return result;
     },
-    [fetchBoards, showToast],
+    [executeApi, fetchBoards],
   );
 
   // 게시글 삭제
   const deleteBoard = useCallback(
     async (boardId: number) => {
-      try {
-        setLoading(true);
-        await boardApi.deleteBoard(boardId);
+      const result = await executeApi(() => boardApi.deleteBoard(boardId), {
+        successMessage: '게시글이 삭제되었습니다.',
+        errorMessage: '게시글 삭제에 실패했습니다.',
+      });
 
-        // 목록 새로고침
-        await fetchBoards();
-        return { success: true };
-      } catch (error: any) {
-        showToast(error.message || '게시글 삭제에 실패했습니다.', 'error');
-        return { success: false, error: error.message };
-      } finally {
-        setLoading(false);
+      if (result.success) {
+        await fetchBoards(); // 목록 새로고침
       }
+
+      return result;
     },
-    [fetchBoards, showToast],
+    [executeApi, fetchBoards],
   );
 
   useEffect(() => {

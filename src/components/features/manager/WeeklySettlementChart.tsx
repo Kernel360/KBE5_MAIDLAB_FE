@@ -64,7 +64,9 @@ const WeeklySettlementChart: React.FC<WeeklySettlementChartProps> = ({
     return (
       <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-8 text-center">
         <div className="text-gray-400 dark:text-gray-300 mb-2">📊</div>
-        <p className="text-gray-500 dark:text-gray-400">정산 데이터를 불러오는 중...</p>
+        <p className="text-gray-500 dark:text-gray-400">
+          정산 데이터를 불러오는 중...
+        </p>
       </div>
     );
   }
@@ -270,7 +272,9 @@ const WeeklySettlementChart: React.FC<WeeklySettlementChartProps> = ({
           </p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-3">
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">총 정산금액</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+            총 정산금액
+          </p>
           <p className="text-lg font-bold text-blue-500">
             {formatPrice(
               weeklySettlements.reduce(
@@ -281,7 +285,9 @@ const WeeklySettlementChart: React.FC<WeeklySettlementChartProps> = ({
           </p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-lg p-3">
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">주평균</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+            주평균
+          </p>
           <p className="text-lg font-bold text-green-500">
             {formatPrice(
               Math.round(

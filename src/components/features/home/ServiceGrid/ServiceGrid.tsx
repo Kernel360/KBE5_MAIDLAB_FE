@@ -17,7 +17,8 @@ export const ServiceGrid: React.FC<ServiceGridProps> = ({ onServiceClick }) => {
             전문 가사도우미 서비스
           </h3>
           <p className="text-gray-600 mb-6 leading-relaxed">
-            청소, 가사, 돌봄 등 다양한 서비스를<br />
+            청소, 가사, 돌봄 등 다양한 서비스를
+            <br />
             믿을 수 있는 전문가와 함께하세요
           </p>
           <button

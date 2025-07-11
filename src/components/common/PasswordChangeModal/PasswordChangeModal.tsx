@@ -38,7 +38,10 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({
     confirmPassword: '',
   });
 
-  const handlePasswordChange = (field: keyof PasswordData, value: string | boolean) => {
+  const handlePasswordChange = (
+    field: keyof PasswordData,
+    value: string | boolean,
+  ) => {
     setPasswordData((prev) => ({
       ...prev,
       [field]: value,
@@ -135,7 +138,10 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({
               <button
                 type="button"
                 onClick={() =>
-                  handlePasswordChange('showPassword', !passwordData.showPassword)
+                  handlePasswordChange(
+                    'showPassword',
+                    !passwordData.showPassword,
+                  )
                 }
                 className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
               >
@@ -175,7 +181,10 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({
               <button
                 type="button"
                 onClick={() =>
-                  handlePasswordChange('showConfirmPassword', !passwordData.showConfirmPassword)
+                  handlePasswordChange(
+                    'showConfirmPassword',
+                    !passwordData.showConfirmPassword,
+                  )
                 }
                 className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
               >

@@ -58,32 +58,10 @@ export const useAdminAuth = () => {
     }
   }, [showToast]);
 
-  // 토큰 갱신
-  const adminRefreshToken = useCallback(async () => {
-    try {
-      const refreshToken = tokenStorage.getRefreshToken();
-      if (!refreshToken) {
-        console.error('No refresh token available');
-        logout();
-        return false;
-      }
-
-      const response = await adminApi.refreshToken();
-      tokenStorage.setAccessToken(response.accessToken);
-      setAuthTrigger((prev) => prev + 1); // 강제 리렌더링
-      return true;
-    } catch (error) {
-      console.error('Token refresh failed:', error);
-      logout();
-      return false;
-    }
-  }, [logout]);
-
   return {
     loading,
     isAuthenticated,
     login,
     logout,
-    adminRefreshToken,
   };
 };

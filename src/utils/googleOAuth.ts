@@ -1,6 +1,11 @@
-import { env } from './env';
-import { OAUTH_CONFIG } from '@/config/constants';
-import type { PopupConfig } from '@/types/utils';
+import { env } from '@/config/env';
+import { DEFAULT_POPUP_CONFIG } from '@/constants/auth';
+import {
+  setLocalStorage,
+  getLocalStorage,
+  removeLocalStorage,
+} from './storage';
+import type { PopupConfig } from '@/types/domain/auth';
 
 /**
  * localStorage 기반 메시지 시스템 (COOP 우회)
@@ -53,20 +58,6 @@ export const extractUserTypeFromState = (
   if (!state) return null;
   const match = state.match(/userType=([^&]+)/);
   return match ? (match[1] as 'CONSUMER' | 'MANAGER') : null;
-};
-
-/**
- * OAuth 팝업 설정 타입
- * @see {@link PopupConfig} from '@/types/utils'
- */
-
-const DEFAULT_POPUP_CONFIG: PopupConfig = {
-  width: OAUTH_CONFIG.POPUP_WIDTH,
-  height: OAUTH_CONFIG.POPUP_HEIGHT,
-  timeout: OAUTH_CONFIG.TIMEOUT_MS,
-  fastPollInterval: OAUTH_CONFIG.FAST_POLL_INTERVAL,
-  slowPollInterval: OAUTH_CONFIG.SLOW_POLL_INTERVAL,
-  fastPollDuration: OAUTH_CONFIG.FAST_POLL_DURATION,
 };
 
 /**
@@ -139,16 +130,13 @@ class GoogleOAuthPopupManager {
   }
 
   private prepareOAuthSession(): void {
-    localStorage.removeItem(OAUTH_MESSAGE_KEY);
-    localStorage.removeItem(OAUTH_STATUS_KEY);
-    localStorage.setItem(
-      OAUTH_STATUS_KEY,
-      JSON.stringify({
-        status: 'pending',
-        sessionId: this.sessionId,
-        startTime: Date.now(),
-      }),
-    );
+    removeLocalStorage(OAUTH_MESSAGE_KEY);
+    removeLocalStorage(OAUTH_STATUS_KEY);
+    setLocalStorage(OAUTH_STATUS_KEY, {
+      status: 'pending',
+      sessionId: this.sessionId,
+      startTime: Date.now(),
+    });
   }
 
   private setupEventListeners(): void {
@@ -172,11 +160,11 @@ class GoogleOAuthPopupManager {
   }
 
   private isValidSession(): boolean {
-    const status = localStorage.getItem(OAUTH_STATUS_KEY);
+    const status = getLocalStorage(OAUTH_STATUS_KEY);
     if (!status) return false;
 
     try {
-      const statusData = JSON.parse(status);
+      const statusData = status as { sessionId: string };
       return statusData.sessionId === this.sessionId;
     } catch {
       return false;
@@ -208,7 +196,10 @@ class GoogleOAuthPopupManager {
     this.checkForMessage();
 
     // 빠른 폴링 종료 조건
-    if (this.fastPollCount >= this.config.fastPollDuration / this.config.fastPollInterval) {
+    if (
+      this.fastPollCount >=
+      this.config.fastPollDuration / this.config.fastPollInterval
+    ) {
       if (this.fastPollInterval) {
         clearInterval(this.fastPollInterval);
       }
@@ -222,9 +213,9 @@ class GoogleOAuthPopupManager {
 
   private checkForMessage(): void {
     try {
-      const message = localStorage.getItem(OAUTH_MESSAGE_KEY);
+      const message = getLocalStorage(OAUTH_MESSAGE_KEY);
       if (message && this.isValidSession()) {
-        const data = JSON.parse(message);
+        const data = message;
         this.processMessage(data);
       }
     } catch (error) {
@@ -283,8 +274,8 @@ class GoogleOAuthPopupManager {
     window.removeEventListener('beforeunload', this.cleanup.bind(this));
 
     // localStorage 정리
-    localStorage.removeItem(OAUTH_MESSAGE_KEY);
-    localStorage.removeItem(OAUTH_STATUS_KEY);
+    removeLocalStorage(OAUTH_MESSAGE_KEY);
+    removeLocalStorage(OAUTH_STATUS_KEY);
   }
 }
 
@@ -327,16 +318,15 @@ export const handleGoogleOAuthCallback = () => {
   // ✅ 메시지를 localStorage에 저장 (여러 번 시도)
   const saveMessage = (attempt: number = 1) => {
     try {
-      const messageStr = JSON.stringify(message);
-      localStorage.setItem(OAUTH_MESSAGE_KEY, messageStr);
+      setLocalStorage(OAUTH_MESSAGE_KEY, message);
 
       // 상태 업데이트
-      const currentStatus = localStorage.getItem(OAUTH_STATUS_KEY);
+      const currentStatus = getLocalStorage(OAUTH_STATUS_KEY);
       if (currentStatus) {
-        const statusData = JSON.parse(currentStatus);
+        const statusData = currentStatus as { status: string; endTime: number };
         statusData.status = 'completed';
         statusData.endTime = Date.now();
-        localStorage.setItem(OAUTH_STATUS_KEY, JSON.stringify(statusData));
+        setLocalStorage(OAUTH_STATUS_KEY, statusData);
       }
     } catch (saveError: any) {
       console.error(`❌ 메시지 저장 실패 (${attempt}번째 시도):`, saveError);
@@ -391,20 +381,20 @@ export const validateGoogleOAuthConfig = (): {
  * OAuth 관련 localStorage 정리
  */
 export const cleanupOAuthStorage = () => {
-  localStorage.removeItem(OAUTH_MESSAGE_KEY);
-  localStorage.removeItem(OAUTH_STATUS_KEY);
+  removeLocalStorage(OAUTH_MESSAGE_KEY);
+  removeLocalStorage(OAUTH_STATUS_KEY);
 };
 
 /**
  * OAuth 상태 조회 (디버깅용)
  */
 export const getOAuthStatus = () => {
-  const message = localStorage.getItem(OAUTH_MESSAGE_KEY);
-  const status = localStorage.getItem(OAUTH_STATUS_KEY);
+  const message = getLocalStorage(OAUTH_MESSAGE_KEY);
+  const status = getLocalStorage(OAUTH_STATUS_KEY);
 
   return {
-    message: message ? JSON.parse(message) : null,
-    status: status ? JSON.parse(status) : null,
+    message: message,
+    status: status,
   };
 };
 
@@ -412,14 +402,19 @@ export const getOAuthStatus = () => {
  * OAuth 통계 조회 (디버깅용)
  */
 export const getOAuthStats = () => {
-  const status = localStorage.getItem(OAUTH_STATUS_KEY);
+  const status = getLocalStorage(OAUTH_STATUS_KEY);
 
   if (!status) {
     return { active: false };
   }
 
   try {
-    const statusData = JSON.parse(status);
+    const statusData = status as {
+      sessionId: string;
+      startTime: number;
+      status: string;
+      endTime?: number;
+    };
     const now = Date.now();
     const elapsed = now - statusData.startTime;
 

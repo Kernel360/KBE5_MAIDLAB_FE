@@ -182,3 +182,15 @@ export interface SessionInfo {
   expiresAt: number;
   lastActivity: number;
 }
+
+/**
+ * 팝업 설정
+ */
+export interface PopupConfig {
+  width: number;
+  height: number;
+  timeout: number;
+  fastPollInterval: number;
+  slowPollInterval: number;
+  fastPollDuration: number;
+}

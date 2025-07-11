@@ -84,7 +84,9 @@ export const Header: React.FC<HeaderProps> = ({
       return (
         <header className="sticky top-0 z-[9999] flex items-center justify-between px-4 py-[18px] border-b bg-white dark:bg-gray-900 dark:border-gray-700 transition-colors">
           <div className="w-10" />
-          <h1 className="text-lg font-bold text-center w-full text-gray-900 dark:text-white">{title}</h1>
+          <h1 className="text-lg font-bold text-center w-full text-gray-900 dark:text-white">
+            {title}
+          </h1>
           <div className="w-10" />
         </header>
       );
@@ -97,7 +99,9 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <ArrowLeft className="w-6 h-6 text-gray-900 dark:text-white" />
         </button>
-        <h1 className="text-lg font-bold text-gray-900 dark:text-white">{title}</h1>
+        <h1 className="text-lg font-bold text-gray-900 dark:text-white">
+          {title}
+        </h1>
         <div className="flex items-center gap-2">
           {showNotification && (
             <button
@@ -181,14 +185,10 @@ export const Header: React.FC<HeaderProps> = ({
                       <span>로그인</span>
                     </button>
                   )}
-                  
+
                   {/* 테마 토글 스위치 - 모든 사용자 */}
                   <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-600 flex justify-center">
-                    <ThemeToggle 
-                      variant="switch" 
-                      size="sm" 
-                      showLabel={false}
-                    />
+                    <ThemeToggle variant="switch" size="sm" showLabel={false} />
                   </div>
                 </div>
               )}
@@ -209,7 +209,9 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
           <span className="text-white font-bold text-lg">M</span>
         </div>
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white">{title}</h1>
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+          {title}
+        </h1>
       </button>
 
       <div className="flex items-center gap-2 relative" ref={menuRef}>
@@ -287,12 +289,12 @@ export const Header: React.FC<HeaderProps> = ({
                       <LogOut className="w-5 h-5 text-gray-600" />
                       <span>로그아웃</span>
                     </button>
-                    
+
                     {/* 테마 토글 스위치 - 로그인 사용자 */}
                     <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-600 flex justify-center">
-                      <ThemeToggle 
-                        variant="switch" 
-                        size="sm" 
+                      <ThemeToggle
+                        variant="switch"
+                        size="sm"
                         showLabel={false}
                       />
                     </div>
@@ -331,14 +333,10 @@ export const Header: React.FC<HeaderProps> = ({
                   <User className="w-5 h-5 text-gray-600 dark:text-white" />
                   <span>로그인</span>
                 </button>
-                
+
                 {/* 테마 토글 스위치 - 비로그인 사용자 */}
                 <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-600 flex justify-center">
-                  <ThemeToggle 
-                    variant="switch" 
-                    size="sm" 
-                    showLabel={false}
-                  />
+                  <ThemeToggle variant="switch" size="sm" showLabel={false} />
                 </div>
               </div>
             )}

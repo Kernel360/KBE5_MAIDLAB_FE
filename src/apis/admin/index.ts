@@ -1,12 +1,15 @@
-import { apiClient, handleApiError, apiCall, buildQueryString } from '../index';
-import type { ApiResponse } from '@/types/api';
+import { apiCall, buildQueryString } from '../index';
 import type { LoginResponse } from '@/types/domain/auth';
 import type {
   ReservationListResponse,
   ReservationDetailResponse,
 } from '@/types/domain/reservation';
 import type { MatchingResponse } from '@/types/domain/matching';
-import type { BoardResponse, BoardDetailResponse, BoardListResponse } from '@/types/domain/board';
+import type {
+  BoardResponse,
+  BoardDetailResponse,
+  BoardListResponse,
+} from '@/types/domain/board';
 import type {
   AdminLoginRequest,
   AdminPageParams,
@@ -29,13 +32,6 @@ export const adminApi = {
    */
   login: async (data: AdminLoginRequest): Promise<LoginResponse> => {
     return apiCall<LoginResponse>('post', API_ENDPOINTS.ADMIN.AUTH.LOGIN, data);
-  },
-
-  /**
-   * 관리자 토큰 갱신
-   */
-  refreshToken: async (): Promise<LoginResponse> => {
-    return apiCall<LoginResponse>('post', API_ENDPOINTS.ADMIN.AUTH.REFRESH);
   },
 
   /**
@@ -95,7 +91,7 @@ export const adminApi = {
    */
   getManagersByStatus: async (
     params: ManagerStatusParams,
-  ): Promise<ApiResponse<ManagerListResponse>> => {
+  ): Promise<ManagerListResponse> => {
     const { page = 0, size = 10, status, sortByRating, isDescending } = params;
     const queryString = buildQueryString({
       page,
@@ -105,15 +101,10 @@ export const adminApi = {
       isDescending,
     });
 
-    // 특별히 이 API만 전체 응답이 필요한 경우
-    try {
-      const response = await apiClient.get<ApiResponse<ManagerListResponse>>(
-        `${API_ENDPOINTS.ADMIN.MANAGER.STATUS}${queryString}`,
-      );
-      return response.data;
-    } catch (error) {
-      throw new Error(handleApiError(error));
-    }
+    return apiCall<ManagerListResponse>(
+      'get',
+      `${API_ENDPOINTS.ADMIN.MANAGER.STATUS}${queryString}`,
+    );
   },
 
   // ===== 소비자 관리 =====
@@ -290,7 +281,9 @@ export const adminApi = {
   /**
    * 상담 게시판 조회
    */
-  getConsultationBoards: async (params: AdminPageParams = {}): Promise<BoardListResponse> => {
+  getConsultationBoards: async (
+    params: AdminPageParams = {},
+  ): Promise<BoardListResponse> => {
     const { page = 0, size = 10 } = params;
     const queryString = buildQueryString({ page, size });
     return apiCall<BoardListResponse>(
@@ -302,10 +295,15 @@ export const adminApi = {
   /**
    * 환불 게시판 조회
    */
-  getRefundBoards: async (params: AdminPageParams = {}): Promise<BoardListResponse> => {
+  getRefundBoards: async (
+    params: AdminPageParams = {},
+  ): Promise<BoardListResponse> => {
     const { page = 0, size = 10 } = params;
     const queryString = buildQueryString({ page, size });
-    return apiCall<BoardListResponse>('get', `${API_ENDPOINTS.ADMIN.BOARD.REFUND}${queryString}`);
+    return apiCall<BoardListResponse>(
+      'get',
+      `${API_ENDPOINTS.ADMIN.BOARD.REFUND}${queryString}`,
+    );
   },
 
   /**
@@ -401,16 +399,10 @@ export const adminApi = {
     return apiCall<string>('get', `${API_ENDPOINTS.EVENT.GETCOUNT}`);
   },
   getRefundBoardCount: async (): Promise<string> => {
-    return apiCall<string>(
-      'get',
-      `${API_ENDPOINTS.ADMIN.BOARD.REFUND_COUNT}`,
-    )
+    return apiCall<string>('get', `${API_ENDPOINTS.ADMIN.BOARD.REFUND_COUNT}`);
   },
   getCounselBoardCount: async (): Promise<string> => {
-    return apiCall<string>(
-      'get',
-      `${API_ENDPOINTS.ADMIN.BOARD.COUNSEL_COUNT}`,
-    )
+    return apiCall<string>('get', `${API_ENDPOINTS.ADMIN.BOARD.COUNSEL_COUNT}`);
   },
 
   /**
@@ -419,7 +411,7 @@ export const adminApi = {
   getTotalReservationCount: async (consumerId: number): Promise<number> => {
     return apiCall<number>(
       'get',
-      `/api/admin/reservations/reservationcount/${consumerId}`,
+      API_ENDPOINTS.ADMIN.RESERVATION.TOTAL_RESERVATION_COUNT(consumerId),
     );
   },
 
@@ -429,7 +421,7 @@ export const adminApi = {
   getReviewPercent: async (consumerId: number): Promise<number> => {
     return apiCall<number>(
       'get',
-      `/api/admin/reservations/reviewedpercent/${consumerId}`,
+      API_ENDPOINTS.ADMIN.RESERVATION.REVIEW_PERCENT(consumerId),
     );
   },
 
@@ -439,7 +431,7 @@ export const adminApi = {
   getTotalPaidMoney: async (consumerId: number): Promise<number> => {
     return apiCall<number>(
       'get',
-      `/api/admin/reservations/totalpaidmoney/${consumerId}`,
+      API_ENDPOINTS.ADMIN.RESERVATION.TOTAL_PAID_MONEY(consumerId),
     );
   },
 
@@ -449,7 +441,7 @@ export const adminApi = {
   getMatchedCount: async (managerId: number): Promise<number> => {
     return apiCall<number>(
       'get',
-      `/api/admin/reservations/matchedcount/${managerId}`,
+      API_ENDPOINTS.ADMIN.RESERVATION.MATCHED_COUNT(managerId),
     );
   },
 
@@ -459,7 +451,7 @@ export const adminApi = {
   getManagerSettlementSum: async (managerId: number): Promise<number> => {
     return apiCall<number>(
       'get',
-      `/api/admin/reservations/manager/settlementsum/${managerId}`,
+      API_ENDPOINTS.ADMIN.RESERVATION.MANAGER_SETTLEMENT_SUM(managerId),
     );
   },
 
@@ -469,7 +461,7 @@ export const adminApi = {
   getManagerReviewPercent: async (managerId: number): Promise<number> => {
     return apiCall<number>(
       'get',
-      `/api/admin/reservations/managerreviewedpercent/${managerId}`,
+      API_ENDPOINTS.ADMIN.RESERVATION.MANAGER_REVIEW_PERCENT(managerId),
     );
   },
 
@@ -477,6 +469,6 @@ export const adminApi = {
    * 관리자 로그 조회 (최근 활동)
    */
   getAdminLogs: async (lines: number = 50): Promise<string[]> => {
-    return apiCall<string[]>('get', `api/admin/logs/tail?lines=${lines}`);
+    return apiCall<string[]>('get', API_ENDPOINTS.ADMIN.LOGS.ADMIN_LOGS(lines));
   },
 };

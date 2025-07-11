@@ -1,18 +1,5 @@
-import {
-  STORAGE_KEYS,
-  SESSION_KEYS,
-  STORAGE_EXPIRY,
-} from '@/constants/storage';
-import type { StorageItem } from '@/types/utils';
-
-/**
- * 만료 시간과 함께 데이터를 저장하는 인터페이스
- * @see {@link StorageItem} from '@/types/utils'
- */
-
-/**
- * 로컬스토리지에 데이터 저장 (만료 시간 포함)
- */
+import { STORAGE_KEYS, SESSION_KEYS, STORAGE_EXPIRY } from '@/constants';
+import type { StorageItem } from '@/types/common';
 export const setLocalStorage = <T>(
   key: string,
   value: T,

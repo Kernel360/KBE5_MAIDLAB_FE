@@ -28,7 +28,7 @@ const ConditionalLayout = () => {
       <>
         <ScrollToTop />
         <App />
-        
+
         {/* 토스트 컨테이너 - Admin에서도 표시 */}
         <div style={{ position: 'fixed', zIndex: 10000 }}>
           <ToastContainer />
@@ -45,7 +45,7 @@ const ConditionalLayout = () => {
       <DesktopViewport>
         <App />
       </DesktopViewport>
-      
+
       {/* 토스트 컨테이너 - 최상위에서 관리 */}
       <div style={{ position: 'fixed', zIndex: 10000 }}>
         <ToastContainer />

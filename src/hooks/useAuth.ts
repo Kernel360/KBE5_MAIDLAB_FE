@@ -18,16 +18,23 @@ import {
 } from '@/utils/auth';
 import { ROUTES, SUCCESS_MESSAGES, ERROR_MESSAGES } from '@/constants';
 import { useToast } from './useToast';
+import type { UserType } from '@/constants/user';
+import type {
+  GlobalLogoutHandler,
+  AuthState,
+  AuthAction,
+  AuthContextType,
+  AuthProviderProps,
+  SocialLoginHookReturn,
+  SocialLoginResponse,
+  AuthResponse,
+} from '@/types/hooks/auth';
 import type {
   LoginRequest,
   SignUpRequest,
   SocialLoginRequest,
   SocialSignUpRequest,
 } from '@/types/domain/auth';
-import type { UserType } from '@/types';
-
-// 🆕 전역 로그아웃 핸들러 타입 정의
-type GlobalLogoutHandler = (() => void) | null;
 
 // 🆕 전역 로그아웃 핸들러 관리
 let globalLogoutHandler: GlobalLogoutHandler = null;
@@ -39,23 +46,6 @@ export const setGlobalLogoutHandler = (handler: GlobalLogoutHandler) => {
 export const getGlobalLogoutHandler = (): GlobalLogoutHandler => {
   return globalLogoutHandler;
 };
-
-// 인증 상태 타입
-interface AuthState {
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  userType: UserType | null;
-  userInfo: any | null;
-  error: string | null;
-}
-
-// 인증 액션 타입
-type AuthAction =
-  | { type: 'AUTH_START' }
-  | { type: 'AUTH_SUCCESS'; payload: { userType: UserType; userInfo?: any } }
-  | { type: 'AUTH_FAILURE'; payload: string }
-  | { type: 'AUTH_LOGOUT' }
-  | { type: 'AUTH_RESET_ERROR' };
 
 // 초기 상태
 const initialState: AuthState = {
@@ -101,53 +91,31 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
   }
 };
 
-// 컨텍스트 타입
-interface AuthContextType extends AuthState {
-  login: (data: LoginRequest) => Promise<{ success: boolean; error?: string }>;
-  socialLogin: (data: SocialLoginRequest) => Promise<{
-    success: boolean;
-    newUser?: boolean;
-    error?: string;
-    accessToken?: string;
-    profileCompleted?: boolean;
-  }>;
-  signUp: (
-    data: SignUpRequest,
-  ) => Promise<{ success: boolean; error?: string }>;
-  socialSignUp: (
-    data: SocialSignUpRequest,
-  ) => Promise<{ success: boolean; error?: string }>;
-  logout: () => void;
-  resetError: () => void;
-  changePassword: (
-    password: string,
-  ) => Promise<{ success: boolean; error?: string }>;
-  withdraw: () => Promise<{ success: boolean; error?: string }>;
-  canAccessPage: (requiredUserType?: string) => boolean;
-  isConsumer: () => boolean;
-  isManager: () => boolean;
-}
-
 // 컨텍스트 생성
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // 🔧 소셜 로그인 로직 분리
-const useSocialLogin = (showToast: (message: string, type: string) => void) => {
-  const handleNewUser = useCallback((response: any, userType: UserType) => {
-    // 임시 토큰 저장 (소셜 회원가입용)
-    localStorage.setItem('tempSocialToken', response.accessToken);
-    localStorage.setItem('tempUserType', userType);
+const useSocialLogin = (
+  showToast: (message: string, type: string) => void,
+): SocialLoginHookReturn => {
+  const handleNewUser = useCallback(
+    (response: any, userType: UserType): SocialLoginResponse => {
+      // 임시 토큰 저장 (소셜 회원가입용)
+      localStorage.setItem('tempSocialToken', response.accessToken);
+      localStorage.setItem('tempUserType', userType);
 
-    return {
-      success: true,
-      newUser: true,
-      profileCompleted: response.profileCompleted,
-      accessToken: response.accessToken,
-    };
-  }, []);
+      return {
+        success: true,
+        newUser: true,
+        profileCompleted: response.profileCompleted,
+        accessToken: response.accessToken,
+      };
+    },
+    [],
+  );
 
   const handleExistingUser = useCallback(
-    (response: any, userType: UserType) => {
+    (response: any, userType: UserType): SocialLoginResponse => {
       // 🔧 utils/auth.ts의 login 함수 활용
       authLogin(response.accessToken, userType);
       showToast(SUCCESS_MESSAGES.LOGIN, 'success');
@@ -173,9 +141,7 @@ const useSocialLogin = (showToast: (message: string, type: string) => void) => {
 };
 
 // Provider 컴포넌트
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -245,7 +211,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // 로그인 함수
   const login = useCallback(
-    async (data: LoginRequest) => {
+    async (data: LoginRequest): Promise<AuthResponse> => {
       try {
         dispatch({ type: 'AUTH_START' });
 
@@ -279,7 +245,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // 소셜 로그인 함수
   const socialLogin = useCallback(
-    async (data: SocialLoginRequest) => {
+    async (data: SocialLoginRequest): Promise<SocialLoginResponse> => {
       try {
         dispatch({ type: 'AUTH_START' });
         const response = await authApi.socialLogin(data);
@@ -311,7 +277,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // 회원가입 함수
   const signUp = useCallback(
-    async (data: SignUpRequest) => {
+    async (data: SignUpRequest): Promise<AuthResponse> => {
       try {
         dispatch({ type: 'AUTH_START' });
 
@@ -345,7 +311,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // 소셜 회원가입 함수
   const socialSignUp = useCallback(
-    async (data: SocialSignUpRequest) => {
+    async (data: SocialSignUpRequest): Promise<AuthResponse> => {
       try {
         dispatch({ type: 'AUTH_START' });
 
@@ -399,7 +365,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // 비밀번호 변경 함수
   const changePassword = useCallback(
-    async (password: string) => {
+    async (password: string): Promise<AuthResponse> => {
       try {
         await authApi.changePassword({ password });
         showToast(SUCCESS_MESSAGES.PASSWORD_CHANGED, 'success');
@@ -414,7 +380,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   // 회원탈퇴 함수
-  const withdraw = useCallback(async () => {
+  const withdraw = useCallback(async (): Promise<AuthResponse> => {
     try {
       await authApi.withdraw();
       authLogout();

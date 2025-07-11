@@ -174,19 +174,6 @@ export const Z_INDEX = {
   TOOLTIP: 1090,
 } as const;
 
-// ===== 브레이크포인트 =====
-export const BREAKPOINTS = {
-  XS: '0px',
-  SM: '640px',
-  MD: '768px',
-  LG: '1024px',
-  XL: '1280px',
-  '2XL': '1536px',
-} as const;
-
-// 브레이크포인트 타입 export
-export type BreakpointKey = keyof typeof BREAKPOINTS;
-
 // ===== 한국어 특화 설정 =====
 export const KOREAN_DESIGN = {
   // 모바일 터치 최적화

@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useReservationPagination } from '@/hooks/domain/useReservationPagination';
-import { useReservation } from '@/hooks/domain/useReservation';
+import { useReservationPagination } from '@/hooks/domain/reservation';
+import { useReservation } from '@/hooks/domain/reservation';
 import { ReservationCard } from '@/components';
 import { ROUTES, RESERVATION_STATUS } from '@/constants';
 import { useNavigate } from 'react-router-dom';
-import type { PagingParams } from '@/types/domain/reservation';
+import type { ReservationPagingParams } from '@/types/domain/reservation';
 import type { ReservationStatus } from '@/constants/status';
 import { Header } from '@/components';
-import { useReservationStatus } from '@/hooks/useReservationStatus';
 import {
   Clock,
   Calendar,
@@ -19,7 +18,6 @@ import {
   CreditCard,
   Banknote,
 } from 'lucide-react';
-
 
 type TabType = '전체' | '결제하기' | '예정' | '대기중' | '완료';
 
@@ -47,7 +45,6 @@ const TABS = [
     label: '대기중',
     icon: Clock,
     color: 'text-amber-600',
-
   },
   {
     key: '완료' as TabType,
@@ -56,7 +53,6 @@ const TABS = [
     color: 'text-green-600',
   },
 ];
-
 
 // 탭에서 서버 상태로 매핑
 const TAB_TO_STATUS_MAP: Record<TabType, ReservationStatus | undefined> = {
@@ -91,7 +87,6 @@ const ConsumerReservations: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<TabType>('전체');
   const [showSortOptions, setShowSortOptions] = useState(false);
-  const { getStatusBadgeStyle } = useReservationStatus();
 
   // 현재 데이터
   const currentReservations = paginatedData?.content || [];
@@ -124,7 +119,7 @@ const ConsumerReservations: React.FC = () => {
 
   // 정렬 기준 변경 핸들러
   const handleSortByChange = useCallback(
-    async (sortBy: PagingParams['sortBy']) => {
+    async (sortBy: ReservationPagingParams['sortBy']) => {
       await changeSort(sortBy, params.sortOrder);
       setShowSortOptions(false);
     },
@@ -221,7 +216,6 @@ const ConsumerReservations: React.FC = () => {
                     <SortDesc className="w-4 h-4 text-orange-600" />
                   ) : (
                     <SortAsc className="w-4 h-4 text-orange-600" />
-
                   )}
                 </button>
                 {/* 정렬 기준 선택 버튼 */}
@@ -247,7 +241,7 @@ const ConsumerReservations: React.FC = () => {
                             key={option.key}
                             onClick={() =>
                               handleSortByChange(
-                                option.key as PagingParams['sortBy'],
+                                option.key as ReservationPagingParams['sortBy'],
                               )
                             }
                             className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
@@ -363,7 +357,6 @@ const ConsumerReservations: React.FC = () => {
                     }
                     onPaymentClick={handlePaymentClick}
                     onReviewClick={handleReviewClick}
-                    getStatusBadgeStyle={getStatusBadgeStyle}
                   />
                 ))}
               </div>
