@@ -110,7 +110,6 @@ const Dashboard = () => {
       );
 
       newSocket.onopen = () => {
-        console.log('WebSocket connected');
         setIsConnected(true);
         setLogsError(null);
 
@@ -376,14 +375,6 @@ const Dashboard = () => {
         setLogsLoading(true);
         setLogsError(null);
         const logs: any = await adminApi.getAdminLogs(50);
-        console.log(
-          'Admin logs API response:',
-          typeof logs,
-          'isArray:',
-          Array.isArray(logs),
-          'length:',
-          logs?.length,
-        );
 
         // API 응답 처리: ServiceImpl 로그만 필터링
         let logLines: string[] = [];
