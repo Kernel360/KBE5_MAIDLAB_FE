@@ -58,6 +58,7 @@ export { usePermission } from './usePermission';
 export { useGeolocation } from './useGeolocation';
 export { useFileUpload } from './useFileUpload';
 export { useValidation } from './useValidation';
+export { useNotification } from './useNotification';
 
 // 타입 정의
 export type {

@@ -6,3 +6,4 @@ export { default as ShareModal } from './ShareModal/ShareModal';
 export { default as PasswordChangeModal } from './PasswordChangeModal/PasswordChangeModal';
 export { default as ScrollToTop } from './ScrollToTop';
 export { ThemeToggle, ThemeToggleIcon } from './ThemeToggle';
+export { default as NotificationDropdown } from './NotificationDropdown/NotificationDropdown';

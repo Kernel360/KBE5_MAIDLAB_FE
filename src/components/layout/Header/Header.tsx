@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, memo } from 'react';
 import {
   Bell,
   ArrowLeft,
@@ -12,6 +12,8 @@ import { useNavigate } from 'react-router-dom';
 import { APP_INFO, ROUTES } from '@/constants';
 import { useAuth, useToast } from '@/hooks';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
+import NotificationDropdown from '@/components/common/NotificationDropdown/NotificationDropdown';
+import { useNotification } from '@/hooks';
 
 interface HeaderProps {
   variant?: 'main' | 'sub';
@@ -25,7 +27,7 @@ interface HeaderProps {
   hideBackButton?: boolean;
 }
 
-export const Header: React.FC<HeaderProps> = ({
+const Header: React.FC<HeaderProps> = ({
   variant = 'main',
   showNotification = false,
   title = APP_INFO.NAME,
@@ -38,6 +40,7 @@ export const Header: React.FC<HeaderProps> = ({
   const navigate = useNavigate();
   const { logout, isAuthenticated, userType } = useAuth();
   const { showToast } = useToast();
+  const { headerRefreshTrigger } = useNotification();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -46,9 +49,9 @@ export const Header: React.FC<HeaderProps> = ({
     else navigate(ROUTES.HOME);
   };
 
-  const handleNotificationClick = () => {
-    showToast('알람 기능을 준비 중입니다.', 'info');
-  };
+  // const handleNotificationClick = () => {
+  //   showToast('알람 기능을 준비 중입니다.', 'info');
+  // };
 
   const handleBackClick = () => {
     if (onBackClick) onBackClick();
@@ -79,6 +82,11 @@ export const Header: React.FC<HeaderProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // 헤더 리렌더링 감지
+  useEffect(() => {
+    // 헤더 새로고침 트리거 처리
+  }, [headerRefreshTrigger]);
+
   if (variant === 'sub') {
     if (hideBackButton) {
       return (
@@ -103,13 +111,10 @@ export const Header: React.FC<HeaderProps> = ({
           {title}
         </h1>
         <div className="flex items-center gap-2">
-          {showNotification && (
-            <button
-              onClick={handleNotificationClick}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors relative"
-            >
-              <Bell className="w-5 h-5 text-gray-600 dark:text-white" />
-            </button>
+          {showNotification && isAuthenticated && (
+            <NotificationDropdown
+              key={`notification-sub-${headerRefreshTrigger}`}
+            />
           )}
           {showMenu && (
             <div className="relative" ref={menuRef}>
@@ -215,13 +220,10 @@ export const Header: React.FC<HeaderProps> = ({
       </button>
 
       <div className="flex items-center gap-2 relative" ref={menuRef}>
-        {showNotification && (
-          <button
-            onClick={handleNotificationClick}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors relative"
-          >
-            <Bell className="w-6 h-6 text-gray-600 dark:text-white" />
-          </button>
+        {showNotification && isAuthenticated && (
+          <NotificationDropdown
+            key={`notification-main-${headerRefreshTrigger}`}
+          />
         )}
 
         {isAuthenticated && (
@@ -346,3 +348,8 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
+
+// Remove custom memo comparison - let React handle it naturally
+const MemoizedHeader = memo(Header);
+
+export { MemoizedHeader as Header };
