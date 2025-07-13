@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { ReservationListResponse } from '@/types/domain/reservation';
 import { useReservation } from '@/hooks/domain/reservation';
 import { useMatching } from '@/hooks/domain/useMatching';
@@ -63,6 +63,7 @@ const FILTERS = [
 
 const ManagerReservationsAndMatching: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { showToast } = useToast();
   const { checkIn, checkOut, respondToReservation } = useReservation();
   const { fetchMatchings, matchings } = useMatching();
@@ -85,7 +86,12 @@ const ManagerReservationsAndMatching: React.FC = () => {
     pageSize: 5,
   });
 
-  const [tab, setTab] = useState<'schedule' | 'request'>('schedule');
+  const [tab, setTab] = useState<'schedule' | 'request'>(() => {
+    const tabParam = searchParams.get('tab');
+    return tabParam === 'request' || tabParam === 'schedule'
+      ? tabParam
+      : 'schedule';
+  });
   const [matchingLoading, setMatchingLoading] = useState(true);
   const [filterOpen, setFilterOpen] = useState(false);
   const [modal, setModal] = useState<{
