@@ -83,6 +83,7 @@ export interface ReservationDetailResponse {
   pet: string;
   specialRequest: string;
   totalPrice: number;
+  finalPaymentPrice: number | null;
   canceledAt: string | null;
   checkinTime: string | null;
   checkoutTime: string | null;

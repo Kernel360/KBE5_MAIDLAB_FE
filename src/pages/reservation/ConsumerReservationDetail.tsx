@@ -412,7 +412,9 @@ const ConsumerReservationDetail: React.FC = () => {
         {/* 결제 정보 */}
         <div className="mx-4 mt-4 bg-orange-50 rounded-2xl shadow-sm p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            결제 정보
+            {[RESERVATION_STATUS.PAID, RESERVATION_STATUS.WORKING, RESERVATION_STATUS.COMPLETED].includes(reservation.status) 
+              ? '결제 정보' 
+              : '예상 결제 정보'}
           </h3>
           <div className="space-y-3">
             <div className="flex justify-between py-2">
@@ -440,16 +442,54 @@ const ConsumerReservationDetail: React.FC = () => {
                   </span>
                 </div>
               ))}
-            <div className="border-t border-gray-200 pt-3 mt-3">
-              <div className="flex justify-between items-center">
-                <span className="text-lg font-semibold text-gray-900">
-                  총 결제금액
-                </span>
-                <span className="text-xl font-bold text-orange-500">
-                  {formatPrice(reservation.totalPrice)}
-                </span>
+            {/* 결제 완료 상태 이후: 실제 결제 정보 표시 */}
+            {[RESERVATION_STATUS.PAID, RESERVATION_STATUS.WORKING, RESERVATION_STATUS.COMPLETED].includes(reservation.status) && (
+              <div className="border-t border-gray-200 pt-3 mt-3">
+                <div className="flex justify-between items-center py-2">
+                  <span className="text-lg font-semibold text-gray-900">
+                    서비스 총 금액
+                  </span>
+                  <span className="text-lg font-bold text-gray-900">
+                    {formatPrice(reservation.totalPrice)}
+                  </span>
+                </div>
+                {reservation.finalPaymentPrice !== null && reservation.totalPrice !== reservation.finalPaymentPrice && (
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-gray-600">포인트 사용</span>
+                    <span className="text-green-600 font-medium">
+                      -{formatPrice(reservation.totalPrice - reservation.finalPaymentPrice)}
+                    </span>
+                  </div>
+                )}
+                <div className="border-t border-orange-200 pt-3 mt-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-semibold text-gray-900">
+                      최종 결제금액
+                    </span>
+                    <span className="text-xl font-bold text-orange-500">
+                      {formatPrice(reservation.finalPaymentPrice ?? reservation.totalPrice)}
+                    </span>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
+            
+            {/* 결제 전 상태: 예상 결제 금액만 표시 */}
+            {![RESERVATION_STATUS.PAID, RESERVATION_STATUS.WORKING, RESERVATION_STATUS.COMPLETED].includes(reservation.status) && (
+              <div className="border-t border-gray-200 pt-3 mt-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-semibold text-gray-900">
+                    예상 결제금액
+                  </span>
+                  <span className="text-xl font-bold text-orange-500">
+                    {formatPrice(reservation.totalPrice)}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-500 mt-2">
+                  * 포인트 사용 시 최종 결제금액이 달라질 수 있습니다.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
