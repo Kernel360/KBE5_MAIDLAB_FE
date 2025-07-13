@@ -18,8 +18,6 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
 }) => {
   const { theme, setTheme, resolvedTheme } = useTheme();
 
-  console.log('ThemeToggle render:', { theme, resolvedTheme });
-
   const sizeClasses = {
     sm: 'w-20 h-8',
     md: 'w-24 h-10',
@@ -39,17 +37,14 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
   };
 
   const handleLightClick = () => {
-    console.log('Light clicked, setting theme to light');
     setTheme('light');
   };
 
   const handleDarkClick = () => {
-    console.log('Dark clicked, setting theme to dark');
     setTheme('dark');
   };
 
   const handleSystemClick = () => {
-    console.log('System clicked, setting theme to system');
     setTheme('system');
   };
 
