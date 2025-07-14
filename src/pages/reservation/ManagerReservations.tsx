@@ -74,6 +74,7 @@ const ManagerReservationsAndMatching: React.FC = () => {
     loading,
     currentPage,
     totalPages,
+    totalElements,
     status: filter,
     sortBy,
     sortOrder,
@@ -351,14 +352,14 @@ const ManagerReservationsAndMatching: React.FC = () => {
               >
                 <Calendar className="w-4 h-4" />
                 <span>일정 내역</span>
-                {reservations.length > 0 && (
+                {totalElements > 0 && (
                   <span
                     className={`
                     px-2 py-0.5 rounded-full text-xs font-semibold
                     ${tab === 'schedule' ? 'bg-orange-100 text-orange-600' : 'bg-gray-200 text-gray-500'}
                   `}
                   >
-                    {reservations.length}
+                    {totalElements}
                   </span>
                 )}
               </button>
