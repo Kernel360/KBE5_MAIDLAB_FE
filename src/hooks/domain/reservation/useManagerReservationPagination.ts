@@ -1,33 +1,19 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { reservationApi } from '@/apis/reservation';
-import { useServerPagination } from '../../useServerPagination';
 import type {
   ReservationPagingParams,
+  PageResponse,
   ReservationListResponse,
 } from '@/types/domain/reservation';
-import type { ReservationStatus } from '@/constants/status';
-import type {
-  ManagerStatusFilter,
-  UseManagerReservationPaginationOptions,
-} from '@/types/hooks/managerReservation';
+import { useApiCall } from '../../useApiCall';
 
-// 매니저 필터 상태를 API 상태로 변환하는 함수
-const mapManagerStatusToApiStatus = (
-  managerStatus: ManagerStatusFilter,
-): ReservationStatus | undefined => {
-  switch (managerStatus) {
-    case 'TODAY':
-      return undefined; // TODAY는 날짜 기반 필터링, API에서는 status 파라미터 없음
-    case 'PAID':
-      return 'PAID';
-    case 'WORKING':
-      return 'WORKING';
-    case 'COMPLETED':
-      return 'COMPLETED';
-    default:
-      return undefined;
-  }
-};
+interface UseManagerReservationPaginationParams {
+  initialStatus?: 'TODAY' | 'PAID' | 'WORKING' | 'COMPLETED';
+  initialPage?: number;
+  pageSize?: number;
+  initialSortBy?: string;
+  initialSortOrder?: 'ASC' | 'DESC';
+}
 
 export const useManagerReservationPagination = ({
   initialStatus = 'TODAY',
@@ -35,58 +21,71 @@ export const useManagerReservationPagination = ({
   pageSize = 5,
   initialSortBy = 'reservationDate',
   initialSortOrder = 'DESC',
-}: UseManagerReservationPaginationOptions = {}) => {
-  const [status, setStatus] = useState<ManagerStatusFilter>(initialStatus);
+}: UseManagerReservationPaginationParams = {}) => {
+  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [status, setStatus] = useState<
+    'TODAY' | 'PAID' | 'WORKING' | 'COMPLETED'
+  >(initialStatus);
+  const [sortBy, setSortBy] = useState(initialSortBy);
+  const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>(initialSortOrder);
+  const [data, setData] =
+    useState<PageResponse<ReservationListResponse> | null>(null);
 
-  const initialParams: ReservationPagingParams = {
-    page: initialPage,
-    size: pageSize,
-    sortBy: initialSortBy,
-    sortOrder: initialSortOrder,
-    status: mapManagerStatusToApiStatus(initialStatus),
-  } as ReservationPagingParams;
+  const { callApi, loading } = useApiCall();
 
-  const {
-    data,
-    params,
-    loading,
-    fetchData: fetchReservations,
-    changePage: baseChangePage,
-    changeSort: baseChangeSort,
-  } = useServerPagination<ReservationListResponse, ReservationPagingParams>({
-    fetcher: reservationApi.getManagerReservationsPaginated,
-    initialParams,
-  });
+  // API 호출 함수
+  const fetchReservations = useCallback(
+    async (params?: Partial<ReservationPagingParams>) => {
+      const queryParams: ReservationPagingParams = {
+        page: currentPage,
+        size: pageSize,
+        sortBy: sortBy as any,
+        sortOrder: sortOrder,
+        status: status as any, // TODO: 백엔드에서 매니저 전용 상태 타입 정의 필요
+        ...params,
+      };
+
+      const result = await callApi(
+        () => reservationApi.getManagerReservationsPaginated(queryParams),
+        {
+          showSuccessToast: false,
+          errorMessage: '예약 목록을 불러오는데 실패했습니다.',
+        },
+      );
+
+      if (result.success && result.data) {
+        setData(result.data);
+        return result.data;
+      } else {
+        setData(null);
+        return null;
+      }
+    },
+    [callApi, currentPage, pageSize, status, sortBy, sortOrder],
+  );
 
   // 페이지 변경
-  const changePage = useCallback(
-    async (newPage: number) => {
-      await baseChangePage(newPage);
-    },
-    [baseChangePage],
-  );
+  const changePage = useCallback((newPage: number) => {
+    setCurrentPage(newPage);
+  }, []);
 
   // 상태 변경
   const changeStatus = useCallback(
-    async (newStatus: ManagerStatusFilter) => {
+    (newStatus: 'TODAY' | 'PAID' | 'WORKING' | 'COMPLETED') => {
       setStatus(newStatus);
-      await fetchReservations({
-        status: mapManagerStatusToApiStatus(newStatus),
-        page: 0,
-      } as Partial<ReservationPagingParams>);
+      setCurrentPage(0); // 상태 변경 시 첫 페이지로 이동
     },
-    [fetchReservations],
+    [],
   );
 
   // 정렬 변경
   const changeSort = useCallback(
-    async (
-      newSortBy?: ReservationPagingParams['sortBy'],
-      newSortOrder?: 'ASC' | 'DESC',
-    ) => {
-      await baseChangeSort(newSortBy, newSortOrder);
+    (newSortBy?: string, newSortOrder?: 'ASC' | 'DESC') => {
+      if (newSortBy) setSortBy(newSortBy);
+      if (newSortOrder) setSortOrder(newSortOrder);
+      setCurrentPage(0);
     },
-    [baseChangeSort],
+    [],
   );
 
   // 새로고침
@@ -95,9 +94,14 @@ export const useManagerReservationPagination = ({
   }, [fetchReservations]);
 
   // 첫 페이지로 이동
-  const goToFirstPage = useCallback(async () => {
-    await changePage(0);
-  }, [changePage]);
+  const goToFirstPage = useCallback(() => {
+    setCurrentPage(0);
+  }, []);
+
+  // 페이지 변경 시 API 호출
+  useEffect(() => {
+    fetchReservations();
+  }, [currentPage, status, sortBy, sortOrder]); // fetchReservations 의존성 제거하여 무한 루프 방지
 
   return {
     // 데이터
@@ -106,7 +110,7 @@ export const useManagerReservationPagination = ({
     loading,
 
     // 페이지네이션 정보
-    currentPage: params.page || 0,
+    currentPage,
     totalPages: data?.totalPages || 0,
     totalElements: data?.totalElements || 0,
     isFirst: data?.first || true,
@@ -116,8 +120,8 @@ export const useManagerReservationPagination = ({
     status,
 
     // 정렬 정보
-    sortBy: params.sortBy,
-    sortOrder: params.sortOrder,
+    sortBy,
+    sortOrder,
 
     // 액션
     changePage,
