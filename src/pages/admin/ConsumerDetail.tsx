@@ -60,10 +60,7 @@ const ConsumerDetail = () => {
       size: 5,
     };
 
-    const reservations = await fetchConsumerReservations(
-      parseInt(id),
-      params,
-    );
+    const reservations = await fetchConsumerReservations(parseInt(id), params);
     setRecentReservations(reservations || []);
   };
 
@@ -341,8 +338,11 @@ const ConsumerDetail = () => {
 
                     <div className="mb-2">
                       <h4 className="font-semibold text-gray-900 text-base">
-                        {reservation.serviceType === 'CLEANING' ? '청소' : reservation.serviceType === 'MOVING' ? '이사' : reservation.serviceType}
-                        {' '}
+                        {reservation.serviceType === 'CLEANING'
+                          ? '청소'
+                          : reservation.serviceType === 'MOVING'
+                            ? '이사'
+                            : reservation.serviceType}{' '}
                         - {reservation.detailServiceType}
                       </h4>
                     </div>

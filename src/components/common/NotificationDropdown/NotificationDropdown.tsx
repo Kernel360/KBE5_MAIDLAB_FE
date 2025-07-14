@@ -3,7 +3,10 @@ import { Bell, Check, CheckCheck, Clock, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useNotification } from '@/hooks/useNotification';
 import { formatDateTime } from '@/utils/date';
-import { getNotificationTitle, type NotificationDto } from '@/types/notification';
+import {
+  getNotificationTitle,
+  type NotificationDto,
+} from '@/types/notification';
 
 const NotificationDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -57,15 +60,16 @@ const NotificationDropdown = () => {
   }, []);
 
   const handleNotificationClick = async (notification: NotificationDto) => {
-    const { id, isRead, relatedId, notificationType, receiverType } = notification;
-    
+    const { id, isRead, relatedId, notificationType, receiverType } =
+      notification;
+
     // 읽지 않은 알림이면 읽음 처리
     if (!isRead) {
       await markAsRead(id);
     }
-    
+
     setIsOpen(false); // 드롭다운 닫기
-    
+
     // 매니저용 알림 처리
     if (receiverType === 'MANAGER') {
       if (notificationType === 'MATCHING_REQUEST') {
@@ -75,7 +79,7 @@ const NotificationDropdown = () => {
         // 다른 알림들은 예약 상세페이지로 이동
         navigate(`/manager/reservations/${relatedId}`);
       }
-    } 
+    }
     // Consumer용 알림은 모두 예약 상세페이지로 이동
     else if (receiverType === 'CONSUMER' && relatedId) {
       navigate(`/consumer/reservations/${relatedId}`);

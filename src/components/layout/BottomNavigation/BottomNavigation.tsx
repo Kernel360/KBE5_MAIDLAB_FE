@@ -78,10 +78,12 @@ interface ManagerFooterProps {
   activeTab?: string;
 }
 
-export const ManagerFooter: React.FC<ManagerFooterProps> = ({ activeTab: propActiveTab }) => {
+export const ManagerFooter: React.FC<ManagerFooterProps> = ({
+  activeTab: propActiveTab,
+}) => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const navItems = [
     { id: 'home', icon: Home, label: '홈', path: ROUTES.HOME },
     {
@@ -97,14 +99,14 @@ export const ManagerFooter: React.FC<ManagerFooterProps> = ({ activeTab: propAct
   // props로 받은 activeTab이 있으면 우선 사용, 없으면 현재 경로 기반으로 결정
   const getActiveTab = () => {
     if (propActiveTab) return propActiveTab;
-    
+
     const currentPath = location.pathname;
-    
+
     if (currentPath === ROUTES.HOME) return 'home';
     if (currentPath.includes('/manager/reservations')) return 'calendar';
     if (currentPath.includes('/board')) return 'consultation';
     if (currentPath.includes('/manager/mypage')) return 'profile';
-    
+
     return 'home'; // 기본값
   };
 
@@ -117,7 +119,7 @@ export const ManagerFooter: React.FC<ManagerFooterProps> = ({ activeTab: propAct
       <div className="flex items-center justify-around">
         {navItems.map(({ id, icon: Icon, label, path }) => {
           const isActive = getActiveTab() === id;
-          
+
           return (
             <button
               key={id}
