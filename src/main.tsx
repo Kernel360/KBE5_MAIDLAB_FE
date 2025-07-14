@@ -12,9 +12,18 @@ import { injectSpeedInsights } from '@vercel/speed-insights';
 
 const isDev = import.meta.env.DEV;
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement,
-);
+// React root를 한 번만 생성하도록 보장
+const rootElement = document.getElementById('root') as HTMLElement & {
+  _reactRoot?: ReactDOM.Root;
+};
+let root: ReactDOM.Root;
+
+if (!rootElement._reactRoot) {
+  root = ReactDOM.createRoot(rootElement);
+  rootElement._reactRoot = root;
+} else {
+  root = rootElement._reactRoot;
+}
 
 // 조건부 레이아웃 컴포넌트
 const ConditionalLayout = () => {
@@ -72,6 +81,34 @@ const SimpleViewportResize = () => {
 const AppToRender = SimpleViewportResize;
 
 injectSpeedInsights();
+
+// OAuth 해시 결과 처리
+const handleOAuthHashResult = () => {
+  const hash = window.location.hash;
+  if (hash.startsWith('#oauth-result=')) {
+    try {
+      const resultData = hash.substring('#oauth-result='.length);
+      const message = JSON.parse(atob(resultData));
+      console.log('📨 전역에서 URL 해시 OAuth 결과 받음:', message);
+      
+      // 해시 제거
+      window.location.hash = '';
+      
+      // sessionStorage에 OAuth 결과 저장
+      sessionStorage.setItem('google_oauth_result', JSON.stringify(message));
+      
+      // 로그인 페이지로 리다이렉트
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    } catch (error) {
+      console.error('❌ 전역 OAuth 해시 파싱 에러:', error);
+    }
+  }
+};
+
+// 앱 시작 시 해시 확인
+handleOAuthHashResult();
 
 if (isDev) {
   root.render(

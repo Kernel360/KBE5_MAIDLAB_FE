@@ -342,7 +342,7 @@ const ReservationStep2: React.FC<Props> = ({
   const handleFinalSubmit = async () => {
     // 중복 클릭 방지
     if (isSubmitting) return;
-    
+
     setIsSubmitting(true);
     // serviceDetailTypeId는 실제 서비스 상세 타입의 id(숫자)로 전달해야 함
     const serviceDetail =
