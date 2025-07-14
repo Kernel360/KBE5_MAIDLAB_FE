@@ -18,6 +18,7 @@ const OAUTH_STATUS_KEY = 'google_oauth_status';
  */
 export const generateGoogleOAuthUrl = (
   userType: 'CONSUMER' | 'MANAGER',
+  sessionId: string,
 ): string => {
   const clientId = env.GOOGLE_CLIENT_ID;
   const redirectUri = env.GOOGLE_REDIRECT_URI;
@@ -29,7 +30,7 @@ export const generateGoogleOAuthUrl = (
     scope: 'openid profile email',
     access_type: 'offline',
     prompt: 'consent',
-    state: `userType=${userType}&timestamp=${Date.now()}`,
+    state: `userType=${userType}&sessionId=${sessionId}&timestamp=${Date.now()}`,
   });
 
   return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
@@ -61,6 +62,17 @@ export const extractUserTypeFromState = (
 };
 
 /**
+ * state 파라미터에서 sessionId 추출
+ */
+export const extractSessionIdFromState = (
+  state: string | null,
+): string | null => {
+  if (!state) return null;
+  const match = state.match(/sessionId=([^&]+)/);
+  return match ? match[1] : null;
+};
+
+/**
  * 구글 로그인 팝업 열기
  */
 export const openGoogleLoginPopup = (
@@ -70,8 +82,8 @@ export const openGoogleLoginPopup = (
   config: Partial<PopupConfig> = {},
 ): void => {
   const popupConfig = { ...DEFAULT_POPUP_CONFIG, ...config };
-  const authUrl = generateGoogleOAuthUrl(userType);
   const sessionId = `oauth_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const authUrl = generateGoogleOAuthUrl(userType, sessionId);
 
   const popupManager = new GoogleOAuthPopupManager(
     sessionId,
@@ -105,6 +117,10 @@ class GoogleOAuthPopupManager {
 
   openPopup(authUrl: string): void {
     this.prepareOAuthSession();
+
+    // 페이지 로드 시 해시 확인
+    this.checkHashOnLoad();
+
     this.popup = this.createPopupWindow(authUrl);
 
     if (!this.popup) {
@@ -141,6 +157,8 @@ class GoogleOAuthPopupManager {
 
   private setupEventListeners(): void {
     window.addEventListener('storage', this.handleStorageChange.bind(this));
+    window.addEventListener('message', this.handleMessage.bind(this));
+    window.addEventListener('hashchange', this.handleHashChange.bind(this));
     window.addEventListener('beforeunload', this.cleanup.bind(this));
   }
 
@@ -156,6 +174,40 @@ class GoogleOAuthPopupManager {
       }
     } catch (error) {
       console.error('❌ localStorage 이벤트 파싱 에러:', error);
+    }
+  }
+
+  private handleMessage(e: MessageEvent): void {
+    if (this.messageProcessed || e.data.type !== 'GOOGLE_OAUTH_RESULT') {
+      return;
+    }
+
+    console.log('📨 postMessage 받음:', e.data);
+    this.processMessage(e.data.data);
+  }
+
+  private handleHashChange(): void {
+    this.checkHashOnLoad();
+  }
+
+  private checkHashOnLoad(): void {
+    if (this.messageProcessed) {
+      return;
+    }
+
+    const hash = window.location.hash;
+
+    if (hash.startsWith('#oauth-result=')) {
+      try {
+        const resultData = hash.substring('#oauth-result='.length);
+        const message = JSON.parse(atob(resultData));
+        this.processMessage(message);
+
+        // 해시 제거
+        window.location.hash = '';
+      } catch (error) {
+        console.error('❌ URL 해시 파싱 에러:', error);
+      }
     }
   }
 
@@ -214,9 +266,30 @@ class GoogleOAuthPopupManager {
   private checkForMessage(): void {
     try {
       const message = getLocalStorage(OAUTH_MESSAGE_KEY);
+      const directMessage = localStorage.getItem(OAUTH_MESSAGE_KEY);
+
+      console.log('🔍 폴링 중 메시지 체크:', {
+        hasMessage: !!message,
+        sessionId: this.sessionId,
+        isValidSession: this.isValidSession(),
+        message: message,
+        directMessage: directMessage,
+      });
+
       if (message && this.isValidSession()) {
         const data = message;
         this.processMessage(data);
+      } else if (directMessage) {
+        // 직접 localStorage에서 가져온 메시지 처리 (sessionId 체크 제거)
+        try {
+          const parsedMessage = JSON.parse(directMessage);
+          if (parsedMessage.value) {
+            console.log(parsedMessage.value);
+            this.processMessage(parsedMessage.value);
+          }
+        } catch (parseError) {
+          console.error('❌ 직접 메시지 파싱 에러:', parseError);
+        }
       }
     } catch (error) {
       console.error('❌ 메시지 체크 에러:', error);
@@ -225,6 +298,12 @@ class GoogleOAuthPopupManager {
 
   private processMessage(messageData: any): void {
     if (this.messageProcessed) return;
+
+    // messageData가 없거나 잘못된 경우 처리 중단
+    if (!messageData || typeof messageData !== 'object') {
+      console.log('❌ 잘못된 메시지 데이터:', messageData);
+      return;
+    }
 
     this.cleanup();
     this.closePopup();
@@ -241,7 +320,13 @@ class GoogleOAuthPopupManager {
     setTimeout(() => {
       try {
         if (this.popup && typeof this.popup.close === 'function') {
-          this.popup.close();
+          setTimeout(() => {
+            try {
+              this.popup?.close();
+            } catch (e) {
+              // COOP 에러 무시
+            }
+          }, 100);
         }
       } catch (e) {
         // 팝업 닫기 실패 무시
@@ -250,13 +335,19 @@ class GoogleOAuthPopupManager {
   }
 
   private setupTimeout(): void {
+    // 타임아웃을 30초로 늘려서 sessionStorage 처리 시간 확보
+    const extendedTimeout = 30000;
+    console.log(
+      '⏰ 타임아웃 설정:',
+      extendedTimeout + 'ms (sessionStorage 처리용)',
+    );
     this.timeoutHandle = setTimeout(() => {
       if (!this.messageProcessed) {
+        console.log('❌ 타임아웃 발생 - sessionStorage 처리가 완료되지 않음');
         this.cleanup();
         this.closePopup();
-        this.onError('로그인 시간이 초과되었습니다. 다시 시도해주세요.');
       }
-    }, this.config.timeout);
+    }, extendedTimeout);
   }
 
   private cleanup(): void {
@@ -271,6 +362,8 @@ class GoogleOAuthPopupManager {
 
     // 이벤트 리스너 제거
     window.removeEventListener('storage', this.handleStorageChange.bind(this));
+    window.removeEventListener('message', this.handleMessage.bind(this));
+    window.removeEventListener('hashchange', this.handleHashChange.bind(this));
     window.removeEventListener('beforeunload', this.cleanup.bind(this));
 
     // localStorage 정리
@@ -285,6 +378,7 @@ class GoogleOAuthPopupManager {
 export const handleGoogleOAuthCallback = () => {
   const { code, error, state } = extractOAuthParams();
   const userType = extractUserTypeFromState(state);
+  const sessionId = extractSessionIdFromState(state);
 
   let message;
 
@@ -306,6 +400,12 @@ export const handleGoogleOAuthCallback = () => {
       error: '사용자 타입 정보가 없습니다.',
       timestamp: Date.now(),
     };
+  } else if (!sessionId) {
+    message = {
+      type: 'GOOGLE_AUTH_ERROR',
+      error: '세션 ID 정보가 없습니다.',
+      timestamp: Date.now(),
+    };
   } else {
     message = {
       type: 'GOOGLE_AUTH_SUCCESS',
@@ -320,13 +420,22 @@ export const handleGoogleOAuthCallback = () => {
     try {
       setLocalStorage(OAUTH_MESSAGE_KEY, message);
 
-      // 상태 업데이트
-      const currentStatus = getLocalStorage(OAUTH_STATUS_KEY);
-      if (currentStatus) {
-        const statusData = currentStatus as { status: string; endTime: number };
-        statusData.status = 'completed';
-        statusData.endTime = Date.now();
-        setLocalStorage(OAUTH_STATUS_KEY, statusData);
+      // 상태 업데이트 - sessionId가 있을 때만
+      if (sessionId) {
+        const currentStatus = getLocalStorage(OAUTH_STATUS_KEY);
+        if (currentStatus) {
+          const statusData = currentStatus as {
+            status: string;
+            sessionId: string;
+            endTime: number;
+          };
+          // sessionId가 일치하는 경우에만 업데이트
+          if (statusData.sessionId === sessionId) {
+            statusData.status = 'completed';
+            statusData.endTime = Date.now();
+            setLocalStorage(OAUTH_STATUS_KEY, statusData);
+          }
+        }
       }
     } catch (saveError: any) {
       console.error(`❌ 메시지 저장 실패 (${attempt}번째 시도):`, saveError);
@@ -341,11 +450,44 @@ export const handleGoogleOAuthCallback = () => {
   // 메시지 저장
   saveMessage();
 
+  // 부모 창에 메시지 전달 시도
+  setTimeout(() => {
+    try {
+      // 1. postMessage 시도
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage(
+          {
+            type: 'GOOGLE_OAUTH_RESULT',
+            data: message,
+          },
+          window.location.origin,
+        );
+        console.log('📨 부모 창에 postMessage 전송:', message);
+      }
+
+      // 2. URL 기반 메시지 전달 시도
+      if (window.opener && !window.opener.closed) {
+        const resultData = btoa(JSON.stringify(message));
+        const callbackUrl = `${window.location.origin}/#oauth-result=${resultData}`;
+        window.opener.location.href = callbackUrl;
+        console.log('📨 부모 창 URL 변경:', callbackUrl);
+      }
+    } catch (error) {
+      console.log('❌ 부모 창 메시지 전송 실패:', error);
+    }
+  }, 100);
+
   // ✅ 팝업 닫기 (여러 번 시도)
   const closePopup = (attempt: number = 1) => {
     try {
       if (typeof window.close === 'function') {
-        window.close();
+        setTimeout(() => {
+          try {
+            window.close();
+          } catch (e) {
+            // COOP 에러 무시
+          }
+        }, 100);
       }
     } catch (closeError: any) {
       // 재시도 (최대 3번)

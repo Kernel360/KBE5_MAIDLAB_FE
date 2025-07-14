@@ -1,8 +1,4 @@
-import {
-  CURRENCY_FORMATTERS,
-  CURRENCY,
-  BUSINESS_CONFIG,
-} from '@/constants/service';
+import { CURRENCY_FORMATTERS, CURRENCY } from '@/constants/service';
 
 /**
  * 숫자를 천 단위로 콤마 포맷팅
@@ -14,7 +10,9 @@ export const formatNumber = (num: number): string => {
 /**
  * 가격을 원화 형식으로 포맷팅 (예: 150,000원)
  */
-export const formatPrice = (price: string | number | null | undefined): string => {
+export const formatPrice = (
+  price: string | number | null | undefined,
+): string => {
   if (price === null || price === undefined) return '0원';
   const numPrice = typeof price === 'string' ? parseInt(price, 10) : price;
   if (isNaN(numPrice)) return '0원';

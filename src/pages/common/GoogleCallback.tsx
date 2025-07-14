@@ -7,6 +7,11 @@ const GoogleCallback: React.FC = () => {
   );
   const [message, setMessage] = useState('로그인 처리 중...');
 
+  // 컴포넌트가 마운트되었음을 알리기 위해 타이틀 변경
+  useEffect(() => {
+    document.title = 'Google OAuth 콜백 처리 중...';
+  }, []);
+
   useEffect(() => {
     try {
       handleGoogleOAuthCallback();
