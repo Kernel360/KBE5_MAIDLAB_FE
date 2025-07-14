@@ -45,7 +45,8 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
           </div>
           <span
             className={`
-              px-3 py-1 ${getReservationStatusClasses(reservation.status, reservation.reservationDate)}
+              px-3 py-1 text-xs font-medium rounded-full border
+              ${getReservationStatusClasses(reservation.status, reservation.reservationDate)}
             `}
             style={{
               backgroundColor: getReservationStatusColor(
@@ -54,7 +55,10 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
               ),
             }}
           >
-            {getReservationStatusText(reservation.status)}
+            {getReservationStatusText(
+              reservation.status,
+              reservation.reservationDate,
+            )}
           </span>
         </div>
       </div>
