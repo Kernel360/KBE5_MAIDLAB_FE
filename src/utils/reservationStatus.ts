@@ -23,7 +23,7 @@ export const getReservationStatusColor = (
   const today = new Date().toISOString().split('T')[0];
 
   // D-Day인 경우 빨간색 우선 적용
-  if (status === RESERVATION_STATUS.MATCHED && reservationDate === today) {
+  if (status === RESERVATION_STATUS.PAID && reservationDate === today) {
     return '#F44336'; // 빨간색 (긴급)
   }
 
@@ -49,11 +49,11 @@ export const getReservationStatusText = (
     case RESERVATION_STATUS.WORKING:
       return '진행중';
     case RESERVATION_STATUS.PAID:
-      return '결제완료';
-    case RESERVATION_STATUS.MATCHED:
       if (reservationDate === today) {
         return 'D-Day';
       }
+      return '결제완료';
+    case RESERVATION_STATUS.MATCHED:
       return '매니저 매칭 성공';
     case RESERVATION_STATUS.PENDING:
       return '매니저 매칭 대기중';

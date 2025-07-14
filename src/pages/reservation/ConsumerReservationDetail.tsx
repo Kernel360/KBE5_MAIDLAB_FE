@@ -163,7 +163,7 @@ const ConsumerReservationDetail: React.FC = () => {
 
   // 상태/서비스 정보
   const status = reservation.status || 'PENDING';
-  const statusLabel = getReservationStatusText(status);
+  const statusLabel = getReservationStatusText(status, reservation.reservationDate);
   const statusColor = getReservationStatusColor(status, reservation.reservationDate);
   const StatusIcon = STATUS_ICONS[status] || Clock;
   const serviceType =
