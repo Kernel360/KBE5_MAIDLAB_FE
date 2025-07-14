@@ -445,9 +445,8 @@
     @apply text-base; /* iOS에서 줌 방지 */
   }
 
-  /* 모바일에서 hover 효과 비활성화 */
-  .hover\:bg-gray-100:hover,
-  .btn:hover {
+  /* 모바일에서 특정 hover 효과 비활성화 (버튼은 제외) */
+  .hover\:bg-gray-100:hover {
     background-color: initial;
     transform: none;
   }
