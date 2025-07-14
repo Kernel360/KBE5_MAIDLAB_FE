@@ -8,11 +8,12 @@ import {
   PET_TYPES,
 } from '@/constants/service';
 import {
-  RESERVATION_STATUS_LABELS,
-  RESERVATION_STATUS_COLORS,
   RESERVATION_STATUS,
 } from '@/constants/status';
-import { COLORS } from '@/constants/theme';
+import {
+  getReservationStatusColor,
+  getReservationStatusText,
+} from '@/utils/reservationStatus';
 import { formatKoreanDate, formatTime, getKoreanWeekday } from '@/utils/date';
 import {
   formatEstimatedPriceByRoomSize,
@@ -56,9 +57,9 @@ const SERVICE_ICONS: Record<
   string,
   { icon: React.ElementType; color: string }
 > = {
-  GENERAL_CLEANING: { icon: Home, color: COLORS.PRIMARY[500] },
+  GENERAL_CLEANING: { icon: Home, color: '#F97316' },
   BABYSITTER: { icon: Baby, color: '#F472B6' },
-  PET_CARE: { icon: PawPrint, color: COLORS.PRIMARY[400] },
+  PET_CARE: { icon: PawPrint, color: '#FB923C' },
 };
 
 function parseAdditionalOptions(serviceAdd: string) {
@@ -161,10 +162,9 @@ const ConsumerReservationDetail: React.FC = () => {
   }
 
   // 상태/서비스 정보
-  const status = (reservation.status ||
-    'PENDING') as keyof typeof RESERVATION_STATUS_LABELS;
-  const statusLabel = RESERVATION_STATUS_LABELS[status] || '-';
-  const statusColor = RESERVATION_STATUS_COLORS[status] || COLORS.PRIMARY[500];
+  const status = reservation.status || 'PENDING';
+  const statusLabel = getReservationStatusText(status);
+  const statusColor = getReservationStatusColor(status, reservation.reservationDate);
   const StatusIcon = STATUS_ICONS[status] || Clock;
   const serviceType =
     reservation.serviceType as keyof typeof SERVICE_TYPE_LABELS;
@@ -231,7 +231,7 @@ const ConsumerReservationDetail: React.FC = () => {
               <div className="flex items-center space-x-2 text-gray-600">
                 <AlertCircle className="w-4 h-4" />
                 <span className="text-sm">
-                  {RESERVATION_STATUS_LABELS[status]}
+                  {statusLabel}
                 </span>
               </div>
             </div>
