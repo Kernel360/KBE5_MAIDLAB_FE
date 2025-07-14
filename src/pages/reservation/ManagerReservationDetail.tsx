@@ -13,6 +13,10 @@ import {
   RESERVATION_STATUS_COLORS,
   RESERVATION_STATUS,
 } from '@/constants/status';
+import {
+  getManagerReservationStatusText,
+  getReservationStatusColor,
+} from '@/utils/reservationStatus';
 import { COLORS } from '@/constants/theme';
 import { formatKoreanDate, formatTime, getKoreanWeekday } from '@/utils/date';
 import {
@@ -172,8 +176,8 @@ const ManagerReservationDetail: React.FC = () => {
   // 상태/서비스 정보
   const status = (reservation.status ||
     'PENDING') as keyof typeof RESERVATION_STATUS_LABELS;
-  const statusLabel = RESERVATION_STATUS_LABELS[status] || '-';
-  const statusColor = RESERVATION_STATUS_COLORS[status] || COLORS.PRIMARY[500];
+  const statusLabel = getManagerReservationStatusText(status, reservation.reservationDate);
+  const statusColor = getReservationStatusColor(status, reservation.reservationDate);
   const StatusIcon = STATUS_ICONS[status] || Clock;
   const serviceType =
     reservation.serviceType as keyof typeof SERVICE_TYPE_LABELS;
@@ -241,7 +245,7 @@ const ManagerReservationDetail: React.FC = () => {
               <div className="flex items-center space-x-2 text-gray-600">
                 <AlertCircle className="w-4 h-4" />
                 <span className="text-sm">
-                  {RESERVATION_STATUS_LABELS[status]}
+                  {statusLabel}
                 </span>
               </div>
             </div>

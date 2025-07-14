@@ -147,6 +147,29 @@ export const isToday = (date: Date | string): boolean => {
 };
 
 /**
+ * D-Day 계산 (예약 날짜까지 남은 일수)
+ */
+export const calculateDDay = (reservationDate: Date | string): string => {
+  const reservation = new Date(reservationDate);
+  const today = new Date();
+  
+  // 시간 제거하고 날짜만 비교
+  today.setHours(0, 0, 0, 0);
+  reservation.setHours(0, 0, 0, 0);
+  
+  const diffInMs = reservation.getTime() - today.getTime();
+  const diffInDays = Math.ceil(diffInMs / (1000 * 60 * 60 * 24));
+  
+  if (diffInDays === 0) {
+    return 'D-Day';
+  } else if (diffInDays > 0) {
+    return `D-${diffInDays}`;
+  } else {
+    return `D+${Math.abs(diffInDays)}`;
+  }
+};
+
+/**
  * 날짜가 과거인지 확인
  */
 export const isPast = (date: Date | string): boolean => {
