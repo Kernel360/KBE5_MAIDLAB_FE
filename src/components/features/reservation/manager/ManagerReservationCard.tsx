@@ -65,7 +65,10 @@ export const ManagerReservationCard: React.FC<ManagerReservationCardProps> = ({
               ${getReservationStatusClasses(reservation.status, reservation.reservationDate)}
             `}
             style={{
-              backgroundColor: getReservationStatusColor(reservation.status, reservation.reservationDate),
+              backgroundColor: getReservationStatusColor(
+                reservation.status,
+                reservation.reservationDate,
+              ),
             }}
           >
             {getManagerReservationStatusText(

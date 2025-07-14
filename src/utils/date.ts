@@ -152,14 +152,14 @@ export const isToday = (date: Date | string): boolean => {
 export const calculateDDay = (reservationDate: Date | string): string => {
   const reservation = new Date(reservationDate);
   const today = new Date();
-  
+
   // 시간 제거하고 날짜만 비교
   today.setHours(0, 0, 0, 0);
   reservation.setHours(0, 0, 0, 0);
-  
+
   const diffInMs = reservation.getTime() - today.getTime();
   const diffInDays = Math.ceil(diffInMs / (1000 * 60 * 60 * 24));
-  
+
   if (diffInDays === 0) {
     return 'D-Day';
   } else if (diffInDays > 0) {
