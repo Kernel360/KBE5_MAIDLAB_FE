@@ -8,6 +8,7 @@ import type {
   PreferenceRequest,
   ConsumerProfileCreateRequest,
   PointRecordResponseDto,
+  PointChargeRequestDto,
 } from '@/types/domain/consumer';
 import { API_ENDPOINTS } from '@/constants/api';
 
@@ -104,5 +105,12 @@ export const consumerApi = {
       'get',
       API_ENDPOINTS.CONSUMER.BLACKLIST,
     );
+  },
+
+  /**
+   * 포인트 충전
+   */
+  chargePoint: async (data: PointChargeRequestDto): Promise<void> => {
+    return apiCall<void>('post', API_ENDPOINTS.CONSUMER.POINT_CHARGE, data);
   },
 };

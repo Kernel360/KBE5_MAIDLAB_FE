@@ -41,6 +41,25 @@ export const usePoint = () => {
     [executeApi],
   );
 
+  // 포인트 충전
+  const chargePoint = useCallback(
+    async (amount: number) => {
+      const result = await executeApi(
+        () => consumerApi.chargePoint({ chargeAmount: amount }),
+        {
+          successMessage: '포인트가 충전되었습니다.',
+          errorMessage: '포인트 충전에 실패했습니다.',
+        },
+      );
+      if (result.success) {
+        // 충전 후 포인트 재조회
+        await fetchPoint();
+      }
+      return result;
+    },
+    [executeApi, fetchPoint],
+  );
+
   return {
     point,
     history,
@@ -48,5 +67,6 @@ export const usePoint = () => {
     loading,
     fetchPoint,
     fetchPointHistory,
+    chargePoint,
   };
 };

@@ -183,9 +183,14 @@ export interface ProfileData {
   detailAddress: string;
   profileImage: string | undefined;
 }
+
 export interface PointRecordResponseDto {
   amount: number;
   pointType: string;
   description: string;
   createdAt: string;
+}
+
+export interface PointChargeRequestDto {
+  chargeAmount: number;
 }
