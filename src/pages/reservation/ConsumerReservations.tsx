@@ -2,11 +2,12 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useReservationPagination } from '@/hooks/domain/reservation';
 import { useReservation } from '@/hooks/domain/reservation';
 import { ReservationCard } from '@/components';
-import { ROUTES, RESERVATION_STATUS } from '@/constants';
+import { ROUTES, RESERVATION_STATUS, SERVICE_OPTIONS } from '@/constants';
 import { useNavigate } from 'react-router-dom';
 import type { ReservationPagingParams } from '@/types/domain/reservation';
 import type { ReservationStatus } from '@/constants/status';
 import { Header } from '@/components';
+import PaymentModal from '@/components/features/reservation/consumer/PaymentModal';
 import {
   Clock,
   Calendar,
@@ -83,10 +84,13 @@ const ConsumerReservations: React.FC = () => {
     fetchReservations,
   } = useReservationPagination();
 
-  const { payReservation } = useReservation();
+  const { payReservation, fetchReservationDetail } = useReservation();
 
   const [activeTab, setActiveTab] = useState<TabType>('전체');
   const [showSortOptions, setShowSortOptions] = useState(false);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [selectedReservation, setSelectedReservation] = useState<any>(null);
+  const [modalLoading, setModalLoading] = useState(false);
 
   // 현재 데이터
   const currentReservations = paginatedData?.content || [];
@@ -187,7 +191,38 @@ const ConsumerReservations: React.FC = () => {
     event: React.MouseEvent,
   ) => {
     event.stopPropagation();
-    await handlePayment(reservationId);
+    setModalLoading(true);
+    const detail = await fetchReservationDetail(reservationId);
+    setModalLoading(false);
+    if (!detail) return;
+    // 추가 옵션 파싱
+    let additionalOptions: any[] = [];
+    if (detail && detail.serviceAdd) {
+      additionalOptions = detail.serviceAdd
+        .split(',')
+        .map((item: string) => {
+          const [id, countStr] = item.split(':');
+          const option = SERVICE_OPTIONS.find((opt) => opt.id === id);
+          if (!option) return undefined;
+          const count = countStr ? Number(countStr) : undefined;
+          return {
+            id,
+            label: option.label,
+            price: option.priceAdd,
+            time: option.timeAdd,
+            ...(count !== undefined ? { count } : {}),
+          };
+        })
+        .filter(Boolean);
+    }
+    setSelectedReservation({
+      reservationId,
+      totalPrice: detail.totalPrice,
+      roomSize: detail.roomSize,
+      serviceAdd: detail.serviceAdd,
+      additionalOptions,
+    });
+    setPaymentModalOpen(true);
   };
 
   return (
@@ -480,6 +515,13 @@ const ConsumerReservations: React.FC = () => {
           )}
         </div>
       </div>
+      {paymentModalOpen && selectedReservation && !modalLoading && (
+        <PaymentModal
+          isOpen={paymentModalOpen}
+          onClose={() => setPaymentModalOpen(false)}
+          reservation={selectedReservation}
+        />
+      )}
     </div>
   );
 };
