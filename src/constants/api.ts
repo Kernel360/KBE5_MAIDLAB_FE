@@ -81,6 +81,7 @@ export const API_ENDPOINTS = {
   CONSUMER: {
     POINT: '/api/point',
     POINT_RECORD: '/api/point/record',
+    POINT_CHARGE: '/api/point/charge',
     PROFILE: '/api/consumers/profile',
     MYPAGE: '/api/consumers/mypage',
     LIKES: '/api/consumers/likes',

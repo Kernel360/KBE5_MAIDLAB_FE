@@ -3,6 +3,7 @@ import { Header } from '@/components/layout/Header/Header';
 import { ROUTES } from '@/constants';
 import { Coins } from 'lucide-react';
 import { usePoint } from '@/hooks/domain/usePoint';
+import ChargePointModal from '@/components/features/consumer/point/ChargePointModal';
 
 const PAGE_SIZE = 5;
 
@@ -13,6 +14,7 @@ const PointsPage: React.FC = () => {
   const [page, setPage] = useState(0);
   const [allLoaded, setAllLoaded] = useState(false);
   const [list, setList] = useState<typeof history>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // 현재 월 계산
   const getMonthLabel = (offset: number) => {
@@ -69,6 +71,12 @@ const PointsPage: React.FC = () => {
     if (monthOffset < 0) setMonthOffset((prev) => prev + 1);
   };
 
+  const handleChargeComplete = (chargedAmount: number) => {
+    // 충전 후 포인트 새로고침 등 처리 가능
+    setIsModalOpen(false);
+    fetchPoint();
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header
@@ -82,9 +90,17 @@ const PointsPage: React.FC = () => {
           <div className="flex flex-col items-center gap-2 mb-4">
             <Coins className="w-10 h-10 text-[#FF6B00]" />
             <span className="text-gray-600">내 포인트</span>
-            <span className="text-2xl font-bold text-[#FF6B00]">
-              {point !== null ? point.toLocaleString() : '-'}P
-            </span>
+            <div className="flex flex-row items-center gap-2">
+              <span className="text-2xl font-bold text-[#FF6B00]">
+                {point !== null ? point.toLocaleString() : '-'}P
+              </span>
+              <button
+                className="bg-orange-500 text-white px-3 py-1 rounded text-sm whitespace-nowrap"
+                onClick={() => setIsModalOpen(true)}
+              >
+                충전하기
+              </button>
+            </div>
           </div>
         </div>
         <div className="bg-white rounded-xl shadow-sm p-6">
@@ -167,6 +183,12 @@ const PointsPage: React.FC = () => {
             </>
           )}
         </div>
+        {isModalOpen && (
+          <ChargePointModal
+            onClose={() => setIsModalOpen(false)}
+            onCharge={handleChargeComplete}
+          />
+        )}
       </div>
     </div>
   );
