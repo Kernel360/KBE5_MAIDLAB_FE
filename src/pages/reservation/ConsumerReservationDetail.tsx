@@ -7,12 +7,11 @@ import {
   HOUSING_TYPES,
   PET_TYPES,
 } from '@/constants/service';
+import { RESERVATION_STATUS } from '@/constants/status';
 import {
-  RESERVATION_STATUS_LABELS,
-  RESERVATION_STATUS_COLORS,
-  RESERVATION_STATUS,
-} from '@/constants/status';
-import { COLORS } from '@/constants/theme';
+  getReservationStatusColor,
+  getReservationStatusText,
+} from '@/utils/reservationStatus';
 import { formatKoreanDate, formatTime, getKoreanWeekday } from '@/utils/date';
 import {
   formatEstimatedPriceByRoomSize,
@@ -56,9 +55,9 @@ const SERVICE_ICONS: Record<
   string,
   { icon: React.ElementType; color: string }
 > = {
-  GENERAL_CLEANING: { icon: Home, color: COLORS.PRIMARY[500] },
+  GENERAL_CLEANING: { icon: Home, color: '#F97316' },
   BABYSITTER: { icon: Baby, color: '#F472B6' },
-  PET_CARE: { icon: PawPrint, color: COLORS.PRIMARY[400] },
+  PET_CARE: { icon: PawPrint, color: '#FB923C' },
 };
 
 function parseAdditionalOptions(serviceAdd: string) {
@@ -132,9 +131,7 @@ const ConsumerReservationDetail: React.FC = () => {
   // 결제 핸들러
   const handlePayment = async () => {
     if (!reservation) return;
-    await payReservation({
-      reservationId: Number(id),
-    });
+    await payReservation(Number(id));
   };
 
   if (loading) {
@@ -163,10 +160,15 @@ const ConsumerReservationDetail: React.FC = () => {
   }
 
   // 상태/서비스 정보
-  const status = (reservation.status ||
-    'PENDING') as keyof typeof RESERVATION_STATUS_LABELS;
-  const statusLabel = RESERVATION_STATUS_LABELS[status] || '-';
-  const statusColor = RESERVATION_STATUS_COLORS[status] || COLORS.PRIMARY[500];
+  const status = reservation.status || 'PENDING';
+  const statusLabel = getReservationStatusText(
+    status,
+    reservation.reservationDate,
+  );
+  const statusColor = getReservationStatusColor(
+    status,
+    reservation.reservationDate,
+  );
   const StatusIcon = STATUS_ICONS[status] || Clock;
   const serviceType =
     reservation.serviceType as keyof typeof SERVICE_TYPE_LABELS;
@@ -232,9 +234,7 @@ const ConsumerReservationDetail: React.FC = () => {
             <div className="bg-gray-50 rounded-xl p-4">
               <div className="flex items-center space-x-2 text-gray-600">
                 <AlertCircle className="w-4 h-4" />
-                <span className="text-sm">
-                  {RESERVATION_STATUS_LABELS[status]}
-                </span>
+                <span className="text-sm">{statusLabel}</span>
               </div>
             </div>
           </div>
@@ -412,8 +412,14 @@ const ConsumerReservationDetail: React.FC = () => {
         {/* 결제 정보 */}
         <div className="mx-4 mt-4 bg-orange-50 rounded-2xl shadow-sm p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            {[RESERVATION_STATUS.PAID, RESERVATION_STATUS.WORKING, RESERVATION_STATUS.COMPLETED].includes(reservation.status) 
-              ? '결제 정보' 
+            {(
+              [
+                RESERVATION_STATUS.PAID,
+                RESERVATION_STATUS.WORKING,
+                RESERVATION_STATUS.COMPLETED,
+              ] as string[]
+            ).includes(reservation.status)
+              ? '결제 정보'
               : '예상 결제 정보'}
           </h3>
           <div className="space-y-3">
@@ -443,7 +449,13 @@ const ConsumerReservationDetail: React.FC = () => {
                 </div>
               ))}
             {/* 결제 완료 상태 이후: 실제 결제 정보 표시 */}
-            {[RESERVATION_STATUS.PAID, RESERVATION_STATUS.WORKING, RESERVATION_STATUS.COMPLETED].includes(reservation.status) && (
+            {(
+              [
+                RESERVATION_STATUS.PAID,
+                RESERVATION_STATUS.WORKING,
+                RESERVATION_STATUS.COMPLETED,
+              ] as string[]
+            ).includes(reservation.status) && (
               <div className="border-t border-gray-200 pt-3 mt-3">
                 <div className="flex justify-between items-center py-2">
                   <span className="text-lg font-semibold text-gray-900">
@@ -453,29 +465,42 @@ const ConsumerReservationDetail: React.FC = () => {
                     {formatPrice(reservation.totalPrice)}
                   </span>
                 </div>
-                {reservation.finalPaymentPrice !== null && reservation.totalPrice !== reservation.finalPaymentPrice && (
-                  <div className="flex justify-between items-center py-2">
-                    <span className="text-gray-600">포인트 사용</span>
-                    <span className="text-green-600 font-medium">
-                      -{formatPrice(reservation.totalPrice - reservation.finalPaymentPrice)}
-                    </span>
-                  </div>
-                )}
+                {reservation.finalPaymentPrice !== null &&
+                  reservation.totalPrice !== reservation.finalPaymentPrice && (
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-gray-600">포인트 사용</span>
+                      <span className="text-green-600 font-medium">
+                        -
+                        {formatPrice(
+                          reservation.totalPrice -
+                            reservation.finalPaymentPrice,
+                        )}
+                      </span>
+                    </div>
+                  )}
                 <div className="border-t border-orange-200 pt-3 mt-3">
                   <div className="flex justify-between items-center">
                     <span className="text-lg font-semibold text-gray-900">
                       최종 결제금액
                     </span>
                     <span className="text-xl font-bold text-orange-500">
-                      {formatPrice(reservation.finalPaymentPrice ?? reservation.totalPrice)}
+                      {formatPrice(
+                        reservation.finalPaymentPrice ?? reservation.totalPrice,
+                      )}
                     </span>
                   </div>
                 </div>
               </div>
             )}
-            
+
             {/* 결제 전 상태: 예상 결제 금액만 표시 */}
-            {![RESERVATION_STATUS.PAID, RESERVATION_STATUS.WORKING, RESERVATION_STATUS.COMPLETED].includes(reservation.status) && (
+            {!(
+              [
+                RESERVATION_STATUS.PAID,
+                RESERVATION_STATUS.WORKING,
+                RESERVATION_STATUS.COMPLETED,
+              ] as string[]
+            ).includes(reservation.status) && (
               <div className="border-t border-gray-200 pt-3 mt-3">
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold text-gray-900">

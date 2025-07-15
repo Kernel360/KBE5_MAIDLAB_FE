@@ -3,6 +3,7 @@ import { SERVICE_TYPE_LABELS, SERVICE_TYPES } from '@/constants/service';
 import { formatKoreanDate, formatPrice } from '@/utils';
 import {
   getReservationStatusClasses,
+  getReservationStatusColor,
   getReservationStatusText,
 } from '@/utils/reservationStatus';
 import type { ReservationListResponse } from '@/types/domain/reservation';
@@ -47,6 +48,12 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
               px-3 py-1 text-xs font-medium rounded-full border
               ${getReservationStatusClasses(reservation.status, reservation.reservationDate)}
             `}
+            style={{
+              backgroundColor: getReservationStatusColor(
+                reservation.status,
+                reservation.reservationDate,
+              ),
+            }}
           >
             {getReservationStatusText(
               reservation.status,

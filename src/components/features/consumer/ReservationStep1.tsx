@@ -1,6 +1,5 @@
 // src/components/features/consumer/ReservationStep1.tsx
 import React, { useState, useEffect } from 'react';
-import { BottomNavigation } from '@/components/layout/BottomNavigation/BottomNavigation';
 import { useAuth, useToast, useConsumer } from '@/hooks';
 import { useNavigate } from 'react-router-dom';
 import { SERVICE_DETAIL_TYPES } from '@/constants/service';
@@ -114,11 +113,6 @@ const ReservationStep1: React.FC<Props> = ({ onNext, onBack }) => {
           </section>
         </div>
       </main>
-      <BottomNavigation
-        activeTab="reservation"
-        onTabClick={navigate}
-        isAuthenticated={isAuthenticated}
-      />
     </div>
   );
 };
