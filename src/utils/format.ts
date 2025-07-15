@@ -1,8 +1,4 @@
-import {
-  CURRENCY_FORMATTERS,
-  CURRENCY,
-  BUSINESS_CONFIG,
-} from '@/constants/service';
+import { CURRENCY_FORMATTERS, CURRENCY } from '@/constants/service';
 
 /**
  * 숫자를 천 단위로 콤마 포맷팅

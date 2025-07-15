@@ -23,8 +23,61 @@ const Login: React.FC = () => {
     LOGIN_USER_TYPES.CONSUMER,
   );
 
+  // OAuth 성공 처리 함수
+  const handleOAuthSuccess = async (
+    code: string,
+    userType: 'CONSUMER' | 'MANAGER',
+  ) => {
+    try {
+      const socialLoginData: SocialLoginRequest = {
+        userType,
+        socialType: 'GOOGLE',
+        code,
+      };
+
+      const result = await socialLogin(socialLoginData);
+
+      if (result.success) {
+        if (result.newUser) {
+          // 신규 사용자는 소셜 회원가입 페이지로
+          showToast('추가 정보를 입력해주세요.', 'info');
+          navigate(ROUTES.SOCIAL_SIGNUP, { replace: true });
+        } else {
+          // ✅ 기존 사용자는 무조건 홈으로 (프로필 체크 로직 제거)
+          // 각 페이지의 ProtectedRoute에서 프로필 유무에 따라 리다이렉트 처리
+          navigate(ROUTES.HOME, { replace: true });
+        }
+      } else {
+        showToast(result.error || 'Google 로그인에 실패했습니다.', 'error');
+      }
+    } catch (error: any) {
+      showToast('Google 로그인 중 오류가 발생했습니다.', 'error');
+    }
+  };
+
   useEffect(() => {
     cleanupOAuthStorage();
+
+    // sessionStorage에서 OAuth 결과 확인
+    const oauthResult = sessionStorage.getItem('google_oauth_result');
+    if (oauthResult) {
+      try {
+        const result = JSON.parse(oauthResult);
+
+        // sessionStorage 정리
+        sessionStorage.removeItem('google_oauth_result');
+
+        // OAuth 결과 처리
+        if (result.type === 'GOOGLE_AUTH_SUCCESS') {
+          handleOAuthSuccess(result.code, result.userType);
+        } else {
+          showToast(result.error || 'OAuth 인증에 실패했습니다.', 'error');
+        }
+      } catch (error) {
+        console.error('❌ OAuth 결과 파싱 에러:', error);
+        sessionStorage.removeItem('google_oauth_result');
+      }
+    }
 
     const savedLoginInfo = getLocalStorage<SavedLoginInfo>(
       STORAGE_KEYS.SAVED_LOGIN_INFO,
@@ -107,37 +160,16 @@ const Login: React.FC = () => {
       return;
     }
 
+    // sessionStorage 기반 OAuth 처리만 사용 (팝업 콜백 비활성화)
     openGoogleLoginPopup(
       selectedUserType,
-      async (code: string, userType: 'CONSUMER' | 'MANAGER') => {
-        try {
-          const socialLoginData: SocialLoginRequest = {
-            userType,
-            socialType: 'GOOGLE',
-            code,
-          };
-
-          const result = await socialLogin(socialLoginData);
-
-          if (result.success) {
-            if (result.newUser) {
-              // 신규 사용자는 소셜 회원가입 페이지로
-              showToast('추가 정보를 입력해주세요.', 'info');
-              navigate(ROUTES.SOCIAL_SIGNUP, { replace: true });
-            } else {
-              // ✅ 기존 사용자는 무조건 홈으로 (프로필 체크 로직 제거)
-              // 각 페이지의 ProtectedRoute에서 프로필 유무에 따라 리다이렉트 처리
-              navigate(ROUTES.HOME, { replace: true });
-            }
-          } else {
-            showToast(result.error || 'Google 로그인에 실패했습니다.', 'error');
-          }
-        } catch (error: any) {
-          showToast('Google 로그인 중 오류가 발생했습니다.', 'error');
-        }
+      () => {
+        // 성공 콜백 비활성화 (sessionStorage에서 처리)
+        console.log('팝업 성공 콜백 호출됨 - sessionStorage에서 처리 예정');
       },
-      (error: string) => {
-        showToast(error, 'error');
+      () => {
+        // 에러 콜백도 비활성화 (sessionStorage에서 처리)
+        console.log('팝업 에러 콜백 호출됨 - sessionStorage에서 처리 예정');
       },
     );
   };

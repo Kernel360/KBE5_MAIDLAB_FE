@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo, memo } from 'react';
-import { Bell, Check, CheckCheck, Clock, MapPin } from 'lucide-react';
+import { Bell, Check, CheckCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useNotification } from '@/hooks/useNotification';
 import { formatDateTime } from '@/utils/date';
