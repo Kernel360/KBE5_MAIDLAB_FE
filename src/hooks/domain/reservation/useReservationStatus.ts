@@ -64,7 +64,7 @@ export const useReservationStatus = () => {
   const isCheckInAvailable = (reservation: ReservationListResponse) => {
     const today = new Date().toISOString().split('T')[0];
     return (
-      reservation.status === RESERVATION_STATUS.MATCHED &&
+      reservation.status === RESERVATION_STATUS.PAID &&
       reservation.reservationDate === today
     );
   };

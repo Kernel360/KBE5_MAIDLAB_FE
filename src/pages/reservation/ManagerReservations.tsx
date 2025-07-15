@@ -8,7 +8,12 @@ import { formatDateTime } from '@/utils';
 import { SERVICE_TYPE_LABELS, SERVICE_TYPES } from '@/constants/service';
 import { ManagerReservationCard } from '@/components';
 import { useToast } from '@/hooks/useToast';
-import { CheckInOutModal, ConfirmModal, MatchingCard } from '@/components';
+import {
+  CheckInOutModal,
+  CheckInOutConfirmModal,
+  ConfirmModal,
+  MatchingCard,
+} from '@/components';
 import { ROUTES } from '@/constants/route';
 import { Header } from '@/components';
 import {
@@ -114,7 +119,7 @@ const ManagerReservationsAndMatching: React.FC = () => {
     reservationId: null,
     reservationInfo: { serviceType: '', detailServiceType: '', time: '' },
   });
-  const [confirmModal, setConfirmModal] = useState<{
+  const [checkInOutConfirmModal, setCheckInOutConfirmModal] = useState<{
     isOpen: boolean;
     isCheckIn: boolean;
   }>({
@@ -162,15 +167,18 @@ const ManagerReservationsAndMatching: React.FC = () => {
         checkTime: new Date().toISOString(),
       });
       setCheckInOutModal({ ...checkInOutModal, isOpen: false });
-      setConfirmModal({ isOpen: true, isCheckIn: checkInOutModal.isCheckIn });
+      setCheckInOutConfirmModal({
+        isOpen: true,
+        isCheckIn: checkInOutModal.isCheckIn,
+      });
       refresh(); // 서버사이드 페이징이므로 새로고침 필요
     } catch (error) {
       showToast('작업 처리 중 오류가 발생했습니다.', 'error');
     }
   };
 
-  const handleConfirmModalClose = () => {
-    setConfirmModal({ isOpen: false, isCheckIn: true });
+  const handleCheckInOutConfirmModalClose = () => {
+    setCheckInOutConfirmModal({ isOpen: false, isCheckIn: true });
   };
 
   // 예약 일정 카드 UI
@@ -644,10 +652,10 @@ const ManagerReservationsAndMatching: React.FC = () => {
           isCheckIn={checkInOutModal.isCheckIn}
           reservationInfo={checkInOutModal.reservationInfo}
         />
-        <ConfirmModal
-          isOpen={confirmModal.isOpen}
-          onClose={handleConfirmModalClose}
-          isCheck={confirmModal.isCheckIn}
+        <CheckInOutConfirmModal
+          isOpen={checkInOutConfirmModal.isOpen}
+          onClose={handleCheckInOutConfirmModalClose}
+          isCheckIn={checkInOutConfirmModal.isCheckIn}
         />
       </div>
     </div>
