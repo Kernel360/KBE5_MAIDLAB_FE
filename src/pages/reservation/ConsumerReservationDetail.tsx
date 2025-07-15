@@ -38,6 +38,7 @@ import {
 } from 'lucide-react';
 import { ROUTES } from '@/constants/route';
 import { Header } from '@/components';
+import PaymentModal from '@/components/features/reservation/consumer/PaymentModal';
 // 상태별 아이콘 매핑
 const STATUS_ICONS: Record<string, React.ElementType> = {
   PENDING: Clock,
@@ -77,7 +78,17 @@ function parseAdditionalOptions(serviceAdd: string) {
         ...(count !== undefined ? { count } : {}),
       };
     })
-    .filter(Boolean);
+    .filter(
+      (
+        v,
+      ): v is {
+        id: string;
+        label: string;
+        price: number;
+        time: number;
+        count?: number;
+      } => Boolean(v),
+    );
 }
 
 function parsePet(pet: string) {
@@ -97,6 +108,7 @@ const ConsumerReservationDetail: React.FC = () => {
   const [reservation, setReservation] =
     useState<ReservationDetailResponse | null>(null);
   const [showPhoneNumber, setShowPhoneNumber] = useState(false);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
 
   useEffect(() => {
     const loadReservationDetail = async () => {
@@ -130,8 +142,7 @@ const ConsumerReservationDetail: React.FC = () => {
 
   // 결제 핸들러
   const handlePayment = async () => {
-    if (!reservation) return;
-    await payReservation(Number(id));
+    setPaymentModalOpen(true);
   };
 
   if (loading) {
@@ -469,8 +480,8 @@ const ConsumerReservationDetail: React.FC = () => {
                   reservation.totalPrice !== reservation.finalPaymentPrice && (
                     <div className="flex justify-between items-center py-2">
                       <span className="text-gray-600">포인트 사용</span>
-                      <span className="text-green-600 font-medium">
-                        -
+                      <span className="text-orange-400">
+                        -{' '}
                         {formatPrice(
                           reservation.totalPrice -
                             reservation.finalPaymentPrice,
@@ -554,6 +565,19 @@ const ConsumerReservationDetail: React.FC = () => {
           </button>
         </div>
       </div>
+      {paymentModalOpen && reservation && (
+        <PaymentModal
+          isOpen={paymentModalOpen}
+          onClose={() => setPaymentModalOpen(false)}
+          reservation={{
+            reservationId: Number(id),
+            totalPrice: reservation.totalPrice,
+            roomSize: reservation.roomSize,
+            serviceAdd: reservation.serviceAdd,
+            additionalOptions: additionalOptions,
+          }}
+        />
+      )}
     </div>
   );
 };
