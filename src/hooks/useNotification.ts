@@ -53,15 +53,15 @@ export const useNotification = () => {
     };
   }, []);
 
-  // 읽지 않은 알림 조회
-  const fetchUnreadNotifications = useCallback(async () => {
+  // 페이징된 알림 조회
+  const fetchNotifications = useCallback(async (page: number = 0, size: number = 10, reset: boolean = false) => {
     try {
       const token = localStorage.getItem('accessToken');
       if (!token) {
-        return;
+        return { notifications: [], hasMore: false };
       }
 
-      const apiUrl = `${env.API_BASE_URL.replace(/\/$/, '')}/api/notifications/unread`;
+      const apiUrl = `${env.API_BASE_URL.replace(/\/$/, '')}/api/notifications?page=${page}&size=${size}`;
       const response = await fetch(apiUrl, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -71,9 +71,10 @@ export const useNotification = () => {
 
       if (response.ok) {
         const data = await response.json();
-
-        // /unread API 응답을 NotificationDto 형식으로 변환
-        const rawNotifications = data.data || [];
+        const rawNotifications = data.data?.content || [];
+        const totalPages = data.data?.totalPages || 0;
+        const currentPage = data.data?.number || 0;
+        
         const convertedNotifications = rawNotifications.map(
           (notificationData: any) => {
             const notification: NotificationDto = {
@@ -93,13 +94,33 @@ export const useNotification = () => {
           },
         );
 
-        updateNotifications(convertedNotifications);
-        updateUnreadCount(convertedNotifications.length);
+        if (reset) {
+          updateNotifications(convertedNotifications);
+        } else {
+          updateNotifications([...globalNotifications, ...convertedNotifications]);
+        }
+
+        const unreadCount = convertedNotifications.filter(n => !n.isRead).length;
+        if (reset) {
+          updateUnreadCount(unreadCount);
+        }
+
+        return {
+          notifications: convertedNotifications,
+          hasMore: currentPage < totalPages - 1
+        };
       }
+      return { notifications: [], hasMore: false };
     } catch (error) {
-      console.error('[SSE] 알림 조회 중 오류:', error);
+      console.error('[API] 알림 조회 중 오류:', error);
+      return { notifications: [], hasMore: false };
     }
   }, []);
+
+  // 읽지 않은 알림 조회 (기존 호환성 유지)
+  const fetchUnreadNotifications = useCallback(async () => {
+    await fetchNotifications(0, 10, true);
+  }, [fetchNotifications]);
 
   // SSE 연결 (싱글톤)
   const connectSSE = useCallback(() => {
@@ -301,6 +322,7 @@ export const useNotification = () => {
     markAsRead,
     markAllAsRead,
     fetchUnreadNotifications,
+    fetchNotifications,
     forceHeaderRefresh,
   };
 };
