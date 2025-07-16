@@ -35,7 +35,7 @@ export const useApiCall = () => {
         return { success: true, data };
       } catch (error: any) {
         if (showErrorToast && errorMessage) {
-          showToast(error.message || errorMessage, 'error');
+          showToast(errorMessage, 'error');
         }
         return { success: false, error: error.message };
       } finally {
