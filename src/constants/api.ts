@@ -110,7 +110,7 @@ export const API_ENDPOINTS = {
   },
   EVENT: {
     LIST: '/api/events',
-    DETAIL: (id: number) => `/api/event/${id}`,
+    DETAIL: (id: number) => `/api/events/${id}`,
     CREATE: '/api/admin/event',
     UPDATE: (id: number) => `/api/admin/event/${id}`,
     DELETE: (id: number) => `/api/admin/event/${id}`,
