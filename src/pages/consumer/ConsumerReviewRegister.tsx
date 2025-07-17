@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useReview } from '@/hooks';
+import { usePoint } from '@/hooks/domain/usePoint';
+import { useToast } from '@/hooks';
 import { ROUTES } from '@/constants';
 import { LENGTH_LIMITS } from '@/constants/validation';
 import {
@@ -150,7 +152,7 @@ const RatingSection: React.FC<{
   );
 };
 
-// 키워드 선택 인라인 컴포넌트 (ManagerReviewRegister.tsx 참고)
+// 키워드 선택 인라인 컴포넌트
 const KeywordSelection: React.FC<{
   rating: number;
   selectedKeywords: string[];
@@ -392,6 +394,8 @@ const ConsumerReviewRegister: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { registerReview } = useReview();
+  const { chargePoint } = usePoint();
+  const { success, error } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
 
@@ -420,11 +424,11 @@ const ConsumerReviewRegister: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id) {
-      alert('예약 정보를 찾을 수 없습니다.');
+      error('예약 정보를 찾을 수 없습니다.');
       return;
     }
     if (!isFormValid) {
-      alert('키워드를 선택하거나 리뷰를 작성해주세요.');
+      error('키워드를 선택하거나 리뷰를 작성해주세요.');
       return;
     }
     setIsSubmitting(true);
@@ -439,10 +443,20 @@ const ConsumerReviewRegister: React.FC = () => {
         }),
       };
       await registerReview(data);
-      alert('리뷰가 등록되었습니다.');
+      
+      // 리뷰 등록 성공 시 500 포인트 충전
+      try {
+        await chargePoint(500);
+        success('리뷰가 등록되었습니다! 500 포인트가 적립되었습니다 🎉');
+      } catch (pointError) {
+        // 포인트 충전 실패해도 리뷰 등록은 성공이므로 알림
+        success('리뷰가 등록되었습니다!');
+        error('포인트 적립 중 오류가 발생했습니다.');
+      }
+      
       navigate(ROUTES.CONSUMER.RESERVATIONS);
-    } catch (error) {
-      alert('리뷰 등록에 실패했습니다.');
+    } catch (err) {
+      error('리뷰 등록에 실패했습니다.');
     } finally {
       setIsSubmitting(false);
     }
