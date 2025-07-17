@@ -196,28 +196,28 @@ export const SERVICE_OPTIONS = [
   {
     id: 'WINDOW_CLEANING',
     label: '창문 유리/커튼 및 블라인드 청소',
-    timeAdd: 90, // 1.5시간 = 90분
-    priceAdd: 27900,
+    timeAdd: 60, // 1.5시간 = 90분
+    priceAdd: 16900,
   },
   {
     id: 'FAN_CLEANING',
     label: '선풍기 청소',
-    timeAdd: 20, // 20분
-    priceAdd: 7800,
+    timeAdd: 10, // 10분
+    priceAdd: 4600,
     countable: true, // 개수 선택 가능
   },
   {
     id: 'SHOES_CLEANING',
     label: '운동화 세탁',
-    timeAdd: 30, // 0.5시간 = 30분
-    priceAdd: 8600,
+    timeAdd: 20, // 20분
+    priceAdd: 5900,
     countable: true, // 개수 선택 가능
   },
   {
     id: 'IRONING',
     label: '다림질',
-    timeAdd: 60, // 1시간 = 60분
-    priceAdd: 15600,
+    timeAdd: 50, // 50분
+    priceAdd: 12600,
   },
 ];
 

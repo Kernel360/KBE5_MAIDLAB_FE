@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useReview } from '@/hooks';
+import { useReview, useToast } from '@/hooks';
 import { ROUTES } from '@/constants';
 import { LENGTH_LIMITS } from '@/constants/validation';
 import { ArrowLeft, Star, Sparkles, Edit3, X } from 'lucide-react';
@@ -314,7 +314,7 @@ const ManagerReviewRegister: React.FC = () => {
   const { registerReview } = useReview();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
-
+  const { error } = useToast();
   const [formData, setFormData] = useState<ReviewFormData>({
     rating: 5,
     comment: '',
@@ -346,17 +346,17 @@ const ManagerReviewRegister: React.FC = () => {
     e.preventDefault();
 
     if (!id) {
-      alert('예약 정보를 찾을 수 없습니다.');
+      error('예약 정보를 찾을 수 없습니다.');
       return;
     }
 
     if (!isFormValid) {
-      alert('키워드를 선택하거나 리뷰를 작성해주세요.');
+      error('키워드를 선택하거나 리뷰를 작성해주세요.');
       return;
     }
 
     if (formData.comment.length > LENGTH_LIMITS.REVIEW_COMMENT.MAX) {
-      alert(
+      error(
         `리뷰는 ${LENGTH_LIMITS.REVIEW_COMMENT.MAX}자 이하로 작성해주세요.`,
       );
       return;
@@ -374,7 +374,6 @@ const ManagerReviewRegister: React.FC = () => {
       };
 
       await registerReview(data);
-      alert('고객 리뷰가 등록되었습니다.');
       navigate(ROUTES.MANAGER.RESERVATIONS); // 매니저용 라우트로 변경 필요
     } catch (error) {
       alert('리뷰 등록에 실패했습니다.');
