@@ -124,7 +124,7 @@ const MyPage: React.FC = () => {
         />
 
         {/* Content */}
-        <div className="px-4 pb-6">
+        <main className="px-4 py-6 pb-20">
           <div className="max-w-md mx-auto">
             <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
               {/* Profile Section */}
@@ -180,14 +180,14 @@ const MyPage: React.FC = () => {
                 <div className="border-t border-gray-200">
                   <MenuItem
                     icon={<Heart className="w-5 h-5" />}
-                    title="찜한 도우미"
+                    title="찜한 매니저"
                     onClick={handleLikedManagers}
                   />
                 </div>
                 <div className="border-t border-gray-200">
                   <MenuItem
                     icon={<Ban className="w-5 h-5" />}
-                    title="블랙리스트 도우미"
+                    title="블랙리스트 매니저"
                     onClick={handleBlacklist}
                   />
                 </div>
@@ -218,7 +218,7 @@ const MyPage: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
+        </main>
 
         {/* 비밀번호 변경 모달 */}
         <PasswordChangeModal

@@ -130,7 +130,7 @@ const ManagerMyPage: React.FC = () => {
       />
 
       {/* Content */}
-      <div className="px-4 py-6">
+      <main className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto">
           <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
             {/* Profile Section */}
@@ -216,7 +216,7 @@ const ManagerMyPage: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+      </main>
 
       {/* 비밀번호 변경 모달 */}
       <PasswordChangeModal

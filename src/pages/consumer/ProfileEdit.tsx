@@ -227,7 +227,7 @@ const ProfileEdit: React.FC = () => {
         showMenu={true}
       />
 
-      <div className="px-4 py-0">
+      <main className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto">
           <div className="bg-white rounded-xl shadow-sm p-6 space-y-8">
             {/* 프로필 이미지 */}
@@ -400,7 +400,7 @@ const ProfileEdit: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
