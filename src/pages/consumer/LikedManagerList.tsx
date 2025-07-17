@@ -25,7 +25,7 @@ function ManagerNameModal({
     <>
       <h3
         ref={nameRef}
-        className="text-lg font-semibold text-gray-900 truncate max-w-[120px] block cursor-pointer hover:text-orange-600 transition-colors"
+        className="text-lg font-semibold text-gray-900 truncate max-w-[120px] block cursor-pointer transition-colors"
         onClick={() => {
           if (isNameTruncated(nameRef.current)) setOpen(true);
         }}
@@ -81,20 +81,11 @@ export default function LikedManagerList() {
   >({});
 
   const PAGE_SIZE = 5;
-  const {
-    currentPage,
-    totalPages,
-    startIndex,
-    endIndex,
-    hasNext,
-    hasPrevious,
-    goToPage,
-    goToNext,
-    goToPrevious,
-  } = usePagination({
-    totalItems: favoriteManagers.length,
-    itemsPerPage: PAGE_SIZE,
-  });
+  const { currentPage, totalPages, startIndex, endIndex, goToPage } =
+    usePagination({
+      totalItems: favoriteManagers.length,
+      itemsPerPage: PAGE_SIZE,
+    });
 
   useEffect(() => {
     const loadData = async () => {
@@ -176,21 +167,20 @@ export default function LikedManagerList() {
     <div className="min-h-screen bg-gray-50">
       <Header
         variant="sub"
-        title="찜한 도우미"
+        title="찜한 매니저"
         backRoute={ROUTES.CONSUMER.MYPAGE}
         showMenu={true}
       />
-      <div className="pb-6">
-        <div className="max-w-2xl mx-auto px-4">
+      <main className="px-4 py-6 pb-20">
+        <div className="max-w-md mx-auto">
           <div className="space-y-3">
             {favoriteManagers.length > 0 ? (
               favoriteManagers.slice(startIndex, endIndex).map((manager) => (
                 <div
                   key={manager.managerUuid}
-                  className="relative bg-white rounded-xl p-6 shadow-sm border border-slate-200 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 hover:border-slate-300 overflow-hidden group"
+                  className="relative bg-white rounded-xl p-6 shadow-sm border border-slate-200 transition-all duration-200 overflow-hidden group"
                 >
-                  {/* 상단 그라데이션 바 */}
-                  <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-orange-500 to-orange-400 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+                  
                   {/* 상단: 프로필, 정보, 삭제 버튼 */}
                   <div className="flex items-center mb-4">
                     {/* 프로필 이미지 */}
@@ -296,7 +286,7 @@ export default function LikedManagerList() {
             )}
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

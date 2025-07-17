@@ -90,11 +90,7 @@ export default function BlackListManagerList() {
     totalPages,
     startIndex,
     endIndex,
-    hasNext,
-    hasPrevious,
     goToPage,
-    goToNext,
-    goToPrevious,
   } = usePagination({
     totalItems: blacklistManagers.length,
     itemsPerPage: PAGE_SIZE,
@@ -184,17 +180,16 @@ export default function BlackListManagerList() {
         backRoute={ROUTES.CONSUMER.MYPAGE}
         showMenu={true}
       />
-      <div className="pb-6">
-        <div className="max-w-2xl mx-auto px-4">
+      <main className="px-4 py-6 pb-20">
+        <div className="max-w-md mx-auto">
           <div className="space-y-3">
             {blacklistManagers.length > 0 ? (
               blacklistManagers.slice(startIndex, endIndex).map((manager) => (
                 <div
                   key={manager.managerUuid}
-                  className="relative bg-white rounded-xl p-6 shadow-sm border border-slate-200 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 hover:border-slate-300 overflow-hidden group"
+                  className="relative bg-white rounded-xl p-6 shadow-sm border border-slate-200 transition-all duration-200 overflow-hidden group"
                 >
-                  {/* 상단 그라데이션 바 */}
-                  <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-orange-500 to-orange-400 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+                  
                   {/* 상단: 프로필, 정보, 삭제 버튼 */}
                   <div className="flex items-start mb-4">
                     {/* 프로필 이미지 */}
@@ -290,9 +285,24 @@ export default function BlackListManagerList() {
                 </p>
               </div>
             )}
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-2 mt-4">
+                {/* 이전 버튼 제거 */}
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => goToPage(i)}
+                    className={`px-3 py-1 rounded font-medium ${currentPage === i ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+                {/* 다음 버튼 제거 */}
+              </div>
+            )}
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
