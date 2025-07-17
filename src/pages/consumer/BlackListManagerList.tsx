@@ -8,6 +8,7 @@ import { SEOUL_DISTRICT_LABELS } from '@/constants/region';
 import React from 'react';
 import { usePagination } from '@/hooks';
 import { Header } from '@/components/layout/Header/Header';
+import Pagination from '@/components/common/Pagination';
 
 function ManagerNameModal({
   name,
@@ -285,21 +286,12 @@ export default function BlackListManagerList() {
                 </p>
               </div>
             )}
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2 mt-4">
-                {/* 이전 버튼 제거 */}
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => goToPage(i)}
-                    className={`px-3 py-1 rounded font-medium ${currentPage === i ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-                {/* 다음 버튼 제거 */}
-              </div>
-            )}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={goToPage}
+              loading={isLoading}
+            />
           </div>
         </div>
       </main>
