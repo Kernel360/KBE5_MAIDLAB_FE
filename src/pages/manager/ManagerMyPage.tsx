@@ -2,19 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   User,
-  Settings,
   FileText,
   MessageCircle,
   Share2,
   ChevronRight,
   Lock,
+  Trash,
 } from 'lucide-react';
 import { useManager, useToast, useAuth } from '@/hooks';
+import { useWithdraw } from '@/hooks/useWithdraw';
 import { LoadingSpinner, ShareModal } from '@/components/common';
 import PasswordChangeModal from '@/components/common/PasswordChangeModal/PasswordChangeModal';
 import { Header } from '@/components/layout/Header/Header';
 import { ROUTES } from '@/constants';
 import type { ManagerMyPageResponse } from '@/types/domain/manager';
+import WithdrawConfirmModal from '@/components/common/WithdrawConfirmModal';
+import { authApi } from '@/apis/auth';
+import { tokenStorage, userStorage } from '@/utils/storage';
 
 interface MenuItemProps {
   icon: React.ReactNode;
@@ -47,6 +51,8 @@ const ManagerMyPage: React.FC = () => {
   const [changingPassword, setChangingPassword] = useState(false);
   const [isGoogleUser, setIsGoogleUser] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
+  const { withdraw, withdrawing } = useWithdraw();
 
   useEffect(() => {
     loadData();
@@ -79,24 +85,46 @@ const ManagerMyPage: React.FC = () => {
   };
 
   const handleProfile = () => {
+    if (withdrawing) return;
     navigate(ROUTES.MANAGER.PROFILE);
   };
 
   const handleSettlementHistory = () => {
+    if (withdrawing) return;
     navigate(ROUTES.MANAGER.SETTLEMENTS);
   };
 
   const handleReviews = () => {
+    if (withdrawing) return;
     navigate(ROUTES.MANAGER.REVIEWS);
   };
 
   const handleInviteFriend = () => {
+    if (withdrawing) return;
     setShowShareModal(true);
   };
 
-  // TODO: 설정 페이지 추가
-  const handleSettings = () => {
-    showToast('설정 페이지를 준비 중입니다.', 'info');
+  const handleWithdraw = () => {
+    setWithdrawModalOpen(true);
+  };
+  const handleWithdrawConfirm = async () => {
+    try {
+      await authApi.withdraw();
+      // 모든 토큰, 유저 정보 삭제
+      tokenStorage.clearTokens();
+      userStorage.clearUserData();
+      sessionStorage.clear();
+      // 쿠키에서 refreshToken 삭제 (js-cookie 미사용 시 직접 삭제)
+      document.cookie = 'refreshToken=; Max-Age=0; path=/;';
+      showToast('회원 탈퇴가 완료되었습니다.', 'success');
+      setTimeout(() => {
+        window.location.replace('/');
+      }, 1000);
+    } catch (e) {
+      showToast('회원 탈퇴에 실패했습니다.', 'error');
+    } finally {
+      setWithdrawModalOpen(false);
+    }
   };
 
   const handlePasswordSubmit = async (newPassword: string) => {
@@ -206,12 +234,15 @@ const ManagerMyPage: React.FC = () => {
                   />
                 </div>
               )}
+              {/* 회원 탈퇴 버튼 추가 */}
               <div className="border-t border-gray-200">
-                <MenuItem
-                  icon={<Settings className="w-5 h-5" />}
-                  title="알림 설정"
-                  onClick={handleSettings}
-                />
+                <div className="text-red-500">
+                  <MenuItem
+                    icon={<Trash className="w-5 h-5" />}
+                    title="회원 탈퇴"
+                    onClick={handleWithdraw}
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -233,6 +264,12 @@ const ManagerMyPage: React.FC = () => {
         title="MaidLab 매니저 초대"
         url="https://www.maidlab.site"
         text={`${profileData?.name || '매니저'}님이 MaidLab 매니저로 초대합니다!`}
+      />
+
+      <WithdrawConfirmModal
+        isOpen={withdrawModalOpen}
+        onClose={() => setWithdrawModalOpen(false)}
+        onConfirm={withdraw}
       />
     </div>
   );
