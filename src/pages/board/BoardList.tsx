@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { MessageSquare } from 'lucide-react';
 import { useBoard } from '@/hooks/domain/useBoard';
 import { ROUTES } from '@/constants/route';
@@ -11,11 +11,21 @@ import Pagination from '@/components/common/Pagination';
 
 export default function BoardList() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { boards, loading: isLoading, fetchBoards } = useBoard();
 
   useEffect(() => {
     fetchBoards();
   }, [fetchBoards]);
+
+  useEffect(() => {
+    if (location.state && location.state.toast) {
+      const { message, type } = location.state.toast;
+      showToast(message, type);
+      // 히스토리 state 초기화 (중복 방지)
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state, showToast]);
 
   const handleCreate = () => {
     navigate(ROUTES.BOARD.CREATE);
