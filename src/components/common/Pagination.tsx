@@ -22,7 +22,7 @@ const Pagination: React.FC<PaginationProps> = ({
   const handlePageChange = (page: number) => {
     if (page >= 0 && page < totalPages && !loading) {
       onPageChange(page);
-      
+
       // 페이지 변경 후 스크롤을 맨 위로 이동
       const mainContainer = document.querySelector('.main-container');
       if (mainContainer) {
@@ -54,7 +54,7 @@ const Pagination: React.FC<PaginationProps> = ({
         className="w-10 h-10 rounded-xl font-semibold text-sm transition-all duration-200 disabled:opacity-50 bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-500"
       >
         1
-      </button>
+      </button>,
     );
 
     if (startPage > 1) {
@@ -64,7 +64,7 @@ const Pagination: React.FC<PaginationProps> = ({
           className="w-10 h-10 flex items-center justify-center text-gray-400 text-sm"
         >
           ...
-        </span>
+        </span>,
       );
     }
   }
@@ -86,7 +86,7 @@ const Pagination: React.FC<PaginationProps> = ({
         `}
       >
         {i + 1}
-      </button>
+      </button>,
     );
   }
 
@@ -99,7 +99,7 @@ const Pagination: React.FC<PaginationProps> = ({
           className="w-10 h-10 flex items-center justify-center text-gray-400 text-sm"
         >
           ...
-        </span>
+        </span>,
       );
     }
 
@@ -111,7 +111,7 @@ const Pagination: React.FC<PaginationProps> = ({
         className="w-10 h-10 rounded-xl font-semibold text-sm transition-all duration-200 disabled:opacity-50 bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-500"
       >
         {totalPages}
-      </button>
+      </button>,
     );
   }
 

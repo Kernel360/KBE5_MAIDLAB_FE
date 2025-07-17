@@ -86,16 +86,11 @@ export default function BlackListManagerList() {
   >({});
 
   const PAGE_SIZE = 5;
-  const {
-    currentPage,
-    totalPages,
-    startIndex,
-    endIndex,
-    goToPage,
-  } = usePagination({
-    totalItems: blacklistManagers.length,
-    itemsPerPage: PAGE_SIZE,
-  });
+  const { currentPage, totalPages, startIndex, endIndex, goToPage } =
+    usePagination({
+      totalItems: blacklistManagers.length,
+      itemsPerPage: PAGE_SIZE,
+    });
 
   useEffect(() => {
     const loadData = async () => {
@@ -190,7 +185,6 @@ export default function BlackListManagerList() {
                   key={manager.managerUuid}
                   className="relative bg-white rounded-xl p-6 shadow-sm border border-slate-200 transition-all duration-200 overflow-hidden group"
                 >
-                  
                   {/* 상단: 프로필, 정보, 삭제 버튼 */}
                   <div className="flex items-start mb-4">
                     {/* 프로필 이미지 */}

@@ -181,7 +181,6 @@ export default function LikedManagerList() {
                   key={manager.managerUuid}
                   className="relative bg-white rounded-xl p-6 shadow-sm border border-slate-200 transition-all duration-200 overflow-hidden group"
                 >
-                  
                   {/* 상단: 프로필, 정보, 삭제 버튼 */}
                   <div className="flex items-center mb-4">
                     {/* 프로필 이미지 */}

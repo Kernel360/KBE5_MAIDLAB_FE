@@ -22,13 +22,8 @@ export default function BoardList() {
   };
 
   // 페이지네이션 적용 (5개씩)
-  const {
-    currentPage,
-    totalPages,
-    startIndex,
-    endIndex,
-    goToPage,
-  } = usePagination({ totalItems: boards.length, itemsPerPage: 5 });
+  const { currentPage, totalPages, startIndex, endIndex, goToPage } =
+    usePagination({ totalItems: boards.length, itemsPerPage: 5 });
 
   if (isLoading) {
     return (
