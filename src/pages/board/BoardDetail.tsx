@@ -40,6 +40,46 @@ const ImageModal = ({
   );
 };
 
+// 삭제 확인 팝업 컴포넌트
+const DeleteConfirmModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg shadow-xl max-w-sm w-full p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          게시글 삭제
+        </h3>
+        <p className="text-gray-700 mb-6">
+          정말로 이 게시글을 삭제하시겠습니까?
+        </p>
+        <div className="flex gap-3 justify-end">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            취소
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors"
+          >
+            삭제
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function BoardDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -49,6 +89,7 @@ export default function BoardDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedImage, setSelectedImage] = useState<ImageInfo | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // 날짜 포맷팅 함수
   const formatDate = (dateString: string) => {
@@ -111,7 +152,7 @@ export default function BoardDetail() {
   }, [id, navigate, showToast, fetchBoardDetail]);
 
   const handleDelete = async () => {
-    if (!id || !window.confirm('정말로 이 게시글을 삭제하시겠습니까?')) return;
+    if (!id) return;
 
     try {
       setIsDeleting(true);
@@ -124,6 +165,7 @@ export default function BoardDetail() {
       showToast(error.message || '게시글 삭제에 실패했습니다.', 'error');
     } finally {
       setIsDeleting(false);
+      setShowDeleteModal(false);
     }
   };
 
@@ -148,7 +190,7 @@ export default function BoardDetail() {
         showMenu={false}
       />
       {/* Content */}
-      <div className="px-4 py-0 pb-0">
+      <main className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto space-y-6">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="space-y-4">
@@ -186,7 +228,7 @@ export default function BoardDetail() {
                       수정
                     </button>
                     <button
-                      onClick={handleDelete}
+                      onClick={() => setShowDeleteModal(true)}
                       className="w-10 h-10 hover:bg-gray-100 rounded-full flex items-center justify-center transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={isDeleting}
                       title="삭제"
@@ -247,8 +289,15 @@ export default function BoardDetail() {
               onClose={() => setSelectedImage(null)}
             />
           )}
+
+          {/* 삭제 확인 모달 */}
+          <DeleteConfirmModal
+            isOpen={showDeleteModal}
+            onClose={() => setShowDeleteModal(false)}
+            onConfirm={handleDelete}
+          />
         </div>
-      </div>
+      </main>
     </div>
   );
 }

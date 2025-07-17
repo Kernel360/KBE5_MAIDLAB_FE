@@ -20,13 +20,15 @@ export default function BoardEdit() {
         backRoute={ROUTES.BOARD.DETAIL.replace(':id', id)}
         showMenu={false}
       />
-      <div className="py-0">
-        <BoardForm
-          mode="edit"
-          boardId={parseInt(id)}
-          onSuccess={() => navigate(`/board/${id}`)}
-        />
-      </div>
+      <main className="px-4 py-6 pb-20">
+        <div className="max-w-md mx-auto">
+          <BoardForm
+            mode="edit"
+            boardId={parseInt(id)}
+            onSuccess={() => navigate(`/board/${id}`)}
+          />
+        </div>
+      </main>
     </div>
   );
 }
