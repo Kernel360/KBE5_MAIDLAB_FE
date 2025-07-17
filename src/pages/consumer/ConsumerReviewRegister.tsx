@@ -395,7 +395,7 @@ const ConsumerReviewRegister: React.FC = () => {
   const navigate = useNavigate();
   const { registerReview } = useReview();
   const { chargePoint } = usePoint();
-  const { success, error } = useToast();
+  const { error } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>([]);
 
@@ -443,17 +443,10 @@ const ConsumerReviewRegister: React.FC = () => {
         }),
       };
       await registerReview(data);
-      
+
       // 리뷰 등록 성공 시 500 포인트 충전
-      try {
-        await chargePoint(500);
-        success('리뷰가 등록되었습니다! 500 포인트가 적립되었습니다 🎉');
-      } catch (pointError) {
-        // 포인트 충전 실패해도 리뷰 등록은 성공이므로 알림
-        success('리뷰가 등록되었습니다!');
-        error('포인트 적립 중 오류가 발생했습니다.');
-      }
-      
+      await chargePoint(500);
+
       navigate(ROUTES.CONSUMER.RESERVATIONS);
     } catch (err) {
       error('리뷰 등록에 실패했습니다.');
