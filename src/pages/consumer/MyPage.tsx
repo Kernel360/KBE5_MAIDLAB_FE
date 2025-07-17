@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   User,
-  Settings,
   ChevronRight,
   Coins,
   Heart,
   Ban,
   Users,
   Lock,
+  Trash,
 } from 'lucide-react';
 import { useConsumer } from '@/hooks/domain/useConsumer';
 import { useToast } from '@/hooks/useToast';
@@ -19,6 +19,8 @@ import { Header } from '@/components/layout/Header/Header';
 import PasswordChangeModal from '@/components/common/PasswordChangeModal/PasswordChangeModal';
 import { ShareModal } from '@/components/common';
 import { usePoint } from '@/hooks/domain/usePoint';
+import WithdrawConfirmModal from '@/components/common/WithdrawConfirmModal';
+import { useWithdraw } from '@/hooks/useWithdraw';
 
 interface MenuItemProps {
   icon: React.ReactNode;
@@ -49,8 +51,11 @@ const MyPage: React.FC = () => {
   const [changingPassword, setChangingPassword] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const { point: apiPoint, fetchPoint, loading: pointLoading } = usePoint();
+  const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
+  const { withdraw, withdrawing } = useWithdraw();
 
   useEffect(() => {
+    if (withdrawing) return;
     const loadUserInfo = async () => {
       const data = await fetchMypage();
       if (data) {
@@ -58,34 +63,36 @@ const MyPage: React.FC = () => {
       }
     };
     loadUserInfo();
-  }, [fetchMypage]);
+  }, [fetchMypage, withdrawing]);
 
   useEffect(() => {
+    if (withdrawing) return;
     fetchPoint();
-  }, [fetchPoint]);
+  }, [fetchPoint, withdrawing]);
 
   const handleProfileEdit = () => {
+    if (withdrawing) return;
     navigate(ROUTES.CONSUMER.PROFILE);
   };
 
   const handlePoints = () => {
+    if (withdrawing) return;
     navigate(ROUTES.CONSUMER.POINTS);
   };
 
   const handleLikedManagers = () => {
+    if (withdrawing) return;
     navigate(ROUTES.CONSUMER.LIKED_MANAGERS);
   };
 
   const handleBlacklist = () => {
+    if (withdrawing) return;
     navigate(ROUTES.CONSUMER.BLACKLIST);
   };
 
   const handleInviteFriends = () => {
+    if (withdrawing) return;
     setShowShareModal(true);
-  };
-
-  const handleSettings = () => {
-    showToast('설정 기능은 준비 중입니다.', 'info');
   };
 
   const handlePasswordSubmit = async (newPassword: string) => {
@@ -208,12 +215,15 @@ const MyPage: React.FC = () => {
                     />
                   </div>
                 )}
+                {/* 회원 탈퇴 버튼 추가 */}
                 <div className="border-t border-gray-200">
-                  <MenuItem
-                    icon={<Settings className="w-5 h-5" />}
-                    title="알림 설정"
-                    onClick={handleSettings}
-                  />
+                  <div className="text-red-500">
+                    <MenuItem
+                      icon={<Trash className="w-5 h-5" />}
+                      title="회원 탈퇴"
+                      onClick={() => setWithdrawModalOpen(true)}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -234,6 +244,12 @@ const MyPage: React.FC = () => {
           title="MaidLab 친구 초대"
           url="https://www.maidlab.site"
           text={`${userInfo?.name || '사용자'}님이 MaidLab에 초대합니다!`}
+        />
+
+        <WithdrawConfirmModal
+          isOpen={withdrawModalOpen}
+          onClose={() => setWithdrawModalOpen(false)}
+          onConfirm={withdraw}
         />
       </div>
     </>
