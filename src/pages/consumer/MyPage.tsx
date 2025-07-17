@@ -180,14 +180,14 @@ const MyPage: React.FC = () => {
                 <div className="border-t border-gray-200">
                   <MenuItem
                     icon={<Heart className="w-5 h-5" />}
-                    title="찜한 도우미"
+                    title="찜한 매니저"
                     onClick={handleLikedManagers}
                   />
                 </div>
                 <div className="border-t border-gray-200">
                   <MenuItem
                     icon={<Ban className="w-5 h-5" />}
-                    title="블랙리스트 도우미"
+                    title="블랙리스트 매니저"
                     onClick={handleBlacklist}
                   />
                 </div>
