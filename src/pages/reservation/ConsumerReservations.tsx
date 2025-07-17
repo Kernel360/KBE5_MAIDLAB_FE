@@ -8,6 +8,7 @@ import type { ReservationPagingParams } from '@/types/domain/reservation';
 import type { ReservationStatus } from '@/constants/status';
 import { Header } from '@/components';
 import PaymentModal from '@/components/features/reservation/consumer/PaymentModal';
+import ScrollToTop from '@/components/common/ScrollToTop';
 import {
   Clock,
   Calendar,
@@ -117,6 +118,14 @@ const ConsumerReservations: React.FC = () => {
   const handlePageChange = useCallback(
     async (page: number) => {
       await changePage(page);
+
+      // 페이지 변경 후 스크롤을 맨 위로 이동
+      const mainContainer = document.querySelector('.main-container');
+      if (mainContainer) {
+        mainContainer.scrollTo({ top: 50, behavior: 'smooth' });
+      } else {
+        window.scrollTo({ top: 50, behavior: 'smooth' });
+      }
     },
     [changePage],
   );
@@ -522,6 +531,7 @@ const ConsumerReservations: React.FC = () => {
           reservation={selectedReservation}
         />
       )}
+      <ScrollToTop />
     </div>
   );
 };
