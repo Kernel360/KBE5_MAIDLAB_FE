@@ -97,6 +97,21 @@ export const adminApi = {
   },
 
   /**
+   * 지역별 매니저 조회
+   */
+  getManagersByRegion: async (
+    regionId: number,
+    params: AdminPageParams = {},
+  ): Promise<ManagerListResponse> => {
+    const { page = 0, size = 10 } = params;
+    const queryString = buildQueryString({ page, size });
+    return apiCall<ManagerListResponse>(
+      'get',
+      `${API_ENDPOINTS.ADMIN.MANAGER.REGION(regionId)}${queryString}`,
+    );
+  },
+
+  /**
    * 매니저 상태별 조회
    */
   getManagersByStatus: async (
@@ -149,6 +164,21 @@ export const adminApi = {
     return apiCall<string>(
       'delete',
       API_ENDPOINTS.ADMIN.CONSUMER.DELETE(consumerId),
+    );
+  },
+
+  /**
+   * 소비자 필터 조회 (삭제 상태별)
+   */
+  getConsumersByFilter: async (
+    isDeleted: boolean,
+    params: AdminPageParams = {},
+  ): Promise<ConsumerListResponse> => {
+    const { page = 0, size = 10 } = params;
+    const queryString = buildQueryString({ page, size, isDeleted });
+    return apiCall<ConsumerListResponse>(
+      'get',
+      `${API_ENDPOINTS.ADMIN.CONSUMER.FILTER}${queryString}`,
     );
   },
 

@@ -6,6 +6,13 @@ import type { ConsumerListResponse } from '@/types/domain/admin';
 import { adminApi } from '../../apis/admin';
 import { DEFAULT_PAGE_SIZE, DEFAULT_PAGE_NUMBER } from '../../constants/ui';
 import { USER_TYPES } from '@/constants/user';
+import {
+  CONSUMER_FILTER_STATUS,
+  CONSUMER_FILTER_LABELS,
+  type ConsumerFilterStatus,
+} from '../../constants/status';
+import { LOCAL_STORAGE_KEYS } from '@/constants/storage';
+import { getLocalStorage, setLocalStorage } from '@/utils/storage';
 
 const ConsumerList = () => {
   const navigate = useNavigate();
@@ -13,6 +20,14 @@ const ConsumerList = () => {
   const [page, setPage] = useState(DEFAULT_PAGE_NUMBER);
   const [rowsPerPage, setRowsPerPage] = useState(DEFAULT_PAGE_SIZE);
   const [loading, setLoading] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState<ConsumerFilterStatus>(
+    () => {
+      const savedFilter = getLocalStorage<ConsumerFilterStatus>(
+        LOCAL_STORAGE_KEYS.ADMIN_CONSUMER_FILTER,
+      );
+      return savedFilter || 'ALL';
+    },
+  );
 
   const [consumerData, setConsumerData] = useState<ConsumerListResponse>({
     content: [],
@@ -37,13 +52,31 @@ const ConsumerList = () => {
     setPage(DEFAULT_PAGE_NUMBER);
   };
 
+  const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newFilter = event.target.value as ConsumerFilterStatus;
+    setSelectedFilter(newFilter);
+    setLocalStorage(LOCAL_STORAGE_KEYS.ADMIN_CONSUMER_FILTER, newFilter);
+    setPage(DEFAULT_PAGE_NUMBER);
+  };
+
   const fetchConsumers = async () => {
     try {
       setLoading(true);
-      const response = await adminApi.getConsumers({
-        page,
-        size: rowsPerPage,
-      });
+      let response;
+
+      if (selectedFilter === CONSUMER_FILTER_STATUS.ALL) {
+        response = await adminApi.getConsumers({
+          page,
+          size: rowsPerPage,
+        });
+      } else {
+        const isDeleted = selectedFilter === CONSUMER_FILTER_STATUS.DELETED;
+        response = await adminApi.getConsumersByFilter(isDeleted, {
+          page,
+          size: rowsPerPage,
+        });
+      }
+      
       setConsumerData(response);
     } catch (error) {
       console.error('Failed to fetch consumers:', error);
@@ -54,7 +87,7 @@ const ConsumerList = () => {
 
   useEffect(() => {
     fetchConsumers();
-  }, [page, rowsPerPage]);
+  }, [page, rowsPerPage, selectedFilter]);
 
   const handleRowClick = (id: number) => {
     navigate(`/admin/${USER_TYPES.CONSUMER}/${id}`);
@@ -95,6 +128,29 @@ const ConsumerList = () => {
   return (
     <div className="container mx-auto mt-8 px-4">
       <h1 className="text-3xl font-bold mb-6 text-gray-900">수요자 관리</h1>
+
+      <div className="flex gap-4 mb-6">
+        <div className="min-w-[200px]">
+          <label
+            htmlFor="filter-select"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            계정 상태
+          </label>
+          <select
+            id="filter-select"
+            value={selectedFilter}
+            onChange={handleFilterChange}
+            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            {Object.entries(CONSUMER_FILTER_STATUS).map(([, value]) => (
+              <option key={value} value={value}>
+                {CONSUMER_FILTER_LABELS[value as ConsumerFilterStatus]}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
 
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <div className="overflow-x-auto">

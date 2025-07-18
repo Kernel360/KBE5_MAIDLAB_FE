@@ -21,6 +21,7 @@ export const S3_CONFIG = {
 export const LOCAL_STORAGE_KEYS = {
   ADMIN_USER_TAB: 'adminUserTab',
   ADMIN_MANAGER_STATUS: 'adminManagerStatus',
+  ADMIN_CONSUMER_FILTER: 'adminConsumerFilter',
 } as const;
 
 // ===== 세션스토리지 키 상수 =====
