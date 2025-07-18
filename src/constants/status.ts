@@ -72,3 +72,20 @@ export const SETTLEMENT_STATUS = {
 
 export type SettlementStatus =
   (typeof SETTLEMENT_STATUS)[keyof typeof SETTLEMENT_STATUS];
+
+// ===== 소비자 필터 상태 =====
+export const CONSUMER_FILTER_STATUS = {
+  ALL: 'ALL',
+  ACTIVE: 'ACTIVE',
+  DELETED: 'DELETED',
+} as const;
+
+export type ConsumerFilterStatus =
+  (typeof CONSUMER_FILTER_STATUS)[keyof typeof CONSUMER_FILTER_STATUS];
+
+// ===== 소비자 필터 상태 한글명 =====
+export const CONSUMER_FILTER_LABELS = {
+  [CONSUMER_FILTER_STATUS.ALL]: '전체',
+  [CONSUMER_FILTER_STATUS.ACTIVE]: '활성 계정',
+  [CONSUMER_FILTER_STATUS.DELETED]: '삭제된 계정',
+} as const;

@@ -5,6 +5,7 @@ export * from './date';
 export * from './format';
 export * from './googleOAuth';
 export * from './mappers';
+export * from './region';
 export * from './s3';
 export * from './storage';
 export * from './theme';
