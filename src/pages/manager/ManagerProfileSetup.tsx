@@ -410,7 +410,7 @@ const ManagerProfileSetup: React.FC = () => {
             {/* 프로필 이미지 업로드 */}
             <div className="text-center">
               <div className="relative inline-block mb-4">
-                <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+                <div className="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center overflow-hidden">
                   {imagePreview || formData.profileImage ? (
                     <img
                       src={imagePreview || formData.profileImage}
@@ -418,7 +418,7 @@ const ManagerProfileSetup: React.FC = () => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <User className="w-12 h-12 text-gray-400" />
+                    <User className="w-12 h-12 text-gray-400 dark:text-gray-500" />
                   )}
                 </div>
                 <button
@@ -441,10 +441,10 @@ const ManagerProfileSetup: React.FC = () => {
 
             {/* 서비스 선택 */}
             <div className="text-center">
-              <h2 className="text-xl font-bold text-gray-900 mb-2">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
                 제공 가능한 서비스
               </h2>
-              <p className="text-gray-600">어떤 서비스를 제공하실 수 있나요?</p>
+              <p className="text-gray-600 dark:text-gray-300">어떤 서비스를 제공하실 수 있나요?</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -454,12 +454,12 @@ const ManagerProfileSetup: React.FC = () => {
                   onClick={() => handleServiceToggle(service.id)}
                   className={`p-6 rounded-xl border-2 transition-all ${
                     formData.serviceTypes.includes(service.id)
-                      ? 'border-orange-500 bg-orange-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-orange-500 bg-orange-50 dark:bg-orange-900'
+                      : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 bg-white dark:bg-gray-800'
                   }`}
                 >
                   <div className="text-3xl mb-2">{service.icon}</div>
-                  <div className="font-medium">{service.label}</div>
+                  <div className="font-medium text-gray-900 dark:text-white">{service.label}</div>
                 </button>
               ))}
             </div>
@@ -474,31 +474,31 @@ const ManagerProfileSetup: React.FC = () => {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-xl font-bold text-gray-900 mb-2">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
                 가능 지역
               </h2>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-300">
                 어느 지역에서 서비스 가능하신가요?
               </p>
             </div>
 
             <button
               onClick={() => setIsRegionModalOpen(true)}
-              className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-orange-500 hover:text-orange-500 transition-colors"
+              className="w-full p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-500 dark:text-gray-400 hover:border-orange-500 hover:text-orange-500 transition-colors bg-white dark:bg-gray-800"
             >
               지역 선택하기
             </button>
 
             {formData.regions.length > 0 && (
               <div className="space-y-3">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-gray-600 dark:text-gray-300">
                   선택된 지역: {formData.regions.length}개
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {formData.regions.map((region) => (
                     <span
                       key={region}
-                      className="px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-sm"
+                      className="px-3 py-1 bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-400 rounded-full text-sm"
                     >
                       {region}
                     </span>
@@ -517,10 +517,10 @@ const ManagerProfileSetup: React.FC = () => {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-xl font-bold text-gray-900 mb-2">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
                 가능 시간
               </h2>
-              <p className="text-gray-600">언제 서비스 제공이 가능하신가요?</p>
+              <p className="text-gray-600 dark:text-gray-300">언제 서비스 제공이 가능하신가요?</p>
             </div>
 
             <ScheduleSelector
@@ -540,10 +540,10 @@ const ManagerProfileSetup: React.FC = () => {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-xl font-bold text-gray-900 mb-2">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
                 필수 서류 업로드
               </h2>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-300">
                 서비스 제공을 위한 필수 서류를 업로드해주세요
               </p>
             </div>
@@ -556,14 +556,14 @@ const ManagerProfileSetup: React.FC = () => {
                 return (
                   <div
                     key={docType.id}
-                    className="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
+                    className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800"
                   >
                     <div className="flex items-center gap-3">
-                      <FileText className="w-5 h-5 text-gray-400" />
+                      <FileText className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                       <div>
-                        <div className="font-medium">{docType.label}</div>
+                        <div className="font-medium text-gray-900 dark:text-white">{docType.label}</div>
                         {uploaded && (
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-500 dark:text-gray-400">
                             {uploaded.fileName}
                           </div>
                         )}
@@ -578,8 +578,8 @@ const ManagerProfileSetup: React.FC = () => {
                       disabled={loading || uploadingDocument}
                       className={`p-2 rounded-full transition-colors ${
                         uploaded
-                          ? 'bg-green-100 text-green-600 hover:bg-green-200'
-                          : 'bg-orange-100 text-orange-600 hover:bg-orange-200'
+                          ? 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-800'
+                          : 'bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-400 hover:bg-orange-200 dark:hover:bg-orange-800'
                       } ${loading || uploadingDocument ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                       {loading || uploadingDocument ? (
@@ -595,17 +595,17 @@ const ManagerProfileSetup: React.FC = () => {
               })}
             </div>
 
-            <div className="bg-blue-50 p-4 rounded-lg">
+            <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
               <div className="flex items-start gap-2">
                 <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                   <span className="text-white text-xs">i</span>
                 </div>
-                <div className="text-sm text-blue-700">
-                  <p className="font-medium mb-1">업로드 안내</p>
+                <div className="text-sm text-blue-700 dark:text-blue-300">
+                  <p className="font-medium mb-1 text-blue-700 dark:text-blue-300">업로드 안내</p>
                   <ul className="space-y-1 text-xs">
-                    <li>• PDF, DOC, DOCX 파일만 업로드 가능합니다.</li>
-                    <li>• 파일 크기는 10MB 이하로 제한됩니다.</li>
-                    <li>• 개인정보는 안전하게 보호됩니다.</li>
+                    <li class="text-blue-600 dark:text-blue-400">• PDF, DOC, DOCX 파일만 업로드 가능합니다.</li>
+                    <li class="text-blue-600 dark:text-blue-400">• 파일 크기는 10MB 이하로 제한됩니다.</li>
+                    <li class="text-blue-600 dark:text-blue-400">• 개인정보는 안전하게 보호됩니다.</li>
                   </ul>
                 </div>
               </div>
@@ -616,8 +616,8 @@ const ManagerProfileSetup: React.FC = () => {
             )}
 
             {/* 소개글 섹션 */}
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+            <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 mb-2">
                 <FileText className="w-4 h-4" />
                 <span>소개글 (선택사항)</span>
               </div>
@@ -630,11 +630,11 @@ const ManagerProfileSetup: React.FC = () => {
                   }))
                 }
                 placeholder="고객에게 보여질 간단한 소개를 작성해주세요."
-                className="w-full p-3 border border-gray-300 rounded-lg resize-none"
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 rows={3}
                 maxLength={LENGTH_LIMITS.INTRODUCE.MAX}
               />
-              <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
+              <div className="flex justify-between items-center mt-2 text-xs text-gray-500 dark:text-gray-400">
                 <span>고객에게 보여질 간단한 소개를 작성해주세요.</span>
                 <span>
                   {formData.introduceText.length}/{LENGTH_LIMITS.INTRODUCE.MAX}
@@ -656,7 +656,7 @@ const ManagerProfileSetup: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-900">
       {/* Header */}
       <Header
         variant="sub"

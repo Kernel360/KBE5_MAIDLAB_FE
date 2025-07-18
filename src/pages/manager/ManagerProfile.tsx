@@ -30,7 +30,7 @@ const ManagerProfile: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
       <Header
         variant="sub"
@@ -41,11 +41,11 @@ const ManagerProfile: React.FC = () => {
 
       <div className="px-4 py-6">
         <div className="max-w-md mx-auto">
-          <div className="bg-white rounded-xl shadow-sm p-6 space-y-8">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 space-y-8">
             {/* 프로필 이미지 */}
             <div className="flex flex-col items-center mb-4">
               <div className="relative mb-2">
-                <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+                <div className="w-32 h-32 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center overflow-hidden">
                   {profile.profileImage ? (
                     <img
                       src={profile.profileImage}
@@ -53,7 +53,7 @@ const ManagerProfile: React.FC = () => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <User className="w-12 h-12 text-gray-400" />
+                    <User className="w-12 h-12 text-gray-400 dark:text-gray-500" />
                   )}
                 </div>
               </div>
@@ -61,20 +61,20 @@ const ManagerProfile: React.FC = () => {
 
             {/* 이름 */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
+              <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">
                 이름
               </label>
               <input
                 type="text"
                 value={profile.name}
                 disabled
-                className="w-full p-3 text-center text-sm rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50"
+                className="w-full p-3 text-center text-sm rounded-lg text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 disabled:bg-gray-50 dark:disabled:bg-gray-700"
               />
             </div>
 
             {/* 성별 */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
+              <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">
                 성별
               </label>
               <div className="flex gap-2">
@@ -83,8 +83,8 @@ const ManagerProfile: React.FC = () => {
                   disabled
                   className={`flex-1 py-2 rounded-lg text-center font-medium text-sm transition-all ${
                     profile.gender === GENDER.MALE
-                      ? 'bg-gray-50 text-gray-900'
-                      : 'text-gray-400'
+                      ? 'bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white'
+                      : 'text-gray-400 dark:text-gray-500'
                   }`}
                 >
                   {GENDER_LABELS[GENDER.MALE]}
@@ -94,8 +94,8 @@ const ManagerProfile: React.FC = () => {
                   disabled
                   className={`flex-1 py-2 rounded-lg text-center font-medium text-sm transition-all ${
                     profile.gender === GENDER.FEMALE
-                      ? 'bg-gray-50 text-gray-900'
-                      : 'text-gray-400'
+                      ? 'bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white'
+                      : 'text-gray-400 dark:text-gray-500'
                   }`}
                 >
                   {GENDER_LABELS[GENDER.FEMALE]}
@@ -105,20 +105,20 @@ const ManagerProfile: React.FC = () => {
 
             {/* 생년월일 */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
+              <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">
                 생년월일
               </label>
               <input
                 type="text"
                 value={profile.birth}
                 disabled
-                className="w-full p-3 text-center rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50 text-sm"
+                className="w-full p-3 text-center rounded-lg text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 disabled:bg-gray-50 dark:disabled:bg-gray-700 text-sm"
               />
             </div>
 
             {/* 제공 서비스 */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
+              <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">
                 제공 가능한 서비스
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -129,8 +129,8 @@ const ManagerProfile: React.FC = () => {
                     disabled
                     className={`w-full h-12 flex items-center justify-center rounded-lg  font-medium text-sm transition-all ${
                       profile.services.includes(service)
-                        ? 'bg-gray-50 text-gray-900'
-                        : 'text-gray-400'
+                        ? 'bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white'
+                        : 'text-gray-400 dark:text-gray-500'
                     }`}
                   >
                     {SERVICE_TYPE_LABELS[service as ServiceType]}
@@ -141,7 +141,7 @@ const ManagerProfile: React.FC = () => {
 
             {/* 가능 지역 */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
+              <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">
                 가능 지역
               </label>
               <div className="flex gap-2 flex-wrap">
@@ -150,7 +150,7 @@ const ManagerProfile: React.FC = () => {
                     key={region.region}
                     type="button"
                     disabled
-                    className="px-4 py-2 rounded-lg bg-gray-50 text-gray-900 font-medium text-sm"
+                    className="px-4 py-2 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white font-medium text-sm"
                   >
                     {SEOUL_DISTRICT_LABELS[region.region as SeoulDistrict] ||
                       region.region}
@@ -161,20 +161,20 @@ const ManagerProfile: React.FC = () => {
 
             {/* 가능 시간 */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
+              <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">
                 가능 시간
               </label>
               <ScheduleSummary schedules={profile.schedules} />
             </div>
             {/* 소개글 */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
+              <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">
                 소개글
               </label>
               <textarea
                 value={profile.introduceText || ''}
                 disabled
-                className="w-full p-3  text-center text-sm rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50 resize-none min-h-[48px]"
+                className="w-full p-3  text-center text-sm rounded-lg text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 disabled:bg-gray-50 dark:disabled:bg-gray-700 resize-none min-h-[48px]"
                 rows={3}
               />
             </div>
@@ -182,14 +182,14 @@ const ManagerProfile: React.FC = () => {
             {/* 비상연락처 - 소셜 로그인 사용자만 표시 */}
             {profile.emergencyCall !== undefined && (
               <div>
-                <label className="block text-gray-700 font-medium mb-1">
+                <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">
                   비상연락처
                 </label>
                 <input
                   type="text"
                   value={profile.emergencyCall || ''}
                   disabled
-                  className="w-full p-3 text-center rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50 text-sm"
+                  className="w-full p-3 text-center rounded-lg text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 disabled:bg-gray-50 dark:disabled:bg-gray-700 text-sm"
                 />
               </div>
             )}

@@ -113,7 +113,7 @@ const ConsumerMain: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header
         showNotification={true}
         onNotificationClick={handleNotificationClick}
@@ -128,15 +128,15 @@ const ConsumerMain: React.FC = () => {
           />
           {/* Greeting + Service Button Card (색상 스왑) */}
           <div className="flex justify-center mb-8">
-            <div className="w-full max-w-md bg-white bg-opacity-90 rounded-2xl p-6 text-orange-600 shadow-lg">
+            <div className="w-full max-w-md bg-white dark:bg-gray-800 bg-opacity-90 rounded-2xl p-6 text-orange-600 shadow-lg">
               <div className="flex items-center justify-between">
                 <div>
-                  <h1 className="text-xl font-bold mb-1 text-black">
+                  <h1 className="text-xl font-bold mb-1 text-black dark:text-white">
                     {profile?.name
                       ? `${profile.name}님, 반가워요!`
                       : '환영합니다!'}
                   </h1>
-                  <p className="text-sm text-black">
+                  <p className="text-sm text-black dark:text-gray-300">
                     {profile?.name
                       ? '오늘도 좋은 하루 보내세요.'
                       : '서비스를 신청해보세요.'}
@@ -190,7 +190,7 @@ const ConsumerMain: React.FC = () => {
 
           <div className="recent-reservation-card">
             <div className="flex justify-between items-start mb-2">
-              <h2 className="text-lg font-bold text-gray-900">최근 예약</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">최근 예약</h2>
               <button
                 className="text-sm text-orange-500 font-medium hover:underline ml-4"
                 onClick={() => navigate(ROUTES.CONSUMER.RESERVATIONS)}
@@ -198,9 +198,9 @@ const ConsumerMain: React.FC = () => {
                 더보기
               </button>
             </div>
-            <hr className="border-t border-gray-200 mb-2" />
+            <hr className="border-t border-gray-200 dark:border-gray-600 mb-2" />
             <div
-              className="flex justify-between items-start cursor-pointer rounded-lg transition-colors duration-150 border border-gray-200 p-4 hover:border-orange-400 hover:shadow-lg"
+              className="flex justify-between items-start cursor-pointer rounded-lg transition-colors duration-150 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 p-4 hover:border-orange-400 hover:shadow-lg"
               role="button"
               tabIndex={0}
               onClick={() => {
@@ -248,7 +248,7 @@ const ConsumerMain: React.FC = () => {
                     </div>
                   </>
                 ) : (
-                  <div className="recent-reservation-label">
+                  <div className="recent-reservation-label text-gray-600 dark:text-gray-300">
                     최근 예약이 없습니다.
                   </div>
                 )}

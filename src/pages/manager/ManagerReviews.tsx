@@ -42,8 +42,8 @@ const Pagination: React.FC<PaginationProps> = ({
         disabled={!hasPrevious}
         className={`p-2 rounded-lg ${
           hasPrevious
-            ? 'bg-white border border-gray-200 hover:bg-gray-50'
-            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+            ? 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+            : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
         }`}
       >
         <ChevronLeft className="w-4 h-4" />
@@ -58,7 +58,7 @@ const Pagination: React.FC<PaginationProps> = ({
             className={`px-3 py-2 rounded-lg text-sm font-medium ${
               currentPage === index
                 ? 'bg-orange-500 text-white'
-                : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
             }`}
           >
             {index + 1}
@@ -72,8 +72,8 @@ const Pagination: React.FC<PaginationProps> = ({
         disabled={!hasNext}
         className={`p-2 rounded-lg ${
           hasNext
-            ? 'bg-white border border-gray-200 hover:bg-gray-50'
-            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+            ? 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+            : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
         }`}
       >
         <ChevronRight className="w-4 h-4" />
@@ -124,16 +124,16 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow duration-200">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 hover:shadow-md transition-shadow duration-200">
       {/* 리뷰어 정보 */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <h3 className="font-semibold text-gray-900 text-base">
+          <h3 className="font-semibold text-gray-900 dark:text-white text-base">
             {review.name}
           </h3>
           <div className="flex items-center gap-1">
             {renderStars(review.rating)}
-            <span className="text-sm text-gray-500 ml-1">
+            <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">
               ({review.rating})
             </span>
           </div>
@@ -141,8 +141,8 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
       </div>
 
       {/* 리뷰 내용 */}
-      <div className="bg-gray-50 rounded-lg p-4 mb-4">
-        <p className="text-gray-700 leading-relaxed text-sm">
+      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-4">
+        <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-sm">
           {review.comment}
         </p>
       </div>
@@ -155,8 +155,8 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review }) => {
               review.serviceType as keyof typeof SERVICE_TYPE_LABELS
             ] || review.serviceType}
           </span>
-          <span className="text-gray-500">•</span>
-          <span className="text-gray-600">{review.serviceDetailType}</span>
+          <span className="text-gray-500 dark:text-gray-400">•</span>
+          <span className="text-gray-600 dark:text-gray-300">{review.serviceDetailType}</span>
         </div>
       </div>
     </div>
@@ -230,7 +230,7 @@ const ReviewStats: React.FC<ReviewStatsProps> = ({ reviews }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 mb-6">
       {/* 전체 평점 */}
       <div className="flex items-end gap-4 mb-6">
         <div className="text-5xl font-bold text-orange-500">
@@ -240,7 +240,7 @@ const ReviewStats: React.FC<ReviewStatsProps> = ({ reviews }) => {
           <div className="flex items-center gap-1 mb-2">
             {renderStars(averageRating)}
           </div>
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-gray-500 dark:text-gray-400">
             총 {reviews.length}개의 리뷰
           </div>
         </div>
@@ -250,16 +250,16 @@ const ReviewStats: React.FC<ReviewStatsProps> = ({ reviews }) => {
       <div className="space-y-3">
         {ratingCounts.map(({ rating, count, percentage }) => (
           <div key={rating} className="flex items-center gap-3">
-            <span className="text-sm text-gray-600 w-8 font-medium">
+            <span className="text-sm text-gray-600 dark:text-gray-300 w-8 font-medium">
               {rating}점
             </span>
-            <div className="flex-1 bg-gray-200 rounded-full h-2.5">
+            <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
               <div
                 className="bg-gradient-to-r from-yellow-400 to-orange-400 h-2.5 rounded-full transition-all duration-500 ease-out"
                 style={{ width: `${percentage}%` }}
               />
             </div>
-            <span className="text-sm text-gray-500 w-8 text-right font-medium">
+            <span className="text-sm text-gray-500 dark:text-gray-400 w-8 text-right font-medium">
               {count}
             </span>
           </div>
@@ -341,7 +341,7 @@ const ManagerReviews: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
       <Header
         variant="sub"
@@ -378,14 +378,14 @@ const ManagerReviews: React.FC = () => {
             </>
           ) : (
             /* 빈 상태 */
-            <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 p-8 text-center">
               <div className="mb-4">
-                <Star className="w-16 h-16 text-gray-300 mx-auto" />
+                <Star className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 아직 리뷰가 없습니다
               </h2>
-              <p className="text-gray-500 mb-6">
+              <p className="text-gray-500 dark:text-gray-400 mb-6">
                 첫 번째 서비스를 완료하고
                 <br />
                 고객님의 소중한 리뷰를 받아보세요!

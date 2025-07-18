@@ -31,13 +31,13 @@ interface MenuItemProps {
 const MenuItem: React.FC<MenuItemProps> = ({ icon, title, onClick }) => (
   <button
     onClick={onClick}
-    className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+    className="w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
   >
     <div className="flex items-center gap-3">
-      <div className="text-gray-600">{icon}</div>
-      <span className="text-gray-900">{title}</span>
+      <div className="text-gray-600 dark:text-gray-400">{icon}</div>
+      <span className="text-gray-900 dark:text-white">{title}</span>
     </div>
-    <ChevronRight className="w-5 h-5 text-gray-400" />
+    <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-500" />
   </button>
 );
 
@@ -113,15 +113,15 @@ const MyPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex justify-center items-center">
-        <p className="text-gray-500">로딩 중...</p>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex justify-center items-center">
+        <p className="text-gray-500 dark:text-gray-400">로딩 중...</p>
       </div>
     );
   }
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         {/* Header */}
         <Header
           variant="sub"
@@ -133,11 +133,11 @@ const MyPage: React.FC = () => {
         {/* Content */}
         <main className="px-4 py-6 pb-20">
           <div className="max-w-md mx-auto">
-            <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 space-y-6">
               {/* Profile Section */}
               <div className="text-center mb-8">
                 <div className="relative inline-block mb-4">
-                  <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden mx-auto">
+                  <div className="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center overflow-hidden mx-auto">
                     {userInfo?.profileImage ? (
                       <img
                         src={userInfo.profileImage}
@@ -145,25 +145,25 @@ const MyPage: React.FC = () => {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <User className="w-12 h-12 text-gray-400" />
+                      <User className="w-12 h-12 text-gray-400 dark:text-gray-500" />
                     )}
                   </div>
                 </div>
 
-                <h2 className="text-xl font-bold text-gray-900 mb-2">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
                   {userInfo?.name || '사용자'}
                 </h2>
 
                 <div className="flex items-center justify-center gap-2 mb-6">
-                  <span className="text-gray-600">포인트:</span>
+                  <span className="text-gray-600 dark:text-gray-300">포인트:</span>
                   {pointLoading ? (
-                    <span className="text-gray-400">로딩 중...</span>
+                    <span className="text-gray-400 dark:text-gray-500">로딩 중...</span>
                   ) : apiPoint !== null ? (
                     <span className="text-[#FF6B00] font-medium">
                       {apiPoint.toLocaleString()}P
                     </span>
                   ) : (
-                    <span className="text-gray-400">-</span>
+                    <span className="text-gray-400 dark:text-gray-500">-</span>
                   )}
                 </div>
 
@@ -176,29 +176,29 @@ const MyPage: React.FC = () => {
               </div>
 
               {/* Menu Items */}
-              <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                <div className="border-t border-gray-200">
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                <div className="border-t border-gray-200 dark:border-gray-700">
                   <MenuItem
                     icon={<Coins className="w-5 h-5" />}
                     title="포인트"
                     onClick={handlePoints}
                   />
                 </div>
-                <div className="border-t border-gray-200">
+                <div className="border-t border-gray-200 dark:border-gray-700">
                   <MenuItem
                     icon={<Heart className="w-5 h-5" />}
                     title="찜한 매니저"
                     onClick={handleLikedManagers}
                   />
                 </div>
-                <div className="border-t border-gray-200">
+                <div className="border-t border-gray-200 dark:border-gray-700">
                   <MenuItem
                     icon={<Ban className="w-5 h-5" />}
                     title="블랙리스트 매니저"
                     onClick={handleBlacklist}
                   />
                 </div>
-                <div className="border-t border-gray-200">
+                <div className="border-t border-gray-200 dark:border-gray-700">
                   <MenuItem
                     icon={<Users className="w-5 h-5" />}
                     title="친구 초대하기"
@@ -207,7 +207,7 @@ const MyPage: React.FC = () => {
                 </div>
                 {/* 비밀번호 변경 메뉴: 소셜 로그인 사용자는 숨김 */}
                 {userInfo && !userInfo.socialType && (
-                  <div className="border-t border-gray-200">
+                  <div className="border-t border-gray-200 dark:border-gray-700">
                     <MenuItem
                       icon={<Lock className="w-5 h-5" />}
                       title="비밀번호 변경"
@@ -216,8 +216,8 @@ const MyPage: React.FC = () => {
                   </div>
                 )}
                 {/* 회원 탈퇴 버튼 추가 */}
-                <div className="border-t border-gray-200">
-                  <div className="text-red-500">
+                <div className="border-t border-gray-200 dark:border-gray-700">
+                  <div className="text-red-500 dark:text-red-400">
                     <MenuItem
                       icon={<Trash className="w-5 h-5" />}
                       title="회원 탈퇴"

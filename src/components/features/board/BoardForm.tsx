@@ -150,18 +150,18 @@ export default function BoardForm({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex justify-center items-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex justify-center items-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Content */}
       <div className="px-4 py-0 pb-4">
         <div className="max-w-md mx-auto">
-          <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 space-y-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="text-left">
                 <BoardTypeSelector
@@ -173,10 +173,10 @@ export default function BoardForm({
               <div className="text-left">
                 <label
                   htmlFor="title"
-                  className="block text-sm font-medium text-gray-700 mb-2 text-left"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 text-left"
                 >
                   제목{' '}
-                  <span className="text-gray-500 text-xs">(최대 30자)</span>
+                  <span className="text-gray-500 dark:text-gray-400 text-xs">(최대 30자)</span>
                 </label>
                 <input
                   type="text"
@@ -191,7 +191,7 @@ export default function BoardForm({
                   className="form-input text-left"
                   placeholder="제목을 입력해주세요 (최대 30자)"
                 />
-                <div className="mt-1 text-right text-sm text-gray-500">
+                <div className="mt-1 text-right text-sm text-gray-500 dark:text-gray-400">
                   {title.length}/30
                 </div>
               </div>
@@ -199,10 +199,10 @@ export default function BoardForm({
               <div className="text-left">
                 <label
                   htmlFor="content"
-                  className="block text-sm font-medium text-gray-700 mb-2 text-left"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 text-left"
                 >
                   내용{' '}
-                  <span className="text-gray-500 text-xs">(최대 2000자)</span>
+                  <span className="text-gray-500 dark:text-gray-400 text-xs">(최대 2000자)</span>
                 </label>
                 <textarea
                   id="content"
@@ -217,7 +217,7 @@ export default function BoardForm({
                   className="form-input text-left"
                   placeholder="문의 내용을 입력해주세요 (최대 2000자)"
                 />
-                <div className="mt-1 text-right text-sm text-gray-500">
+                <div className="mt-1 text-right text-sm text-gray-500 dark:text-gray-400">
                   {content.length}/2000
                 </div>
               </div>

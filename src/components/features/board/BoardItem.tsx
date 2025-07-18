@@ -56,15 +56,15 @@ export default function BoardItem({ board }: BoardItemProps) {
           `${ROUTES.BOARD.DETAIL.replace(':id', board.boardId.toString())}`,
         )
       }
-      className="p-4 bg-white rounded-lg shadow cursor-pointer hover:shadow-md transition-shadow"
+      className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow cursor-pointer hover:shadow-md transition-shadow"
     >
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center space-x-2">
           <span className="text-xl">{BOARD_TYPE_ICONS[boardType] || '📝'}</span>
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-gray-500 dark:text-gray-400">
             {BOARD_TYPE_LABELS[boardType] || '기타 문의'}
           </span>
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-gray-400 dark:text-gray-500">
             {formatDate(board.createdAt)}
           </span>
         </div>
@@ -78,12 +78,12 @@ export default function BoardItem({ board }: BoardItemProps) {
           {board.answered ? '답변완료' : '답변대기'}
         </span>
       </div>
-      <h2 className="text-lg font-semibold mb-2 text-left">
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 text-left">
         {board.title.length > 20
           ? `${board.title.slice(0, 20)}...`
           : board.title}
       </h2>
-      <p className="text-gray-600 line-clamp-2 text-left">{board.content}</p>
+      <p className="text-gray-600 dark:text-gray-300 line-clamp-2 text-left">{board.content}</p>
       {/* 답변 토글 */}
       {board.answerContent && (
         <div className="mt-3">
@@ -98,11 +98,11 @@ export default function BoardItem({ board }: BoardItemProps) {
             {openAnswer ? '답변 닫기' : '답변 보기'}
           </button>
           {openAnswer && (
-            <div className="p-3 bg-gray-50 rounded text-sm text-gray-700">
+            <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded text-sm text-gray-700 dark:text-gray-300">
               <div className="mb-1 flex items-center gap-2">
                 <span className="font-semibold text-green-700">답변</span>
                 {board.answerCreatedAt && (
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-gray-400 dark:text-gray-500">
                     {formatDate(board.answerCreatedAt)}
                   </span>
                 )}

@@ -84,7 +84,7 @@ export default function ImageUploader({
 
   return (
     <div className="mb-6">
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
         이미지 첨부 (선택사항, 최대 {maxImages}개)
       </label>
       <div className="space-y-4">
@@ -148,7 +148,7 @@ export default function ImageUploader({
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-orange-500 hover:text-orange-500 transition-colors"
+              className="w-full p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-500 dark:text-gray-400 hover:border-orange-500 hover:text-orange-500 transition-colors"
             >
               이미지 선택하기
             </button>

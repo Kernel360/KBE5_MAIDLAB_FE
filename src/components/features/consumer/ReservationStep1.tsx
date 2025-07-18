@@ -58,7 +58,7 @@ const ReservationStep1: React.FC<Props> = ({ onNext, onBack }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header
         variant="sub"
         title="서비스 상세 옵션 선택"
@@ -67,30 +67,30 @@ const ReservationStep1: React.FC<Props> = ({ onNext, onBack }) => {
       />
       <main className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto space-y-6">
-          <h2 className="text-lg font-bold mb-2 mt-2 text-center">
+          <h2 className="text-lg font-bold mb-2 mt-2 text-center text-gray-900 dark:text-white">
             하위 옵션을 선택해 주세요.
           </h2>
 
-          <section className="bg-white rounded-2xl shadow p-6">
+          <section className="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
             <div className="w-full flex gap-2 mt-4 mb-6">
               {TABS.map((tab) => (
                 <button
                   key={tab.key}
-                  className={`flex-1 py-2 rounded-lg font-semibold border transition text-base ${selectedTab === tab.key ? 'bg-orange-50 border-orange-500 text-orange-500' : 'bg-white border-gray-200 text-gray-500'}`}
+                  className={`flex-1 py-2 rounded-lg font-semibold border transition text-base ${
+                    selectedTab === tab.key
+                      ? 'bg-orange-50 border-orange-500 text-orange-500 dark:bg-orange-900/50 dark:border-orange-500 dark:text-orange-400'
+                      : 'bg-white border-gray-200 text-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400'
+                  }`}
                   onClick={() =>
-                    setSelectedTab(
-                      tab.key as
-                        | '\uC0DD\uD65C\uCCAD\uC18C'
-                        | '\uBD80\uBD84\uCCAD\uC18C',
-                    )
+                    setSelectedTab(tab.key as '생활청소' | '부분청소')
                   }
                 >
                   {tab.label}
                 </button>
               ))}
             </div>
-            <div className="card mt-2 mb-6">
-              <ul className="text-sm space-y-2 text-gray-700">
+            <div className="card mt-2 mb-6 bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+              <ul className="text-sm space-y-2 text-gray-700 dark:text-gray-300">
                 {detail.options?.map((opt, idx) => (
                   <li key={idx} className="flex items-start gap-2">
                     <span className="text-blue-500 mt-0.5">✔</span>

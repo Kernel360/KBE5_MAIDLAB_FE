@@ -45,15 +45,15 @@ const RegionSelectionModal: React.FC<RegionSelectionModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md relative max-h-[80vh] flex flex-col">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md relative max-h-[80vh] flex flex-col">
         {/* 헤더 */}
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold flex items-center gap-2">
+          <h2 className="text-lg font-bold flex items-center gap-2 text-gray-900 dark:text-white">
             <MapPin className="w-5 h-5 text-orange-500" />
             {title}
           </h2>
           <button
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
             onClick={onClose}
           >
             <X className="w-5 h-5" />
@@ -61,7 +61,7 @@ const RegionSelectionModal: React.FC<RegionSelectionModalProps> = ({
         </div>
 
         {/* 선택 개수 표시 */}
-        <div className="mb-3 text-sm text-gray-600">
+        <div className="mb-3 text-sm text-gray-600 dark:text-gray-400">
           선택된 지역: {selectedRegions.length}개
           {maxSelections && ` / 최대 ${maxSelections}개`}
         </div>
@@ -84,8 +84,8 @@ const RegionSelectionModal: React.FC<RegionSelectionModalProps> = ({
                   isSelected
                     ? 'bg-orange-500 text-white border-orange-500'
                     : isDisabled
-                      ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
-                      : 'bg-gray-100 text-gray-600 border-gray-300 hover:border-gray-400'
+                      ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500 dark:border-gray-600'
+                      : 'bg-gray-100 text-gray-600 border-gray-300 hover:border-gray-400 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:border-gray-500'
                 }`}
               >
                 {region}

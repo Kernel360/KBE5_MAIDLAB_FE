@@ -111,12 +111,12 @@ const RatingSection: React.FC<{
   };
 
   return (
-    <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-700">
       <div className="text-center">
-        <h2 className="text-xl font-bold text-gray-900 mb-2">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
           서비스는 어떠셨나요?
         </h2>
-        <p className="text-gray-500 mb-8">별점을 선택해주세요</p>
+        <p className="text-gray-500 dark:text-gray-400 mb-8">별점을 선택해주세요</p>
 
         <div className="flex justify-center items-center gap-3 mb-6">
           {[1, 2, 3, 4, 5].map((star) => (
@@ -139,11 +139,11 @@ const RatingSection: React.FC<{
           ))}
         </div>
 
-        <div className="bg-gray-50 rounded-xl p-4 inline-block">
-          <div className="text-3xl font-bold text-gray-900 mb-1">
+        <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 inline-block">
+          <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
             {rating}.0
           </div>
-          <div className="text-gray-600 font-medium">
+          <div className="text-gray-600 dark:text-gray-300 font-medium">
             {getRatingText(rating)}
           </div>
         </div>
@@ -456,19 +456,19 @@ const ConsumerReviewRegister: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* 헤더 */}
-      <div className="sticky top-0 z-20 bg-white shadow-sm">
+      <div className="sticky top-0 z-20 bg-white dark:bg-gray-800 shadow-sm">
         <div className="max-w-md mx-auto">
           <div className="flex items-center justify-between p-4">
             <button
               onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors focus:outline-none focus:ring-4 focus:ring-blue-200 rounded-lg p-2 -ml-2"
+              className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors focus:outline-none focus:ring-4 focus:ring-blue-200 rounded-lg p-2 -ml-2"
             >
               <ArrowLeft className="w-6 h-6" />
               <span className="font-medium">뒤로</span>
             </button>
-            <h1 className="text-xl font-bold text-gray-900">리뷰 작성</h1>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">리뷰 작성</h1>
             <div className="w-16"></div>
           </div>
         </div>

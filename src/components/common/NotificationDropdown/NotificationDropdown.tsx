@@ -187,13 +187,13 @@ const NotificationDropdown = () => {
     () => (serviceType: string) => {
       switch (serviceType) {
         case '정기청소':
-          return 'bg-blue-100 text-blue-800';
+          return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
         case '입주청소':
-          return 'bg-green-100 text-green-800';
+          return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
         case '사무실청소':
-          return 'bg-purple-100 text-purple-800';
+          return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300';
         default:
-          return 'bg-gray-100 text-gray-800';
+          return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
       }
     },
     [],
@@ -204,7 +204,7 @@ const NotificationDropdown = () => {
       {/* 알림 벨 버튼 */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`relative p-2 text-gray-600 hover:text-gray-900 transition-all duration-300 ${
+        className={`relative p-2 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-all duration-300 ${
           isRefreshing ? 'animate-pulse scale-110' : ''
         }`}
       >
@@ -232,22 +232,22 @@ const NotificationDropdown = () => {
 
       {/* 드롭다운 메뉴 */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-[420px] bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+        <div className="absolute right-0 mt-2 w-[420px] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-50">
           {/* 헤더 */}
-          <div className="p-4 border-b border-gray-200">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-600">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-gray-900">알림</h3>
+              <h3 className="font-semibold text-gray-900 dark:text-white">알림</h3>
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
+                  className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 flex items-center"
                 >
                   <CheckCheck className="w-4 h-4 mr-1" />
                   모두 읽음
                 </button>
               )}
             </div>
-            <div className="text-sm text-gray-500 mt-1">
+            <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               읽지 않음 {unreadCount}개
             </div>
           </div>
@@ -255,8 +255,8 @@ const NotificationDropdown = () => {
           {/* 알림 목록 */}
           <div className="max-h-96 overflow-y-auto">
             {notifications.length === 0 ? (
-              <div className="p-6 text-center text-gray-500">
-                <Bell className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+              <div className="p-6 text-center text-gray-500 dark:text-gray-400">
+                <Bell className="w-8 h-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
                 <p>새로운 알림이 없습니다</p>
               </div>
             ) : (
@@ -267,22 +267,22 @@ const NotificationDropdown = () => {
                     data-notification-id={notification.id}
                     data-is-read={notification.isRead}
                     onClick={() => handleNotificationClick(notification)}
-                    className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
-                      !notification.isRead ? 'bg-blue-50' : ''
+                    className={`p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors ${
+                      !notification.isRead ? 'bg-blue-50 dark:bg-blue-900/20' : ''
                     }`}
                   >
                     <div className="flex items-start space-x-3">
                       {/* 아이콘 */}
                       <div
                         className={`p-2 rounded-full ${
-                          !notification.isRead ? 'bg-blue-100' : 'bg-gray-100'
+                          !notification.isRead ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-gray-100 dark:bg-gray-700'
                         }`}
                       >
                         <Bell
                           className={`w-4 h-4 ${
                             !notification.isRead
-                              ? 'text-blue-600'
-                              : 'text-gray-400'
+                              ? 'text-blue-600 dark:text-blue-400'
+                              : 'text-gray-400 dark:text-gray-500'
                           }`}
                         />
                       </div>
@@ -304,14 +304,14 @@ const NotificationDropdown = () => {
                             <h4
                               className={`text-sm font-semibold mb-1 ${
                                 !notification.isRead
-                                  ? 'text-gray-900'
-                                  : 'text-gray-600'
+                                  ? 'text-gray-900 dark:text-white'
+                                  : 'text-gray-600 dark:text-gray-300'
                               }`}
                             >
                               {notification.title}
                             </h4>
 
-                            <p className="text-xs text-gray-600 leading-relaxed">
+                            <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">
                               {notification.message}
                             </p>
                           </div>
@@ -322,8 +322,8 @@ const NotificationDropdown = () => {
                         </div>
 
                         {/* 시간 */}
-                        <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100">
-                          <span className="text-xs text-gray-400">
+                        <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100 dark:border-gray-700">
+                          <span className="text-xs text-gray-400 dark:text-gray-500">
                             {formatDateTime(notification.createdAt)}
                           </span>
                           {notification.isRead && (
@@ -341,12 +341,12 @@ const NotificationDropdown = () => {
                     {isLoadingMore ? (
                       <div className="flex items-center justify-center">
                         <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mr-2"></div>
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
                           로딩 중...
                         </span>
                       </div>
                     ) : (
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-gray-400 dark:text-gray-500">
                         스크롤하여 더 보기
                       </span>
                     )}

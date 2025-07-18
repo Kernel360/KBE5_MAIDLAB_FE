@@ -21,7 +21,7 @@ const ReservationStep0: React.FC<Props> = React.memo(({ onNext }) => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header
         variant="sub"
         title="서비스 선택"
@@ -30,14 +30,14 @@ const ReservationStep0: React.FC<Props> = React.memo(({ onNext }) => {
       />
       <main className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto">
-          <h2 className="text-xl font-bold mb-2 mt-2 text-center">
+          <h2 className="text-xl font-bold mb-2 mt-2 text-center text-gray-900 dark:text-white">
             서비스를 선택해주세요
           </h2>
           <div className="w-full max-w-md flex flex-col gap-6 mt-8">
             {SERVICE_LIST.map((item) => (
               <button
                 key={item.id}
-                className="flex items-center gap-4 card shadow hover:shadow-md transition cursor-pointer py-5 px-6 text-lg font-semibold text-gray-800 bg-white border border-gray-200 rounded-2xl focus:ring-2 focus:ring-orange-400"
+                className="flex items-center gap-4 card shadow hover:shadow-md transition cursor-pointer py-5 px-6 text-lg font-semibold text-gray-800 bg-white border border-gray-200 rounded-2xl focus:ring-2 focus:ring-orange-400 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:border-orange-500"
                 onClick={() => handleSelect(item.id)}
               >
                 <span className="text-4xl">{item.icon}</span>

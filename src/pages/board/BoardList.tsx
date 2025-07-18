@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { MessageSquare } from 'lucide-react';
 import { useBoard } from '@/hooks/domain/useBoard';
+import { useToast } from '@/hooks/useToast';
 import { ROUTES } from '@/constants/route';
 import type { BoardResponse } from '@/types/domain/board';
 import BoardItem from '@/components/features/board/BoardItem';
@@ -12,6 +13,7 @@ import Pagination from '@/components/common/Pagination';
 export default function BoardList() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { showToast } = useToast();
   const { boards, loading: isLoading, fetchBoards } = useBoard();
 
   useEffect(() => {
@@ -37,14 +39,14 @@ export default function BoardList() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex justify-center items-center">
-        <p className="text-gray-500">로딩중...</p>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex justify-center items-center">
+        <p className="text-gray-500 dark:text-gray-400">로딩중...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header
         variant="sub"
         title="문의 게시판"
@@ -85,14 +87,14 @@ export default function BoardList() {
             </>
           ) : (
             /* 빈 상태 */
-            <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 p-8 text-center">
               <div className="mb-4">
                 <MessageSquare className="w-16 h-16 text-gray-300 mx-auto" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 아직 문의가 없습니다
               </h2>
-              <p className="text-gray-500 mb-6">
+              <p className="text-gray-500 dark:text-gray-300 mb-6">
                 궁금한 점이 있으시면
                 <br />
                 언제든 문의해 주세요!

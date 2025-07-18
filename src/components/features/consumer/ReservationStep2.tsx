@@ -475,23 +475,23 @@ const ReservationStep2: React.FC<Props> = ({
           <div className="space-y-8">
             <div className="text-center mb-8">
               <MapPinIcon className="w-16 h-16 mx-auto text-orange-500 mb-4" />
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
                 주소를 입력해주세요
               </h2>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 정확한 주소를 입력하면 더 나은 서비스를 제공할 수 있어요
               </p>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   주소
                 </label>
                 <div className="flex gap-2">
                   <input
                     type="text"
-                    className="flex-1 form-input"
+                    className="flex-1 form-input dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     placeholder="서울특별시 서초구 서초대로 74길 29"
                     value={form.address}
                     onChange={(e) =>
@@ -513,12 +513,12 @@ const ReservationStep2: React.FC<Props> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   상세 주소
                 </label>
                 <input
                   type="text"
-                  className="w-full form-input"
+                  className="w-full form-input dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   placeholder="동/호수, 층수 등 상세 주소를 입력해주세요"
                   value={form.addressDetail}
                   onChange={(e) =>
@@ -531,12 +531,12 @@ const ReservationStep2: React.FC<Props> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   출입 안내 (선택사항)
                 </label>
                 <input
                   type="text"
-                  className="w-full form-input"
+                  className="w-full form-input dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   placeholder="현관 비밀번호, 출입 방법 등을 알려주세요"
                   value={form.housingInformation}
                   onChange={(e) =>
@@ -556,17 +556,17 @@ const ReservationStep2: React.FC<Props> = ({
           <div className="space-y-8">
             <div className="text-center mb-8">
               <HomeIcon className="w-16 h-16 mx-auto text-orange-500 mb-4" />
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
                 주택 정보를 알려주세요
               </h2>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 주택 유형과 크기에 따라 최적의 서비스를 제공해드려요
               </p>
             </div>
 
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4">
                   주택 유형
                 </h3>
                 <div className="grid grid-cols-2 gap-3">
@@ -581,8 +581,8 @@ const ReservationStep2: React.FC<Props> = ({
                       }
                       className={`p-4 rounded-xl border-2 transition-all font-medium ${
                         form.housingType === key
-                          ? 'border-orange-500 bg-orange-50 text-orange-700'
-                          : 'border-gray-200 hover:border-orange-300 text-gray-700'
+                          ? 'border-orange-500 bg-orange-50 text-orange-700 dark:bg-orange-900/50 dark:border-orange-500 dark:text-orange-400'
+                          : 'border-gray-200 hover:border-orange-300 text-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:border-orange-500'
                       }`}
                     >
                       {label}
@@ -607,13 +607,13 @@ const ReservationStep2: React.FC<Props> = ({
                   />
                   
                   {selectedRoomIdx !== null && selectedRoomIdx >= 0 && (
-                    <div className="bg-white border-2 border-orange-200 rounded-xl p-4 mt-4">
+                    <div className="bg-white dark:bg-gray-800 border-2 border-orange-200 dark:border-orange-700 rounded-xl p-4 mt-4">
                       <div className="flex justify-between items-center">
                         <div>
-                          <div className="font-semibold text-gray-800">
+                          <div className="font-semibold text-gray-800 dark:text-white">
                             {ROOM_SIZES_LIFE_CLEANING[selectedRoomIdx]?.range}
                           </div>
-                          <div className="text-sm text-gray-600 flex items-center gap-1 mt-1">
+                          <div className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1 mt-1">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
@@ -624,7 +624,7 @@ const ReservationStep2: React.FC<Props> = ({
                           <div className="font-bold text-xl text-orange-600">
                             {ROOM_SIZES_LIFE_CLEANING[selectedRoomIdx]?.estimatedPrice.toLocaleString()}원
                           </div>
-                          <div className="text-xs text-gray-500 mt-1">
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                             기본 요금
                           </div>
                         </div>
@@ -642,10 +642,10 @@ const ReservationStep2: React.FC<Props> = ({
           <div className="space-y-8">
             <div className="text-center mb-8">
               <SparklesIcon className="w-16 h-16 mx-auto text-orange-500 mb-4" />
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
                 추가 서비스를 선택해주세요
               </h2>
-              <p className="text-gray-600">필요한 서비스만 선택하시면 됩니다</p>
+              <p className="text-gray-600 dark:text-gray-400">필요한 서비스만 선택하시면 됩니다</p>
             </div>
 
             <div className="space-y-4">
@@ -654,8 +654,8 @@ const ReservationStep2: React.FC<Props> = ({
                   key={service.id}
                   className={`p-4 border-2 rounded-xl transition-all ${
                     selectedServices.includes(service.id)
-                      ? 'border-orange-500 bg-orange-50'
-                      : 'border-gray-200'
+                      ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/50'
+                      : 'border-gray-200 dark:border-gray-700'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -670,7 +670,7 @@ const ReservationStep2: React.FC<Props> = ({
                       />
                       <label
                         htmlFor={service.id}
-                        className="font-medium text-gray-800 cursor-pointer"
+                        className="font-medium text-gray-800 dark:text-white cursor-pointer"
                       >
                         {service.label}
                       </label>
@@ -697,12 +697,12 @@ const ReservationStep2: React.FC<Props> = ({
                               (optionCounts[service.id] || 1) - 1,
                             )
                           }
-                          className="w-8 h-8 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                          className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                           disabled={(optionCounts[service.id] || 1) <= 1}
                         >
                           -
                         </button>
-                        <span className="w-8 text-center font-medium">
+                        <span className="w-8 text-center font-medium dark:text-white">
                           {optionCounts[service.id] || 1}
                         </span>
                         <button
@@ -712,7 +712,7 @@ const ReservationStep2: React.FC<Props> = ({
                               (optionCounts[service.id] || 1) + 1,
                             )
                           }
-                          className="w-8 h-8 rounded-full bg-gray-100 text-gray-600 hover:bg-orange-600 transition-colors"
+                          className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-orange-600 transition-colors"
                           disabled={
                             (optionCounts[service.id] || 1) >=
                             MAX_COUNTABLE_ITEMS
@@ -720,7 +720,7 @@ const ReservationStep2: React.FC<Props> = ({
                         >
                           +
                         </button>
-                        <span className="text-sm text-gray-500">개</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">개</span>
                       </div>
                     )}
                 </div>
@@ -729,16 +729,16 @@ const ReservationStep2: React.FC<Props> = ({
 
             {/* 반려동물 및 특이사항 */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-800">특이사항</h3>
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white">특이사항</h3>
 
-              <div className="flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl">
-                <span className="font-medium text-gray-800">
+              <div className="flex items-center justify-between p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl">
+                <span className="font-medium text-gray-800 dark:text-white">
                   반려동물이 있어요
                 </span>
                 <button
                   onClick={handlePetToggle}
                   className={`w-12 h-6 rounded-full transition-colors duration-200 ${
-                    form.pet !== 'NONE' ? 'bg-orange-500' : 'bg-gray-300'
+                    form.pet !== 'NONE' ? 'bg-orange-500' : 'bg-gray-300 dark:bg-gray-600'
                   }`}
                 >
                   <div
@@ -750,7 +750,7 @@ const ReservationStep2: React.FC<Props> = ({
               </div>
 
               <textarea
-                className="w-full form-input resize-none"
+                className="w-full form-input resize-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 rows={3}
                 placeholder="매니저가 알아야 할 특이사항이 있다면 알려주세요 (예: 집 구조, 주의사항 등)"
                 value={form.specialRequest}
@@ -770,18 +770,18 @@ const ReservationStep2: React.FC<Props> = ({
           <div className="space-y-6">
             <div className="text-center mb-8">
               <CalendarDaysIcon className="w-16 h-16 mx-auto text-orange-500 mb-4" />
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
                 예약 날짜와 매니저 선택
               </h2>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 날짜와 시간, 매니저를 선택해주세요
               </p>
             </div>
             {/* 날짜 선택 카드 */}
-            <div className="bg-white border-2 border-gray-100 rounded-2xl p-6 transition-all hover:border-orange-200 hover:shadow-lg">
+            <div className="bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl p-6 transition-all hover:border-orange-200 dark:hover:border-orange-700 hover:shadow-lg">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                <h3 className="text-lg font-semibold text-gray-800">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                   날짜 선택
                 </h3>
               </div>
@@ -792,25 +792,25 @@ const ReservationStep2: React.FC<Props> = ({
                 minDate={tomorrow}
                 dateFormat="yyyy년 MM월 dd일"
                 locale={ko}
-                className="w-full h-16 form-input text-center text-lg font-semibold shadow-sm"
-                calendarClassName="!border-orange-200 !rounded-2xl !shadow-xl !border-2"
+                className="w-full h-16 form-input text-center text-lg font-semibold shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                calendarClassName="!border-orange-200 !rounded-2xl !shadow-xl !border-2 dark:!bg-gray-800 dark:!border-gray-700"
                 dayClassName={(date) =>
                   format(date, 'yyyy-MM-dd') ===
                   format(selectedDate, 'yyyy-MM-dd')
                     ? '!bg-orange-500 !text-white !rounded-full !shadow-md'
-                    : '!hover:bg-orange-50 !rounded-full'
+                    : '!hover:bg-orange-50 dark:!hover:bg-orange-900/50 !rounded-full'
                 }
                 showPopperArrow={false}
                 placeholderText="날짜를 선택해주세요"
               />
 
               {selectedDate && (
-                <div className="mt-4 p-4 bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-100 rounded-xl">
+                <div className="mt-4 p-4 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900 dark:to-amber-800 border border-orange-100 dark:border-orange-800 rounded-xl">
                   <div className="flex items-center justify-center gap-2">
-                    <span className="text-orange-600 font-medium">
+                    <span className="text-orange-600 dark:text-orange-400 font-medium">
                       선택된 날짜:
                     </span>
-                    <span className="font-semibold text-orange-800">
+                    <span className="font-semibold text-orange-800 dark:text-orange-300">
                       {format(selectedDate, 'yyyy년 MM월 dd일 (E)', {
                         locale: ko,
                       })}
@@ -821,10 +821,10 @@ const ReservationStep2: React.FC<Props> = ({
             </div>
 
             {/* 시간 선택 카드 */}
-            <div className="bg-white border-2 border-gray-100 rounded-2xl p-6 transition-all hover:border-orange-200 hover:shadow-lg">
+            <div className="bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl p-6 transition-all hover:border-orange-200 dark:hover:border-orange-700 hover:shadow-lg">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                <h3 className="text-lg font-semibold text-gray-800">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                   시작 시간
                 </h3>
               </div>
@@ -846,7 +846,7 @@ const ReservationStep2: React.FC<Props> = ({
                         className={`p-3 rounded-xl border-2 transition-all font-medium text-sm shadow-sm hover:shadow-md ${
                           form.startTime === time
                             ? 'border-orange-500 bg-orange-500 text-white shadow-orange-200'
-                            : 'border-gray-200 hover:border-orange-300 text-gray-700 bg-white'
+                            : 'border-gray-200 hover:border-orange-300 text-gray-700 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:border-orange-500'
                         }`}
                       >
                         {time}
@@ -858,18 +858,18 @@ const ReservationStep2: React.FC<Props> = ({
               </div>
 
               {form.startTime && (
-                <div className="p-4 bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-100 rounded-xl">
+                <div className="p-4 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900 dark:to-amber-800 border border-orange-100 dark:border-orange-800 rounded-xl">
                   <div className="flex items-center justify-center gap-4 text-sm">
                     <div className="flex items-center gap-2">
-                      <span className="text-orange-700 font-medium">시작:</span>
-                      <span className="font-semibold text-orange-800">
+                      <span className="text-orange-700 dark:text-orange-400 font-medium">시작:</span>
+                      <span className="font-semibold text-orange-800 dark:text-orange-300">
                         {form.startTime}
                       </span>
                     </div>
-                    <div className="w-px h-4 bg-orange-300"></div>
+                    <div className="w-px h-4 bg-orange-300 dark:bg-orange-700"></div>
                     <div className="flex items-center gap-2">
-                      <span className="text-orange-700 font-medium">종료:</span>
-                      <span className="font-semibold text-orange-800">
+                      <span className="text-orange-700 dark:text-orange-400 font-medium">종료:</span>
+                      <span className="font-semibold text-orange-800 dark:text-orange-300">
                         {(() => {
                           const [startHour, startMinute] = form.startTime
                             .split(':')
@@ -884,7 +884,7 @@ const ReservationStep2: React.FC<Props> = ({
                         })()}
                       </span>
                     </div>
-                    <div className="text-xs text-orange-600 bg-orange-100 px-2 py-1 rounded-full">
+                    <div className="text-xs text-orange-600 bg-orange-100 dark:bg-orange-800 dark:text-orange-300 px-2 py-1 rounded-full">
                       {Math.floor(calculateTotalTimeAndPrice().totalTime / 60)}
                       시간
                     </div>
@@ -894,28 +894,28 @@ const ReservationStep2: React.FC<Props> = ({
             </div>
 
             {/* 매니저 선택 카드 */}
-            <div className="bg-white border-2 border-gray-100 rounded-2xl p-6 transition-all hover:border-orange-200 hover:shadow-lg">
+            <div className="bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-2xl p-6 transition-all hover:border-orange-200 dark:hover:border-orange-700 hover:shadow-lg">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                <h3 className="text-lg font-semibold text-gray-800">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                   매니저 선택
                 </h3>
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl bg-gray-50">
+                <div className="flex items-center justify-between p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-700">
                   <div>
-                    <span className="font-medium text-gray-800 block">
+                    <span className="font-medium text-gray-800 dark:text-white block">
                       매니저 직접 선택
                     </span>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
                       원하는 매니저를 선택할 수 있어요
                     </span>
                   </div>
                   <button
                     onClick={handleManagerToggle}
                     className={`w-12 h-6 rounded-full transition-colors duration-200 shadow-inner ${
-                      form.chooseManager ? 'bg-orange-500' : 'bg-gray-300'
+                      form.chooseManager ? 'bg-orange-500' : 'bg-gray-300 dark:bg-gray-600'
                     }`}
                   >
                     <div
@@ -936,19 +936,19 @@ const ReservationStep2: React.FC<Props> = ({
                 )}
 
                 {!form.chooseManager && (
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4">
-                    <div className="flex items-center gap-2 text-blue-700">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-800 border border-blue-200 dark:border-blue-700 rounded-xl p-4">
+                    <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
                       <CheckCircleIcon className="w-5 h-5" />
                       <span className="font-medium">자동 배정</span>
                     </div>
-                    <p className="text-sm text-blue-600 mt-1">
+                    <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">
                       해당 시간대에 가능한 최적의 매니저를 자동으로 배정해드려요
                     </p>
                   </div>
                 )}
 
                 {form.managerInfo && (
-                  <div className="bg-gradient-to-r from-orange-50 to-amber-50 border-2 border-orange-200 rounded-xl p-4">
+                  <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900 dark:to-amber-800 border-2 border-orange-200 dark:border-orange-700 rounded-xl p-4">
                     <div className="flex items-center gap-4">
                       <img
                         src={
@@ -960,14 +960,14 @@ const ReservationStep2: React.FC<Props> = ({
                       />
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-gray-800">
+                          <span className="font-semibold text-gray-800 dark:text-white">
                             {form.managerInfo.name}
                           </span>
-                          <span className="text-orange-500 font-bold text-sm bg-orange-100 px-2 py-0.5 rounded-full">
+                          <span className="text-orange-500 font-bold text-sm bg-orange-100 dark:bg-orange-800 dark:text-orange-300 px-2 py-0.5 rounded-full">
                             ★ {form.managerInfo.averageRate}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                           {form.managerInfo.introduceText}
                         </p>
                       </div>
@@ -1000,28 +1000,28 @@ const ReservationStep2: React.FC<Props> = ({
           <div className="space-y-8">
             <div className="text-center mb-8">
               <CurrencyDollarIcon className="w-16 h-16 mx-auto text-orange-500 mb-4" />
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">
                 예약 정보를 확인해주세요
               </h2>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 모든 정보가 정확한지 확인 후 예약을 완료해주세요
               </p>
             </div>
 
             <div className="space-y-6">
               {/* 주소 정보 */}
-              <div className="bg-white rounded-xl border-2 border-gray-100 p-4">
+              <div className="bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-100 dark:border-gray-700 p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <MapPinIcon className="w-5 h-5 text-orange-500" />
-                  <span className="font-semibold text-gray-800">
+                  <span className="font-semibold text-gray-800 dark:text-white">
                     서비스 주소
                   </span>
                 </div>
-                <div className="text-gray-700">
+                <div className="text-gray-700 dark:text-gray-300">
                   <p>{form.address}</p>
-                  <p className="text-sm text-gray-500">{form.addressDetail}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{form.addressDetail}</p>
                   {form.housingInformation && (
-                    <p className="text-sm text-gray-500 mt-1">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       출입 정보: {form.housingInformation}
                     </p>
                   )}
@@ -1029,12 +1029,12 @@ const ReservationStep2: React.FC<Props> = ({
               </div>
 
               {/* 주택 정보 */}
-              <div className="bg-white rounded-xl border-2 border-gray-100 p-4">
+              <div className="bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-100 dark:border-gray-700 p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <HomeIcon className="w-5 h-5 text-orange-500" />
-                  <span className="font-semibold text-gray-800">주택 정보</span>
+                  <span className="font-semibold text-gray-800 dark:text-white">주택 정보</span>
                 </div>
-                <div className="text-gray-700">
+                <div className="text-gray-700 dark:text-gray-300">
                   <p>
                     주택 유형:{' '}
                     {
@@ -1052,12 +1052,12 @@ const ReservationStep2: React.FC<Props> = ({
               </div>
 
               {/* 예약 일시 */}
-              <div className="bg-white rounded-xl border-2 border-gray-100 p-4">
+              <div className="bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-100 dark:border-gray-700 p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <CalendarDaysIcon className="w-5 h-5 text-orange-500" />
-                  <span className="font-semibold text-gray-800">예약 일시</span>
+                  <span className="font-semibold text-gray-800 dark:text-white">예약 일시</span>
                 </div>
-                <div className="text-gray-700">
+                <div className="text-gray-700 dark:text-gray-300">
                   <p>
                     {format(
                       new Date(form.reservationDate),
@@ -1068,12 +1068,12 @@ const ReservationStep2: React.FC<Props> = ({
                   <p>
                     {form.startTime} ~ {form.endTime}
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     예상 소요 시간:{' '}
                     {Math.floor(calculateTotalTimeAndPrice().totalTime / 60)}
                     시간 {calculateTotalTimeAndPrice().totalTime % 60}분
                   </p>
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                     (기본 {baseInfo?.baseTime}시간
                     {additionalTime > 0 && (
                       <>
@@ -1100,10 +1100,10 @@ const ReservationStep2: React.FC<Props> = ({
 
               {/* 추가 서비스 */}
               {selectedServices.length > 0 && (
-                <div className="bg-white rounded-xl border-2 border-gray-100 p-4">
+                <div className="bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-100 dark:border-gray-700 p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <SparklesIcon className="w-5 h-5 text-orange-500" />
-                    <span className="font-semibold text-gray-800">
+                    <span className="font-semibold text-gray-800 dark:text-white">
                       추가 서비스
                     </span>
                   </div>
@@ -1119,7 +1119,7 @@ const ReservationStep2: React.FC<Props> = ({
                       return (
                         <div
                           key={serviceId}
-                          className="flex justify-between text-gray-700"
+                          className="flex justify-between text-gray-700 dark:text-gray-300"
                         >
                           <span>
                             {service.label}
@@ -1137,13 +1137,13 @@ const ReservationStep2: React.FC<Props> = ({
 
               {/* 특이사항 */}
               {(form.pet !== 'NONE' || form.specialRequest) && (
-                <div className="bg-white rounded-xl border-2 border-gray-100 p-4">
+                <div className="bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-100 dark:border-gray-700 p-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="font-semibold text-gray-800">
+                    <span className="font-semibold text-gray-800 dark:text-white">
                       특이사항
                     </span>
                   </div>
-                  <div className="text-gray-700 space-y-1">
+                  <div className="text-gray-700 dark:text-gray-300 space-y-1">
                     {form.pet !== 'NONE' && <p>반려동물: {form.pet}</p>}
                     {form.specialRequest && (
                       <p>요청사항: {form.specialRequest}</p>
@@ -1153,10 +1153,10 @@ const ReservationStep2: React.FC<Props> = ({
               )}
 
               {/* 매니저 정보 */}
-              <div className="bg-white rounded-xl border-2 border-gray-100 p-4">
+              <div className="bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-100 dark:border-gray-700 p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <UserGroupIcon className="w-5 h-5 text-orange-500" />
-                  <span className="font-semibold text-gray-800">매니저</span>
+                  <span className="font-semibold text-gray-800 dark:text-white">매니저</span>
                 </div>
                 {form.managerInfo ? (
                   <div className="flex items-center gap-3">
@@ -1169,27 +1169,27 @@ const ReservationStep2: React.FC<Props> = ({
                     />
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-medium">
+                        <span className="font-medium dark:text-white">
                           {form.managerInfo.name}
                         </span>
                         <span className="text-orange-500 text-sm">
                           ★ {form.managerInfo.averageRate}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         {form.managerInfo.introduceText}
                       </p>
                     </div>
                   </div>
                 ) : (
-                  <p className="text-gray-700">배정된 매니저가 없습니다.</p>
+                  <p className="text-gray-700 dark:text-gray-300">배정된 매니저가 없습니다.</p>
                 )}
               </div>
 
               {/* 요금 정보 */}
-              <div className="bg-orange-50 rounded-xl border-2 border-orange-100 p-4">
+              <div className="bg-orange-50 dark:bg-orange-900/50 rounded-xl border-2 border-orange-100 dark:border-orange-800 p-4">
                 <div className="space-y-3">
-                  <div className="flex justify-between text-gray-700">
+                  <div className="flex justify-between text-gray-700 dark:text-gray-300">
                     <span>기본 요금</span>
                     <span>{baseInfo?.estimatedPrice.toLocaleString()}원</span>
                   </div>
@@ -1204,7 +1204,7 @@ const ReservationStep2: React.FC<Props> = ({
                     return (
                       <div
                         key={serviceId}
-                        className="flex justify-between text-gray-700"
+                        className="flex justify-between text-gray-700 dark:text-gray-300"
                       >
                         <span>
                           {service.label}
@@ -1216,8 +1216,8 @@ const ReservationStep2: React.FC<Props> = ({
                       </div>
                     );
                   })}
-                  <div className="border-t border-orange-200 pt-3 flex justify-between items-center">
-                    <span className="text-lg font-bold text-gray-800">
+                  <div className="border-t border-orange-200 dark:border-orange-700 pt-3 flex justify-between items-center">
+                    <span className="text-lg font-bold text-gray-800 dark:text-white">
                       총 금액
                     </span>
                     <span className="text-2xl font-bold text-orange-600">
@@ -1254,7 +1254,7 @@ const ReservationStep2: React.FC<Props> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header
         variant="sub"
         title={getHeaderTitle()}
@@ -1263,7 +1263,7 @@ const ReservationStep2: React.FC<Props> = ({
       />
 
       {/* 진행 단계 표시 */}
-      <div className="bg-gray-50 px-10 py-4">
+      <div className="bg-gray-50 dark:bg-gray-900 px-10 py-4">
         <div className="max-w-md mx-auto">
           <div className="flex items-center justify-center">
             {STEPS.map((step, index) => (
@@ -1272,7 +1272,7 @@ const ReservationStep2: React.FC<Props> = ({
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
                     step.id <= currentStep
                       ? 'bg-orange-500 text-white'
-                      : 'bg-gray-200 text-gray-500'
+                      : 'bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
                   }`}
                 >
                   {step.id}
@@ -1280,7 +1280,7 @@ const ReservationStep2: React.FC<Props> = ({
                 {index < STEPS.length - 1 && (
                   <div
                     className={`w-12 h-0.5 mx-3 transition-colors ${
-                      step.id < currentStep ? 'bg-orange-500' : 'bg-gray-200'
+                      step.id < currentStep ? 'bg-orange-500' : 'bg-gray-200 dark:bg-gray-700'
                     }`}
                   />
                 )}
@@ -1292,16 +1292,16 @@ const ReservationStep2: React.FC<Props> = ({
 
       <main className="px-4 py-2 pb-24">
         <div className="max-w-md mx-auto">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
             {renderStepContent()}
           </div>
 
           {/* 하단 네비게이션 버튼 */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+          <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4">
             <div className="max-w-md mx-auto flex gap-3">
               <button
                 onClick={handlePrev}
-                className="flex items-center justify-center px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
+                className="flex items-center justify-center px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
               >
                 <ChevronLeftIcon className="w-5 h-5 mr-1" />
                 이전
@@ -1362,10 +1362,10 @@ const ReservationStep2: React.FC<Props> = ({
             }
           }}
         >
-          <div className="bg-white rounded-2xl w-full max-w-md max-h-[80vh] overflow-hidden">
-            <div className="p-6 border-b border-gray-200">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md max-h-[80vh] overflow-hidden">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-gray-800">매니저 선택</h3>
+                <h3 className="text-xl font-bold text-gray-800 dark:text-white">매니저 선택</h3>
                 <button
                   onClick={() => {
                     setShowManagerModal(false);
@@ -1379,7 +1379,7 @@ const ReservationStep2: React.FC<Props> = ({
                       }));
                     }
                   }}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
                 >
                   <svg
                     className="w-6 h-6"
@@ -1405,8 +1405,8 @@ const ReservationStep2: React.FC<Props> = ({
                     key={manager.uuid}
                     className={`w-full p-4 border-2 rounded-xl transition-all text-left ${
                       form.managerUuid === manager.uuid
-                        ? 'border-orange-500 bg-orange-50'
-                        : 'border-gray-200 hover:border-orange-300'
+                        ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/50'
+                        : 'border-gray-200 hover:border-orange-300 dark:border-gray-700 dark:hover:border-orange-500'
                     }`}
                     onClick={() => {
                       setForm((prev: ReservationFormData) => ({
@@ -1431,14 +1431,14 @@ const ReservationStep2: React.FC<Props> = ({
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-semibold text-gray-800 truncate">
+                          <span className="font-semibold text-gray-800 dark:text-white truncate">
                             {manager.name}
                           </span>
                           <span className="text-orange-500 font-bold text-sm">
                             ★ {manager.averageRate}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-600 truncate">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
                           {manager.introduceText}
                         </p>
                       </div>
@@ -1457,10 +1457,10 @@ const ReservationStep2: React.FC<Props> = ({
       {/* 반려동물 모달 */}
       {petModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-sm">
             <div className="p-6">
               <div className="text-center mb-6">
-                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg
                     className="w-8 h-8 text-orange-500"
                     fill="none"
@@ -1475,10 +1475,10 @@ const ReservationStep2: React.FC<Props> = ({
                     />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">
+                <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">
                   반려동물 정보
                 </h3>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-600 dark:text-gray-400 text-sm">
                   반려동물이 있다면 알려주세요.
                   <br />
                   알레르기가 있는 매니저를 피할 수 있어요.
@@ -1506,12 +1506,12 @@ const ReservationStep2: React.FC<Props> = ({
                       className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors ${
                         petType.dog
                           ? 'bg-orange-500 text-white'
-                          : 'bg-gray-100 text-gray-400'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-400'
                       }`}
                     >
                       🐕
                     </div>
-                    <span className="mt-2 text-sm font-medium text-gray-700">
+                    <span className="mt-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                       강아지
                     </span>
                   </label>
@@ -1535,12 +1535,12 @@ const ReservationStep2: React.FC<Props> = ({
                       className={`w-16 h-16 rounded-full flex items-center justify-center transition-colors ${
                         petType.cat
                           ? 'bg-orange-500 text-white'
-                          : 'bg-gray-100 text-gray-400'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-400'
                       }`}
                     >
                       🐱
                     </div>
-                    <span className="mt-2 text-sm font-medium text-gray-700">
+                    <span className="mt-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                       고양이
                     </span>
                   </label>
@@ -1548,7 +1548,7 @@ const ReservationStep2: React.FC<Props> = ({
 
                 <input
                   type="text"
-                  className="w-full form-input"
+                  className="w-full form-input dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   placeholder="기타 (예: 토끼, 햄스터 등)"
                   value={petType.etc}
                   onChange={(e) =>
@@ -1564,7 +1564,7 @@ const ReservationStep2: React.FC<Props> = ({
                 <div className="flex gap-3 pt-4">
                   <button
                     onClick={() => setPetModal(false)}
-                    className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
+                    className="flex-1 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                   >
                     취소
                   </button>

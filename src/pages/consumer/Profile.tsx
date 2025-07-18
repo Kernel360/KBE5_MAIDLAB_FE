@@ -56,7 +56,7 @@ const Profile: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
         <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -64,7 +64,7 @@ const Profile: React.FC = () => {
 
   if (!profile || !formData.name) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <Header
           variant="sub"
           title="프로필"
@@ -73,9 +73,9 @@ const Profile: React.FC = () => {
         />
         <main className="px-4 py-6 pb-20">
           <div className="max-w-md mx-auto">
-            <div className="bg-white rounded-xl shadow-sm p-6 text-center">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 text-center">
               <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-              <p className="text-gray-500">프로필 정보를 불러오는 중...</p>
+              <p className="text-gray-500 dark:text-gray-400">프로필 정보를 불러오는 중...</p>
             </div>
           </div>
         </main>
@@ -84,7 +84,7 @@ const Profile: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header
         variant="sub"
         title="프로필"
@@ -94,11 +94,11 @@ const Profile: React.FC = () => {
 
       <main className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto">
-          <div className="bg-white rounded-xl shadow-sm p-6 space-y-8">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 space-y-8">
             {/* 프로필 이미지 */}
             <div className="flex flex-col items-center mb-4">
               <div className="relative mb-2">
-                <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+                <div className="w-32 h-32 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center overflow-hidden">
                   {formData.profileImage ? (
                     <img
                       src={
@@ -111,7 +111,7 @@ const Profile: React.FC = () => {
                       onError={handleImageError}
                     />
                   ) : (
-                    <User className="w-12 h-12 text-gray-400" />
+                    <User className="w-12 h-12 text-gray-400 dark:text-gray-500" />
                   )}
                 </div>
               </div>
@@ -119,34 +119,34 @@ const Profile: React.FC = () => {
 
             {/* 이름 */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
+              <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">
                 이름
               </label>
               <input
                 type="text"
                 value={formData.name}
                 disabled
-                className="w-full p-3 text-center rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50"
+                className="w-full p-3 text-center rounded-lg text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 disabled:bg-gray-50 dark:disabled:bg-gray-700"
               />
             </div>
 
             {/* 성별 */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
+              <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">
                 성별
               </label>
               <div className="flex gap-2">
                 <button
                   type="button"
                   disabled
-                  className={`flex-1 py-2 rounded-lg text-center font-medium transition-all ${formData.gender === 'MALE' ? 'bg-gray-50 text-gray-900' : 'text-gray-400'}`}
+                  className={`flex-1 py-2 rounded-lg text-center font-medium transition-all ${formData.gender === 'MALE' ? 'bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'}`}
                 >
                   남성
                 </button>
                 <button
                   type="button"
                   disabled
-                  className={`flex-1 py-2 rounded-lg text-center font-medium transition-all ${formData.gender === 'FEMALE' ? 'bg-gray-50 text-gray-900' : 'text-gray-400'}`}
+                  className={`flex-1 py-2 rounded-lg text-center font-medium transition-all ${formData.gender === 'FEMALE' ? 'bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-500'}`}
                 >
                   여성
                 </button>
@@ -155,54 +155,54 @@ const Profile: React.FC = () => {
 
             {/* 생년월일 */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
+              <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">
                 생년월일
               </label>
               <input
                 type="text"
                 value={formData.birth}
                 disabled
-                className="w-full p-3 text-center rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50"
+                className="w-full p-3 text-center rounded-lg text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 disabled:bg-gray-50 dark:disabled:bg-gray-700"
               />
             </div>
 
             {/* 주소 */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
+              <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">
                 주소
               </label>
               <input
                 type="text"
                 value={formData.address}
                 disabled
-                className="w-full p-3 text-center rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50"
+                className="w-full p-3 text-center rounded-lg text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 disabled:bg-gray-50 dark:disabled:bg-gray-700"
               />
             </div>
 
             {/* 상세 주소 */}
             <div>
-              <label className="block text-gray-700 font-medium mb-1">
+              <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">
                 상세 주소
               </label>
               <input
                 type="text"
                 value={formData.detailAddress}
                 disabled
-                className="w-full p-3 text-center rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50"
+                className="w-full p-3 text-center rounded-lg text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 disabled:bg-gray-50 dark:disabled:bg-gray-700"
               />
             </div>
 
             {/* 비상연락처 - 소셜 로그인 사용자만 표시 */}
             {formData.emergencyCall !== undefined && (
               <div>
-                <label className="block text-gray-700 font-medium mb-1">
+                <label className="block text-gray-700 dark:text-gray-300 font-medium mb-1">
                   비상연락처
                 </label>
                 <input
                   type="text"
                   value={formData.emergencyCall || ''}
                   disabled
-                  className="w-full p-3 text-center rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50"
+                  className="w-full p-3 text-center rounded-lg text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 disabled:bg-gray-50 dark:disabled:bg-gray-700"
                 />
               </div>
             )}
