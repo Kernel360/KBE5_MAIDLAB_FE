@@ -47,7 +47,7 @@ export default function BoardList() {
     <div className="min-h-screen bg-gray-50">
       <Header
         variant="sub"
-        title="상담 게시판"
+        title="문의 게시판"
         backRoute={ROUTES.HOME}
         showMenu={true}
       />

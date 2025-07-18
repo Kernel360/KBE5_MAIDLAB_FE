@@ -4,6 +4,7 @@ import { Upload, User } from 'lucide-react';
 import { useToast } from '@/hooks/useToast';
 import { useConsumer } from '@/hooks/domain/useConsumer';
 import { validateBirthDate } from '@/constants/validation';
+import { validatePhone } from '@/utils/validation';
 import type {
   ConsumerProfileUpdateRequest,
   ProfileData,
@@ -35,6 +36,7 @@ const ProfileEdit: React.FC = () => {
     birth: '',
     address: '',
     detailAddress: '',
+    emergencyCall: '',
   });
 
   // 1. Add a new state to store the selected image file
@@ -58,15 +60,26 @@ const ProfileEdit: React.FC = () => {
         address: profile.address || '',
         detailAddress: profile.detailAddress || '',
         profileImage: profile.profileImage,
+        emergencyCall: profile.emergencyCall || undefined,
       });
     }
   }, [profile]);
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    // 비상연락처는 숫자만 입력 가능
+    if (field === 'emergencyCall') {
+      const numbers = value.replace(/[^0-9]/g, '');
+      if (numbers.length > 11) return;
+      setFormData((prev) => ({
+        ...prev,
+        [field]: numbers,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: value,
+      }));
+    }
 
     // 에러 메시지 초기화
     if (field === 'address' && errors.address) {
@@ -74,6 +87,9 @@ const ProfileEdit: React.FC = () => {
     }
     if (field === 'detailAddress' && errors.detailAddress) {
       setErrors((prev) => ({ ...prev, detailAddress: '' }));
+    }
+    if (field === 'emergencyCall' && errors.emergencyCall) {
+      setErrors((prev) => ({ ...prev, emergencyCall: '' }));
     }
   };
 
@@ -108,12 +124,19 @@ const ProfileEdit: React.FC = () => {
   };
 
   const isFormValid = (): boolean => {
-    return (
+    const baseValid = (
       !errors.address &&
       !errors.detailAddress &&
       formData.address.trim() !== '' &&
       formData.detailAddress.trim() !== ''
     );
+    
+    // 소셜 로그인 사용자는 비상연락처도 필수
+    if (formData.emergencyCall !== undefined) {
+      return baseValid && !errors.emergencyCall && formData.emergencyCall.trim() !== '';
+    }
+    
+    return baseValid;
   };
 
   // 생년월일 자동 하이픈 처리
@@ -136,6 +159,7 @@ const ProfileEdit: React.FC = () => {
       birth: '',
       address: '',
       detailAddress: '',
+      emergencyCall: '',
     };
     if (!formData.name.trim()) {
       newErrors.name = '이름을 입력해주세요.';
@@ -158,6 +182,14 @@ const ProfileEdit: React.FC = () => {
     if (!formData.detailAddress.trim()) {
       newErrors.detailAddress = '상세 주소를 입력해주세요.';
     }
+    // 소셜 로그인 사용자는 비상연락처 필수
+    if (formData.emergencyCall !== undefined) {
+      if (!formData.emergencyCall?.trim()) {
+        newErrors.emergencyCall = '비상연락처를 입력해주세요.';
+      } else if (!validatePhone(formData.emergencyCall)) {
+        newErrors.emergencyCall = '올바른 휴대폰 번호를 입력해주세요. (예: 01012345678)';
+      }
+    }
 
     if (Object.values(newErrors).some((v) => v)) {
       setErrors(newErrors);
@@ -179,6 +211,7 @@ const ProfileEdit: React.FC = () => {
         profileImage: profileImageUrl,
         address: formData.address,
         detailAddress: formData.detailAddress,
+        ...(formData.emergencyCall !== undefined && { emergencyCall: formData.emergencyCall }),
       };
       await updateProfile(profileData);
       navigate(ROUTES.CONSUMER.PROFILE);
@@ -368,6 +401,30 @@ const ProfileEdit: React.FC = () => {
                   </p>
                 )}
               </div>
+
+              {/* 비상연락처 - 소셜 로그인 사용자만 표시 */}
+              {formData.emergencyCall !== undefined && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    비상연락처 <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.emergencyCall || ''}
+                    onChange={(e) =>
+                      handleInputChange('emergencyCall', e.target.value)
+                    }
+                    placeholder="01012345678"
+                    maxLength={11}
+                    className={`w-full p-3 border text-center rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 ${
+                      errors.emergencyCall ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                  />
+                  {errors.emergencyCall && (
+                    <p className="text-red-500 text-sm mt-1">{errors.emergencyCall}</p>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* 버튼 그룹 */}

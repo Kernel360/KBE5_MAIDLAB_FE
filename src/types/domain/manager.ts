@@ -69,6 +69,7 @@ export interface ManagerProfileUpdateRequest {
   regions: RegionListItem[];
   availableTimes: ScheduleListItem[];
   introduceText?: string;
+  emergencyCall?: string;
 }
 
 /**
@@ -87,6 +88,7 @@ export interface ManagerProfileResponse {
   services: string[];
   introduceText?: string;
   documents?: DocumentListItem[];
+  emergencyCall?: string | null; // 소셜 로그인 사용자만 값이 있음
 }
 
 /**

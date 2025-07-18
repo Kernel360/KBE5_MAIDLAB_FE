@@ -179,6 +179,21 @@ const ManagerProfile: React.FC = () => {
               />
             </div>
 
+            {/* 비상연락처 - 소셜 로그인 사용자만 표시 */}
+            {profile.emergencyCall !== undefined && (
+              <div>
+                <label className="block text-gray-700 font-medium mb-1">
+                  비상연락처
+                </label>
+                <input
+                  type="text"
+                  value={profile.emergencyCall || ''}
+                  disabled
+                  className="w-full p-3 text-center rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50 text-sm"
+                />
+              </div>
+            )}
+
             {/* 수정하기 버튼 */}
             <button
               type="button"

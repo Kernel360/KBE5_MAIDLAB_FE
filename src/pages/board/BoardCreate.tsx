@@ -14,12 +14,14 @@ export default function BoardCreate() {
         backRoute={ROUTES.BOARD.LIST}
         showMenu={false}
       />
-      <div className="py-0">
-        <BoardForm
-          mode="create"
-          onSuccess={() => navigate(ROUTES.BOARD.LIST)}
-        />
-      </div>
+      <main className="px-4 py-6 pb-20">
+        <div className="max-w-md mx-auto">
+          <BoardForm
+            mode="create"
+            onSuccess={() => navigate(ROUTES.BOARD.LIST)}
+          />
+        </div>
+      </main>
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth, useForm, useToast } from '@/hooks';
 import { ROUTES } from '@/constants';
 import { validateBirthDate } from '@/constants/validation';
+import { validatePhone } from '@/utils/validation';
 import type { SocialSignUpRequest } from '@/types/domain/auth';
 import { Header } from '@/components/layout/Header/Header';
 
@@ -45,9 +46,14 @@ const SocialSignUp: React.FC = () => {
       initialValues: {
         birth: '',
         gender: 'MALE',
+        emergencyCall: '',
       },
       validationSchema: {
         birth: (value) => validateBirthDate(value).isValid,
+        emergencyCall: (value) => {
+          if (!value.trim()) return false;
+          return validatePhone(value);
+        },
       },
       onSubmit: async (formData) => {
         if (!tempToken || !userType) {
@@ -63,7 +69,7 @@ const SocialSignUp: React.FC = () => {
         const result = await socialSignUp(formData);
 
         if (result.success) {
-          navigate(ROUTES.HOME, { replace: true });
+          // useAuth의 socialSignUp에서 이미 적절한 페이지로 이동 처리됨
         } else {
           showToast(result.error || '회원가입에 실패했습니다.', 'error');
         }
@@ -83,10 +89,26 @@ const SocialSignUp: React.FC = () => {
     setValue('birth', formatted);
   };
 
+  const handleEmergencyCallChange = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    
+    // 최대 11자리 제한
+    if (numbers.length > 11) {
+      return;
+    }
+    
+    setValue('emergencyCall', numbers);
+  };
+
   const getBirthErrorMessage = () => {
     if (!errors.birth || !touched.birth) return '';
     const validation = validateBirthDate(values.birth);
     return validation.error || '올바른 생년월일을 입력해주세요.';
+  };
+
+  const getEmergencyCallErrorMessage = () => {
+    if (!errors.emergencyCall || !touched.emergencyCall) return '';
+    return '올바른 휴대폰 번호를 입력해주세요. (예: 01012345678)';
   };
 
   if (isValidating) {
@@ -176,6 +198,29 @@ const SocialSignUp: React.FC = () => {
               />
               {errors.birth && touched.birth && (
                 <p className="text-red-500 text-sm">{getBirthErrorMessage()}</p>
+              )}
+            </div>
+
+            {/* 비상연락처 */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                비상연락처 <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={values.emergencyCall}
+                onChange={(e) => handleEmergencyCallChange(e.target.value)}
+                onBlur={() => setFieldTouched('emergencyCall')}
+                placeholder="01012345678"
+                maxLength={11}
+                className={`w-full px-4 py-3 border focus:outline-none rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                  errors.emergencyCall && touched.emergencyCall
+                    ? 'border-red-500'
+                    : 'border-gray-300'
+                }`}
+              />
+              {errors.emergencyCall && touched.emergencyCall && (
+                <p className="text-red-500 text-sm">{getEmergencyCallErrorMessage()}</p>
               )}
             </div>
 

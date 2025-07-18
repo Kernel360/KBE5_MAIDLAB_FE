@@ -36,6 +36,7 @@ const Profile: React.FC = () => {
         address: profile.address || '',
         detailAddress: profile.detailAddress || '',
         profileImage: profile.profileImage,
+        emergencyCall: profile.emergencyCall || undefined,
       });
     }
   }, [profile]);
@@ -57,6 +58,27 @@ const Profile: React.FC = () => {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!profile || !formData.name) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header
+          variant="sub"
+          title="프로필"
+          backRoute={ROUTES.CONSUMER.MYPAGE}
+          showMenu={true}
+        />
+        <main className="px-4 py-6 pb-20">
+          <div className="max-w-md mx-auto">
+            <div className="bg-white rounded-xl shadow-sm p-6 text-center">
+              <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-gray-500">프로필 정보를 불러오는 중...</p>
+            </div>
+          </div>
+        </main>
       </div>
     );
   }
@@ -169,6 +191,21 @@ const Profile: React.FC = () => {
                 className="w-full p-3 text-center rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50"
               />
             </div>
+
+            {/* 비상연락처 - 소셜 로그인 사용자만 표시 */}
+            {formData.emergencyCall !== undefined && (
+              <div>
+                <label className="block text-gray-700 font-medium mb-1">
+                  비상연락처
+                </label>
+                <input
+                  type="text"
+                  value={formData.emergencyCall || ''}
+                  disabled
+                  className="w-full p-3 text-center rounded-lg text-gray-900 bg-gray-50 disabled:bg-gray-50"
+                />
+              </div>
+            )}
 
             {/* 완료 버튼 */}
             <div className="pt-1">

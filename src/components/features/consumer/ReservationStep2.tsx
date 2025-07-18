@@ -29,6 +29,7 @@ import { Header } from '@/components';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { ko } from 'date-fns/locale';
+import CustomSelect from '@/components/features/manager/CustomSelect';
 
 interface Props {
   initialData: Partial<ReservationFormData>;
@@ -338,6 +339,23 @@ const ReservationStep2: React.FC<Props> = ({
   // 예약 완료 버튼 로딩 상태
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // currentStep이 변경될 때마다 스크롤 맨 위로 이동
+  useEffect(() => {
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      
+      // 상위 컨테이너 찾아서 스크롤
+      const scrollableElement = document.querySelector('.main-container') || 
+                               document.querySelector('[data-scroll]') ||
+                               document.documentElement;
+      if (scrollableElement) {
+        scrollableElement.scrollTop = 0;
+      }
+    }, 100);
+  }, [currentStep]);
+
   // 최종 제출
   const handleFinalSubmit = async () => {
     // 중복 클릭 방지
@@ -484,7 +502,7 @@ const ReservationStep2: React.FC<Props> = ({
                     }
                   />
                   <button
-                    onClick={() => navigate('/google-map')}
+                    onClick={() => navigate(ROUTES.GOOGLE_MAP)}
                     // onClick={() => alert("서비스 준비중입니다.")}
                     className="px-4 py-4 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors whitespace-nowrap"
                     type="button"
@@ -575,38 +593,44 @@ const ReservationStep2: React.FC<Props> = ({
 
               {form.serviceDetailType === '생활청소' && (
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                    평수 선택
-                  </h3>
-                  <div className="grid grid-cols-1 gap-3">
-                    {ROOM_SIZES_LIFE_CLEANING.map((item, idx) => (
-                      <button
-                        key={item.range}
-                        onClick={() => setSelectedRoomIdx(idx)}
-                        className={`p-4 rounded-xl border-2 transition-all text-left ${
-                          selectedRoomIdx === idx
-                            ? 'border-orange-500 bg-orange-50'
-                            : 'border-gray-200 hover:border-orange-300'
-                        }`}
-                      >
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <div className="font-semibold text-gray-800">
-                              {item.range}
-                            </div>
-                            <div className="text-sm text-gray-600">
-                              {item.baseTime}시간 소요
-                            </div>
+                  <CustomSelect
+                    value={selectedRoomIdx?.toString() || ''}
+                    onChange={(value) => setSelectedRoomIdx(value ? Number(value) : 0)}
+                    options={ROOM_SIZES_LIFE_CLEANING.map((_, idx) => idx.toString())}
+                    optionLabels={ROOM_SIZES_LIFE_CLEANING.reduce((acc, item, idx) => {
+                      acc[idx.toString()] = `${item.range} - ${item.baseTime}시간 소요 (${item.estimatedPrice.toLocaleString()}원)`;
+                      return acc;
+                    }, {} as Record<string, string>)}
+                    placeholder="평수를 선택해주세요"
+                    label="평수 선택"
+                    icon="calendar"
+                  />
+                  
+                  {selectedRoomIdx !== null && selectedRoomIdx >= 0 && (
+                    <div className="bg-white border-2 border-orange-200 rounded-xl p-4 mt-4">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <div className="font-semibold text-gray-800">
+                            {ROOM_SIZES_LIFE_CLEANING[selectedRoomIdx]?.range}
                           </div>
-                          <div className="text-right">
-                            <div className="font-bold text-orange-600">
-                              {item.estimatedPrice.toLocaleString()}원
-                            </div>
+                          <div className="text-sm text-gray-600 flex items-center gap-1 mt-1">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {ROOM_SIZES_LIFE_CLEANING[selectedRoomIdx]?.baseTime}시간 소요
                           </div>
                         </div>
-                      </button>
-                    ))}
-                  </div>
+                        <div className="text-right">
+                          <div className="font-bold text-xl text-orange-600">
+                            {ROOM_SIZES_LIFE_CLEANING[selectedRoomIdx]?.estimatedPrice.toLocaleString()}원
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1">
+                            기본 요금
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -1212,19 +1236,36 @@ const ReservationStep2: React.FC<Props> = ({
     }
   };
 
+  const getHeaderTitle = () => {
+    switch (currentStep) {
+      case 1:
+        return '주소 입력';
+      case 2:
+        return '주택 정보 입력';
+      case 3:
+        return '추가 서비스 선택';
+      case 4:
+        return '매니저 선택';
+      case 5:
+        return '예약 확인';
+      default:
+        return '서비스 예약';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header
         variant="sub"
-        title="서비스 상세 옵션 선택"
+        title={getHeaderTitle()}
         backRoute={ROUTES.HOME}
-        showMenu={true}
+        showMenu={false}
       />
 
       {/* 진행 단계 표시 */}
-      <div className="bg-gray-50 px-10 py-6">
+      <div className="bg-gray-50 px-10 py-4">
         <div className="max-w-md mx-auto">
-          <div className="flex items-center justify-center mb-6">
+          <div className="flex items-center justify-center">
             {STEPS.map((step, index) => (
               <div key={step.id} className="flex items-center">
                 <div
@@ -1249,7 +1290,7 @@ const ReservationStep2: React.FC<Props> = ({
         </div>
       </div>
 
-      <main className="px-4 py-0 pb-32">
+      <main className="px-4 py-2 pb-24">
         <div className="max-w-md mx-auto">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             {renderStepContent()}
@@ -1284,8 +1325,17 @@ const ReservationStep2: React.FC<Props> = ({
                       : 'bg-orange-500 hover:bg-orange-600'
                   } text-white`}
                 >
-                  {isSubmitting ? '처리 중...' : '예약 완료'}
-                  <CheckCircleIcon className="w-5 h-5 ml-1" />
+                  {isSubmitting ? (
+                    <div className="flex items-center">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      예약 처리 중...
+                    </div>
+                  ) : (
+                    <>
+                      예약 완료
+                      <CheckCircleIcon className="w-5 h-5 ml-1" />
+                    </>
+                  )}
                 </button>
               )}
             </div>

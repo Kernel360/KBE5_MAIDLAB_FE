@@ -62,6 +62,10 @@ function GoogleMap() {
       center,
       zoom: 16,
       disableDefaultUI: false,
+      mapTypeControl: false,
+      fullscreenControl: false,
+      streetViewControl: false,
+      gestureHandling: 'cooperative',
     });
     setGoogleMap(instance);
     setLoading(true);
@@ -108,20 +112,33 @@ function GoogleMap() {
       {/* 지도 */}
       <div ref={mapRef} style={{ width: '100vw', height: '100vh' }} />
       {/* 중앙 마커 오버레이 */}
-      <img
-        src="https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi2_hdpi.png"
-        alt="marker"
+      <div
         style={{
           position: 'fixed',
           top: '50%',
           left: '50%',
           width: 48,
           height: 48,
-          transform: 'translate(-50%, -100%)',
+          transform: 'translate(-50%, -70%)',
           zIndex: 1100,
           pointerEvents: 'none',
         }}
-      />
+      >
+        <svg
+          width="48"
+          height="48"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+            fill="#FF5722"
+            stroke="#FFF"
+            strokeWidth="1"
+          />
+        </svg>
+      </div>
       {/* 주소/버튼 오버레이 */}
       <div
         style={{

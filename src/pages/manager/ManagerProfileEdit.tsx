@@ -7,6 +7,7 @@ import { Header } from '@/components/layout/Header/Header';
 import RegionSelectionModal from '@/components/features/manager/RegionSelectionModal';
 import ScheduleSelector from '@/components/features/manager/ScheduleSelector';
 import { validateBirthDate } from '@/constants/validation';
+import { validatePhone } from '@/utils/validation';
 
 import {
   SERVICE_TYPES,
@@ -51,9 +52,6 @@ const ManagerProfileEdit: React.FC = () => {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imagePreview, setImagePreview] = useState<string>('');
   const [isRegionModalOpen, setIsRegionModalOpen] = useState(false);
-
-  // profile 상태가 바뀔 때마다 추적
-  useEffect(() => {}, [profile]);
 
   const timeSlots = [
     '06:00',
@@ -219,7 +217,7 @@ const ManagerProfileEdit: React.FC = () => {
       schedules: true,
     });
 
-    if (!validate() || !validateTimeSlots()) {
+    if (!validate() || !validateTimeSlots() || !validateEmergencyCall()) {
       return;
     }
 
@@ -233,6 +231,9 @@ const ManagerProfileEdit: React.FC = () => {
         regions: profile.regions,
         availableTimes: profile.schedules,
         introduceText: profile.introduceText || '',
+        ...(profile.emergencyCall !== undefined && { 
+          emergencyCall: profile.emergencyCall || ''
+        }),
       };
 
       const result = await updateProfile(profileData);
@@ -669,6 +670,33 @@ const ManagerProfileEdit: React.FC = () => {
                 </span>
               </div>
             </div>
+
+            {/* 비상연락처 - 소셜 로그인 사용자만 표시 */}
+            {profile.emergencyCall !== undefined && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  비상연락처
+                </label>
+                <input
+                  type="text"
+                  value={profile.emergencyCall || ''}
+                  onChange={(e) => {
+                    const numbers = e.target.value.replace(/[^0-9]/g, '');
+                    if (numbers.length > 11) return;
+                    setProfile((prev) => {
+                      if (!prev) return prev;
+                      return {
+                        ...prev,
+                        emergencyCall: numbers,
+                      };
+                    });
+                  }}
+                  placeholder="01012345678"
+                  maxLength={11}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-all text-center"
+                />
+              </div>
+            )}
 
             {/* 저장하기 버튼 */}
             <button
