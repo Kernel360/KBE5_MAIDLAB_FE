@@ -54,17 +54,17 @@ const DeleteConfirmModal = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-sm w-full p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-sm w-full p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
           게시글 삭제
         </h3>
-        <p className="text-gray-700 mb-6">
+        <p className="text-gray-700 dark:text-gray-300 mb-6">
           정말로 이 게시글을 삭제하시겠습니까?
         </p>
         <div className="flex gap-3 justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
           >
             취소
           </button>
@@ -183,7 +183,7 @@ export default function BoardDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex justify-center items-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex justify-center items-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
       </div>
     );
@@ -194,7 +194,7 @@ export default function BoardDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header
         variant="sub"
         title="문의 상세"
@@ -204,15 +204,15 @@ export default function BoardDetail() {
       {/* Content */}
       <main className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto space-y-6">
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <div className="space-y-4">
               {/* 게시글 타입과 답변 상태 */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-sm text-gray-500 whitespace-nowrap">
+                  <span className="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
                     {BOARD_TYPE_LABELS[board.boardType]}
                   </span>
-                  <span className="text-xs text-gray-400 whitespace-nowrap">
+                  <span className="text-xs text-gray-400 dark:text-gray-500 whitespace-nowrap">
                     {formatDate(board.createdAt)}
                   </span>
                   {board.answered ? (
@@ -241,23 +241,23 @@ export default function BoardDetail() {
                     </button>
                     <button
                       onClick={() => setShowDeleteModal(true)}
-                      className="w-10 h-10 hover:bg-gray-100 rounded-full flex items-center justify-center transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-10 h-10 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full flex items-center justify-center transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={isDeleting}
                       title="삭제"
                     >
-                      <Trash2 className="w-4 h-4 text-gray-400" />
+                      <Trash2 className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                     </button>
                   </div>
                 )}
               </div>
 
               {/* 제목 */}
-              <h1 className="text-2xl font-bold text-gray-900 break-words text-left">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white break-words text-left">
                 {board.title}
               </h1>
 
               {/* 내용 */}
-              <div className="text-gray-900 text-base break-words">
+              <div className="text-gray-900 dark:text-white text-base break-words">
                 {board.content}
               </div>
             </div>
@@ -265,8 +265,8 @@ export default function BoardDetail() {
 
           {/* 이미지 갤러리 */}
           {board.images && board.images.length > 0 && (
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                 첨부 이미지
               </h3>
               <div className="grid grid-cols-3 gap-4">

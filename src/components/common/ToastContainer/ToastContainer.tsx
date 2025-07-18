@@ -15,10 +15,10 @@ const ToastItem: React.FC<ToastItemProps> = ({
   onClose,
 }) => {
   const bgColors = {
-    success: 'bg-green-500',
-    error: 'bg-red-500',
-    warning: 'bg-yellow-500',
-    info: 'bg-blue-500',
+    success: 'bg-green-500 dark:bg-green-600',
+    error: 'bg-red-500 dark:bg-red-600',
+    warning: 'bg-yellow-500 dark:bg-yellow-600',
+    info: 'bg-blue-500 dark:bg-blue-600',
   };
 
   const icons = {
@@ -44,7 +44,7 @@ const ToastItem: React.FC<ToastItemProps> = ({
       <span className="flex-1">{message}</span>
       <button
         onClick={() => onClose(id)}
-        className="text-white hover:text-gray-200 font-bold text-lg leading-none"
+        className="text-white hover:text-gray-200 dark:hover:text-gray-300 font-bold text-lg leading-none"
       >
         ×
       </button>

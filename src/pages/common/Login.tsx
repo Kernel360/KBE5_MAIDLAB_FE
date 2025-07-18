@@ -175,7 +175,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* 헤더 */}
       <Header
         variant="sub"
@@ -187,14 +187,14 @@ const Login: React.FC = () => {
       <main className="px-4 py-6">
         <div className="max-w-md mx-auto">
           {/* 사용자 타입 선택 */}
-          <div className="flex bg-gray-100 rounded-lg p-1 mb-6">
+          <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 mb-6">
             <button
               type="button"
               onClick={() => setSelectedUserType(LOGIN_USER_TYPES.CONSUMER)}
               className={`flex-1 py-3 px-4 rounded-md text-sm font-medium transition-colors ${
                 selectedUserType === LOGIN_USER_TYPES.CONSUMER
                   ? 'bg-orange-500 text-white'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               회원
@@ -205,7 +205,7 @@ const Login: React.FC = () => {
               className={`flex-1 py-3 px-4 rounded-md text-sm font-medium transition-colors ${
                 selectedUserType === LOGIN_USER_TYPES.MANAGER
                   ? 'bg-orange-500 text-white'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               매니저
@@ -215,7 +215,7 @@ const Login: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* 휴대폰 번호 */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 휴대폰 번호
               </label>
               <input
@@ -224,14 +224,14 @@ const Login: React.FC = () => {
                 onChange={(e) => handlePhoneChange(e.target.value)}
                 onBlur={() => setFieldTouched('phoneNumber')}
                 placeholder="010-0000-0000"
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                   errors.phoneNumber && touched.phoneNumber
                     ? 'border-red-500'
-                    : 'border-gray-300'
+                    : 'border-gray-300 dark:border-gray-600'
                 }`}
               />
               {errors.phoneNumber && touched.phoneNumber && (
-                <p className="text-red-500 text-sm">
+                <p className="text-red-500 dark:text-red-400 text-sm">
                   올바른 휴대폰 번호를 입력해주세요.
                 </p>
               )}
@@ -239,7 +239,7 @@ const Login: React.FC = () => {
 
             {/* 비밀번호 */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 비밀번호
               </label>
               <div className="relative">
@@ -249,16 +249,16 @@ const Login: React.FC = () => {
                   onChange={(e) => setValue('password', e.target.value)}
                   onBlur={() => setFieldTouched('password')}
                   placeholder="••••••••"
-                  className={`w-full px-4 py-3 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                  className={`w-full px-4 py-3 pr-12 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                     errors.password && touched.password
                       ? 'border-red-500'
-                      : 'border-gray-300'
+                      : 'border-gray-300 dark:border-gray-600'
                   }`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                 >
                   {showPassword ? (
                     <EyeOff className="w-5 h-5" />
@@ -268,7 +268,7 @@ const Login: React.FC = () => {
                 </button>
               </div>
               {errors.password && touched.password && (
-                <p className="text-red-500 text-sm">
+                <p className="text-red-500 dark:text-red-400 text-sm">
                   비밀번호를 8자 이상 입력해주세요.
                 </p>
               )}
@@ -285,7 +285,7 @@ const Login: React.FC = () => {
               />
               <label
                 htmlFor="remember-me"
-                className="ml-2 text-sm text-gray-600"
+                className="ml-2 text-sm text-gray-600 dark:text-gray-300"
               >
                 로그인 정보 기억하기
               </label>
@@ -310,10 +310,10 @@ const Login: React.FC = () => {
             {/* 구분선 */}
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
+                <div className="w-full border-t border-gray-300 dark:border-gray-600" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-gray-50 text-gray-500">또는</span>
+                <span className="px-2 bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400">또는</span>
               </div>
             </div>
 
@@ -324,7 +324,7 @@ const Login: React.FC = () => {
                 type="button"
                 onClick={handleGoogleLogin}
                 disabled={isLoading}
-                className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 disabled:bg-gray-100 transition-colors"
+                className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:bg-gray-100 dark:disabled:bg-gray-800 transition-colors text-gray-900 dark:text-white"
               >
                 <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
                   <path
@@ -350,7 +350,7 @@ const Login: React.FC = () => {
 
             {/* 회원가입 링크 */}
             <div className="text-center">
-              <span className="text-gray-600 text-sm">
+              <span className="text-gray-600 dark:text-gray-300 text-sm">
                 아직 계정이 없으신가요?{' '}
               </span>
               <Link

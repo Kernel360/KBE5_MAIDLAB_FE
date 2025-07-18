@@ -51,7 +51,7 @@ const Pagination: React.FC<PaginationProps> = ({
         key={0}
         onClick={() => handlePageChange(0)}
         disabled={loading}
-        className="w-10 h-10 rounded-xl font-semibold text-sm transition-all duration-200 disabled:opacity-50 bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-500"
+        className="w-10 h-10 rounded-xl font-semibold text-sm transition-all duration-200 disabled:opacity-50 bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-orange-900/30 hover:text-orange-500 dark:hover:text-orange-400"
       >
         1
       </button>,
@@ -61,7 +61,7 @@ const Pagination: React.FC<PaginationProps> = ({
       pages.push(
         <span
           key="start-ellipsis"
-          className="w-10 h-10 flex items-center justify-center text-gray-400 text-sm"
+          className="w-10 h-10 flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm"
         >
           ...
         </span>,
@@ -80,8 +80,8 @@ const Pagination: React.FC<PaginationProps> = ({
           w-10 h-10 rounded-xl font-semibold text-sm transition-all duration-200 disabled:opacity-50
           ${
             currentPage === i
-              ? 'bg-orange-500 text-white shadow-md scale-110'
-              : 'bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-500 hover:scale-105'
+              ? 'bg-orange-500 dark:bg-orange-600 text-white shadow-md scale-110'
+              : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-orange-900/30 hover:text-orange-500 dark:hover:text-orange-400 hover:scale-105'
           }
         `}
       >
@@ -96,7 +96,7 @@ const Pagination: React.FC<PaginationProps> = ({
       pages.push(
         <span
           key="end-ellipsis"
-          className="w-10 h-10 flex items-center justify-center text-gray-400 text-sm"
+          className="w-10 h-10 flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm"
         >
           ...
         </span>,
@@ -108,7 +108,7 @@ const Pagination: React.FC<PaginationProps> = ({
         key={totalPages - 1}
         onClick={() => handlePageChange(totalPages - 1)}
         disabled={loading}
-        className="w-10 h-10 rounded-xl font-semibold text-sm transition-all duration-200 disabled:opacity-50 bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-500"
+        className="w-10 h-10 rounded-xl font-semibold text-sm transition-all duration-200 disabled:opacity-50 bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-orange-900/30 hover:text-orange-500 dark:hover:text-orange-400"
       >
         {totalPages}
       </button>,
@@ -121,7 +121,7 @@ const Pagination: React.FC<PaginationProps> = ({
       <button
         onClick={() => handlePageChange(currentPage - 1)}
         disabled={loading || currentPage === 0}
-        className="w-10 h-10 rounded-xl font-semibold text-sm transition-all duration-200 disabled:opacity-30 bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-500 disabled:hover:bg-white disabled:hover:text-gray-600"
+        className="w-10 h-10 rounded-xl font-semibold text-sm transition-all duration-200 disabled:opacity-30 bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-orange-900/30 hover:text-orange-500 dark:hover:text-orange-400 disabled:hover:bg-white dark:disabled:hover:bg-gray-700 disabled:hover:text-gray-600 dark:disabled:hover:text-gray-300"
       >
         ‹
       </button>
@@ -133,7 +133,7 @@ const Pagination: React.FC<PaginationProps> = ({
       <button
         onClick={() => handlePageChange(currentPage + 1)}
         disabled={loading || currentPage >= totalPages - 1}
-        className="w-10 h-10 rounded-xl font-semibold text-sm transition-all duration-200 disabled:opacity-30 bg-white text-gray-600 hover:bg-orange-50 hover:text-orange-500 disabled:hover:bg-white disabled:hover:text-gray-600"
+        className="w-10 h-10 rounded-xl font-semibold text-sm transition-all duration-200 disabled:opacity-30 bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-orange-50 dark:hover:bg-orange-900/30 hover:text-orange-500 dark:hover:text-orange-400 disabled:hover:bg-white dark:disabled:hover:bg-gray-700 disabled:hover:text-gray-600 dark:disabled:hover:text-gray-300"
       >
         ›
       </button>

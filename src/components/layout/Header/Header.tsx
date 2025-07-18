@@ -103,7 +103,7 @@ const Header: React.FC<HeaderProps> = ({
       <header className="sticky top-0 z-[10000] flex items-center justify-between px-4 p-3 border-b bg-white dark:bg-gray-900 dark:border-gray-700 transition-colors">
         <button
           onClick={handleBackClick}
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
         >
           <ArrowLeft className="w-6 h-6 text-gray-900 dark:text-white" />
         </button>
@@ -120,7 +120,7 @@ const Header: React.FC<HeaderProps> = ({
             <div className="relative" ref={menuRef}>
               <button
                 onClick={toggleMenu}
-                className={`p-2 rounded-full transition-colors ${menuOpen ? 'bg-orange-500' : 'hover:bg-gray-100'}`}
+                className={`p-2 rounded-full transition-colors ${menuOpen ? 'bg-orange-500' : 'hover:bg-gray-100 dark:hover:bg-gray-700'}`}
               >
                 <Menu
                   className={`w-6 h-6 ${menuOpen ? 'text-white' : 'text-gray-700 dark:text-white'}`}
@@ -230,7 +230,7 @@ const Header: React.FC<HeaderProps> = ({
           <>
             <button
               onClick={toggleMenu}
-              className={`p-2 rounded-full transition-colors ${menuOpen ? 'bg-orange-500' : 'hover:bg-gray-100'}`}
+              className={`p-2 rounded-full transition-colors ${menuOpen ? 'bg-orange-500' : 'hover:bg-gray-100 dark:hover:bg-gray-700'}`}
             >
               <Menu
                 className={`w-6 h-6 ${menuOpen ? 'text-white' : 'text-gray-700 dark:text-white'}`}
@@ -259,16 +259,16 @@ const Header: React.FC<HeaderProps> = ({
                             : ROUTES.CONSUMER.RESERVATIONS,
                         )
                       }
-                      className="flex items-center px-4 py-2 hover:bg-gray-100 gap-2"
+                      className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 gap-2 text-gray-700 dark:text-gray-200"
                     >
-                      <CalendarDays className="w-5 h-5 text-gray-600" />
+                      <CalendarDays className="w-5 h-5 text-gray-600 dark:text-white" />
                       <span>예약</span>
                     </button>
                     <button
                       onClick={() => handleMenuClick(ROUTES.BOARD.LIST)}
-                      className="flex items-center px-4 py-2 hover:bg-gray-100 gap-2"
+                      className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 gap-2 text-gray-700 dark:text-gray-200"
                     >
-                      <HelpCircle className="w-5 h-5 text-gray-600" />
+                      <HelpCircle className="w-5 h-5 text-gray-600 dark:text-white" />
                       <span>문의</span>
                     </button>
                     <button
@@ -279,16 +279,16 @@ const Header: React.FC<HeaderProps> = ({
                             : ROUTES.CONSUMER.MYPAGE,
                         )
                       }
-                      className="flex items-center px-4 py-2 hover:bg-gray-100 gap-2"
+                      className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 gap-2 text-gray-700 dark:text-gray-200"
                     >
-                      <User className="w-5 h-5 text-gray-600" />
+                      <User className="w-5 h-5 text-gray-600 dark:text-white" />
                       <span>마이페이지</span>
                     </button>
                     <button
                       onClick={() => handleMenuClick(logout)}
-                      className="flex items-center px-4 py-2 hover:bg-gray-100 gap-2"
+                      className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 gap-2 text-gray-700 dark:text-gray-200"
                     >
-                      <LogOut className="w-5 h-5 text-gray-600" />
+                      <LogOut className="w-5 h-5 text-gray-600 dark:text-white" />
                       <span>로그아웃</span>
                     </button>
 
@@ -310,7 +310,7 @@ const Header: React.FC<HeaderProps> = ({
           <>
             <button
               onClick={toggleMenu}
-              className={`p-2 rounded-full transition-colors ${menuOpen ? 'bg-orange-500' : 'hover:bg-gray-100'}`}
+              className={`p-2 rounded-full transition-colors ${menuOpen ? 'bg-orange-500' : 'hover:bg-gray-100 dark:hover:bg-gray-700'}`}
             >
               <Menu
                 className={`w-6 h-6 ${menuOpen ? 'text-white' : 'text-gray-700 dark:text-white'}`}

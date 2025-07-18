@@ -39,7 +39,7 @@ const ConsumerReservationCreate: React.FC = () => {
   const handleBackToStep0 = () => setStep(0);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {step === 0 && <ReservationStep0 onNext={handleNextFromStep0} />}
       {step === 1 && (
         <ReservationStep1

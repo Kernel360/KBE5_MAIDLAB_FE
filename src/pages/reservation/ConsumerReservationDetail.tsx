@@ -204,7 +204,7 @@ const ConsumerReservationDetail: React.FC = () => {
     : '';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* 헤더 */}
       <Header
         variant="sub"
@@ -215,7 +215,7 @@ const ConsumerReservationDetail: React.FC = () => {
 
       <div className="max-w-md mx-auto">
         {/* 상태 카드 */}
-        <div className="mx-4 mt-4 bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div className="mx-4 mt-4 bg-white dark:bg-gray-800 rounded-2xl shadow-sm overflow-hidden">
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-3">
@@ -252,7 +252,7 @@ const ConsumerReservationDetail: React.FC = () => {
         </div>
 
         {/* 일정 정보 */}
-        <div className="mx-4 mt-4 bg-white rounded-2xl shadow-sm p-6">
+        <div className="mx-4 mt-4 bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             서비스 일정
           </h3>
@@ -299,7 +299,7 @@ const ConsumerReservationDetail: React.FC = () => {
 
         {/* 도우미 정보 */}
         {reservation.managerName && (
-          <div className="mx-4 mt-4 bg-white rounded-2xl shadow-sm p-6">
+          <div className="mx-4 mt-4 bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               담당 도우미
             </h3>
@@ -358,7 +358,7 @@ const ConsumerReservationDetail: React.FC = () => {
         )}
 
         {/* 서비스 상세 정보 */}
-        <div className="mx-4 mt-4 bg-white rounded-2xl shadow-sm p-6">
+        <div className="mx-4 mt-4 bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             서비스 정보
           </h3>
@@ -390,7 +390,7 @@ const ConsumerReservationDetail: React.FC = () => {
 
         {/* 추가 옵션 */}
         {additionalOptions.length > 0 && (
-          <div className="mx-4 mt-4 bg-white rounded-2xl shadow-sm p-6">
+          <div className="mx-4 mt-4 bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               추가 옵션
             </h3>

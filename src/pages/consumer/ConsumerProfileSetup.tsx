@@ -121,7 +121,7 @@ const ConsumerProfileSetup: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-900">
       {/* Header */}
       <Header
         variant="sub"
@@ -135,7 +135,7 @@ const ConsumerProfileSetup: React.FC = () => {
           {/* 프로필 이미지 */}
           <div className="text-center">
             <div className="relative inline-block">
-              <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+              <div className="w-32 h-32 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center overflow-hidden">
                 {imagePreview || formData.profileImage ? (
                   <img
                     src={imagePreview || formData.profileImage}
@@ -143,7 +143,7 @@ const ConsumerProfileSetup: React.FC = () => {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <User className="w-16 h-16 text-gray-400" />
+                  <User className="w-16 h-16 text-gray-400 dark:text-gray-500" />
                 )}
               </div>
               <button
@@ -162,21 +162,21 @@ const ConsumerProfileSetup: React.FC = () => {
                 )}
               </button>
             </div>
-            <p className="text-sm text-gray-500 mt-3">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">
               프로필 사진을 설정해주세요
             </p>
-            <p className="text-xs text-gray-400">(선택사항)</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">(선택사항)</p>
           </div>
 
           {/* 주소 설정 */}
           <div className="space-y-4">
-            <h3 className="text-xl font-bold text-gray-900 text-center">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white text-center">
               주소 설정
             </h3>
 
             {/* 주소 입력 필드 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 주소 <span className="text-red-500">*</span>
               </label>
               <input
@@ -189,8 +189,8 @@ const ConsumerProfileSetup: React.FC = () => {
                   }))
                 }
                 placeholder="서울특별시 서초구"
-                className={`w-full p-3 border focus:outline-none focus:ring-2 focus:ring-orange-500 rounded-lg transition-colors ${
-                  errors.address ? 'border-red-500' : 'border-gray-300'
+                className={`w-full p-3 border focus:outline-none focus:ring-2 focus:ring-orange-500 rounded-lg transition-colors bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
+                  errors.address ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                 }`}
               />
               {errors.address && (
@@ -200,7 +200,7 @@ const ConsumerProfileSetup: React.FC = () => {
 
             {/* 상세 주소 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 상세 주소 <span className="text-red-500">*</span>
               </label>
               <input
@@ -213,8 +213,8 @@ const ConsumerProfileSetup: React.FC = () => {
                   }))
                 }
                 placeholder="상세 주소를 입력해주세요"
-                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 transition-colors ${
-                  errors.detailAddress ? 'border-red-500' : 'border-gray-300'
+                className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 transition-colors bg-white dark:bg-gray-800 text-gray-900 dark:text-white ${
+                  errors.detailAddress ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                 }`}
               />
               {errors.detailAddress && (
@@ -233,7 +233,7 @@ const ConsumerProfileSetup: React.FC = () => {
               className={`w-full py-4 rounded-lg font-medium transition-colors ${
                 isFormValid() && !loading && !uploadingImage
                   ? 'bg-orange-500 text-white hover:bg-orange-600'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
               }`}
             >
               {loading || uploadingImage ? (

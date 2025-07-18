@@ -426,7 +426,7 @@ const ManagerProfileEdit: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
       <Header
         variant="sub"
@@ -437,11 +437,11 @@ const ManagerProfileEdit: React.FC = () => {
 
       <div className="px-4 py-6">
         <div className="max-w-md mx-auto">
-          <div className="bg-white rounded-xl shadow-sm p-6 space-y-8">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 space-y-8">
             {/* 프로필 이미지 */}
             <div className="flex flex-col items-center mb-4">
               <div className="relative mb-2">
-                <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+                <div className="w-32 h-32 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center overflow-hidden">
                   {imagePreview || profile.profileImage ? (
                     <img
                       src={imagePreview || profile.profileImage}
@@ -449,7 +449,7 @@ const ManagerProfileEdit: React.FC = () => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <User className="w-12 h-12 text-gray-400" />
+                    <User className="w-12 h-12 text-gray-400 dark:text-gray-500" />
                   )}
                 </div>
                 <button
@@ -473,7 +473,7 @@ const ManagerProfileEdit: React.FC = () => {
 
             {/* 이름 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 이름
               </label>
               <input
@@ -487,9 +487,9 @@ const ManagerProfileEdit: React.FC = () => {
                 onBlur={() => setFieldTouched('name')}
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-all text-center ${
                   errors.name && touched.name
-                    ? 'border-red-500'
-                    : 'border-gray-300'
-                }`}
+                    ? 'border-red-500 dark:border-red-400'
+                    : 'border-gray-300 dark:border-gray-600'
+                } bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
               />
               {errors.name && touched.name && (
                 <p className="text-red-500 text-sm mt-1">{errors.name}</p>
@@ -498,7 +498,7 @@ const ManagerProfileEdit: React.FC = () => {
 
             {/* 성별 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 성별
               </label>
               <div className="flex gap-2">
@@ -512,8 +512,8 @@ const ManagerProfileEdit: React.FC = () => {
                   }}
                   className={`flex-1 py-3 px-4 rounded-lg border text-center font-medium transition-all ${
                     profile.gender === GENDER.MALE
-                      ? 'border-orange-500 bg-orange-50 text-orange-600'
-                      : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                      ? 'border-orange-500 bg-orange-50 dark:bg-orange-900 text-orange-600 dark:text-orange-400'
+                      : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500'
                   }`}
                 >
                   {GENDER_LABELS[GENDER.MALE]}
@@ -528,8 +528,8 @@ const ManagerProfileEdit: React.FC = () => {
                   }}
                   className={`flex-1 py-3 px-4 rounded-lg border text-center font-medium transition-all ${
                     profile.gender === GENDER.FEMALE
-                      ? 'border-orange-500 bg-orange-50 text-orange-600'
-                      : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                      ? 'border-orange-500 bg-orange-50 dark:bg-orange-900 text-orange-600 dark:text-orange-400'
+                      : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500'
                   }`}
                 >
                   {GENDER_LABELS[GENDER.FEMALE]}
@@ -542,7 +542,7 @@ const ManagerProfileEdit: React.FC = () => {
 
             {/* 생년월일 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 생년월일
               </label>
               <input
@@ -552,9 +552,9 @@ const ManagerProfileEdit: React.FC = () => {
                 onBlur={() => setFieldTouched('birth')}
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-all text-center ${
                   errors.birth && touched.birth
-                    ? 'border-red-500'
-                    : 'border-gray-300'
-                }`}
+                    ? 'border-red-500 dark:border-red-400'
+                    : 'border-gray-300 dark:border-gray-600'
+                } bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
                 placeholder="1990-01-01"
                 maxLength={10}
                 inputMode="numeric"
@@ -567,7 +567,7 @@ const ManagerProfileEdit: React.FC = () => {
 
             {/* 제공 서비스 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 제공 가능한 서비스
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -581,8 +581,8 @@ const ManagerProfileEdit: React.FC = () => {
                     }}
                     className={`w-full h-12 flex items-center justify-center rounded-lg border font-medium text-sm transition-all ${
                       profile.services.includes(service)
-                        ? 'border-orange-500 bg-orange-50 text-orange-600'
-                        : 'border-gray-300 hover:border-gray-400 text-gray-700'
+                        ? 'border-orange-500 bg-orange-50 dark:bg-orange-900 text-orange-600 dark:text-orange-400'
+                        : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700'
                     }`}
                   >
                     {SERVICE_TYPE_LABELS[service as ServiceType]}
@@ -596,7 +596,7 @@ const ManagerProfileEdit: React.FC = () => {
 
             {/* 가능 지역 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 가능 지역
               </label>
 
@@ -607,12 +607,12 @@ const ManagerProfileEdit: React.FC = () => {
                     {profile.regions.map((region) => (
                       <span
                         key={region.region}
-                        className="px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-sm flex items-center gap-1"
+                        className="px-3 py-1 bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-400 rounded-full text-sm flex items-center gap-1"
                       >
                         {region.region}
                         <button
                           onClick={() => handleRemoveRegion(region.region)}
-                          className="text-orange-400 hover:text-orange-600 transition-colors"
+                          className="text-orange-400 dark:text-orange-500 hover:text-orange-600 dark:hover:text-orange-300 transition-colors"
                         >
                           <X className="w-3 h-3" />
                         </button>
@@ -620,7 +620,7 @@ const ManagerProfileEdit: React.FC = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-400 text-sm py-2">
+                  <p className="text-gray-400 dark:text-gray-500 text-sm py-2">
                     지역을 선택해주세요
                   </p>
                 )}
@@ -636,7 +636,7 @@ const ManagerProfileEdit: React.FC = () => {
                   setIsRegionModalOpen(true);
                   setFieldTouched('regions');
                 }}
-                className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-orange-500 hover:text-orange-500 flex items-center justify-center gap-2 transition-colors"
+                className="w-full p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-500 dark:text-gray-400 hover:border-orange-500 hover:text-orange-500 flex items-center justify-center gap-2 transition-colors"
               >
                 <Plus className="w-5 h-5" />
                 지역 추가 ({profile.regions.length}개 선택됨)
@@ -659,7 +659,7 @@ const ManagerProfileEdit: React.FC = () => {
 
             {/* 소개글 */}
             <div>
-              <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
+              <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 mb-2">
                 <Clock className="w-4 h-4" />
                 <label className="font-medium">소개글 (선택사항)</label>
               </div>
@@ -675,11 +675,11 @@ const ManagerProfileEdit: React.FC = () => {
                   })
                 }
                 placeholder="고객에게 보여질 간단한 소개를 작성해주세요."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 resize-none transition-all"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 resize-none transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 rows={3}
                 maxLength={LENGTH_LIMITS.INTRODUCE.MAX}
               />
-              <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
+              <div className="flex justify-between items-center mt-2 text-xs text-gray-500 dark:text-gray-400">
                 <span>고객에게 보여질 간단한 소개를 작성해주세요.</span>
                 <span>
                   {(profile.introduceText || '').length}/
@@ -691,7 +691,7 @@ const ManagerProfileEdit: React.FC = () => {
             {/* 비상연락처 - 소셜 로그인 사용자만 표시 */}
             {profile.emergencyCall !== undefined && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   비상연락처
                 </label>
                 <input
@@ -710,7 +710,7 @@ const ManagerProfileEdit: React.FC = () => {
                   }}
                   placeholder="01012345678"
                   maxLength={11}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-all text-center"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 transition-all text-center bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
             )}

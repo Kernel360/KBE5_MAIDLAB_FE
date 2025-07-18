@@ -106,12 +106,12 @@ const RatingSection: React.FC<{
   };
 
   return (
-    <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-gray-700">
       <div className="text-center">
-        <h2 className="text-xl font-bold text-gray-900 mb-2">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
           고객은 어떠셨나요?
         </h2>
-        <p className="text-gray-500 mb-8">
+        <p className="text-gray-500 dark:text-gray-400 mb-8">
           업무 진행이 원활했는지 평가해주세요
         </p>
 
@@ -136,11 +136,11 @@ const RatingSection: React.FC<{
           ))}
         </div>
 
-        <div className="bg-gray-50 rounded-xl p-4 inline-block">
-          <div className="text-3xl font-bold text-gray-900 mb-1">
+        <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 inline-block">
+          <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
             {rating}.0
           </div>
-          <div className="text-gray-600 font-medium">
+          <div className="text-gray-600 dark:text-gray-300 font-medium">
             {getRatingText(rating)}
           </div>
         </div>
@@ -164,10 +164,10 @@ const ManagerKeywordSelection: React.FC<{
   const isMaxReached = selectedKeywords.length >= maxKeywords;
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
       <div className="flex items-center gap-2 mb-4">
         <Sparkles className="w-5 h-5 text-blue-500" />
-        <h3 className="text-lg font-semibold text-gray-900">키워드 선택</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">키워드 선택</h3>
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${
             rating >= 4
@@ -181,7 +181,7 @@ const ManagerKeywordSelection: React.FC<{
           최대 {maxKeywords}개
         </span>
       </div>
-      <p className="text-gray-500 text-sm mb-6">
+      <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
         {rating >= 4
           ? '만족스러웠던 점들을 키워드로 선택해보세요'
           : '아쉬웠던 점들을 키워드로 선택해보세요'}
@@ -195,7 +195,7 @@ const ManagerKeywordSelection: React.FC<{
       <div className="space-y-4">
         {keywordData.map((group) => (
           <div key={group.category}>
-            <h4 className="text-sm font-medium text-gray-700 mb-2">
+            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {group.category}
             </h4>
             <div className="flex flex-wrap gap-2">
@@ -210,7 +210,7 @@ const ManagerKeywordSelection: React.FC<{
                     onClick={() => onKeywordToggle(keyword)}
                     disabled={isDisabled}
                     className={`px-3 py-1.5 rounded-full text-sm transition-all
-                      ${isSelected ? 'bg-orange-100 text-orange-700 border-2 border-orange-400' : isDisabled ? 'bg-gray-50 text-gray-400 border-2 border-transparent cursor-not-allowed' : 'bg-gray-100 text-gray-600 border-2 border-transparent hover:bg-orange-50'}
+                      ${isSelected ? 'bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-400 border-2 border-orange-400 dark:border-orange-500' : isDisabled ? 'bg-gray-50 dark:bg-gray-700 text-gray-400 dark:text-gray-500 border-2 border-transparent cursor-not-allowed' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-2 border-transparent hover:bg-orange-50 dark:hover:bg-orange-900'}
                     `}
                   >
                     {keyword}
@@ -223,23 +223,23 @@ const ManagerKeywordSelection: React.FC<{
       </div>
 
       {selectedKeywords.length > 0 && (
-        <div className="mt-6 p-4 bg-orange-50 rounded-xl">
-          <h4 className="text-sm font-medium text-orange-800 mb-2">
+        <div className="mt-6 p-4 bg-orange-50 dark:bg-orange-900 rounded-xl">
+          <h4 className="text-sm font-medium text-orange-800 dark:text-orange-300 mb-2">
             선택된 키워드 ({selectedKeywords.length}/{maxKeywords}개)
           </h4>
           <div className="flex flex-wrap gap-2">
             {selectedKeywords.map((keyword) => (
               <div
                 key={keyword}
-                className="relative inline-flex items-center px-3 py-1.5 bg-orange-200 text-orange-800 text-xs rounded-full pr-8"
+                className="relative inline-flex items-center px-3 py-1.5 bg-orange-200 dark:bg-orange-800 text-orange-800 dark:text-orange-200 text-xs rounded-full pr-8"
               >
                 <span>{keyword}</span>
                 <button
                   type="button"
                   onClick={() => onKeywordRemove(keyword)}
-                  className="absolute right-1 top-1/2 -translate-y-1/2 w-4 h-4 bg-orange-300 hover:bg-orange-400 rounded-full flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 w-4 h-4 bg-orange-300 dark:bg-orange-700 hover:bg-orange-400 dark:hover:bg-orange-600 rounded-full flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-1"
                 >
-                  <X className="w-2.5 h-2.5 text-orange-700" />
+                  <X className="w-2.5 h-2.5 text-orange-700 dark:text-orange-300" />
                 </button>
               </div>
             ))}
@@ -260,10 +260,10 @@ const ReviewTextArea: React.FC<{
   const isValid = comment.length <= LENGTH_LIMITS.REVIEW_COMMENT.MAX;
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
       <div className="flex items-center gap-2 mb-4">
         <Edit3 className="w-5 h-5 text-gray-600" />
-        <h3 className="text-lg font-semibold text-gray-900">직접 리뷰 작성</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">직접 리뷰 작성</h3>
         {isOptional && (
           <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
             선택사항
@@ -274,12 +274,12 @@ const ReviewTextArea: React.FC<{
       <textarea
         value={comment}
         onChange={(e) => onChange(e.target.value)}
-        className={`w-full h-32 p-4 border-2 rounded-xl resize-none text-base transition-all focus:outline-none ${
+        className={`w-full h-32 p-4 border-2 rounded-xl resize-none text-base transition-all focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white ${
           isValid
-            ? 'border-gray-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100'
+            ? 'border-gray-200 dark:border-gray-600 focus:border-blue-400 focus:ring-4 focus:ring-blue-100'
             : comment.length > 0
-              ? 'border-red-300 focus:border-red-400 focus:ring-4 focus:ring-red-100'
-              : 'border-gray-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100'
+              ? 'border-red-300 dark:border-red-500 focus:border-red-400 focus:ring-4 focus:ring-red-100'
+              : 'border-gray-200 dark:border-gray-600 focus:border-blue-400 focus:ring-4 focus:ring-blue-100'
         }`}
         placeholder={
           isOptional
@@ -291,14 +291,14 @@ const ReviewTextArea: React.FC<{
       <div className="flex justify-between items-center mt-3">
         <div>
           {!isValid && comment.length > 0 && (
-            <span className="text-red-500 text-sm font-medium">
+            <span className="text-red-500 dark:text-red-400 text-sm font-medium">
               최대 {LENGTH_LIMITS.REVIEW_COMMENT.MAX}자까지 작성 가능합니다
             </span>
           )}
         </div>
         <span
           className={`text-sm font-medium ${
-            remainingChars < 50 ? 'text-orange-500' : 'text-gray-500'
+            remainingChars < 50 ? 'text-orange-500 dark:text-orange-400' : 'text-gray-500 dark:text-gray-400'
           }`}
         >
           {comment.length} / {LENGTH_LIMITS.REVIEW_COMMENT.MAX}
@@ -383,19 +383,19 @@ const ManagerReviewRegister: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* 헤더 */}
-      <div className="sticky top-0 z-20 bg-white shadow-sm">
+      <div className="sticky top-0 z-20 bg-white dark:bg-gray-800 shadow-sm">
         <div className="max-w-md mx-auto">
           <div className="flex items-center justify-between p-4">
             <button
               onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors focus:outline-none focus:ring-4 focus:ring-blue-200 rounded-lg p-2 -ml-2"
+              className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors focus:outline-none focus:ring-4 focus:ring-blue-200 rounded-lg p-2 -ml-2"
             >
               <ArrowLeft className="w-6 h-6" />
-              <span className="font-medium">뒤로</span>
+              <span className="font-medium text-gray-600 dark:text-gray-300">뒤로</span>
             </button>
-            <h1 className="text-xl font-bold text-gray-900">고객 리뷰 작성</h1>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">고객 리뷰 작성</h1>
             <div className="w-16"></div>
           </div>
         </div>

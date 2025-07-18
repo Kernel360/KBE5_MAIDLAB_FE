@@ -103,7 +103,7 @@ const ManagerSettlements: React.FC = () => {
       : settlements.filter((s) => s.status === selectedStatusFilter);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header
         variant="sub"
         title="정산 내역"

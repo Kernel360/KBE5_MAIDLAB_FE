@@ -245,14 +245,14 @@ const ProfileEdit: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
         <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header
         variant="sub"
         title="프로필 수정"
@@ -262,11 +262,11 @@ const ProfileEdit: React.FC = () => {
 
       <main className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto">
-          <div className="bg-white rounded-xl shadow-sm p-6 space-y-8">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 space-y-8">
             {/* 프로필 이미지 */}
             <div className="text-center mb-4">
               <div className="relative inline-block">
-                <div className="w-32 h-32 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden">
+                <div className="w-32 h-32 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center overflow-hidden">
                   {previewImage || formData.profileImage ? (
                     <img
                       src={
@@ -279,7 +279,7 @@ const ProfileEdit: React.FC = () => {
                       onError={handleImageError}
                     />
                   ) : (
-                    <User className="w-16 h-16 text-gray-400" />
+                    <User className="w-16 h-16 text-gray-400 dark:text-gray-500" />
                   )}
                 </div>
                 <button
@@ -301,17 +301,17 @@ const ProfileEdit: React.FC = () => {
             </div>
 
             {/* 프로필 정보 */}
-            <div className="space-y-4 bg-white rounded-lg">
+            <div className="space-y-4 bg-white dark:bg-gray-800 rounded-lg">
               {/* 이름 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   이름
                 </label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
-                  className="w-full p-3 border text-center border-gray-300 rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full p-3 border text-center border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                 />
                 {errors.name && (
                   <p className="text-red-500 text-sm mt-1">{errors.name}</p>
@@ -320,21 +320,21 @@ const ProfileEdit: React.FC = () => {
 
               {/* 성별 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   성별
                 </label>
                 <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => handleInputChange('gender', 'MALE')}
-                    className={`flex-1 py-2 rounded-lg border text-center font-medium transition-all ${formData.gender === 'MALE' ? 'border-orange-500 bg-orange-50 text-orange-600' : 'border-gray-200 text-gray-400'}`}
+                    className={`flex-1 py-2 rounded-lg border text-center font-medium transition-all ${formData.gender === 'MALE' ? 'border-orange-500 bg-orange-50 dark:bg-orange-900 text-orange-600 dark:text-orange-400' : 'border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-500'}`}
                   >
                     남성
                   </button>
                   <button
                     type="button"
                     onClick={() => handleInputChange('gender', 'FEMALE')}
-                    className={`flex-1 py-2 rounded-lg border text-center font-medium transition-all ${formData.gender === 'FEMALE' ? 'border-orange-500 bg-orange-50 text-orange-600' : 'border-gray-200 text-gray-400'}`}
+                    className={`flex-1 py-2 rounded-lg border text-center font-medium transition-all ${formData.gender === 'FEMALE' ? 'border-orange-500 bg-orange-50 dark:bg-orange-900 text-orange-600 dark:text-orange-400' : 'border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-500'}`}
                   >
                     여성
                   </button>
@@ -346,7 +346,7 @@ const ProfileEdit: React.FC = () => {
 
               {/* 생년월일 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   생년월일
                 </label>
                 <input
@@ -354,7 +354,7 @@ const ProfileEdit: React.FC = () => {
                   value={formData.birth}
                   onChange={handleBirthChange}
                   placeholder="YYYY-MM-DD"
-                  className="w-full p-3 border text-center border-gray-300 rounded-lg text-gray-900 bg-white focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full p-3 border text-center border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
                   maxLength={10}
                   inputMode="numeric"
                   autoComplete="bday"
@@ -366,7 +366,7 @@ const ProfileEdit: React.FC = () => {
 
               {/* 주소 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   주소
                 </label>
                 <input
@@ -383,7 +383,7 @@ const ProfileEdit: React.FC = () => {
 
               {/* 상세 주소 */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   상세 주소
                 </label>
                 <input
@@ -405,7 +405,7 @@ const ProfileEdit: React.FC = () => {
               {/* 비상연락처 - 소셜 로그인 사용자만 표시 */}
               {formData.emergencyCall !== undefined && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     비상연락처 <span className="text-red-500">*</span>
                   </label>
                   <input

@@ -21,7 +21,7 @@ export default function AnswerSection({
     return `${year}/${month}/${day} ${hours}:${minutes}`;
   };
   return (
-    <div className="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-200 dark:border-gray-600 overflow-hidden">
       {/* 답변 헤더 */}
       <div
         className={`flex items-center justify-between px-5 py-3 ${hasAnswer ? 'bg-green-50' : 'bg-yellow-50'}`}
@@ -36,7 +36,7 @@ export default function AnswerSection({
               <Clock className="w-4 h-4 text-yellow-600" />
             )}
           </div>
-          <span className="text-base font-semibold text-gray-900">답변</span>
+          <span className="text-base font-semibold text-gray-900 dark:text-white">답변</span>
         </div>
         {hasAnswer && answerCreatedAt && (
           <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">
@@ -45,10 +45,10 @@ export default function AnswerSection({
         )}
       </div>
       {/* 답변 본문 */}
-      <div className="px-5 py-5 bg-gray-50">
+      <div className="px-5 py-5 bg-gray-50 dark:bg-gray-900">
         {hasAnswer ? (
           <div>
-            <p className="whitespace-pre-wrap text-gray-800 leading-relaxed text-[15px]">
+            <p className="whitespace-pre-wrap text-gray-800 dark:text-gray-200 leading-relaxed text-[15px]">
               {answer}
             </p>
           </div>
@@ -57,7 +57,7 @@ export default function AnswerSection({
             <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
               <Clock className="w-6 h-6 text-yellow-600" />
             </div>
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-500 dark:text-gray-400 text-sm">
               관리자가 답변을 작성하는 중입니다.
               <br />
               조금만 기다려주세요.

@@ -8,15 +8,15 @@ interface ServiceGridProps {
 export const ServiceGrid: React.FC<ServiceGridProps> = ({ onServiceClick }) => {
   return (
     <section className="mb-8">
-      <div className="bg-white rounded-2xl p-6 border border-gray-100">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-100 dark:border-gray-700">
         <div className="text-center">
           <div className="w-20 h-20 bg-orange-200 rounded-full flex items-center justify-center mb-4 mx-auto">
             <Sparkles className="w-10 h-10 text-orange-600" />
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
             전문 가사도우미 서비스
           </h3>
-          <p className="text-gray-600 mb-6 leading-relaxed">
+          <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
             청소, 가사, 돌봄 등 다양한 서비스를
             <br />
             믿을 수 있는 전문가와 함께하세요

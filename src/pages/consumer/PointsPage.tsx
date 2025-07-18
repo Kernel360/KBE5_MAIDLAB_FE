@@ -78,7 +78,7 @@ const PointsPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header
         variant="sub"
         title="내 포인트"
@@ -87,16 +87,16 @@ const PointsPage: React.FC = () => {
       />
       <main className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto">
-          <div className="bg-white rounded-xl shadow-sm p-6 mb-6 text-center">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-6 text-center">
             <div className="flex flex-col items-center gap-2 mb-4">
               <Coins className="w-10 h-10 text-[#FF6B00]" />
-              <span className="text-gray-600">내 포인트</span>
+              <span className="text-gray-600 dark:text-gray-300">내 포인트</span>
               <div className="flex flex-row items-center gap-2">
                 <span className="text-2xl font-bold text-[#FF6B00]">
                   {point !== null ? point.toLocaleString() : '-'}P
                 </span>
                 <button
-                  className="bg-orange-500 text-white px-3 py-1 rounded text-sm whitespace-nowrap"
+                  className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded text-sm whitespace-nowrap transition-colors"
                   onClick={() => setIsModalOpen(true)}
                 >
                   충전하기
@@ -104,7 +104,7 @@ const PointsPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               {/* 이전달 버튼 */}
               <button
@@ -117,7 +117,7 @@ const PointsPage: React.FC = () => {
               >
                 ◀
               </button>
-              <span className="font-semibold text-gray-800">
+              <span className="font-semibold text-gray-800 dark:text-white">
                 {getMonthLabel(monthOffset)}
               </span>
               {/* 다음달 버튼 */}
@@ -133,24 +133,24 @@ const PointsPage: React.FC = () => {
               </button>
             </div>
             {loading && page === 0 ? (
-              <div className="text-gray-400 text-center py-8">로딩 중...</div>
+              <div className="text-gray-400 dark:text-gray-500 text-center py-8">로딩 중...</div>
             ) : list.length === 0 ? (
-              <div className="text-gray-400 text-center py-8">
+              <div className="text-gray-400 dark:text-gray-500 text-center py-8">
                 해당 월의 포인트 내역이 없습니다.
               </div>
             ) : (
               <>
-                <ul className="divide-y divide-gray-100">
+                <ul className="divide-y divide-gray-100 dark:divide-gray-700">
                   {list.map((item, idx) => (
                     <li
                       key={idx}
                       className="flex justify-between items-center py-3"
                     >
                       <div>
-                        <div className="text-gray-900 font-medium">
+                        <div className="text-gray-900 dark:text-white font-medium">
                           {item.description}
                         </div>
-                        <div className="text-xs text-gray-400">
+                        <div className="text-xs text-gray-400 dark:text-gray-500">
                           {item.createdAt
                             ? new Date(item.createdAt).toLocaleDateString()
                             : '-'}
@@ -160,7 +160,7 @@ const PointsPage: React.FC = () => {
                         className={
                           item.amount > 0
                             ? 'text-[#FF6B00] font-bold'
-                            : 'text-gray-400 font-bold'
+                            : 'text-gray-400 dark:text-gray-500 font-bold'
                         }
                       >
                         {item.amount > 0

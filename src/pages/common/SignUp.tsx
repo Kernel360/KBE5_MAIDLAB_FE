@@ -130,16 +130,16 @@ const SignUp: React.FC = () => {
     if (/\d/.test(password)) strength++;
     if (/[!@#$%^&*]/.test(password)) strength++;
 
-    if (strength <= 2) return { strength, text: '약함', color: 'text-red-500' };
+    if (strength <= 2) return { strength, text: '약함', color: 'text-red-500 dark:text-red-400' };
     if (strength <= 3)
-      return { strength, text: '보통', color: 'text-yellow-500' };
-    return { strength, text: '강함', color: 'text-green-500' };
+      return { strength, text: '보통', color: 'text-yellow-500 dark:text-yellow-400' };
+    return { strength, text: '강함', color: 'text-green-500 dark:text-green-400' };
   };
 
   const passwordStrength = getPasswordStrength();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* 헤더 */}
       <Header
         variant="sub"
@@ -152,14 +152,14 @@ const SignUp: React.FC = () => {
         <div className="max-w-md mx-auto">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* 사용자 타입 선택 */}
-            <div className="flex bg-gray-100 rounded-lg p-1">
+            <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
               <button
                 type="button"
                 onClick={() => setSelectedUserType('CONSUMER')}
                 className={`flex-1 py-3 px-4 rounded-md text-sm font-medium transition-colors ${
                   selectedUserType === 'CONSUMER'
                     ? 'bg-orange-500 text-white'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
                 회원
@@ -170,7 +170,7 @@ const SignUp: React.FC = () => {
                 className={`flex-1 py-3 px-4 rounded-md text-sm font-medium transition-colors ${
                   selectedUserType === 'MANAGER'
                     ? 'bg-orange-500 text-white'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
                 매니저
@@ -179,7 +179,7 @@ const SignUp: React.FC = () => {
 
             {/* 휴대폰 번호 */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 휴대폰 번호
               </label>
               <input
@@ -188,14 +188,14 @@ const SignUp: React.FC = () => {
                 onChange={(e) => handlePhoneChange(e.target.value)}
                 onBlur={() => setFieldTouched('phoneNumber')}
                 placeholder="010-0000-0000"
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                   errors.phoneNumber && touched.phoneNumber
                     ? 'border-red-500'
-                    : 'border-gray-300'
+                    : 'border-gray-300 dark:border-gray-600'
                 }`}
               />
               {errors.phoneNumber && touched.phoneNumber && (
-                <p className="text-red-500 text-sm">
+                <p className="text-red-500 dark:text-red-400 text-sm">
                   올바른 휴대폰 번호를 입력해주세요.
                 </p>
               )}
@@ -203,7 +203,7 @@ const SignUp: React.FC = () => {
 
             {/* 비밀번호 */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 비밀번호
               </label>
               <div className="relative">
@@ -213,16 +213,16 @@ const SignUp: React.FC = () => {
                   onChange={(e) => setValue('password', e.target.value)}
                   onBlur={() => setFieldTouched('password')}
                   placeholder="••••••••"
-                  className={`w-full px-4 py-3 pr-12 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                  className={`w-full px-4 py-3 pr-12 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                     errors.password && touched.password
                       ? 'border-red-500'
-                      : 'border-gray-300'
+                      : 'border-gray-300 dark:border-gray-600'
                   }`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                 >
                   {showPassword ? (
                     <EyeOff className="w-5 h-5" />
@@ -233,7 +233,7 @@ const SignUp: React.FC = () => {
               </div>
               {values.password && (
                 <div className="flex items-center space-x-2">
-                  <div className="flex-1 bg-gray-200 rounded-full h-2">
+                  <div className="flex-1 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
                     <div
                       className={`h-2 rounded-full transition-all ${
                         passwordStrength.strength <= 2
@@ -253,7 +253,7 @@ const SignUp: React.FC = () => {
                 </div>
               )}
               {errors.password && touched.password && (
-                <p className="text-red-500 text-sm">
+                <p className="text-red-500 dark:text-red-400 text-sm">
                   영문과 숫자를 포함하여 8-20자로 입력해주세요.
                 </p>
               )}
@@ -261,7 +261,7 @@ const SignUp: React.FC = () => {
 
             {/* 비밀번호 확인 */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 비밀번호 확인
               </label>
               <input
@@ -269,16 +269,16 @@ const SignUp: React.FC = () => {
                 value={values.confirmPassword}
                 onChange={(e) => setValue('confirmPassword', e.target.value)}
                 placeholder="••••••••"
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                   values.confirmPassword &&
                   values.password !== values.confirmPassword
                     ? 'border-red-500'
-                    : 'border-gray-300'
+                    : 'border-gray-300 dark:border-gray-600'
                 }`}
               />
               {values.confirmPassword &&
                 values.password !== values.confirmPassword && (
-                  <p className="text-red-500 text-sm">
+                  <p className="text-red-500 dark:text-red-400 text-sm">
                     비밀번호가 일치하지 않습니다.
                   </p>
                 )}
@@ -286,7 +286,7 @@ const SignUp: React.FC = () => {
 
             {/* 이름 */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 이름
               </label>
               <input
@@ -295,14 +295,14 @@ const SignUp: React.FC = () => {
                 onChange={(e) => setValue('name', e.target.value)}
                 onBlur={() => setFieldTouched('name')}
                 placeholder="홍길동"
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                   errors.name && touched.name
                     ? 'border-red-500'
-                    : 'border-gray-300'
+                    : 'border-gray-300 dark:border-gray-600'
                 }`}
               />
               {errors.name && touched.name && (
-                <p className="text-red-500 text-sm">
+                <p className="text-red-500 dark:text-red-400 text-sm">
                   이름은 2-20자로 입력해주세요.
                 </p>
               )}
@@ -310,7 +310,7 @@ const SignUp: React.FC = () => {
 
             {/* 성별 */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 성별
               </label>
               <div className="flex space-x-3">
@@ -319,8 +319,8 @@ const SignUp: React.FC = () => {
                   onClick={() => setValue('gender', 'MALE')}
                   className={`flex-1 py-3 px-4 rounded-lg border transition-all ${
                     values.gender === 'MALE'
-                      ? 'border-orange-500 bg-orange-50 text-orange-600 font-medium'
-                      : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                      ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 font-medium'
+                      : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500'
                   }`}
                 >
                   남성
@@ -330,8 +330,8 @@ const SignUp: React.FC = () => {
                   onClick={() => setValue('gender', 'FEMALE')}
                   className={`flex-1 py-3 px-4 rounded-lg border transition-all ${
                     values.gender === 'FEMALE'
-                      ? 'border-orange-500 bg-orange-50 text-orange-600 font-medium'
-                      : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                      ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 font-medium'
+                      : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500'
                   }`}
                 >
                   여성
@@ -341,7 +341,7 @@ const SignUp: React.FC = () => {
 
             {/* 생년월일 */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 생년월일
               </label>
               <input
@@ -351,14 +351,14 @@ const SignUp: React.FC = () => {
                 onBlur={() => setFieldTouched('birth')}
                 placeholder="1990-01-01"
                 maxLength={10}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                className={`w-full px-4 py-3 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
                   errors.birth && touched.birth
                     ? 'border-red-500'
-                    : 'border-gray-300'
+                    : 'border-gray-300 dark:border-gray-600'
                 }`}
               />
               {errors.birth && touched.birth && (
-                <p className="text-red-500 text-sm">{getBirthErrorMessage()}</p>
+                <p className="text-red-500 dark:text-red-400 text-sm">{getBirthErrorMessage()}</p>
               )}
             </div>
 
@@ -380,7 +380,7 @@ const SignUp: React.FC = () => {
 
             {/* 로그인 링크 */}
             <div className="text-center">
-              <span className="text-gray-600 text-sm">
+              <span className="text-gray-600 dark:text-gray-300 text-sm">
                 이미 계정이 있으신가요?{' '}
               </span>
               <Link

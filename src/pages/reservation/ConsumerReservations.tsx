@@ -228,48 +228,48 @@ const ConsumerReservations: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header
         variant="sub"
         title="예약 내역"
         backRoute={ROUTES.HOME}
         showMenu={true}
       />
-      <div className="max-w-md mx-auto bg-gray-50 min-h-screen p-0 pb-20 relative">
+      <div className="max-w-md mx-auto bg-gray-50 dark:bg-gray-900 min-h-screen p-0 pb-20 relative">
         {/* 탭 네비게이션 */}
-        <div className="bg-white shadow-sm border-b border-gray-200 sticky top-[65px] z-10">
+        <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-[65px] z-10">
           <div className="px-4 py-3">
             {/* 정렬 옵션 */}
             <div className="flex justify-between items-center mb-3">
-              <h3 className="text-lg font-semibold text-gray-900">예약 내역</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">예약 내역</h3>
               <div className="flex items-center gap-2">
                 {/* 정렬 방향 토글 버튼 */}
                 <button
                   onClick={handleSortOrderToggle}
-                  className="flex items-center gap-1 px-3 py-2 bg-orange-100 rounded-lg hover:bg-orange-200 transition-colors"
+                  className="flex items-center gap-1 px-3 py-2 bg-orange-100 dark:bg-orange-900 rounded-lg hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors"
                   title={params.sortOrder === 'DESC' ? '내림차순' : '오름차순'}
                 >
                   {params.sortOrder === 'DESC' ? (
-                    <SortDesc className="w-4 h-4 text-orange-600" />
+                    <SortDesc className="w-4 h-4 text-orange-600 dark:text-orange-400" />
                   ) : (
-                    <SortAsc className="w-4 h-4 text-orange-600" />
+                    <SortAsc className="w-4 h-4 text-orange-600 dark:text-orange-400" />
                   )}
                 </button>
                 {/* 정렬 기준 선택 버튼 */}
                 <div className="relative">
                   <button
                     onClick={() => setShowSortOptions(!showSortOptions)}
-                    className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                   >
-                    <SortIcon className="w-4 h-4 text-gray-600" />
-                    <span className="text-sm text-gray-600">
+                    <SortIcon className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
                       {currentSortOption.label}
                     </span>
-                    <ChevronDown className="w-4 h-4 text-gray-600" />
+                    <ChevronDown className="w-4 h-4 text-gray-600 dark:text-gray-400" />
                   </button>
 
                   {showSortOptions && (
-                    <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                    <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
                       {SORT_OPTIONS.map((option) => {
                         const OptionIcon = option.icon;
                         const isActive = params.sortBy === option.key;
@@ -281,10 +281,10 @@ const ConsumerReservations: React.FC = () => {
                                 option.key as ReservationPagingParams['sortBy'],
                               )
                             }
-                            className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${
+                            className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg ${
                               isActive
-                                ? 'bg-orange-50 text-orange-600'
-                                : 'text-gray-700'
+                                ? 'bg-orange-50 dark:bg-orange-900 text-orange-600 dark:text-orange-400'
+                                : 'text-gray-700 dark:text-gray-300'
                             }`}
                           >
                             <OptionIcon className="w-4 h-4" />

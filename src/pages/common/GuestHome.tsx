@@ -22,7 +22,7 @@ const GuestHome: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header
         showNotification={true}
         onNotificationClick={handleNotificationClick}
@@ -39,8 +39,8 @@ const GuestHome: React.FC = () => {
           <ServiceGrid onServiceClick={handleServiceClick} />
 
           <div className="space-y-6">
-            <div className="bg-white rounded-2xl p-6 border border-gray-100">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-100 dark:border-gray-700">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
                 왜 메이드랩을 선택해야 할까요?
               </h3>
               <div className="space-y-4">
@@ -49,10 +49,10 @@ const GuestHome: React.FC = () => {
                     <span className="text-white text-sm font-bold">✓</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900">
+                    <h4 className="font-semibold text-gray-900 dark:text-white">
                       전문 검증된 도우미
                     </h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
                       신원 확인과 교육을 완료한 믿을 수 있는 전문가들
                     </p>
                   </div>
@@ -62,10 +62,10 @@ const GuestHome: React.FC = () => {
                     <span className="text-white text-sm font-bold">✓</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900">
+                    <h4 className="font-semibold text-gray-900 dark:text-white">
                       투명한 가격 시스템
                     </h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
                       명확한 요금제로 숨겨진 비용 없이 이용 가능
                     </p>
                   </div>
@@ -75,8 +75,10 @@ const GuestHome: React.FC = () => {
                     <span className="text-white text-sm font-bold">✓</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900">만족도 보장</h4>
-                    <p className="text-sm text-gray-600">
+                    <h4 className="font-semibold text-gray-900 dark:text-white">
+                      만족도 보장
+                    </h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
                       서비스 품질에 문제가 있다면 100% 재서비스 제공
                     </p>
                   </div>

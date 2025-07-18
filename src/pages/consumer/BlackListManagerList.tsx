@@ -43,25 +43,25 @@ function ManagerNameModal({
           onClick={() => setOpen(false)}
         >
           <div
-            className="bg-white rounded-xl shadow-lg p-6 min-w-[220px] max-w-xs"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 min-w-[220px] max-w-xs"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-2">
-              <span className="font-bold text-gray-900">도우미 정보</span>
+              <span className="font-bold text-gray-900 dark:text-white">도우미 정보</span>
               <button
                 onClick={() => setOpen(false)}
-                className="text-gray-400 hover:text-gray-600 text-xl"
+                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 text-xl"
               >
                 &times;
               </button>
             </div>
             <div className="mb-2">
-              <div className="font-semibold text-gray-800 break-words">
+              <div className="font-semibold text-gray-800 dark:text-gray-200 break-words">
                 {name}
               </div>
             </div>
             {introduceText && (
-              <div className="text-sm text-gray-600 mt-2 break-words">
+              <div className="text-sm text-gray-600 dark:text-gray-400 mt-2 break-words">
                 {introduceText}
               </div>
             )}
@@ -164,12 +164,12 @@ export default function BlackListManagerList() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">로딩중...</div>
+      <div className="flex justify-center items-center h-64 text-gray-900 dark:text-white">로딩중...</div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header
         variant="sub"
         title="블랙리스트 도우미"
@@ -183,13 +183,13 @@ export default function BlackListManagerList() {
               blacklistManagers.slice(startIndex, endIndex).map((manager) => (
                 <div
                   key={manager.managerUuid}
-                  className="relative bg-white rounded-xl p-6 shadow-sm border border-slate-200 transition-all duration-200 overflow-hidden group"
+                  className="relative bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-slate-200 dark:border-gray-700 transition-all duration-200 overflow-hidden group"
                 >
                   {/* 상단: 프로필, 정보, 삭제 버튼 */}
                   <div className="flex items-start mb-4">
                     {/* 프로필 이미지 */}
                     <div className="w-20 h-20 min-w-[80px] min-h-[80px] relative flex-shrink-0">
-                      <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
+                      <div className="w-full h-full rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-600 dark:to-gray-700 relative overflow-hidden">
                         {manager.profileImage &&
                         !imageLoadErrors[manager.managerUuid] ? (
                           <img
@@ -202,8 +202,8 @@ export default function BlackListManagerList() {
                             loading="lazy"
                           />
                         ) : (
-                          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 rounded-full">
-                            <div className="text-xl font-semibold text-gray-500">
+                          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-600 dark:to-gray-700 rounded-full">
+                            <div className="text-xl font-semibold text-gray-500 dark:text-gray-400">
                               {manager.name.charAt(0)}
                             </div>
                           </div>
@@ -217,7 +217,7 @@ export default function BlackListManagerList() {
                           name={manager.name}
                           introduceText={manager.introduceText}
                         >
-                          <h3 className="text-lg font-semibold text-gray-900 truncate max-w-[120px] block">
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate max-w-[120px] block">
                             {manager.name}
                           </h3>
                         </ManagerNameModal>
@@ -229,7 +229,7 @@ export default function BlackListManagerList() {
                         </div>
                       </div>
                       {manager.introduceText && (
-                        <p className="text-sm text-gray-500 line-clamp-2 text-left mt-1">
+                        <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 text-left mt-1">
                           {manager.introduceText}
                         </p>
                       )}
@@ -239,25 +239,25 @@ export default function BlackListManagerList() {
                         onClick={() =>
                           handleRemoveBlacklist(manager.managerUuid)
                         }
-                        className="h-8 w-8 flex items-center justify-center hover:bg-gray-100 rounded-full transition-colors duration-200"
+                        className="h-8 w-8 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors duration-200"
                         style={{ border: 'none', padding: 0 }}
                         aria-label="삭제"
                       >
-                        <Trash2 className="w-5 h-5 text-gray-400" />
+                        <Trash2 className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                       </button>
                     </div>
                   </div>
                   {/* 하단: 지역 정보 */}
                   {manager.region && manager.region.length > 0 && (
-                    <div className="pt-4 border-t border-slate-200">
+                    <div className="pt-4 border-t border-slate-200 dark:border-gray-700">
                       {renderRegions(manager.region, manager.managerUuid)}
                     </div>
                   )}
                 </div>
               ))
             ) : (
-              <div className="text-center py-12 bg-white rounded-xl shadow-sm">
-                <div className="text-gray-400 mb-2">
+              <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+                <div className="text-gray-400 dark:text-gray-500 mb-2">
                   <svg
                     className="w-12 h-12 mx-auto"
                     fill="none"
@@ -272,10 +272,10 @@ export default function BlackListManagerList() {
                     />
                   </svg>
                 </div>
-                <p className="text-gray-500 font-medium">
+                <p className="text-gray-500 dark:text-gray-400 font-medium">
                   블랙리스트 매니저가 없습니다
                 </p>
-                <p className="text-gray-400 text-sm mt-1">
+                <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">
                   블랙리스트에 추가된 도우미가 없습니다
                 </p>
               </div>
