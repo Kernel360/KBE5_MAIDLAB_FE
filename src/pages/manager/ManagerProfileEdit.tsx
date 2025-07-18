@@ -204,6 +204,23 @@ const ManagerProfileEdit: React.FC = () => {
     return true;
   };
 
+  // 비상연락처 유효성 검사 함수
+  const validateEmergencyCall = () => {
+    if (!profile || profile.emergencyCall === undefined) return true;
+    
+    if (!profile.emergencyCall || !profile.emergencyCall.trim()) {
+      showToast('비상연락처를 입력해주세요.', 'error');
+      return false;
+    }
+    
+    if (!validatePhone(profile.emergencyCall)) {
+      showToast('올바른 휴대폰 번호를 입력해주세요. (예: 01012345678)', 'error');
+      return false;
+    }
+    
+    return true;
+  };
+
   // 제출 함수
   const handleSubmit = async () => {
     if (!profile) return;

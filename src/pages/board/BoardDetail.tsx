@@ -88,6 +88,7 @@ export default function BoardDetail() {
   const [board, setBoard] = useState<BoardDetailResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deleted, setDeleted] = useState(false);
   const [selectedImage, setSelectedImage] = useState<ImageInfo | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
@@ -159,6 +160,7 @@ export default function BoardDetail() {
       setIsDeleting(true);
       const result = await deleteBoard(parseInt(id));
       if (result.success) {
+        setDeleted(true);
         navigate(ROUTES.BOARD.LIST, {
           replace: true,
           state: {

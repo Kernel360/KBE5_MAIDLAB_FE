@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { MessageSquare } from 'lucide-react';
 import { useBoard } from '@/hooks/domain/useBoard';
+import { useToast } from '@/hooks/useToast';
 import { ROUTES } from '@/constants/route';
 import type { BoardResponse } from '@/types/domain/board';
 import BoardItem from '@/components/features/board/BoardItem';
@@ -12,6 +13,7 @@ import Pagination from '@/components/common/Pagination';
 export default function BoardList() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { showToast } = useToast();
   const { boards, loading: isLoading, fetchBoards } = useBoard();
 
   useEffect(() => {
