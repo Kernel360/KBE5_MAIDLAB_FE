@@ -110,6 +110,26 @@ const ManagerDetail = () => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!id || !managerData) return;
+    
+    const confirmDelete = window.confirm(
+      `매니저 "${managerData.name}"를 정말 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`
+    );
+    
+    if (!confirmDelete) return;
+    
+    try {
+      await adminApi.deleteManager(parseInt(id));
+      alert('매니저 계정이 삭제되었습니다.');
+      navigate('/admin/managers');
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : '삭제 처리에 실패했습니다.',
+      );
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('ko-KR', {
       year: 'numeric',
@@ -185,12 +205,22 @@ const ManagerDetail = () => {
           <h1 className="text-2xl font-bold text-gray-900">매니저 상세 정보</h1>
           <p className="text-gray-600 text-sm mt-1">매니저 ID: {id}</p>
         </div>
-        <button
-          className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-700 font-medium"
-          onClick={() => navigate(-1)}
-        >
-          목록으로
-        </button>
+        <div className="flex gap-2">
+          {!managerData.isDeleted && (
+            <button
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
+              onClick={handleDelete}
+            >
+              계정 삭제
+            </button>
+          )}
+          <button
+            className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-700 font-medium"
+            onClick={() => navigate(-1)}
+          >
+            목록으로
+          </button>
+        </div>
       </div>
 
       {/* 삭제된 계정 알림 */}

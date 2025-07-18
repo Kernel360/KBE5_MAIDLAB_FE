@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
 import { env } from '@/config/env';
 
-// 전역 상태 및 EventSource 인스턴스 (싱글톤)
+// 전역 EventSource 인스턴스
 let globalNotifications: NotificationDto[] = [];
 let globalUnreadCount = 0;
 let globalIsConnected = false;
@@ -54,77 +54,84 @@ export const useNotification = () => {
   }, []);
 
   // 페이징된 알림 조회
-  const fetchNotifications = useCallback(async (page: number = 0, size: number = 10, reset: boolean = false) => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
+  const fetchNotifications = useCallback(
+    async (page: number = 0, size: number = 10, reset: boolean = false) => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+          return { notifications: [], hasMore: false };
+        }
+
+        const apiUrl = `${env.API_BASE_URL.replace(/\/$/, '')}/api/notifications?page=${page}&size=${size}`;
+        const response = await fetch(apiUrl, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const rawNotifications = data.data?.content || [];
+          const totalPages = data.data?.totalPages || 0;
+          const currentPage = data.data?.number || 0;
+
+          const convertedNotifications = rawNotifications.map(
+            (notificationData: any) => {
+              const notification: NotificationDto = {
+                id: notificationData.id,
+                senderId: notificationData.senderId,
+                senderType: notificationData.senderType,
+                receiverId: notificationData.receiverId,
+                receiverType: notificationData.receiverType,
+                notificationType: notificationData.notificationType,
+                title: notificationData.title,
+                message: notificationData.message,
+                relatedId: notificationData.relatedId || 0,
+                isRead: notificationData.isRead,
+                createdAt: notificationData.createdAt,
+              };
+              return notification;
+            },
+          );
+
+          if (reset) {
+            updateNotifications(convertedNotifications);
+          } else {
+            updateNotifications([
+              ...globalNotifications,
+              ...convertedNotifications,
+            ]);
+          }
+
+          const unreadCount = convertedNotifications.filter(
+            (n) => !n.isRead,
+          ).length;
+          if (reset) {
+            updateUnreadCount(unreadCount);
+          }
+
+          return {
+            notifications: convertedNotifications,
+            hasMore: currentPage < totalPages - 1,
+          };
+        }
+        return { notifications: [], hasMore: false };
+      } catch (error) {
+        console.error('[API] 알림 조회 중 오류:', error);
         return { notifications: [], hasMore: false };
       }
-
-      const apiUrl = `${env.API_BASE_URL.replace(/\/$/, '')}/api/notifications?page=${page}&size=${size}`;
-      const response = await fetch(apiUrl, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const rawNotifications = data.data?.content || [];
-        const totalPages = data.data?.totalPages || 0;
-        const currentPage = data.data?.number || 0;
-        
-        const convertedNotifications = rawNotifications.map(
-          (notificationData: any) => {
-            const notification: NotificationDto = {
-              id: notificationData.id,
-              senderId: notificationData.senderId,
-              senderType: notificationData.senderType,
-              receiverId: notificationData.receiverId,
-              receiverType: notificationData.receiverType,
-              notificationType: notificationData.notificationType,
-              title: notificationData.title,
-              message: notificationData.message,
-              relatedId: notificationData.relatedId || 0,
-              isRead: notificationData.isRead,
-              createdAt: notificationData.createdAt,
-            };
-            return notification;
-          },
-        );
-
-        if (reset) {
-          updateNotifications(convertedNotifications);
-        } else {
-          updateNotifications([...globalNotifications, ...convertedNotifications]);
-        }
-
-        const unreadCount = convertedNotifications.filter(n => !n.isRead).length;
-        if (reset) {
-          updateUnreadCount(unreadCount);
-        }
-
-        return {
-          notifications: convertedNotifications,
-          hasMore: currentPage < totalPages - 1
-        };
-      }
-      return { notifications: [], hasMore: false };
-    } catch (error) {
-      console.error('[API] 알림 조회 중 오류:', error);
-      return { notifications: [], hasMore: false };
-    }
-  }, []);
+    },
+    [],
+  );
 
   // 읽지 않은 알림 조회 (기존 호환성 유지)
   const fetchUnreadNotifications = useCallback(async () => {
     await fetchNotifications(0, 10, true);
   }, [fetchNotifications]);
 
-  // SSE 연결 (싱글톤)
   const connectSSE = useCallback(() => {
-    // 이미 연결되어 있으면 새로 연결하지 않음
+    // 전역 변수로 여러컴포넌트에서 함수를 사용해도 하나의 연결만을 유지하도록 제한
     if (globalEventSource) {
       if (globalEventSource.readyState === 1) {
         updateIsConnected(true);

@@ -64,6 +64,26 @@ const ConsumerDetail = () => {
     setRecentReservations(reservations || []);
   };
 
+  const handleDelete = async () => {
+    if (!id || !consumerData) return;
+    
+    const confirmDelete = window.confirm(
+      `소비자 "${consumerData.name}"를 정말 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`
+    );
+    
+    if (!confirmDelete) return;
+    
+    try {
+      await adminApi.deleteConsumer(parseInt(id));
+      alert('소비자 계정이 삭제되었습니다.');
+      navigate('/admin/consumers');
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : '삭제 처리에 실패했습니다.',
+      );
+    }
+  };
+
   if (loading) {
     return (
       <div className="max-w-5xl mx-auto p-6">
@@ -116,12 +136,22 @@ const ConsumerDetail = () => {
           <h1 className="text-2xl font-bold text-gray-900">소비자 상세 정보</h1>
           <p className="text-gray-600 text-sm mt-1">소비자 ID: {id}</p>
         </div>
-        <button
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
-          onClick={() => navigate(-1)}
-        >
-          목록으로
-        </button>
+        <div className="flex gap-2">
+          {!consumerData.isDeleted && (
+            <button
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
+              onClick={handleDelete}
+            >
+              계정 삭제
+            </button>
+          )}
+          <button
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+            onClick={() => navigate(-1)}
+          >
+            목록으로
+          </button>
+        </div>
       </div>
 
       {/* 삭제된 계정 알림 */}

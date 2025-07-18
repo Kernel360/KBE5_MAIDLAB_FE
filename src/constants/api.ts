@@ -137,6 +137,7 @@ export const API_ENDPOINTS = {
       DETAIL: (id: number) => `/api/admin/manager/${id}`,
       APPROVE: (id: number) => `/api/admin/manager/${id}/approve`,
       REJECT: (id: number) => `/api/admin/manager/${id}/reject`,
+      DELETE: (id: number) => `/api/admin/manager/${id}`,
       STATUS: '/api/admin/manager/status',
       GETCOUNT: '/api/admin/manager/managercount',
       NEWMANAGERCOUNT: '/api/admin/manager/newmanagercount',
@@ -144,6 +145,7 @@ export const API_ENDPOINTS = {
     CONSUMER: {
       LIST: '/api/admin/consumer',
       DETAIL: (id: number) => `/api/admin/consumer/${id}`,
+      DELETE: (id: number) => `/api/admin/consumer/${id}`,
       GETCOUNT: '/api/admin/consumer/consumercount',
     },
     RESERVATION: {
