@@ -71,21 +71,15 @@ const SignUp: React.FC = () => {
 
         if (result.success) {
           if (selectedUserType === 'MANAGER') {
-            setTimeout(() => {
-              showToast(
-                '매니저 서비스 제공을 위해 프로필을 완성해주세요.',
-                'info',
-              );
-            }, 1000);
+            showToast(
+              '매니저 서비스 제공을 위해 프로필을 완성해주세요.',
+              'info',
+            );
           } else {
-            setTimeout(() => {
-              showToast('더 나은 서비스를 위해 프로필을 설정해보세요.', 'info');
-            }, 1000);
+            showToast('더 나은 서비스를 위해 프로필을 설정해보세요.', 'info');
           }
 
-          setTimeout(() => {
-            navigateToProfileSetup(selectedUserType);
-          }, 2000);
+          navigateToProfileSetup(selectedUserType);
         } else {
           console.error('회원가입 실패:', result);
           showToast(result.error || '회원가입에 실패했습니다.', 'error');
@@ -377,7 +371,7 @@ const SignUp: React.FC = () => {
               {isLoading ? (
                 <div className="flex items-center justify-center">
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                  가입 중...
+                  프로필 설정 페이지로 이동 중...
                 </div>
               ) : (
                 '회원가입'

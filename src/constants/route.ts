@@ -5,6 +5,7 @@ export const ROUTES = {
   SIGNUP: '/signup',
   SOCIAL_SIGNUP: '/social-signup',
   GOOGLE_CALLBACK: '/google-callback',
+  GOOGLE_MAP: '/google-map',
   EVENTS: '/events',
   NOT_FOUND: '/404',
   EVENT_DETAIL: '/events/:id',

@@ -7,6 +7,7 @@ import type {
   PasswordChangeRequest,
   LoginResponse,
   SocialLoginResponse,
+  SocialSignUpResponse,
 } from '@/types/domain/auth';
 import { API_ENDPOINTS } from '@/constants/api';
 
@@ -58,8 +59,8 @@ export const authApi = {
   socialSignUp: async (
     data: SocialSignUpRequest,
     tempToken: string,
-  ): Promise<void> => {
-    return apiCall<void>('post', API_ENDPOINTS.AUTH.SOCIAL_SIGNUP, data, {
+  ): Promise<SocialSignUpResponse> => {
+    return apiCall<SocialSignUpResponse>('post', API_ENDPOINTS.AUTH.SOCIAL_SIGNUP, data, {
       headers: {
         Authorization: `Bearer ${tempToken}`,
         'Content-Type': 'application/json',

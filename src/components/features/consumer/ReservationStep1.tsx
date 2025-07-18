@@ -62,8 +62,8 @@ const ReservationStep1: React.FC<Props> = ({ onNext, onBack }) => {
       <Header
         variant="sub"
         title="서비스 상세 옵션 선택"
-        backRoute={ROUTES.HOME}
-        showMenu={true}
+        backRoute={ROUTES.CONSUMER.RESERVATION_CREATE}
+        showMenu={false}
       />
       <main className="px-4 py-6 pb-20">
         <div className="max-w-md mx-auto space-y-6">

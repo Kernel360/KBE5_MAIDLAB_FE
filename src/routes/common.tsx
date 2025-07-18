@@ -11,6 +11,8 @@ import {
   EventDetail,
   EventList,
 } from '@/pages';
+import GoogleMap from '@/pages/reservation/GoogleMap';
+import { Status, Wrapper } from '@googlemaps/react-wrapper';
 
 export const CommonRoutes = () => (
   <>
@@ -59,6 +61,43 @@ export const CommonRoutes = () => (
       element={
         <ProtectedRoute requireAuth={false}>
           <GoogleCallback />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path={ROUTES.GOOGLE_MAP}
+      element={
+        <ProtectedRoute requireAuth={false}>
+          <Wrapper
+            apiKey={import.meta.env.VITE_GOOGLEMAP_API_KEY}
+            render={(status: Status) => {
+              switch (status) {
+                case Status.LOADING:
+                  return (
+                    <div className="flex items-center justify-center min-h-screen">
+                      <div className="flex items-center">
+                        <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mr-3" />
+                        <span className="text-lg text-gray-700">지도 로딩 중...</span>
+                      </div>
+                    </div>
+                  );
+                case Status.FAILURE:
+                  return (
+                    <div className="flex items-center justify-center min-h-screen">
+                      <span className="text-lg text-red-500">지도 로딩 실패</span>
+                    </div>
+                  );
+                case Status.SUCCESS:
+                  return <GoogleMap />;
+              }
+            }}
+            libraries={['places']}
+            language="ko"
+            region="KR"
+          >
+            <GoogleMap />
+          </Wrapper>
         </ProtectedRoute>
       }
     />

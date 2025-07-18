@@ -106,9 +106,7 @@ const ConsumerProfileSetup: React.FC = () => {
       const result = await createProfile(profileData);
 
       if (result?.success !== false) {
-        setTimeout(() => {
-          navigate(ROUTES.HOME, { replace: true });
-        }, 1500);
+        navigate(ROUTES.HOME, { replace: true });
       }
     } catch (error) {
       console.error('프로필 등록 실패:', error);

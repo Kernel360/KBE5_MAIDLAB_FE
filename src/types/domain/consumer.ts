@@ -20,6 +20,7 @@ export interface ConsumerProfileUpdateRequest {
   birth?: string;
   address?: string;
   detailAddress?: string;
+  emergencyCall?: string;
 }
 
 /**
@@ -32,6 +33,7 @@ export interface ConsumerProfileResponse {
   gender: Gender;
   address?: string;
   detailAddress?: string;
+  emergencyCall?: string | null; // 소셜 로그인 사용자만 값이 있음
 }
 
 /**
@@ -182,6 +184,7 @@ export interface ProfileData {
   address: string;
   detailAddress: string;
   profileImage: string | undefined;
+  emergencyCall?: string | null;
 }
 
 export interface PointRecordResponseDto {

@@ -36,6 +36,7 @@ export interface SocialLoginRequest {
 export interface SocialSignUpRequest {
   birth: string;
   gender: Gender;
+  emergencyCall: string;
 }
 
 /**
@@ -62,6 +63,15 @@ export interface SocialLoginResponse {
   profileCompleted: boolean;
   accessToken: string;
   expirationTime: number;
+}
+
+/**
+ * 소셜 회원가입 응답
+ */
+export interface SocialSignUpResponse {
+  accessToken: string;
+  expirationTime: string | number; // LocalDateTime은 ISO 문자열이나 timestamp로 올 수 있음
+  profileCompleted: boolean;
 }
 
 /**
@@ -119,6 +129,7 @@ export interface SignUpFormData {
 export interface SocialSignUpFormData {
   birth: string;
   gender: Gender;
+  emergencyCall: string;
 }
 
 /**

@@ -316,17 +316,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         dispatch({ type: 'AUTH_START' });
 
         const tempToken = localStorage.getItem('tempSocialToken');
-        if (!tempToken) {
+        const userType = localStorage.getItem('tempUserType') as UserType;
+        
+        if (!tempToken || !userType) {
           throw new Error('인증 정보가 없습니다.');
         }
 
-        await authApi.socialSignUp(data, tempToken);
+        // 회원가입 후 토큰 받기
+        const response = await authApi.socialSignUp(data, tempToken);
 
+        // 토큰으로 로그인 처리
+        authLogin(response.accessToken, userType);
+
+        // userInfo에 서버 응답 전체 저장 및 localStorage에도 저장
+        dispatch({
+          type: 'AUTH_SUCCESS',
+          payload: { userType: userType, userInfo: response },
+        });
+        localStorage.setItem('userInfo', JSON.stringify(response));
+
+        // 임시 토큰 정리
         localStorage.removeItem('tempSocialToken');
         localStorage.removeItem('tempUserType');
 
-        dispatch({ type: 'AUTH_LOGOUT' });
         showToast(SUCCESS_MESSAGES.SIGNUP, 'success');
+
+        // 프로필 설정 페이지로 이동
+        navigateToProfileSetup(userType, response.profileCompleted || false);
 
         return { success: true };
       } catch (error: any) {
@@ -339,7 +355,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return { success: false, error: errorMessage };
       }
     },
-    [showToast],
+    [showToast, navigateToProfileSetup],
   );
 
   // 🆕 로그아웃 함수 - API 호출 실패해도 로컬 로그아웃 진행
