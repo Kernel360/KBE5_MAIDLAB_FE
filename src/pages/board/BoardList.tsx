@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { MessageSquare } from 'lucide-react';
 import { useBoard } from '@/hooks/domain/useBoard';
 import { ROUTES } from '@/constants/route';
@@ -7,31 +7,33 @@ import type { BoardResponse } from '@/types/domain/board';
 import BoardItem from '@/components/features/board/BoardItem';
 import { usePagination } from '@/hooks';
 import { Header } from '@/components/layout/Header/Header';
+import Pagination from '@/components/common/Pagination';
 
 export default function BoardList() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { boards, loading: isLoading, fetchBoards } = useBoard();
 
   useEffect(() => {
     fetchBoards();
   }, [fetchBoards]);
 
+  useEffect(() => {
+    if (location.state && location.state.toast) {
+      const { message, type } = location.state.toast;
+      showToast(message, type);
+      // 히스토리 state 초기화 (중복 방지)
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state, showToast]);
+
   const handleCreate = () => {
     navigate(ROUTES.BOARD.CREATE);
   };
 
   // 페이지네이션 적용 (5개씩)
-  const {
-    currentPage,
-    totalPages,
-    startIndex,
-    endIndex,
-    hasNext,
-    hasPrevious,
-    goToPage,
-    goToNext,
-    goToPrevious,
-  } = usePagination({ totalItems: boards.length, itemsPerPage: 5 });
+  const { currentPage, totalPages, startIndex, endIndex, goToPage } =
+    usePagination({ totalItems: boards.length, itemsPerPage: 5 });
 
   if (isLoading) {
     return (
@@ -73,32 +75,13 @@ export default function BoardList() {
                     />
                   ))}
               </div>
-              {/* 페이지네이션 UI */}
-              <div className="flex justify-center items-center gap-2 mt-8">
-                <button
-                  onClick={goToPrevious}
-                  disabled={!hasPrevious}
-                  className="px-3 py-1 rounded bg-gray-100 text-gray-500 hover:bg-gray-200 disabled:opacity-50"
-                >
-                  이전
-                </button>
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => goToPage(i)}
-                    className={`px-3 py-1 rounded font-medium ${currentPage === i ? 'bg-orange-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-                <button
-                  onClick={goToNext}
-                  disabled={!hasNext}
-                  className="px-3 py-1 rounded bg-gray-100 text-gray-500 hover:bg-gray-200 disabled:opacity-50"
-                >
-                  다음
-                </button>
-              </div>
+              {/* 페이지네이션 */}
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={goToPage}
+                loading={isLoading}
+              />
             </>
           ) : (
             /* 빈 상태 */

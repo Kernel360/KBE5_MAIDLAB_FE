@@ -7,7 +7,7 @@ import {
   getReservationStatusText,
 } from '@/utils/reservationStatus';
 import type { ReservationListResponse } from '@/types/domain/reservation';
-import { Calendar, Clock, DollarSign, ChevronRight } from 'lucide-react';
+import { Calendar, Clock, DollarSign, ChevronRight, Star, Gift } from 'lucide-react';
 
 interface ReservationCardProps {
   reservation: ReservationListResponse;
@@ -114,10 +114,17 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({
         )}
         {showReviewButton && onReviewClick && (
           <button
-            className="flex-1 flex items-center justify-center text-sm bg-orange-500 text-white rounded-xl px-3 py-2 hover:bg-orange-600 transition"
+            className="flex-1 flex flex-col items-center justify-center text-sm bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl px-3 py-3 hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-sm hover:shadow-md"
             onClick={(e) => onReviewClick(reservation.reservationId, e)}
           >
-            <span>리뷰 작성</span>
+            <div className="flex items-center gap-1 mb-1">
+              <Star className="w-4 h-4" />
+              <span className="font-medium">리뷰 작성</span>
+            </div>
+            <div className="flex items-center gap-1 text-xs opacity-90">
+              <Gift className="w-3 h-3" />
+              <span>500 포인트 획득</span>
+            </div>
           </button>
         )}
       </div>

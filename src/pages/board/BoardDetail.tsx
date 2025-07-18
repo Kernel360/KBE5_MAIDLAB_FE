@@ -104,6 +104,7 @@ export default function BoardDetail() {
   };
 
   useEffect(() => {
+    if (deleted || isDeleting) return; // 삭제 중/삭제 후에는 fetchBoardDetail 실행 안 함
     let isComponentMounted = true;
 
     const loadBoard = async () => {
@@ -113,32 +114,32 @@ export default function BoardDetail() {
         setIsLoading(true);
         const data = await fetchBoardDetail(parseInt(id));
 
-        if (!isComponentMounted) return;
+        if (!isComponentMounted || deleted || isDeleting) return;
 
         if (data) {
           setBoard(data);
         } else {
           showToast('게시글을 찾을 수 없습니다.', 'error');
           setTimeout(() => {
-            if (isComponentMounted) {
+            if (isComponentMounted && !deleted && !isDeleting) {
               navigate(ROUTES.BOARD.LIST);
             }
           }, 1000);
         }
       } catch (error: any) {
-        if (isComponentMounted) {
+        if (isComponentMounted && !deleted && !isDeleting) {
           showToast(
             error.message || '게시글을 불러오는데 실패했습니다.',
             'error',
           );
           setTimeout(() => {
-            if (isComponentMounted) {
+            if (isComponentMounted && !deleted && !isDeleting) {
               navigate(ROUTES.BOARD.LIST);
             }
           }, 1000);
         }
       } finally {
-        if (isComponentMounted) {
+        if (isComponentMounted && !deleted && !isDeleting) {
           setIsLoading(false);
         }
       }
@@ -149,7 +150,7 @@ export default function BoardDetail() {
     return () => {
       isComponentMounted = false;
     };
-  }, [id, navigate, showToast, fetchBoardDetail]);
+  }, [id, navigate, showToast, fetchBoardDetail, deleted, isDeleting]);
 
   const handleDelete = async () => {
     if (!id) return;
@@ -158,8 +159,15 @@ export default function BoardDetail() {
       setIsDeleting(true);
       const result = await deleteBoard(parseInt(id));
       if (result.success) {
-        showToast('게시글이 삭제되었습니다.', 'success');
-        navigate(ROUTES.BOARD.LIST);
+        navigate(ROUTES.BOARD.LIST, {
+          replace: true,
+          state: {
+            toast: { message: '게시글이 삭제되었습니다.', type: 'success' },
+          },
+        });
+        return;
+      } else {
+        throw new Error('게시글 삭제에 실패했습니다.');
       }
     } catch (error: any) {
       showToast(error.message || '게시글 삭제에 실패했습니다.', 'error');
@@ -168,6 +176,8 @@ export default function BoardDetail() {
       setShowDeleteModal(false);
     }
   };
+
+  if (deleted) return null;
 
   if (isLoading) {
     return (
