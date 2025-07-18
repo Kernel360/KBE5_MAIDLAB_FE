@@ -336,7 +336,10 @@ const ManagerHome: React.FC = () => {
                       const reservationMonth = new Date(
                         r.reservationDate,
                       ).getMonth();
-                      return reservationMonth === today.getMonth();
+                      return (
+                        reservationMonth === today.getMonth() &&
+                        r.status === RESERVATION_STATUS.PAID
+                      );
                     }).length
                   }
                 </p>
