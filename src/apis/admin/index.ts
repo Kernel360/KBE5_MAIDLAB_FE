@@ -87,6 +87,16 @@ export const adminApi = {
   },
 
   /**
+   * 매니저 삭제
+   */
+  deleteManager: async (managerId: number): Promise<string> => {
+    return apiCall<string>(
+      'delete',
+      API_ENDPOINTS.ADMIN.MANAGER.DELETE(managerId),
+    );
+  },
+
+  /**
    * 매니저 상태별 조회
    */
   getManagersByStatus: async (
@@ -129,6 +139,16 @@ export const adminApi = {
     return apiCall<ConsumerProfileDetail>(
       'get',
       API_ENDPOINTS.ADMIN.CONSUMER.DETAIL(consumerId),
+    );
+  },
+
+  /**
+   * 소비자 삭제
+   */
+  deleteConsumer: async (consumerId: number): Promise<string> => {
+    return apiCall<string>(
+      'delete',
+      API_ENDPOINTS.ADMIN.CONSUMER.DELETE(consumerId),
     );
   },
 
