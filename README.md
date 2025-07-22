@@ -178,4 +178,3 @@ Kernel360 5기
 ---
 
 **문의사항이나 버그 리포트는 [GitHub Issues](https://github.com/Kernel360/KBE5_MAIDLAB_BE/issues)를 통해 제보해 주세요.**
-- **개발 가이드**: [https://dev.maidlab.site](https://dev.maidlab.kr)
