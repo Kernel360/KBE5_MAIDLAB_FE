@@ -8,7 +8,13 @@ MaidLab은 바쁜 현대인의 일상을 지원하기 위해 청소, 베이비�
 
 ## 🌐 배포 사이트
 
-**배포 URL**: https://www.maidlab.site/ 
+**배포 URL**
+- Consumer & Manager [https://www.maidlab.site/]
+- Admin [https://www.maidlab.site/admin/login]
+
+**test account**
+- Consumer & Manager (id: 01052339896, pw: admin1234)
+- Admin (id: admin, pw: admin1234)
 
 ## 🛠️ 기술 스택
 
