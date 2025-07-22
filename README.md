@@ -1,75 +1,16 @@
-# MaidLab Frontend - 가사서비스 플랫폼
+# MaidLab - 생활 서비스 매칭 플랫폼
 
-[![React](https://img.shields.io/badge/React-18.2.0-blue)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue)](https://www.typescriptlang.org/)
-[![Vite](https://img.shields.io/badge/Vite-6.3.5-green)](https://vitejs.dev/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.3.0-blue)](https://tailwindcss.com/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+## 📄 프로젝트 소개
 
-## 📋 프로젝트 개요
+MaidLab은 바쁜 현대인의 일상을 지원하기 위해 청소, 베이비시터, 반려동물 케어 등의 생활 서비스를 제공하고, 고객(수요자)과 매니저(공급자)를 스마트하게 매칭하는 종합 생활 서비스 플랫폼입니다.
 
-**MaidLab**은 가사도우미 및 돌봄서비스 플랫폼으로, **React 18 + TypeScript + Vite**로 구축된 웹 애플리케이션입니다.
+고객은 필요한 서비스를 손쉽게 예약하고, 매니저는 자신의 전문성을 바탕으로 안정적인 수익을 창출할 수 있도록 도와주는 양방향 플랫폼입니다.
 
-### 🎯 주요 특징
+## 🌐 배포 사이트
 
-- **🔐 멀티롤 아키텍처**: 소비자(수요자), 매니저, 관리자 역할 분리
-- **🚀 모던 기술스택**: React 18, TypeScript, Vite, Tailwind CSS
-- **🎨 반응형 디자인**: 모바일 퍼스트, 다크모드 지원
-- **🔒 보안 강화**: JWT 기반 인증, 소셜 로그인, 권한 기반 접근제어
+**배포 URL**: https://www.maidlab.site/ 
 
-## 🏗️ 아키텍처 구조
-
-```
-src/
-├── 🔌 apis/           # API 통신 레이어 (8개 도메인)
-├── 🧩 components/     # React 컴포넌트 시스템
-│   ├── common/        # 공통 컴포넌트
-│   ├── features/      # 기능별 컴포넌트
-│   └── layout/        # 레이아웃 컴포넌트
-├── 🪝 hooks/          # 커스텀 훅 (20+ 훅)
-├── 📄 pages/          # 페이지 컴포넌트
-├── 🗺️ routes/         # 라우팅 시스템 (5개 모듈)
-├── 🏷️ types/          # TypeScript 타입 정의
-├── 🔧 constants/      # 상수 관리 (15+ 파일)
-├── 🛠️ utils/          # 유틸리티 함수 (12+ 모듈)
-├── ⚙️ config/         # 환경 설정
-└── 🎨 styles/         # 스타일 시스템
-```
-
-## 🚀 빠른 시작
-
-### 필수 요구사항
-
-- **Node.js** 18.0.0 이상
-- **npm** 8.0.0 이상 또는 **yarn** 1.22.0 이상
-
-### 설치 및 실행
-
-```bash
-# 1. 의존성 설치
-npm install
-
-# 2. 개발 서버 시작
-npm run dev
-
-# 3. 브라우저에서 확인
-# http://localhost:5173
-```
-
-### 환경 변수 설정
-
-```bash
-# .env.development
-NODE_ENV=development
-VITE_APP_ENV=development
-VITE_API_BASE_URL=https://api-maidlab.duckdns.org
-VITE_APP_NAME=MaidLab
-VITE_GOOGLE_CLIENT_ID=your_google_client_id
-```
-
-## 🎨 기술 스택
-
-### 핵심 기술
+## 🛠️ 기술 스택
 
 | 분야         | 기술         | 버전   | 설명                        |
 | ------------ | ------------ | ------ | --------------------------- |
@@ -80,6 +21,26 @@ VITE_GOOGLE_CLIENT_ID=your_google_client_id
 | **상태관리** | React Query  | 5.76.1 | 서버 상태 관리              |
 | **라우팅**   | React Router | 6.21.3 | 클라이언트 사이드 라우팅    |
 | **HTTP**     | Axios        | 1.9.0  | HTTP 클라이언트             |
+
+### Authentication & Security
+
+- **JWT (JSON Web Token)** - 토큰 기반 인증
+- **Google OAuth 2.0** - 소셜 로그인
+
+### Cloud & Storage
+
+- **AWS S3** - 파일 저장소 (이미지, 문서)
+- **AWS CloudFront** - CDN (콘텐츠 배포)
+
+### API & Documentation
+
+- **SpringDoc OpenAPI 3** - API 문서화 (Swagger)
+- **Server-Sent Events (SSE)** - 실시간 알림
+
+### DevOps & Infrastructure
+
+- **GitHub Actions** - CI/CD 파이프라인
+- **Vercel** - 배포 환경
 
 ### UI/UX 라이브러리
 
@@ -100,9 +61,8 @@ VITE_GOOGLE_CLIENT_ID=your_google_client_id
 ### 2. 📱 예약 시스템
 
 - **다단계 예약 프로세스**: 서비스 선택 → 매니저 선택 → 예약 확정
-- **실시간 매니저 매칭**: 위치 기반 매니저 검색
+- **실시간 매니저 매칭**: 데이터 기반 매니저 검색
 - **가격 계산**: 서비스 타입, 평수, 추가 옵션 기반
-- **체크인/체크아웃**: GPS 기반 위치 확인
 
 ### 3. 👥 사용자 관리
 
@@ -134,53 +94,6 @@ VITE_GOOGLE_CLIENT_ID=your_google_client_id
 - **환불 게시판**: 환불 요청 및 처리
 - **이미지 업로드**: 파일 첨부 지원
 
-## 🔒 보안 기능
-
-### 인증 및 권한
-
-- **JWT 토큰 기반 인증**
-- **자동 토큰 갱신 시스템**
-- **역할 기반 접근제어 (RBAC)**
-- **라우트 보호 및 권한 검증**
-
-### 데이터 보호
-
-- **개인정보 마스킹**: 이름, 전화번호, 이메일
-- **HTTPS 통신**: 모든 API 통신 암호화
-- **XSS 방지**: 입력값 검증 및 sanitization
-- **CSRF 보호**: 토큰 기반 요청 검증
-
-## 📊 성능 최적화
-
-### 번들 최적화
-
-- **코드 분할**: 라우트 기반 lazy loading
-- **트리 쉐이킹**: 불필요한 코드 제거
-- **이미지 최적화**: WebP 형식 지원
-- **압축**: Terser 기반 minification
-
-### 로딩 성능
-
-- **React Query**: 데이터 캐싱 및 백그라운드 업데이트
-- **Suspense**: 컴포넌트 lazy loading
-- **프리로딩**: 중요 리소스 우선 로딩
-
-## 📱 모바일 지원
-
-### 반응형 디자인
-
-- **모바일 퍼스트**: 320px ~ 1920px 대응
-- **터치 최적화**: 44px 최소 터치 영역
-- **iOS Safari 호환**: 100vh 문제 해결
-- **PWA 준비**: 서비스 워커 설정
-
-### 접근성 (A11Y)
-
-- **키보드 네비게이션**: 모든 기능 키보드 접근 가능
-- **스크린 리더**: ARIA 라벨 및 역할 정의
-- **색상 대비**: WCAG 2.1 AA 준수
-- **포커스 관리**: 명확한 포커스 표시
-
 ## 🔄 API 연동
 
 ### API 구조
@@ -200,12 +113,24 @@ const apiClient = {
 };
 ```
 
-### 에러 처리
+## 🏗️ 아키텍처 구조
 
-- **통합 에러 핸들링**: 모든 API 에러 중앙 처리
-- **한국어 에러 메시지**: 사용자 친화적 메시지
-- **재시도 로직**: 네트워크 오류 자동 재시도
-- **오프라인 지원**: 네트워크 상태 감지
+```
+src/
+├── apis/           # API 통신 레이어
+├── components/     # React 컴포넌트 시스템
+│   ├── common/     # 공통 컴포넌트
+│   ├── features/   # 기능별 컴포넌트
+│   └── layout/     # 레이아웃 컴포넌트
+├── hooks/          # 커스텀 훅
+├── pages/          # 페이지 컴포넌트
+├── routes/         # 라우팅 시스템
+├── types/          # TypeScript 타입 정의
+├── constants/      # 상수 관리
+├── utils/          # 유틸리티 함수
+├── config/         # 환경 설정
+└── styles/         # 스타일 시스템
+```
 
 ## 📚 프로젝트 구조 상세
 
@@ -214,7 +139,7 @@ const apiClient = {
 #### 1. API 레이어 (`/apis`)
 
 - **8개 도메인**: auth, admin, board, consumer, event, manager, matching, reservation
-- **중앙집중식 에러 처리**: 15가지 백엔드 에러 코드 매핑
+- **중앙집중식 에러 처리**: 백엔드 에러 코드 매핑
 - **토큰 관리**: 자동 갱신 및 재시도 로직
 
 #### 2. 컴포넌트 시스템 (`/components`)
@@ -241,39 +166,16 @@ const apiClient = {
 - **서비스 설정**: 가격표, 지역 정보, 서비스 타입
 - **검증 규칙**: 한국 특화 검증 패턴
 
-## 🌟 주요 하이라이트
+## 👥 개발팀
 
-### 기술적 혁신
+**MAIDLAB Backend Team**  
+Kernel360 5기
 
-1. **동시성 토큰 갱신**: 여러 API 요청 시 토큰 갱신 중복 방지
-2. **스마트 인터셉터**: 공개/비공개 엔드포인트 자동 구분
-3. **타입 안전 API**: 제네릭 기반 타입 안전 보장
-4. **한국 특화 검증**: 윤년 고려 생년월일, 한국 전화번호 형식
+### 팀원 구성
+- **팀장**: 이소은
+- **팀원**: 김진성, 조승현, 변재호
 
-### 사용자 경험
+---
 
-1. **직관적 UI**: 한국 사용자 친화적 인터페이스
-2. **빠른 로딩**: 코드 분할 및 지연 로딩
-3. **오프라인 지원**: 네트워크 상태 기반 UX
-4. **접근성**: 키보드 네비게이션, 스크린 리더 지원
-
-### 개발 효율성
-
-1. **강력한 타입 시스템**: 컴파일 타임 에러 방지
-2. **자동화된 워크플로우**: 빌드, 테스트, 배포 자동화
-3. **일관된 코드 스타일**: ESLint + Prettier 통합
-4. **개발자 도구**: 개발 서버, 핫 리로드, 디버깅 지원
-
-## 📞 지원 및 문의
-
-### 개발팀 연락처
-
-- **이메일**: dev@maidlab.kr
-- **Slack**: #maidlab-dev
-- **이슈 트래커**: [GitHub Issues](https://github.com/maidlab/frontend/issues)
-
-### 문서 및 리소스
-
-- **API 문서**: [https://docs.maidlab.site](https://docs.maidlab.kr)
-- **디자인 시스템**: [https://design.maidlab.site](https://design.maidlab.kr)
+**문의사항이나 버그 리포트는 [GitHub Issues](https://github.com/Kernel360/KBE5_MAIDLAB_BE/issues)를 통해 제보해 주세요.**
 - **개발 가이드**: [https://dev.maidlab.site](https://dev.maidlab.kr)
